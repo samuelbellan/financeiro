@@ -122,4 +122,33 @@ class ExportController extends Controller
 
         return abort(404);
     }
+
+    public function exportOrcamentoPost(Request $request, $format)
+    {
+        $user = Auth::user();
+        $mes = $request->get('mes', now()->month);
+        $ano = $request->get('ano', now()->year);
+
+        $transacoes = Transacao::where('user_id', $user->id)
+            ->whereMonth('data', $mes)
+            ->whereYear('data', $ano)
+            ->get();
+
+        $previsoes = TransacaoPrevisao::where('user_id', $user->id)
+            ->where('mes', $mes)
+            ->where('ano', $ano)
+            ->get();
+
+        $filename = "orcamento_{$mes}_{$ano}";
+        
+        $chart1 = $request->get('chart1');
+        $chart2 = $request->get('chart2');
+
+        if ($format === 'pdf') {
+            $pdf = Pdf::loadView('exports.orcamento_pdf', compact('transacoes', 'previsoes', 'mes', 'ano', 'chart1', 'chart2'));
+            return $pdf->download("{$filename}.pdf");
+        }
+
+        return abort(404);
+    }
 }

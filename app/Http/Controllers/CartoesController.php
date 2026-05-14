@@ -141,12 +141,18 @@ class CartoesController extends Controller
         $validated = $request->validate([
             'cartao_id' => 'required|exists:cartoes,id',
             'descricao' => 'required|string|max:255',
-            'valor_total' => 'required|numeric|min:0',
+            'valor_total' => 'required|numeric',
             'tipo' => 'required|in:avista,parcelada,recorrente',
             'numero_parcelas' => 'required_if:tipo,parcelada|integer|min:1',
             'data_compra' => 'required|date',
             'categoria' => 'nullable|string|max:255',
         ]);
+
+        if ($request->has('is_estorno') && $request->is_estorno) {
+            $validated['valor_total'] = -abs($validated['valor_total']);
+        } else {
+            $validated['valor_total'] = abs($validated['valor_total']);
+        }
 
         $compra = CartaoCompra::create($validated);
         $this->gerarParcelas($compra);
@@ -161,12 +167,18 @@ class CartoesController extends Controller
         $validated = $request->validate([
             'cartao_id' => 'required|exists:cartoes,id',
             'descricao' => 'required|string|max:255',
-            'valor_total' => 'required|numeric|min:0',
+            'valor_total' => 'required|numeric',
             'tipo' => 'required|in:avista,parcelada,recorrente',
             'numero_parcelas' => 'required_if:tipo,parcelada|integer|min:1',
             'data_compra' => 'required|date',
             'categoria' => 'nullable|string|max:255',
         ]);
+
+        if ($request->has('is_estorno') && $request->is_estorno) {
+            $validated['valor_total'] = -abs($validated['valor_total']);
+        } else {
+            $validated['valor_total'] = abs($validated['valor_total']);
+        }
 
         $compra->update($validated);
         

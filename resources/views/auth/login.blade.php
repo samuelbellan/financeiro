@@ -21,7 +21,7 @@
                 <div class="form-group">
                     <label for="email">E-mail</label>
                     <div class="input-wrapper">
-                        <input type="email" id="email" name="email" class="input-field" placeholder="exemplo@email.com" required value="{{ old('email') }}">
+                        <input type="email" id="email" name="email" class="input-field" placeholder="exemplo@email.com" required value="{{ old('email') }}" autocomplete="username">
                     </div>
                     @error('email')
                         <p class="error-message">{{ $message }}</p>
@@ -31,7 +31,7 @@
                 <div class="form-group">
                     <label for="password">Senha</label>
                     <div class="input-wrapper">
-                        <input type="password" id="password" name="password" class="input-field" placeholder="••••••••" required>
+                        <input type="password" id="password" name="password" class="input-field" placeholder="••••••••" required autocomplete="current-password">
                     </div>
                     @error('password')
                         <p class="error-message">{{ $message }}</p>

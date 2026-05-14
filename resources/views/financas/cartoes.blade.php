@@ -60,6 +60,23 @@
             border: 1px solid #e2e8f0; border-radius: 0.5rem; padding: 0.4rem 0.75rem;
             font-family: inherit; font-size: 0.875rem; font-weight: 600; color: #1e293b;
         }
+        .invoice-row { cursor: pointer; transition: background-color 0.2s; }
+        .invoice-row:hover { background-color: #f8fafc; }
+        .row-checked { background-color: #dcfce7 !important; }
+
+        /* Floating Action Button */
+        .fab-container { position: fixed; bottom: 2rem; right: 2rem; z-index: 1000; display: flex; flex-direction: column-reverse; align-items: center; gap: 1rem; }
+        .fab-main { width: 56px; height: 56px; background: #6366f1; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.3); cursor: pointer; border: none; transition: all 0.3s; }
+        .fab-main:hover { transform: scale(1.1); background: #4f46e5; }
+        .fab-menu { display: none; flex-direction: column; gap: 0.75rem; align-items: flex-end; margin-bottom: 0.5rem; }
+        .fab-menu.active { display: flex; animation: slideUp 0.3s ease-out; }
+        .fab-item { display: flex; align-items: center; gap: 0.75rem; text-decoration: none; cursor: pointer; }
+        .fab-item span { background: white; padding: 0.4rem 0.8rem; border-radius: 0.5rem; font-size: 0.8rem; font-weight: 600; color: #1e293b; box-shadow: 0 2px 5px rgba(0,0,0,0.1); white-space: nowrap; }
+        .fab-item-icon { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; box-shadow: 0 2px 5px rgba(0,0,0,0.2); border: none; }
+        .bg-card-blue { background: #6366f1; }
+        .bg-card-green { background: #10b981; }
+
+        @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
@@ -182,33 +199,78 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @php $parcelas = $faturasPorCartao->get($cartao->id) ?? collect(); @endphp
-                                @forelse($parcelas as $f)
-                                    <tr style="border-bottom: 1px solid #f1f5f9; font-size: 0.875rem;">
-                                        <td style="padding: 0.75rem 1.5rem;">{{ \Carbon\Carbon::parse($f->data_vencimento)->format('d/m/Y') }}</td>
-                                        <td style="padding: 0.75rem 1.5rem;">
-                                            {{ $f->compra->descricao }}
-                                            @if($f->compra->tipo == 'parcelada') <span class="tag-parcela">{{ $f->numero_parcela }}/{{ $f->compra->numero_parcelas }}</span> @endif
-                                        </td>
-                                        <td style="padding: 0.75rem 1.5rem;"><span style="color: #64748b;">{{ $f->compra->categoria ?? '-' }}</span></td>
-                                        <td style="padding: 0.75rem 1.5rem; text-align: right; font-weight: 700;">R$ {{ number_format($f->valor_parcela, 2, ',', '.') }}</td>
-                                        <td style="padding: 0.75rem 1.5rem; text-align: center;">
-                                            <div style="display: flex; gap: 5px; justify-content: center;">
-                                                <button onclick="editCompra({{ json_encode($f->compra) }})" class="action-btn-small" title="Editar Lançamento">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4L18.5 2.5z"></path></svg>
-                                                </button>
-                                                <form action="{{ route('cartoes.compras.destroy', $f->compra->id) }}" method="POST" style="display:inline;" onsubmit="return confirm('Excluir toda a compra?')">
-                                                    @csrf @method('DELETE')
-                                                    <button type="submit" class="action-btn-small" title="Excluir Lançamento">
-                                                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                                @php 
+                                    $parcelas = $faturasPorCartao->get($cartao->id) ?? collect(); 
+                                    $avista = $parcelas->filter(fn($p) => in_array($p->compra->tipo, ['avista', 'recorrente']));
+                                    $parceladas = $parcelas->filter(fn($p) => $p->compra->tipo == 'parcelada');
+                                @endphp
+                                
+                                @if($avista->isNotEmpty())
+                                    <tr style="background: #f1f5f9;"><td colspan="5" style="padding: 0.5rem 1.5rem; font-weight: 700; font-size: 0.75rem; color: #475569; text-transform: uppercase;">Compras à Vista / Recorrentes</td></tr>
+                                    @foreach($avista as $f)
+                                        <tr class="invoice-row" onclick="toggleRow(event, this)" style="border-bottom: 1px solid #f1f5f9; font-size: 0.875rem;">
+                                            <td style="padding: 0.75rem 1.5rem;">{{ \Carbon\Carbon::parse($f->data_vencimento)->format('d/m/Y') }}</td>
+                                            <td style="padding: 0.75rem 1.5rem;">
+                                                {{ $f->compra->descricao }}
+                                                @if($f->valor_parcela < 0) <span style="background: #dcfce7; color: #166534; font-size: 0.65rem; padding: 0.125rem 0.375rem; border-radius: 4px; margin-left: 5px; font-weight: 700; text-transform: uppercase;">Estorno</span> @endif
+                                                @if($f->status === 'paga') <span style="background: #dcfce7; color: #166534; font-size: 0.65rem; padding: 0.125rem 0.375rem; border-radius: 4px; margin-left: 5px; font-weight: 700; text-transform: uppercase;">Paga</span> @endif
+                                            </td>
+                                            <td style="padding: 0.75rem 1.5rem;"><span style="color: #64748b;">{{ $f->compra->categoria ?? '-' }}</span></td>
+                                            <td style="padding: 0.75rem 1.5rem; text-align: right; font-weight: 700; color: {{ $f->valor_parcela < 0 ? '#10b981' : 'inherit' }};">
+                                                {{ $f->valor_parcela < 0 ? '-' : '' }} R$ {{ number_format(abs($f->valor_parcela), 2, ',', '.') }}
+                                            </td>
+                                            <td style="padding: 0.75rem 1.5rem; text-align: center;">
+                                                <div style="display: flex; gap: 5px; justify-content: center;">
+                                                    <button onclick="editCompra({{ json_encode($f->compra) }})" class="action-btn-small" title="Editar Lançamento">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4L18.5 2.5z"></path></svg>
                                                     </button>
-                                                </form>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                @empty
+                                                    <form action="{{ route('cartoes.compras.destroy', $f->compra->id) }}" method="POST" style="display:inline;" onsubmit="return confirm('Excluir toda a compra?')">
+                                                        @csrf @method('DELETE')
+                                                        <button type="submit" class="action-btn-small" title="Excluir Lançamento">
+                                                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                                                        </button>
+                                                    </form>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                @endif
+
+                                @if($parceladas->isNotEmpty())
+                                    <tr style="background: #f1f5f9;"><td colspan="5" style="padding: 0.5rem 1.5rem; font-weight: 700; font-size: 0.75rem; color: #475569; text-transform: uppercase;">Compras Parceladas</td></tr>
+                                    @foreach($parceladas as $f)
+                                        <tr class="invoice-row" onclick="toggleRow(event, this)" style="border-bottom: 1px solid #f1f5f9; font-size: 0.875rem;">
+                                            <td style="padding: 0.75rem 1.5rem;">{{ \Carbon\Carbon::parse($f->data_vencimento)->format('d/m/Y') }}</td>
+                                            <td style="padding: 0.75rem 1.5rem;">
+                                                {{ $f->compra->descricao }}
+                                                <span class="tag-parcela">{{ $f->numero_parcela }}/{{ $f->compra->numero_parcelas }}</span>
+                                                @if($f->valor_parcela < 0) <span style="background: #dcfce7; color: #166534; font-size: 0.65rem; padding: 0.125rem 0.375rem; border-radius: 4px; margin-left: 5px; font-weight: 700; text-transform: uppercase;">Estorno</span> @endif
+                                                @if($f->status === 'paga') <span style="background: #dcfce7; color: #166534; font-size: 0.65rem; padding: 0.125rem 0.375rem; border-radius: 4px; margin-left: 5px; font-weight: 700; text-transform: uppercase;">Paga</span> @endif
+                                            </td>
+                                            <td style="padding: 0.75rem 1.5rem;"><span style="color: #64748b;">{{ $f->compra->categoria ?? '-' }}</span></td>
+                                            <td style="padding: 0.75rem 1.5rem; text-align: right; font-weight: 700; color: {{ $f->valor_parcela < 0 ? '#10b981' : 'inherit' }};">
+                                                {{ $f->valor_parcela < 0 ? '-' : '' }} R$ {{ number_format(abs($f->valor_parcela), 2, ',', '.') }}
+                                            </td>
+                                            <td style="padding: 0.75rem 1.5rem; text-align: center;">
+                                                <div style="display: flex; gap: 5px; justify-content: center;">
+                                                    <button onclick="editCompra({{ json_encode($f->compra) }})" class="action-btn-small" title="Editar Lançamento">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4L18.5 2.5z"></path></svg>
+                                                    </button>
+                                                    <form action="{{ route('cartoes.compras.destroy', $f->compra->id) }}" method="POST" style="display:inline;" onsubmit="return confirm('Excluir toda a compra?')">
+                                                        @csrf @method('DELETE')
+                                                        <button type="submit" class="action-btn-small" title="Excluir Lançamento">
+                                                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                                                        </button>
+                                                    </form>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                @endif
+                                
+                                @if($parcelas->isEmpty())
                                     <tr><td colspan="5" style="padding: 2rem; text-align: center; color: #94a3b8;">Vazio.</td></tr>
-                                @endforelse
+                                @endif
                             </tbody>
                         </table>
                     </div>
@@ -230,6 +292,10 @@
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
                     <div class="form-group"><label>Valor Total</label><input type="number" step="0.01" name="valor_total" id="purchaseVal" class="form-input" required></div>
                     <div class="form-group"><label>Tipo</label><select name="tipo" id="purchaseType" class="form-input" onchange="toggleInstallments()"><option value="avista">À vista</option><option value="parcelada">Parcelada</option><option value="recorrente">Recorrente</option></select></div>
+                </div>
+                <div class="form-group" style="display: flex; align-items: center; gap: 0.5rem; margin-top: 0.5rem; margin-bottom: 0.5rem;">
+                    <input type="checkbox" name="is_estorno" id="purchaseEstorno" value="1" style="width: 1rem; height: 1rem; accent-color: var(--primary);">
+                    <label for="purchaseEstorno" style="margin: 0; font-weight: 600; color: #b91c1c;">Lançar como Estorno (Crédito na fatura)</label>
                 </div>
                 <div id="installmentsGroup" class="form-group" style="display: none;"><label>Parcelas</label><input type="number" name="numero_parcelas" id="purchaseInstallments" class="form-input" value="1" min="1"></div>
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
@@ -255,6 +321,7 @@
             document.getElementById('purchaseCardId').value = id;
             document.getElementById('purchaseDesc').value = '';
             document.getElementById('purchaseVal').value = '';
+            document.getElementById('purchaseEstorno').checked = false;
             document.getElementById('purchaseType').value = 'avista';
             document.getElementById('purchaseDate').value = "{{ date('Y-m-d') }}";
             document.getElementById('purchaseCat').value = '';
@@ -268,7 +335,8 @@
             document.getElementById('purchaseMethod').innerHTML = '@method("PUT")';
             document.getElementById('purchaseCardId').value = compra.cartao_id;
             document.getElementById('purchaseDesc').value = compra.descricao;
-            document.getElementById('purchaseVal').value = compra.valor_total;
+            document.getElementById('purchaseVal').value = Math.abs(compra.valor_total);
+            document.getElementById('purchaseEstorno').checked = compra.valor_total < 0;
             document.getElementById('purchaseType').value = compra.tipo;
             document.getElementById('purchaseDate').value = compra.data_compra;
             document.getElementById('purchaseCat').value = compra.categoria || '';
@@ -279,6 +347,12 @@
 
         function toggleInstallments() { const type = document.getElementById('purchaseType').value; document.getElementById('installmentsGroup').style.display = (type === 'parcelada') ? 'block' : 'none'; }
         
+        function toggleRow(event, row) {
+            // Evita marcar a linha se clicar em botões ou formulários
+            if (event.target.closest('button') || event.target.closest('form')) return;
+            row.classList.toggle('row-checked');
+        }
+
         function submitMonthForm(val) {
             if (!val) return;
             const parts = val.split('-');
@@ -288,7 +362,40 @@
             window.location.href = url.toString();
         }
 
-        window.onclick = function(e) { if(e.target.className == 'modal-overlay') e.target.style.display = 'none'; }
+        window.onclick = function(e) { 
+            if(e.target.className == 'modal-overlay') e.target.style.display = 'none';
+            if(!e.target.closest('.fab-container')) {
+                const fabMenu = document.getElementById('fabMenu');
+                if(fabMenu) fabMenu.classList.remove('active');
+            }
+        }
+    </script>
+
+    @php $firstCard = $cartoes->first(); @endphp
+    <div class="fab-container">
+        <button class="fab-main" onclick="toggleFab()" title="Novo Lançamento">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+        </button>
+        <div class="fab-menu" id="fabMenu">
+            <div class="fab-item" onclick="{{ $firstCard ? "openPurchaseModal('$firstCard->id', '$firstCard->nome')" : "openCardModal()" }}; toggleFab()">
+                <span>Nova Compra</span>
+                <button class="fab-item-icon bg-card-blue">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
+                </button>
+            </div>
+            <div class="fab-item" onclick="openCardModal(); toggleFab()">
+                <span>Novo Cartão</span>
+                <button class="fab-item-icon bg-card-green">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function toggleFab() {
+            document.getElementById('fabMenu').classList.toggle('active');
+        }
     </script>
 </body>
 </html>

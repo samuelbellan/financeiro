@@ -7,10 +7,15 @@ use App\Http\Controllers\FinancasController;
 use App\Http\Controllers\CartoesController;
 use App\Http\Controllers\CategoriasController;
 use App\Http\Controllers\ExportController;
+use App\Http\Controllers\WhatsappWebhookController;
 
 Route::get('/', function () {
     return view('welcome');
 });
+
+// ── WhatsApp Webhook (rota pública, sem autenticação) ─────────────────────────
+Route::post('/webhook/whatsapp', [WhatsappWebhookController::class, 'receive'])
+    ->name('webhook.whatsapp');
 
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
 Route::post('/login', [AuthController::class, 'authenticate'])->name('login.post');
@@ -50,6 +55,7 @@ Route::middleware('auth')->group(function () {
     // Exportações
     Route::get('/financas/export/fatura/{cartao}/{format}', [ExportController::class, 'exportFatura'])->name('export.fatura');
     Route::get('/financas/export/orcamento/{format}', [ExportController::class, 'exportOrcamento'])->name('export.orcamento');
+    Route::post('/financas/export/orcamento/{format}', [ExportController::class, 'exportOrcamentoPost'])->name('export.orcamento.post');
     
     // Compatibilidade com rota antiga
     Route::get('/dashboard', function () {

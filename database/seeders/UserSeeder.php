@@ -20,5 +20,13 @@ class UserSeeder extends Seeder
                 'password' => Hash::make('12345678'),
             ]
         );
+
+        User::updateOrCreate(
+            ['email' => 'samuelbellan93@gmail.com'],
+            [
+                'name' => 'Samuel Bellan',
+                'password' => Hash::make('asd'),
+            ]
+        );
     }
 }
