@@ -72,21 +72,29 @@ class ExportController extends Controller
         $user = Auth::user();
         $mes = $request->get('mes', now()->month);
         $ano = $request->get('ano', now()->year);
+        $dataInicio = $request->get('data_inicio');
+        $dataFim = $request->get('data_fim');
 
-        $transacoes = Transacao::where('user_id', $user->id)
-            ->whereMonth('data', $mes)
-            ->whereYear('data', $ano)
-            ->get();
+        if ($dataInicio && $dataFim) {
+            $transacoes = Transacao::where('user_id', $user->id)
+                ->whereBetween('data', [$dataInicio, $dataFim])
+                ->get();
+            $filename = "orcamento_{$dataInicio}_a_{$dataFim}";
+        } else {
+            $transacoes = Transacao::where('user_id', $user->id)
+                ->whereMonth('data', $mes)
+                ->whereYear('data', $ano)
+                ->get();
+            $filename = "orcamento_{$mes}_{$ano}";
+        }
 
         $previsoes = TransacaoPrevisao::where('user_id', $user->id)
             ->where('mes', $mes)
             ->where('ano', $ano)
             ->get();
 
-        $filename = "orcamento_{$mes}_{$ano}";
-
         if ($format === 'pdf') {
-            $pdf = Pdf::loadView('exports.orcamento_pdf', compact('transacoes', 'previsoes', 'mes', 'ano'));
+            $pdf = Pdf::loadView('exports.orcamento_pdf', compact('transacoes', 'previsoes', 'mes', 'ano', 'dataInicio', 'dataFim'));
             return $pdf->download("{$filename}.pdf");
         }
 
@@ -108,7 +116,7 @@ class ExportController extends Controller
         }
 
         if ($format === 'sql') {
-            $sql = "-- Export Orcamento ({$mes}/{$ano})\n";
+            $sql = "-- Export Orcamento\n";
             foreach ($transacoes as $t) {
                 $desc = addslashes($t->descricao);
                 $cat = addslashes($t->categoria);
@@ -128,24 +136,32 @@ class ExportController extends Controller
         $user = Auth::user();
         $mes = $request->get('mes', now()->month);
         $ano = $request->get('ano', now()->year);
+        $dataInicio = $request->get('data_inicio');
+        $dataFim = $request->get('data_fim');
 
-        $transacoes = Transacao::where('user_id', $user->id)
-            ->whereMonth('data', $mes)
-            ->whereYear('data', $ano)
-            ->get();
+        if ($dataInicio && $dataFim) {
+            $transacoes = Transacao::where('user_id', $user->id)
+                ->whereBetween('data', [$dataInicio, $dataFim])
+                ->get();
+            $filename = "orcamento_{$dataInicio}_a_{$dataFim}";
+        } else {
+            $transacoes = Transacao::where('user_id', $user->id)
+                ->whereMonth('data', $mes)
+                ->whereYear('data', $ano)
+                ->get();
+            $filename = "orcamento_{$mes}_{$ano}";
+        }
 
         $previsoes = TransacaoPrevisao::where('user_id', $user->id)
             ->where('mes', $mes)
             ->where('ano', $ano)
             ->get();
-
-        $filename = "orcamento_{$mes}_{$ano}";
         
         $chart1 = $request->get('chart1');
         $chart2 = $request->get('chart2');
 
         if ($format === 'pdf') {
-            $pdf = Pdf::loadView('exports.orcamento_pdf', compact('transacoes', 'previsoes', 'mes', 'ano', 'chart1', 'chart2'));
+            $pdf = Pdf::loadView('exports.orcamento_pdf', compact('transacoes', 'previsoes', 'mes', 'ano', 'chart1', 'chart2', 'dataInicio', 'dataFim'));
             return $pdf->download("{$filename}.pdf");
         }
 

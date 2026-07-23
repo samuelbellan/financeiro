@@ -107,6 +107,69 @@ class WhatsappMessageParser
     {
         $texto = trim(mb_strtolower($mensagem));
 
+        // --- Comando de PDF/Fatura (caixa ou cartao) ---
+        if (preg_match('/^(?:fatura|pdf|exportar)\b/iu', $texto) || str_contains($texto, 'pdf') || str_contains($texto, 'fatura')) {
+            $faturaDestino = 'casa';
+            if (str_contains($texto, 'cartao') || str_contains($texto, 'cartão') || str_contains($texto, 'fatura')) {
+                if (str_contains($texto, 'caixa')) {
+                    $faturaDestino = 'casa';
+                } else {
+                    $faturaDestino = 'cartao';
+                }
+            }
+
+            $mes = now()->month;
+            $ano = now()->year;
+
+            $meses = [
+                1 => ['janeiro', 'jan'],
+                2 => ['fevereiro', 'fev'],
+                3 => ['março', 'marco', 'mar'],
+                4 => ['abril', 'abr'],
+                5 => ['maio', 'mai'],
+                6 => ['junho', 'jun'],
+                7 => ['julho', 'jul'],
+                8 => ['agosto', 'ago'],
+                9 => ['setembro', 'set'],
+                10 => ['outubro', 'out'],
+                11 => ['novembro', 'nov'],
+                12 => ['dezembro', 'dez'],
+            ];
+
+            foreach ($meses as $num => $aliases) {
+                foreach ($aliases as $alias) {
+                    if (str_contains($texto, $alias)) {
+                        $mes = $num;
+                        break 2;
+                    }
+                }
+            }
+
+            if (preg_match('/\b(20\d{2})\b/', $texto, $matchesAno)) {
+                $ano = (int)$matchesAno[1];
+            }
+
+            $cartaoId = null;
+            if ($faturaDestino === 'cartao') {
+                $cartoes = \App\Models\Cartao::where('user_id', $userId)->get();
+                foreach ($cartoes as $c) {
+                    if (str_contains($texto, mb_strtolower($c->nome))) {
+                        $cartaoId = $c->id;
+                        break;
+                    }
+                }
+            }
+
+            return [
+                'tipo' => 'comando',
+                'comando' => 'fatura_pdf',
+                'fatura_destino' => $faturaDestino,
+                'cartao_id' => $cartaoId,
+                'mes' => $mes,
+                'ano' => $ano,
+            ];
+        }
+
         // --- Comandos especiais ---
         if (in_array($texto, self::COMANDOS)) {
             return ['tipo' => 'comando', 'comando' => $texto];

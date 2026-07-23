@@ -29,7 +29,7 @@
     <table>
         <thead>
             <tr>
-                <th>Vencimento</th>
+                <th>Data da Compra</th>
                 <th>Descrição</th>
                 <th>Parcela</th>
                 <th style="text-align: right;">Valor</th>
@@ -39,7 +39,7 @@
             @php $total = 0; @endphp
             @foreach($faturas as $f)
                 <tr>
-                    <td>{{ Carbon\Carbon::parse($f->data_vencimento)->format('d/m/Y') }}</td>
+                    <td>{{ Carbon\Carbon::parse($f->compra->data_compra)->format('d/m/Y') }}</td>
                     <td>{{ $f->compra->descricao }}</td>
                     <td>
                         @if($f->compra->tipo == 'parcelada') {{ $f->numero_parcela }}/{{ $f->compra->numero_parcelas }}

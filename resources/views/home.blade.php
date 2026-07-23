@@ -36,20 +36,13 @@
                         <span>Finanças de Casa</span>
                     </a>
 
-                    <a href="{{ route('cartoes.index') }}" class="nav-item">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
-                            <line x1="1" y1="10" x2="23" y2="10"></line>
-                        </svg>
-                        <span>Meus Cartões</span>
-                    </a>
 
-                    <a href="#" class="nav-item">
+                    <a href="{{ route('estudos.index') }}" class="nav-item">
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
-                            <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <polyline points="12 6 12 12 16 14"></polyline>
                         </svg>
-                        <span>Sistema 2</span>
+                        <span>Horas de Estudo</span>
                     </a>
 
                     <a href="#" class="nav-item">
@@ -109,15 +102,15 @@
                     </div>
 
                     <div class="info-card">
-                        <div class="card-icon card-icon-green">
+                        <div class="card-icon card-icon-green" style="background: linear-gradient(135deg, #8b5cf6 0%, #3b82f6 100%);">
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
-                                <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <polyline points="12 6 12 12 16 14"></polyline>
                             </svg>
                         </div>
-                        <h3>Sistema 2</h3>
-                        <p>Descrição do segundo sistema disponível</p>
-                        <a href="#" class="card-link">Acessar →</a>
+                        <h3>Horas de Estudo</h3>
+                        <p>Simulador e calculadora interativa de metas e registros de horas de estudo.</p>
+                        <a href="{{ route('estudos.index') }}" class="card-link">Acessar →</a>
                     </div>
 
                     <div class="info-card">

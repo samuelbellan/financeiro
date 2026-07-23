@@ -186,6 +186,21 @@
         .bg-previsao { background: var(--primary); }
 
         @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Estilo para Lançamentos Selecionados para Auditoria */
+        #transactionsTable tbody tr {
+            cursor: pointer;
+            transition: background-color 0.15s ease-in-out;
+        }
+        #transactionsTable tbody tr:hover {
+            background-color: #f8fafc;
+        }
+        #transactionsTable tbody tr.selected-audit {
+            background-color: #dcfce7 !important; /* Soft pastel green highlight */
+        }
+        #transactionsTable tbody tr.selected-audit td {
+            background-color: #dcfce7 !important;
+        }
     </style>
 </head>
 <body>
@@ -202,6 +217,13 @@
                     <a href="{{ route('financas.index') }}" class="nav-item active">
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
                         <span>Finanças de Casa</span>
+                    </a>
+                    <a href="{{ route('estudos.index') }}" class="nav-item">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <polyline points="12 6 12 12 16 14"></polyline>
+                        </svg>
+                        <span>Horas de Estudo</span>
                     </a>
                     <a href="{{ route('categorias.index') }}" class="nav-item">
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
@@ -223,12 +245,20 @@
                 </div>
                 <div style="display: flex; gap: 0.5rem;">
                     <button onclick="downloadPdf()" class="btn-add" style="background: #ef4444; font-size: 0.75rem; border: none; cursor: pointer; color: white;">PDF</button>
-                    <a href="{{ route('export.orcamento', ['format' => 'csv', 'mes' => $mes, 'ano' => $ano]) }}" class="btn-add" style="background: #10b981; font-size: 0.75rem;">CSV</a>
-                    <a href="{{ route('export.orcamento', ['format' => 'sql', 'mes' => $mes, 'ano' => $ano]) }}" class="btn-add" style="background: #3b82f6; font-size: 0.75rem;">DB (SQL)</a>
+                    <a href="{{ route('export.orcamento', ['format' => 'csv', 'mes' => $mes, 'ano' => $ano, 'data_inicio' => $dataInicio, 'data_fim' => $dataFim]) }}" class="btn-add" style="background: #10b981; font-size: 0.75rem;">CSV</a>
+                    <a href="{{ route('export.orcamento', ['format' => 'sql', 'mes' => $mes, 'ano' => $ano, 'data_inicio' => $dataInicio, 'data_fim' => $dataFim]) }}" class="btn-add" style="background: #3b82f6; font-size: 0.75rem;">DB (SQL)</a>
                 </div>
             </header>
 
             <div class="content-body">
+                @if(session('success'))
+                    <div style="background: #dcfce7; color: #166534; padding: 1rem; border-radius: 0.5rem; margin-bottom: 1.5rem; font-weight: 600;">
+                        {{ session('success') }}
+                    </div>
+                    <script>
+                        if (typeof notifyDataUpdated === 'function') { notifyDataUpdated(); } else { localStorage.setItem('financeiro_data_updated', Date.now().toString()); }
+                    </script>
+                @endif
                 @php
                     $prevMonth = $mes == 1 ? 12 : $mes - 1;
                     $prevYear = $mes == 1 ? $ano - 1 : $ano;
@@ -236,20 +266,33 @@
                     $nextYear = $mes == 12 ? $ano + 1 : $ano;
                 @endphp
 
-                <div class="period-nav">
-                    <div class="period-nav-group">
-                        <a href="{{ route('financas.index', ['mes' => $prevMonth, 'ano' => $prevYear]) }}" class="nav-arrow" title="Mês Anterior">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"></polyline></svg>
-                        </a>
-                        <form action="{{ route('financas.index') }}" method="GET" id="monthForm" style="display: flex; gap: 0.5rem;">
-                            <input type="month" name="period" value="{{ $ano }}-{{ str_pad($mes, 2, '0', STR_PAD_LEFT) }}" class="input-month" onchange="submitMonthForm(this.value)">
-                        </form>
-                        <a href="{{ route('financas.index', ['mes' => $nextMonth, 'ano' => $nextYear]) }}" class="nav-arrow" title="Próximo Mês">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>
-                        </a>
+                <div class="period-nav" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+                    <div style="display: flex; align-items: center; gap: 1rem;">
+                        <div class="period-nav-group">
+                            <a href="{{ route('financas.index', ['mes' => $prevMonth, 'ano' => $prevYear]) }}" class="nav-arrow" title="Mês Anterior">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                            </a>
+                            <form action="{{ route('financas.index') }}" method="GET" id="monthForm" style="display: flex; gap: 0.5rem;">
+                                <input type="month" name="period" value="{{ $ano }}-{{ str_pad($mes, 2, '0', STR_PAD_LEFT) }}" class="input-month" onchange="submitMonthForm(this.value)">
+                            </form>
+                            <a href="{{ route('financas.index', ['mes' => $nextMonth, 'ano' => $nextYear]) }}" class="nav-arrow" title="Próximo Mês">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                            </a>
+                        </div>
+                        
+                        <a href="{{ route('financas.index', ['mes' => date('n'), 'ano' => date('Y')]) }}" class="btn-today">Mês Atual</a>
                     </div>
-                    
-                    <a href="{{ route('financas.index', ['mes' => date('n'), 'ano' => date('Y')]) }}" class="btn-today">Ir para Hoje</a>
+
+                    <form action="{{ route('financas.index') }}" method="GET" id="customPeriodForm" style="display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
+                        <div style="display: flex; align-items: center; gap: 0.35rem;">
+                            <label for="data_inicio" style="font-size: 0.75rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">De:</label>
+                            <input type="date" id="data_inicio" name="data_inicio" value="{{ $dataInicio }}" class="input-month" onchange="this.form.submit()">
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 0.35rem;">
+                            <label for="data_fim" style="font-size: 0.75rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Até:</label>
+                            <input type="date" id="data_fim" name="data_fim" value="{{ $dataFim }}" class="input-month" onchange="this.form.submit()">
+                        </div>
+                    </form>
                 </div>
 
                 <div class="dashboard-grid">
@@ -298,6 +341,18 @@
                             <canvas id="chartExpenses"></canvas>
                         </div>
                     </div>
+                </div>
+
+                <!-- Daily Spending Chart for Checking Account -->
+                <div class="chart-card" style="margin-bottom: 2rem;">
+                    <h3 style="font-size: 1rem; margin-bottom: 1rem;">Análise Diária de Despesas da Conta</h3>
+                    @if(empty($despesasDiariasValues) || array_sum($despesasDiariasValues) == 0)
+                        <p style="color: var(--text-muted); font-size: 0.875rem; padding: 2rem; text-align: center; margin: 0;">Nenhuma despesa registrada no período selecionado.</p>
+                    @else
+                        <div class="chart-container" style="height: 220px;">
+                            <canvas id="chartDiarioDespesas"></canvas>
+                        </div>
+                    @endif
                 </div>
 
                 <div class="predictions-section">
@@ -389,13 +444,13 @@
                         <button onclick="openModal()" class="btn-add">Nova Transação</button>
                     </div>
                     <div id="transactionsContent" class="collapsible-content">
-                    <table>
+                    <table id="transactionsTable">
                         <thead>
                             <tr><th>Data</th><th>Descrição</th><th>Categoria</th><th>Valor</th><th style="text-align: right;">Ações</th></tr>
                         </thead>
                         <tbody>
                             @foreach($transacoes as $t)
-                                <tr>
+                                <tr data-id="{{ $t->id }}">
                                     <td>{{ \Carbon\Carbon::parse($t->data)->format('d/m/Y') }}</td>
                                     <td style="font-weight: 600;">{{ $t->descricao }}</td>
                                     <td>
@@ -531,7 +586,11 @@
                 <div class="modal-body">
                     <div class="form-group"><label>Descrição</label><input type="text" name="descricao" id="inputDescricao" class="form-input" required></div>
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1rem;">
-                        <div class="form-group"><label>Valor (R$)</label><input type="number" step="0.01" name="valor" id="inputValor" class="form-input" required></div>
+                        <div class="form-group">
+                            <label>Valor (R$)</label>
+                            <input type="text" id="inputValorDisplay" class="form-input" required placeholder="0,00" inputmode="numeric">
+                            <input type="hidden" name="valor" id="inputValor">
+                        </div>
                         <div class="form-group"><label>Tipo</label><select name="tipo" id="inputTipo" class="form-input" onchange="filterCategoriesByTipo(this.value)"><option value="receita">Receita</option><option value="despesa" selected>Despesa</option></select></div>
                     </div>
                     <div id="containerPagarFatura" class="form-group" style="margin-top: 1rem; display: block;">
@@ -578,7 +637,11 @@
                     </div>
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1rem;">
                         <div class="form-group"><label>Subcategoria</label><select name="subcategoria" id="previsaoSubcat" class="form-input"><option value="">Selecione...</option></select></div>
-                        <div class="form-group"><label>Valor Meta</label><input type="number" step="0.01" name="valor_previsto" id="previsaoValor" class="form-input" required></div>
+                        <div class="form-group">
+                            <label>Valor Meta</label>
+                            <input type="text" id="previsaoValorDisplay" class="form-input" required placeholder="0,00" inputmode="numeric">
+                            <input type="hidden" name="valor_previsto" id="previsaoValor">
+                        </div>
                     </div>
                     <div id="recorrenciaFields">
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1rem;">
@@ -591,6 +654,21 @@
                 </div>
                 <div class="modal-footer"><button type="submit" class="btn-add">Salvar Previsão</button></div>
             </form>
+        </div>
+    </div>
+
+    <div id="modalComprasDia" class="modal-overlay">
+        <div class="modal" style="max-width: 550px; border-radius: 1rem; padding: 1.5rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 0.75rem; margin-bottom: 1rem;">
+                <h3 id="comprasDiaTitle" style="margin: 0; font-size: 1.1rem; font-weight: 700; color: var(--text-main);">Despesas do Dia</h3>
+                <button onclick="document.getElementById('modalComprasDia').style.display='none'" style="border:none; background:none; font-size:1.5rem; cursor:pointer; line-height: 1; color: var(--text-muted);">&times;</button>
+            </div>
+            <div id="comprasDiaBody" style="max-height: 350px; overflow-y: auto;">
+                <!-- HTML das despesas será gerado por JS -->
+            </div>
+            <div style="display: flex; justify-content: flex-end; margin-top: 1.25rem; padding-top: 0.75rem; border-top: 1px solid var(--border);">
+                <button type="button" onclick="document.getElementById('modalComprasDia').style.display='none'" class="btn-action" style="background: #94a3b8; font-size: 0.8rem; padding: 0.4rem 0.8rem; border-radius: 0.375rem; border: none; color: white; cursor: pointer; font-weight: 600;">Fechar</button>
+            </div>
         </div>
     </div>
 
@@ -618,7 +696,14 @@
             for(let opt of sel.options) { if(opt.value) opt.style.display = opt.getAttribute('data-tipo') === tipo ? 'block' : 'none'; }
             sel.value = ""; document.getElementById('previsaoSubcat').innerHTML = '<option value="">Selecione...</option>';
         }
-        function closeModal() { document.getElementById('modalOverlay').style.display = 'none'; }
+        let hasAddedTransactions = false;
+        function closeModal() { 
+            if (hasAddedTransactions || window.needsReloadOnModalClose) {
+                window.location.reload();
+            } else {
+                document.getElementById('modalOverlay').style.display = 'none'; 
+            }
+        }
         function openConsolidadoModal() { document.getElementById('modalConsolidado').style.display = 'flex'; }
         function openConsolidadoAnoModal() { document.getElementById('modalConsolidadoAno').style.display = 'flex'; }
         function openModal() { 
@@ -627,6 +712,7 @@
             document.getElementById('methodField').innerHTML = '';
             document.getElementById('inputDescricao').value = '';
             document.getElementById('inputValor').value = '';
+            document.getElementById('inputValorDisplay').value = '';
             document.getElementById('inputData').value = "{{ date('Y-m-d') }}";
             document.getElementById('selectCategoria').value = '';
             document.getElementById('selectSubcategoria').innerHTML = '<option value="">Selecione...</option>';
@@ -652,6 +738,8 @@
             document.getElementById('previsaoForm').action = "{{ route('financas.previsoes.store') }}";
             document.getElementById('previsaoMethodField').innerHTML = '';
             document.getElementById('recorrenciaFields').style.display = 'block';
+            document.getElementById('previsaoValor').value = '';
+            document.getElementById('previsaoValorDisplay').value = '';
             filterPrevisaoCats('despesa'); 
             document.getElementById('modalPrevisao').style.display = 'flex'; 
         }
@@ -668,6 +756,8 @@
             updateSubcategories(p.categoria, 'previsaoSubcat');
             document.getElementById('previsaoSubcat').value = p.subcategoria || '';
             document.getElementById('previsaoValor').value = p.valor_previsto;
+            const prevVal = parseFloat(p.valor_previsto) || 0;
+            document.getElementById('previsaoValorDisplay').value = prevVal.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
             document.getElementById('previsaoObs').value = p.observacao || '';
             
             document.getElementById('modalPrevisao').style.display = 'flex';
@@ -679,6 +769,8 @@
             document.getElementById('methodField').innerHTML = '@method("PUT")';
             document.getElementById('inputDescricao').value = t.descricao;
             document.getElementById('inputValor').value = t.valor;
+            const transVal = parseFloat(t.valor) || 0;
+            document.getElementById('inputValorDisplay').value = transVal.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
             document.getElementById('inputTipo').value = t.tipo;
             document.getElementById('inputData').value = t.data;
             filterCategoriesByTipo(t.tipo);
@@ -707,6 +799,8 @@
             const url = new URL(window.location.href);
             url.searchParams.set('ano', parts[0]);
             url.searchParams.set('mes', parseInt(parts[1]));
+            url.searchParams.delete('data_inicio');
+            url.searchParams.delete('data_fim');
             window.location.href = url.toString();
         }
 
@@ -785,7 +879,290 @@
                     plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 10 } } } }
                 }
             });
+
+            // Chart 3: Daily checking account expenses
+            const chartDiarioCtx = document.getElementById('chartDiarioDespesas');
+            if (chartDiarioCtx) {
+                const labelsDiarios = @json($labelsDiarios ?? []);
+                const datesMap = @json($datesMap ?? []);
+                const despesasDiarias = @json($despesasDiariasValues ?? []);
+                const despesasDetalhado = @json($despesasDetalhado ?? []);
+                const mediaDiaria = {{ $mediaDiariaDespesa ?? 0 }};
+                const mediaData = Array(labelsDiarios.length).fill(mediaDiaria);
+
+                new Chart(chartDiarioCtx.getContext('2d'), {
+                    type: 'line',
+                    data: {
+                        labels: labelsDiarios,
+                        datasets: [
+                            {
+                                label: 'Despesas no Dia',
+                                data: despesasDiarias,
+                                borderColor: '#ef4444',
+                                backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                                fill: true,
+                                tension: 0.3,
+                                borderWidth: 2,
+                                pointBackgroundColor: '#ef4444',
+                                pointRadius: 3
+                            },
+                            {
+                                label: 'Média Diária',
+                                data: mediaData,
+                                borderColor: '#f59e0b',
+                                borderWidth: 2,
+                                borderDash: [5, 5],
+                                fill: false,
+                                pointRadius: 0
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        onHover: (event, chartElement) => {
+                            event.native.target.style.cursor = chartElement.length ? 'pointer' : 'default';
+                        },
+                        onClick: (event, activeElements) => {
+                            if (activeElements.length > 0) {
+                                const index = activeElements[0].index;
+                                const dateStr = datesMap[index];
+                                openDespesasDoDiaModal(dateStr);
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                position: 'top',
+                                labels: {
+                                    font: { size: 10, family: 'Inter' }
+                                }
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        let label = context.dataset.label || '';
+                                        if (label) label += ': ';
+                                        if (context.parsed.y !== null) {
+                                            label += new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(context.parsed.y);
+                                        }
+                                        return label;
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    callback: function(value) {
+                                        return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 }).format(value);
+                                    },
+                                    font: { size: 9 }
+                                }
+                            },
+                            x: {
+                                ticks: {
+                                    font: { size: 9 }
+                                }
+                            }
+                        }
+                    }
+                });
+
+                function openDespesasDoDiaModal(dateStr) {
+                    const compras = despesasDetalhado.filter(c => c.data === dateStr);
+                    const modalBody = document.getElementById('comprasDiaBody');
+                    const modalTitle = document.getElementById('comprasDiaTitle');
+                    
+                    const dateParts = dateStr.split('-');
+                    const formattedDate = `${dateParts[2]}/${dateParts[1]}/${dateParts[0]}`;
+                    modalTitle.innerText = `Despesas da Conta - ${formattedDate}`;
+                    
+                    if (compras.length === 0) {
+                        modalBody.innerHTML = '<p style="text-align: center; color: var(--text-muted); padding: 2rem 0; margin: 0; font-size: 0.875rem;">Nenhuma despesa de conta corrente registrada neste dia.</p>';
+                    } else {
+                        let html = `
+                            <table style="width: 100%; border-collapse: collapse; font-size: 0.825rem;">
+                                <thead>
+                                    <tr style="background: #f8fafc; border-bottom: 2px solid #e2e8f0; text-align: left; color: #64748b; text-transform: uppercase; font-size: 0.7rem;">
+                                        <th style="padding: 0.5rem 1rem;">Descrição</th>
+                                        <th style="padding: 0.5rem 1rem;">Categoria</th>
+                                        <th style="padding: 0.5rem 1rem; text-align: right;">Valor</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                        `;
+                        
+                        let total = 0;
+                        compras.forEach(c => {
+                            total += c.valor;
+                            const subcatText = c.subcategoria ? ` • ${c.subcategoria}` : '';
+                            html += `
+                                <tr style="border-bottom: 1px solid #e2e8f0;">
+                                    <td style="padding: 0.75rem 1rem; font-weight: 600; color: #1e293b;">${c.descricao}</td>
+                                    <td style="padding: 0.75rem 1rem;"><span style="font-size: 0.7rem; background: #ffe4e6; color: #9f1239; padding: 2px 6px; border-radius: 4px; font-weight: 500;">${c.categoria}${subcatText}</span></td>
+                                    <td style="padding: 0.75rem 1rem; text-align: right; font-weight: 700; color: #ef4444;">R$ ${c.valor.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                                </tr>
+                            `;
+                        });
+                        
+                        html += `
+                                </tbody>
+                                <tfoot>
+                                    <tr style="font-weight: 800; font-size: 0.9rem; background: #f8fafc;">
+                                        <td colspan="2" style="padding: 0.75rem 1rem; text-align: left; color: #1e293b;">Total do Dia</td>
+                                        <td style="padding: 0.75rem 1rem; text-align: right; color: #ef4444;">R$ ${total.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        `;
+                        modalBody.innerHTML = html;
+                    }
+                    
+                    document.getElementById('modalComprasDia').style.display = 'flex';
+                }
+            }
+
+            // Intercept transaction form submission for creation (AJAX)
+            const form = document.getElementById('transactionForm');
+            
+            // Initialize currency masks
+            applyCurrencyMask('inputValorDisplay', 'inputValor');
+            applyCurrencyMask('previsaoValorDisplay', 'previsaoValor');
+            
+            if (form) {
+                // Ctrl + Enter to submit
+                form.addEventListener('keydown', function(e) {
+                    if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+                        e.preventDefault();
+                        if (typeof form.requestSubmit === 'function') {
+                            form.requestSubmit();
+                        } else {
+                            const submitBtn = form.querySelector('[type="submit"]');
+                            if (submitBtn) submitBtn.click();
+                        }
+                    }
+                });
+
+                form.addEventListener('submit', function(e) {
+                    const methodField = document.getElementById('methodField').innerHTML;
+                    // If methodField contains PUT, it is an edit. Allow normal submit.
+                    if (methodField.includes('PUT')) {
+                        return;
+                    }
+                    
+                    e.preventDefault();
+                    
+                    const formData = new FormData(form);
+                    
+                    fetch(form.action, {
+                        method: 'POST',
+                        body: formData,
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'Accept': 'application/json'
+                        }
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            return response.json().then(err => { throw err; }).catch(() => {
+                                throw new Error('Erro ao salvar transação.');
+                            });
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        if (data.success) {
+                            showToast(data.transacao);
+                            hasAddedTransactions = true;
+                            notifyDataUpdated();
+                            
+                            // Reset description and value
+                            document.getElementById('inputDescricao').value = '';
+                            document.getElementById('inputValor').value = '';
+                            document.getElementById('inputValorDisplay').value = '';
+                            
+                            // Focus back on description
+                            document.getElementById('inputDescricao').focus();
+                        } else {
+                            alert('Erro: ' + (data.message || 'Ocorreu um erro inesperado.'));
+                        }
+                    })
+                    .catch(error => {
+                        console.error(error);
+                        const msg = error.message || 'Erro ao salvar transação. Verifique se os dados estão corretos.';
+                        alert(msg);
+                    });
+                });
+            }
         });
+
+        function showToast(transacao) {
+            let container = document.getElementById('toast-container');
+            if (!container) {
+                container = document.createElement('div');
+                container.id = 'toast-container';
+                container.style.cssText = `
+                    position: fixed;
+                    top: 20px;
+                    right: 20px;
+                    z-index: 9999;
+                    display: flex;
+                    flex-direction: column;
+                    gap: 10px;
+                `;
+                document.body.appendChild(container);
+            }
+            
+            const toast = document.createElement('div');
+            const valorFormatado = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(transacao.valor);
+            const badgeColor = transacao.tipo === 'receita' ? '#10b981' : '#ef4444';
+            const badgeText = transacao.tipo === 'receita' ? 'Receita' : 'Despesa';
+            
+            toast.style.cssText = `
+                background: #ffffff;
+                color: #1f2937;
+                padding: 1rem 1.25rem;
+                border-radius: 0.75rem;
+                box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+                border-left: 4px solid ${badgeColor};
+                min-width: 280px;
+                max-width: 400px;
+                font-family: inherit;
+                opacity: 0;
+                transform: translateY(-20px);
+                transition: all 0.3s ease;
+                display: flex;
+                flex-direction: column;
+                gap: 0.25rem;
+            `;
+            
+            toast.innerHTML = `
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span style="font-weight: 700; font-size: 0.875rem; color: #1f2937;">Transação Salva!</span>
+                    <span style="font-size: 0.7rem; font-weight: 700; color: #ffffff; background: ${badgeColor}; padding: 0.15rem 0.4rem; border-radius: 999px; text-transform: uppercase;">${badgeText}</span>
+                </div>
+                <div style="font-size: 0.85rem; color: #4b5563; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${transacao.descricao}">${transacao.descricao}</div>
+                <div style="font-weight: 700; font-size: 0.95rem; color: ${badgeColor};">${valorFormatado}</div>
+            `;
+            
+            container.appendChild(toast);
+            
+            // Trigger animation
+            setTimeout(() => {
+                toast.style.opacity = '1';
+                toast.style.transform = 'translateY(0)';
+            }, 10);
+            
+            // Remove toast after 4 seconds
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateY(-20px)';
+                setTimeout(() => {
+                    toast.remove();
+                }, 300);
+            }, 4000);
+        }
 
         function downloadPdf() {
             const compCanvas = document.getElementById('chartComparison');
@@ -815,6 +1192,20 @@
             anoInput.value = '{{ $ano }}';
             form.appendChild(anoInput);
 
+            @if(isset($dataInicio) && isset($dataFim))
+            const startInput = document.createElement('input');
+            startInput.type = 'hidden';
+            startInput.name = 'data_inicio';
+            startInput.value = '{{ $dataInicio }}';
+            form.appendChild(startInput);
+
+            const endInput = document.createElement('input');
+            endInput.type = 'hidden';
+            endInput.name = 'data_fim';
+            endInput.value = '{{ $dataFim }}';
+            form.appendChild(endInput);
+            @endif
+
             const chart1Input = document.createElement('input');
             chart1Input.type = 'hidden';
             chart1Input.name = 'chart1';
@@ -832,8 +1223,43 @@
             document.body.removeChild(form);
         }
 
+        function applyCurrencyMask(displayInputId, hiddenInputId) {
+            const displayInput = document.getElementById(displayInputId);
+            const hiddenInput = document.getElementById(hiddenInputId);
+            if (!displayInput || !hiddenInput) return;
+            
+            function formatValue(value) {
+                let clean = value.replace(/\D/g, '');
+                if (!clean) clean = '0';
+                let val = parseFloat(clean) / 100;
+                return {
+                    formatted: val.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+                    raw: val.toFixed(2)
+                };
+            }
+            
+            displayInput.addEventListener('input', function(e) {
+                const res = formatValue(this.value);
+                this.value = res.formatted;
+                hiddenInput.value = res.raw;
+            });
+            
+            // On focus, put cursor at the end
+            displayInput.addEventListener('focus', function() {
+                setTimeout(() => {
+                    this.setSelectionRange(this.value.length, this.value.length);
+                }, 10);
+            });
+        }
+
         window.onclick = function(e) { 
-            if(e.target.className == 'modal-overlay') e.target.style.display = 'none';
+            if(e.target.className == 'modal-overlay') {
+                if (e.target.id === 'modalOverlay' && hasAddedTransactions) {
+                    window.location.reload();
+                } else {
+                    e.target.style.display = 'none';
+                }
+            }
             if(!e.target.closest('.fab-container')) {
                 const fabMenu = document.getElementById('fabMenu');
                 if(fabMenu) fabMenu.classList.remove('active');
@@ -861,49 +1287,60 @@
         </div>
     </div>
 
-    {{-- ── Painel WhatsApp Bot ─────────────────────────────────────────────── --}}
+    {{-- ── Painel Telegram Bot ─────────────────────────────────────────────── --}}
     @php
-        $whatsappLogs = \App\Models\WhatsappLog::latest()->limit(5)->get();
-        $whatsappOk   = config('whatsapp.allowed_number') && config('whatsapp.evolution_key');
+        $telegramLogs = \App\Models\WhatsappLog::where('numero', 'like', 'tg:%')->latest()->limit(5)->get();
+        $telegramOk   = config('telegram.bot_token') && config('telegram.allowed_chat_id');
     @endphp
     <div style="
         position: fixed; bottom: 2rem; left: 2rem; z-index: 900;
         background: white; border-radius: 1rem; border: 1px solid #e5e7eb;
         box-shadow: 0 4px 15px rgba(0,0,0,0.12); width: 280px;
         font-family: inherit; font-size: 0.78rem; overflow: hidden;
-    " id="waBotPanel">
+    " id="telegramBotPanel">
         <div style="
-            background: #25D366; color: white; padding: 0.65rem 1rem;
+            background: #0088cc; color: white; padding: 0.65rem 1rem;
             display: flex; align-items: center; justify-content: space-between;
             cursor: pointer;
-        " onclick="toggleWaPanel()">
+        " onclick="toggleTelegramPanel()">
             <div style="display: flex; align-items: center; gap: 0.5rem; font-weight: 700; font-size: 0.82rem;">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-                WhatsApp Bot
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="white"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-1-.65-.35-1 .22-1.6 1.48-1.52 2.72-2.92 2.72-2.92.08-.07.03-.22-.1-.23-.1-.01-.32.07-.32.07l-3.32 2.1c-.26.17-.5.2-.67.19-.24-.01-.7-.14-1.04-.25-.42-.14-.76-.22-.73-.46.02-.13.2-.26.54-.4 2.11-.92 3.52-1.53 4.22-1.83 2-.85 2.42-1 .27-1.03h.02c.48.01 1.07.13 1.07.7z"/></svg>
+                Telegram Bot
             </div>
             <div style="display: flex; align-items: center; gap: 0.4rem;">
-                <span style="width:8px;height:8px;border-radius:50%;background:{{ $whatsappOk ? '#86efac' : '#fca5a5' }};display:inline-block;"></span>
-                <span style="font-size:0.7rem;opacity:0.9;">{{ $whatsappOk ? 'Ativo' : 'Não configurado' }}</span>
-                <svg id="waChevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="6 9 12 15 18 9"/></svg>
+                <span style="width:8px;height:8px;border-radius:50%;background:{{ $telegramOk ? '#86efac' : '#fca5a5' }};display:inline-block;"></span>
+                <span style="font-size:0.7rem;opacity:0.9;">{{ $telegramOk ? 'Ativo' : 'Não configurado' }}</span>
+                <svg id="telegramChevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="6 9 12 15 18 9"/></svg>
             </div>
         </div>
-        <div id="waBody" style="padding:0.75rem 1rem;">
-            @if(!$whatsappOk)
+        <div id="telegramBody" style="padding:0.75rem 1rem;">
+            @if(!$telegramOk)
                 <p style="color:#6b7280;font-size:0.75rem;margin:0;line-height:1.5;">
-                    Configure <code>WHATSAPP_ALLOWED_NUMBER</code> e <code>EVOLUTION_API_KEY</code> no <code>.env</code>.
+                    Configure <code>TELEGRAM_BOT_TOKEN</code> e <code>TELEGRAM_ALLOWED_CHAT_ID</code> no <code>.env</code>.
                 </p>
-            @elseif($whatsappLogs->isEmpty())
-                <p style="color:#6b7280;margin:0;">Nenhuma mensagem recebida ainda.</p>
+            @elseif($telegramLogs->isEmpty())
+                <p style="color:#6b7280;margin:0;padding:0.5rem 0;">Nenhuma mensagem recebida ainda.</p>
             @else
-                <div style="display:flex;flex-direction:column;gap:0.5rem;">
-                    @foreach($whatsappLogs as $log)
+                <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; padding-bottom: 0.25rem; border-bottom: 1px solid #f1f5f9;">
+                    <span style="font-weight: 700; color: var(--text-muted); font-size: 0.72rem;">LOG DE MENSAGENS</span>
+                    <button onclick="clearTelegramLogs()" style="background: none; border: none; color: #ef4444; font-size: 0.68rem; font-weight: 600; cursor: pointer; padding: 0;">Limpar Tudo</button>
+                </div>
+                <div style="display:flex;flex-direction:column;gap:0.5rem; max-height: 220px; overflow-y: auto;">
+                    @foreach($telegramLogs as $log)
                         <div style="
                             padding:0.4rem 0.6rem;border-radius:0.5rem;
                             border-left:3px solid {{ $log->status==='ok' ? '#10b981' : ($log->status==='erro' ? '#ef4444' : '#f59e0b') }};
                             background:{{ $log->status==='ok' ? '#f0fdf4' : ($log->status==='erro' ? '#fef2f2' : '#fffbeb') }};
-                        ">
-                            <div style="font-weight:600;color:#1f2937;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="{{ $log->mensagem_original }}">
-                                {{ Str::limit($log->mensagem_original, 35) }}
+                            position: relative;
+                            transition: opacity 0.3s ease;
+                        " id="log-item-{{ $log->id }}">
+                            <button onclick="deleteTelegramLog({{ $log->id }})" style="
+                                position: absolute; top: 2px; right: 4px;
+                                background: none; border: none; color: #9ca3af;
+                                font-size: 0.75rem; cursor: pointer; padding: 2px;
+                            " title="Excluir mensagem">×</button>
+                            <div style="font-weight:600;color:#1f2937;white-space:nowrap;overflow:hidden;text-overflow:ellipsis; padding-right: 12px;" title="{{ $log->mensagem_original }}">
+                                {{ Str::limit($log->mensagem_original, 30) }}
                             </div>
                             <div style="color:#6b7280;font-size:0.7rem;margin-top:1px;">
                                 {{ $log->created_at->diffForHumans() }}
@@ -916,7 +1353,8 @@
                 </div>
             @endif
             <div style="margin-top:0.75rem;padding-top:0.5rem;border-top:1px solid #f1f5f9;color:#9ca3af;font-size:0.68rem;line-height:1.5;">
-                💬 <code>despesa 45.90 mercado</code><br>
+                💬 Envie mensagens livres para a IA:<br>
+                💡 <code>despesa de 15 reais no cartao visa</code><br>
                 📊 <code>saldo</code> · <code>listar</code> · <code>ajuda</code>
             </div>
         </div>
@@ -926,13 +1364,372 @@
         function toggleFab() {
             document.getElementById('fabMenu').classList.toggle('active');
         }
-        function toggleWaPanel() {
-            const body = document.getElementById('waBody');
-            const chevron = document.getElementById('waChevron');
+        function toggleTelegramPanel() {
+            const body = document.getElementById('telegramBody');
+            const chevron = document.getElementById('telegramChevron');
             const collapsed = body.style.display === 'none';
             body.style.display = collapsed ? 'block' : 'none';
             chevron.style.transform = collapsed ? '' : 'rotate(180deg)';
         }
+
+        function deleteTelegramLog(logId) {
+            if(!confirm('Excluir esta mensagem do log?')) return;
+            
+            const formData = new FormData();
+            formData.append('_method', 'DELETE');
+            formData.append('_token', '{{ csrf_token() }}');
+            
+            fetch(`/financas/telegram-logs/${logId}`, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'Accept': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if(data.success) {
+                    const item = document.getElementById(`log-item-${logId}`);
+                    if(item) {
+                        item.style.opacity = '0';
+                        setTimeout(() => item.remove(), 300);
+                    }
+                }
+            })
+            .catch(err => alert('Erro ao excluir log.'));
+        }
+
+        function clearTelegramLogs() {
+            if(!confirm('Deseja limpar todas as mensagens do log?')) return;
+            
+            const formData = new FormData();
+            formData.append('_method', 'DELETE');
+            formData.append('_token', '{{ csrf_token() }}');
+            
+            fetch('/financas/telegram-logs', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'Accept': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if(data.success) {
+                    window.location.reload();
+                }
+            })
+            .catch(err => alert('Erro ao limpar logs.'));
+        }
+
+        // ── Funções para tabelas interativas (Busca e Ordenação super rápidas) ─────
+        function makeTableInteractive(table, hasSubGroups = false) {
+            if (!table) return;
+
+            // Adicionar campo de busca
+            const container = table.parentElement;
+            const searchWrapper = document.createElement('div');
+            searchWrapper.style.margin = '0 0 1rem 0';
+            searchWrapper.style.display = 'flex';
+            searchWrapper.style.justifyContent = 'flex-end';
+
+            const searchInput = document.createElement('input');
+            searchInput.type = 'text';
+            searchInput.placeholder = '🔎 Pesquisar lançamentos...';
+            searchInput.className = 'input-month';
+            searchInput.style.width = '100%';
+            searchInput.style.maxWidth = '300px';
+            searchInput.style.borderRadius = '0.5rem';
+            searchInput.style.fontSize = '0.8rem';
+            searchInput.style.padding = '0.4rem 0.75rem';
+
+            searchWrapper.appendChild(searchInput);
+            container.insertBefore(searchWrapper, table);
+
+            searchInput.addEventListener('input', function() {
+                const query = searchInput.value.toLowerCase().trim();
+                const tbody = table.querySelector('tbody');
+                const rows = tbody.querySelectorAll('tr:not(.subheader-row)');
+
+                rows.forEach(row => {
+                    const cells = Array.from(row.children);
+                    const matches = cells.some(cell => cell.textContent.toLowerCase().includes(query));
+                    row.style.display = matches ? '' : 'none';
+                });
+
+                if (hasSubGroups) {
+                    const allTrs = Array.from(tbody.children);
+                    let lastSubheader = null;
+                    let subheaderHasVisibleRows = false;
+
+                    allTrs.forEach(tr => {
+                        if (tr.classList.contains('subheader-row')) {
+                            if (lastSubheader) {
+                                lastSubheader.style.display = subheaderHasVisibleRows ? '' : 'none';
+                            }
+                            lastSubheader = tr;
+                            subheaderHasVisibleRows = false;
+                        } else {
+                            if (tr.style.display !== 'none') {
+                                subheaderHasVisibleRows = true;
+                            }
+                        }
+                    });
+                    if (lastSubheader) {
+                        lastSubheader.style.display = subheaderHasVisibleRows ? '' : 'none';
+                    }
+                }
+            });
+
+            // Adicionar ordenação
+            const headers = table.querySelectorAll('thead th');
+            headers.forEach((header, index) => {
+                if (header.textContent.toLowerCase().includes('ações')) return;
+
+                header.style.cursor = 'pointer';
+                header.style.position = 'relative';
+                header.style.userSelect = 'none';
+                header.title = 'Clique para ordenar';
+
+                let direction = 1;
+
+                header.addEventListener('click', function() {
+                    headers.forEach(h => {
+                        if (h !== header) {
+                            const arrow = h.querySelector('.sort-arrow');
+                            if (arrow) arrow.remove();
+                        }
+                    });
+
+                    let arrow = header.querySelector('.sort-arrow');
+                    if (!arrow) {
+                        arrow = document.createElement('span');
+                        arrow.className = 'sort-arrow';
+                        arrow.style.marginLeft = '5px';
+                        arrow.style.fontSize = '0.75rem';
+                        header.appendChild(arrow);
+                    }
+                    arrow.innerHTML = direction === 1 ? ' ▲' : ' ▼';
+
+                    sortTable(table, index, direction, hasSubGroups);
+                    direction = -direction;
+                });
+            });
+        }
+
+        function sortTable(table, colIndex, direction, hasSubGroups = false) {
+            const tbody = table.querySelector('tbody');
+            const trs = Array.from(tbody.children);
+
+            if (!hasSubGroups) {
+                const rows = trs.filter(tr => !tr.classList.contains('subheader-row'));
+                rows.sort((a, b) => compareCells(a.children[colIndex], b.children[colIndex], direction));
+                rows.forEach(row => tbody.appendChild(row));
+            } else {
+                let currentGroup = [];
+                const groups = [];
+                let headerRow = null;
+
+                trs.forEach(tr => {
+                    if (tr.classList.contains('subheader-row')) {
+                        if (headerRow) {
+                            groups.push({ header: headerRow, rows: currentGroup });
+                        }
+                        headerRow = tr;
+                        currentGroup = [];
+                    } else {
+                        currentGroup.push(tr);
+                    }
+                });
+                if (headerRow) {
+                    groups.push({ header: headerRow, rows: currentGroup });
+                }
+
+                groups.forEach(group => {
+                    group.rows.sort((a, b) => compareCells(a.children[colIndex], b.children[colIndex], direction));
+                });
+
+                tbody.innerHTML = '';
+                groups.forEach(group => {
+                    tbody.appendChild(group.header);
+                    group.rows.forEach(row => tbody.appendChild(row));
+                });
+            }
+        }
+
+        function compareCells(cellA, cellB, direction) {
+            let valA = cellA ? cellA.textContent.trim() : '';
+            let valB = cellB ? cellB.textContent.trim() : '';
+
+            // Valor Monetário
+            if (valA.includes('R$') || valB.includes('R$')) {
+                const cleanNum = (str) => {
+                    let s = str.replace(/[R$\s]/g, '').replace(/\./g, '').replace(',', '.');
+                    s = s.replace(/[^\d.-]/g, '');
+                    return parseFloat(s) || 0;
+                };
+                return (cleanNum(valA) - cleanNum(valB)) * direction;
+            }
+
+            // Data
+            const dateRegex = /^(\d{2})\/(\d{2})\/(\d{4})$/;
+            if (dateRegex.test(valA) && dateRegex.test(valB)) {
+                const parseDate = (str) => {
+                    const parts = str.match(dateRegex);
+                    return new Date(parts[3], parts[2] - 1, parts[1]).getTime();
+                };
+                return (parseDate(valA) - parseDate(valB)) * direction;
+            }
+
+            return valA.localeCompare(valB, 'pt-BR', { numeric: true, sensitivity: 'base' }) * direction;
+        }
+
+        // Key de armazenamento local para persisitir os lançamentos selecionados (destacados em verde)
+        const STORAGE_KEY_TRANSACTIONS = 'financeiro_selected_transactions';
+        const dataSyncChannel = (typeof BroadcastChannel !== 'undefined') ? new BroadcastChannel('financeiro_sync_channel') : null;
+
+        function isAnyModalOpen() {
+            return Array.from(document.querySelectorAll('.modal-overlay')).some(overlay => {
+                const style = window.getComputedStyle(overlay);
+                return style.display !== 'none' && style.visibility !== 'hidden';
+            });
+        }
+
+        function notifyDataUpdated() {
+            localStorage.setItem('financeiro_data_updated', Date.now().toString());
+            if (dataSyncChannel) {
+                try {
+                    dataSyncChannel.postMessage({ action: 'DATA_UPDATED' });
+                } catch (err) {}
+            }
+        }
+
+        function handleDataUpdatedSignal() {
+            const isEditingInput = document.activeElement && ['INPUT', 'SELECT', 'TEXTAREA'].includes(document.activeElement.tagName) && document.activeElement.value !== '';
+            if (!isAnyModalOpen() && !isEditingInput) {
+                window.location.reload();
+            } else {
+                window.needsReloadOnModalClose = true;
+            }
+        }
+
+        if (dataSyncChannel) {
+            dataSyncChannel.onmessage = function(e) {
+                if (e.data && e.data.action === 'DATA_UPDATED') {
+                    handleDataUpdatedSignal();
+                }
+            };
+        }
+
+        function restoreSelectedTransactions(tbody) {
+            if (!tbody) return;
+            try {
+                const saved = JSON.parse(localStorage.getItem(STORAGE_KEY_TRANSACTIONS) || '[]');
+                const set = new Set(saved.map(String));
+                tbody.querySelectorAll('tr[data-id]').forEach(row => {
+                    const id = row.getAttribute('data-id');
+                    if (set.has(id)) {
+                        row.classList.add('selected-audit');
+                    } else {
+                        row.classList.remove('selected-audit');
+                    }
+                });
+            } catch (err) {
+                console.error('Erro ao restaurar lançamentos selecionados:', err);
+            }
+        }
+
+        function updateSelectedTransactionsStorage(tbody) {
+            if (!tbody) return;
+            const selectedIds = Array.from(tbody.querySelectorAll('tr.selected-audit[data-id]'))
+                .map(r => r.getAttribute('data-id'));
+            localStorage.setItem(STORAGE_KEY_TRANSACTIONS, JSON.stringify(selectedIds));
+        }
+
+        // Desativar restauração de scroll automática do navegador para termos controle total
+        if ('scrollRestoration' in history) {
+            history.scrollRestoration = 'manual';
+        }
+
+        const SCROLL_KEY = 'financeiro_scroll_pos_' + window.location.pathname;
+
+        function saveScrollPosition() {
+            if (window.scrollY > 0) {
+                sessionStorage.setItem(SCROLL_KEY, window.scrollY.toString());
+            }
+        }
+
+        window.addEventListener('scroll', function() {
+            if (window.scrollY > 0) {
+                sessionStorage.setItem(SCROLL_KEY, window.scrollY.toString());
+            }
+        }, { passive: true });
+
+        window.addEventListener('beforeunload', saveScrollPosition);
+
+        function restoreScrollPosition() {
+            const saved = sessionStorage.getItem(SCROLL_KEY);
+            if (saved !== null && parseInt(saved, 10) > 0) {
+                const targetPos = parseInt(saved, 10);
+                
+                const doScroll = () => {
+                    window.scrollTo({
+                        top: targetPos,
+                        left: 0,
+                        behavior: 'instant'
+                    });
+                };
+
+                doScroll();
+                requestAnimationFrame(doScroll);
+                setTimeout(doScroll, 50);
+                setTimeout(doScroll, 200);
+                setTimeout(doScroll, 500);
+            }
+        }
+
+        window.addEventListener('load', restoreScrollPosition);
+
+        // Inicializar tabela
+        document.addEventListener('DOMContentLoaded', function() {
+            restoreScrollPosition();
+            const table = document.getElementById('transactionsTable');
+            makeTableInteractive(table);
+
+            if (table) {
+                const tbody = table.querySelector('tbody');
+                if (tbody) {
+                    restoreSelectedTransactions(tbody);
+
+                    tbody.addEventListener('click', function(e) {
+                        // Não seleciona se clicar em botões, links, ícones, SVGs ou formulários de ações
+                        if (
+                            e.target.closest('.action-btn-small') || 
+                            e.target.closest('form') || 
+                            e.target.closest('a') || 
+                            e.target.closest('button')
+                        ) {
+                            return;
+                        }
+                        const row = e.target.closest('tr');
+                        if (row && row.parentElement.tagName.toLowerCase() === 'tbody') {
+                            row.classList.toggle('selected-audit');
+                            updateSelectedTransactionsStorage(tbody);
+                        }
+                    });
+
+                    // Sincronização em tempo real entre abas duplicadas ou janelas abertas
+                    window.addEventListener('storage', function(e) {
+                        if (e.key === STORAGE_KEY_TRANSACTIONS) {
+                            restoreSelectedTransactions(tbody);
+                        }
+                        if (e.key === 'financeiro_data_updated') {
+                            handleDataUpdatedSignal();
+                        }
+                    });
+                }
+            }
+        });
     </script>
 </body>
 </html>

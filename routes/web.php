@@ -7,15 +7,16 @@ use App\Http\Controllers\FinancasController;
 use App\Http\Controllers\CartoesController;
 use App\Http\Controllers\CategoriasController;
 use App\Http\Controllers\ExportController;
-use App\Http\Controllers\WhatsappWebhookController;
+use App\Http\Controllers\TelegramWebhookController;
+use App\Http\Controllers\EstudosController;
 
 Route::get('/', function () {
     return view('welcome');
 });
 
-// ── WhatsApp Webhook (rota pública, sem autenticação) ─────────────────────────
-Route::post('/webhook/whatsapp', [WhatsappWebhookController::class, 'receive'])
-    ->name('webhook.whatsapp');
+// ── Telegram Webhook (rota pública, sem autenticação) ─────────────────────────
+Route::post('/webhook/telegram', [TelegramWebhookController::class, 'receive'])
+    ->name('webhook.telegram');
 
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
 Route::post('/login', [AuthController::class, 'authenticate'])->name('login.post');
@@ -56,7 +57,17 @@ Route::middleware('auth')->group(function () {
     Route::get('/financas/export/fatura/{cartao}/{format}', [ExportController::class, 'exportFatura'])->name('export.fatura');
     Route::get('/financas/export/orcamento/{format}', [ExportController::class, 'exportOrcamento'])->name('export.orcamento');
     Route::post('/financas/export/orcamento/{format}', [ExportController::class, 'exportOrcamentoPost'])->name('export.orcamento.post');
+    Route::delete('/financas/telegram-logs', [TelegramWebhookController::class, 'clearLogs'])->name('telegram.logs.clear');
+    Route::delete('/financas/telegram-logs/{log}', [TelegramWebhookController::class, 'destroyLog'])->name('telegram.logs.destroy');
     
+    // Sistema 2 - Calculadora de Estudos
+    Route::get('/estudos', [EstudosController::class, 'index'])->name('estudos.index');
+    Route::post('/estudos/goals', [EstudosController::class, 'storeGoal'])->name('estudos.goals.store');
+    Route::post('/estudos/goals/{goal}/activate', [EstudosController::class, 'activateGoal'])->name('estudos.goals.activate');
+    Route::delete('/estudos/goals/{goal}', [EstudosController::class, 'destroyGoal'])->name('estudos.goals.destroy');
+    Route::post('/estudos/logs', [EstudosController::class, 'storeLog'])->name('estudos.logs.store');
+    Route::delete('/estudos/logs/{log}', [EstudosController::class, 'destroyLog'])->name('estudos.logs.destroy');
+
     // Compatibilidade com rota antiga
     Route::get('/dashboard', function () {
         return redirect()->route('home');

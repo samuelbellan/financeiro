@@ -20,8 +20,27 @@ class FinancasController extends Controller
     {
         $user = Auth::user();
         
-        $mes = $request->get('mes', now()->month);
-        $ano = $request->get('ano', now()->year);
+        $dataInicio = $request->get('data_inicio');
+        $dataFim = $request->get('data_fim');
+
+        if (!$dataInicio || !$dataFim) {
+            if ($request->has('period')) {
+                $period = $request->get('period'); // YYYY-MM
+                $parts = explode('-', $period);
+                $ano = (int)$parts[0];
+                $mes = (int)$parts[1];
+            } else {
+                $mes = $request->get('mes', now()->month);
+                $ano = $request->get('ano', now()->year);
+            }
+            
+            $dataInicio = \Carbon\Carbon::create($ano, $mes, 1)->startOfMonth()->toDateString();
+            $dataFim = \Carbon\Carbon::create($ano, $mes, 1)->endOfMonth()->toDateString();
+        } else {
+            $carbonFim = \Carbon\Carbon::parse($dataFim);
+            $mes = $carbonFim->month;
+            $ano = $carbonFim->year;
+        }
 
         $cartoes = Cartao::where('user_id', $user->id)->get();
         
@@ -31,8 +50,7 @@ class FinancasController extends Controller
             ->get();
         
         $transacoes = Transacao::where('user_id', $user->id)
-            ->whereMonth('data', $mes)
-            ->whereYear('data', $ano)
+            ->whereBetween('data', [$dataInicio, $dataFim])
             ->orderBy('data', 'desc')
             ->get();
 
@@ -42,14 +60,12 @@ class FinancasController extends Controller
 
         $receitasMes = Transacao::where('user_id', $user->id)
             ->where('tipo', 'receita')
-            ->whereMonth('data', $mes)
-            ->whereYear('data', $ano)
+            ->whereBetween('data', [$dataInicio, $dataFim])
             ->sum('valor');
 
         $despesasMes = Transacao::where('user_id', $user->id)
             ->where('tipo', 'despesa')
-            ->whereMonth('data', $mes)
-            ->whereYear('data', $ano)
+            ->whereBetween('data', [$dataInicio, $dataFim])
             ->sum('valor');
 
         // Previsões de transações (Contas de Casa)
@@ -65,12 +81,8 @@ class FinancasController extends Controller
             $queryConsumo = Transacao::where('user_id', $user->id)
                 ->where('tipo', $p->tipo)
                 ->where('categoria', 'like', $p->categoria)
-                ->whereMonth('data', $mes)
-                ->whereYear('data', $ano);
+                ->whereBetween('data', [$dataInicio, $dataFim]);
 
-            // Se a previsão tem subcategoria, filtra por ela. 
-            // Caso contrário, busca transações que também não tenham subcategoria (ou opcionalmente soma tudo)
-            // Para seguir o desejo do usuário de precisão, vamos filtrar por subcategoria exata.
             if ($p->subcategoria) {
                 $queryConsumo->where('subcategoria', 'like', $p->subcategoria);
             } else {
@@ -90,8 +102,7 @@ class FinancasController extends Controller
         $faturas = CartaoParcela::whereHas('compra.cartao', function($query) use ($user) {
                 $query->where('user_id', $user->id);
             })
-            ->whereMonth('data_vencimento', $mes)
-            ->whereYear('data_vencimento', $ano)
+            ->whereBetween('data_vencimento', [$dataInicio, $dataFim])
             ->with('compra.cartao')
             ->get();
 
@@ -239,12 +250,54 @@ class FinancasController extends Controller
             $totalConsolidadoAno += $cMes;
         }
 
+        $start = \Carbon\Carbon::parse($dataInicio);
+        $end = \Carbon\Carbon::parse($dataFim);
+        $diffInDays = $start->diffInDays($end) + 1;
+
+        $labelsDiarios = [];
+        $datesMap = [];
+        $dailyExpensesMap = [];
+        for ($i = 0; $i < $diffInDays; $i++) {
+            $dateObj = $start->copy()->addDays($i);
+            $dateStr = $dateObj->toDateString();
+            $labelStr = $dateObj->format('d/m');
+            
+            $labelsDiarios[] = $labelStr;
+            $datesMap[] = $dateStr;
+            $dailyExpensesMap[$dateStr] = 0;
+        }
+
+        $despesasPeriodo = Transacao::where('user_id', $user->id)
+            ->where('tipo', 'despesa')
+            ->whereBetween('data', [$dataInicio, $dataFim])
+            ->get();
+
+        $despesasDetalhado = [];
+        foreach ($despesasPeriodo as $t) {
+            $dateStr = \Carbon\Carbon::parse($t->data)->toDateString();
+            if (isset($dailyExpensesMap[$dateStr])) {
+                $dailyExpensesMap[$dateStr] += (float)$t->valor;
+            }
+            $despesasDetalhado[] = [
+                'data' => $dateStr,
+                'descricao' => $t->descricao,
+                'valor' => (float)$t->valor,
+                'categoria' => $t->categoria ?: 'Sem Categoria',
+                'subcategoria' => $t->subcategoria ?: ''
+            ];
+        }
+        $despesasDiariasValues = array_values($dailyExpensesMap);
+
+        $totalDespesasPeriodo = array_sum($despesasDiariasValues);
+        $mediaDiariaDespesa = $diffInDays > 0 ? $totalDespesasPeriodo / $diffInDays : 0;
+
         return view('financas.index', compact(
             'transacoes', 'saldo', 'receitasMes', 'despesasMes', 'cartoes', 
             'previsoes', 'mes', 'ano', 'categorias', 'totalPrevistoReceita', 
             'totalPrevistoDespesa', 'faturasPorCartao', 'totalFaturas',
             'consolidadoMaisPrevisao', 'listaImprevistos', 'listaExcessos',
-            'consolidadoAnoMeses', 'totalConsolidadoAno'
+            'consolidadoAnoMeses', 'totalConsolidadoAno', 'dataInicio', 'dataFim',
+            'labelsDiarios', 'despesasDiariasValues', 'datesMap', 'despesasDetalhado', 'mediaDiariaDespesa'
         ));
     }
 
@@ -323,7 +376,7 @@ class FinancasController extends Controller
 
         $validated['user_id'] = Auth::id();
 
-        Transacao::create($validated);
+        $transacao = Transacao::create($validated);
 
         if ($request->has('pagar_fatura') && $request->tipo === 'despesa') {
             $cartaoId = $request->input('cartao_id');
@@ -340,6 +393,21 @@ class FinancasController extends Controller
                 ->whereYear('data_vencimento', $anoFatura)
                 ->update(['status' => 'paga']);
             }
+        }
+
+        if ($request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Transação adicionada com sucesso!',
+                'transacao' => [
+                    'descricao' => $transacao->descricao,
+                    'valor' => (float)$transacao->valor,
+                    'tipo' => $transacao->tipo,
+                    'data' => $transacao->data,
+                    'categoria' => $transacao->categoria,
+                    'subcategoria' => $transacao->subcategoria,
+                ]
+            ]);
         }
 
         return redirect()->route('financas.index')->with('success', 'Transação adicionada com sucesso!');

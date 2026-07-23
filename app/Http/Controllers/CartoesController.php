@@ -32,17 +32,12 @@ class CartoesController extends Controller
         // Agrupar parcelas por cartão
         $faturasPorCartao = $faturas->groupBy('compra.cartao_id');
 
-        // Análise de gastos por categoria (compras realizadas no mês selecionado)
-        $gastosPorCategoria = CartaoCompra::whereHas('cartao', function($query) use ($user) {
-                $query->where('user_id', $user->id);
-            })
-            ->whereMonth('data_compra', $currentMonth)
-            ->whereYear('data_compra', $currentYear)
-            ->get()
-            ->groupBy('categoria')
-            ->map(function ($compras) {
-                return $compras->sum('valor_total');
-            });
+        // Análise de gastos por categoria (compras cujas parcelas vencem no mês selecionado)
+        $gastosPorCategoria = $faturas->groupBy(function($fatura) {
+            return $fatura->compra->categoria ?: 'Sem Categoria';
+        })->map(function($parcelas) {
+            return $parcelas->sum('valor_parcela');
+        });
 
         // Previsões do período selecionado
         $previsoes = CartaoPrevisao::whereHas('cartao', function($query) use ($user) {
@@ -66,7 +61,63 @@ class CartoesController extends Controller
             $p->porcentagem = $p->valor_previsto > 0 ? min(100, ($consumoReal / $p->valor_previsto) * 100) : 0;
         }
 
-        return view('financas.cartoes', compact('cartoes', 'faturasPorCartao', 'previsoes', 'gastosPorCategoria', 'currentMonth', 'currentYear'));
+        // Gastos do período para os gráficos (agrupados por categoria, baseados em vencimento)
+        $gastosChartAVista = [];
+        $gastosChartAPrazo = [];
+        
+        $diasNoMes = \Carbon\Carbon::create($currentYear, $currentMonth, 1)->daysInMonth;
+        // Inicializar todos os dias com zero
+        $gastosDiariosAVista = array_fill(1, $diasNoMes, 0);
+
+        foreach ($faturas as $fatura) {
+            $compra = $fatura->compra;
+            $cat = $compra->categoria ?: 'Sem Categoria';
+            $isAVista = in_array($compra->tipo, ['avista', 'recorrente']);
+            
+            if ($isAVista) {
+                if (!isset($gastosChartAVista[$cat])) {
+                    $gastosChartAVista[$cat] = 0;
+                }
+                $gastosChartAVista[$cat] += abs($fatura->valor_parcela);
+                
+                // Extrair o dia da compra para a análise diária
+                $diaCompra = \Carbon\Carbon::parse($compra->data_compra)->day;
+                if ($diaCompra >= 1 && $diaCompra <= $diasNoMes) {
+                    $gastosDiariosAVista[$diaCompra] += abs($fatura->valor_parcela);
+                }
+            } else {
+                if (!isset($gastosChartAPrazo[$cat])) {
+                    $gastosChartAPrazo[$cat] = 0;
+                }
+                $gastosChartAPrazo[$cat] += abs($fatura->valor_parcela);
+            }
+        }
+
+        $totalAVista = array_sum($gastosDiariosAVista);
+        $mediaDiaria = $diasNoMes > 0 ? $totalAVista / $diasNoMes : 0;
+
+        $comprasAVistaDetalhado = [];
+        foreach ($faturas as $fatura) {
+            $compra = $fatura->compra;
+            $isAVista = in_array($compra->tipo, ['avista', 'recorrente']);
+            if ($isAVista) {
+                $diaCompra = \Carbon\Carbon::parse($compra->data_compra)->day;
+                $comprasAVistaDetalhado[] = [
+                    'dia' => $diaCompra,
+                    'descricao' => $compra->descricao,
+                    'valor' => (float)$fatura->valor_parcela,
+                    'cartao' => $compra->cartao->nome,
+                    'categoria' => $compra->categoria ?: 'Sem Categoria',
+                    'tipo' => $compra->tipo
+                ];
+            }
+        }
+
+        return view('financas.cartoes', compact(
+            'cartoes', 'faturasPorCartao', 'previsoes', 'gastosPorCategoria', 
+            'currentMonth', 'currentYear', 'gastosChartAVista', 'gastosChartAPrazo',
+            'gastosDiariosAVista', 'mediaDiaria', 'diasNoMes', 'comprasAVistaDetalhado'
+        ));
     }
 
     public function storePrevisao(Request $request)
@@ -156,6 +207,20 @@ class CartoesController extends Controller
 
         $compra = CartaoCompra::create($validated);
         $this->gerarParcelas($compra);
+
+        if ($request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Compra registrada com sucesso!',
+                'compra' => [
+                    'descricao' => $compra->descricao,
+                    'valor_total' => (float)$compra->valor_total,
+                    'tipo' => $compra->tipo,
+                    'data_compra' => $compra->data_compra,
+                    'categoria' => $compra->categoria,
+                ]
+            ]);
+        }
 
         return redirect()->back()->with('success', 'Compra registrada com sucesso!');
     }
