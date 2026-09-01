@@ -1,11 +1,6 @@
-* text=auto eol=lf
+# Auto detect text files and perform LF normalization
+* text=auto
 
-*.blade.php diff=html
-*.css diff=css
-*.html diff=html
-*.md diff=markdown
-*.php diff=php
-
-/.github export-ignore
-CHANGELOG.md export-ignore
-.styleci.yml export-ignore
+# Enforce Unix line endings for shell scripts and Docker entrypoints
+*.sh text eol=lf
+Dockerfile text eol=lf

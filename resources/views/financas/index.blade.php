@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="{{ asset('css/home.css') }}">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="{{ asset('js/sidebar.js') }}"></script>
     <style>
         :root {
             --primary: #6366f1;
@@ -206,7 +207,16 @@
 <body>
     <div class="layout">
         <aside class="sidebar">
-            <div class="sidebar-header"><h2>Financeiro</h2></div>
+            <div class="sidebar-header">
+                <h2>Financeiro</h2>
+                <button type="button" class="sidebar-toggle-btn js-toggle-sidebar" title="Ocultar barra lateral (Ctrl + \)">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                        <line x1="9" y1="3" x2="9" y2="21"></line>
+                        <path d="M15 9l-3 3 3 3"></path>
+                    </svg>
+                </button>
+            </div>
             <nav class="sidebar-nav">
                 <a href="{{ route('home') }}" class="nav-item">
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
@@ -229,19 +239,41 @@
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
                         <span>Categorias</span>
                     </a>
+                    <a href="{{ route('financas.mercado.index') }}" class="nav-item">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
+                        <span>Supermercado & NFs</span>
+                    </a>
                     <a href="{{ route('cartoes.index') }}" class="nav-item">
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
                         <span>Meus Cartões</span>
+                    </a>
+
+                    <a href="{{ route('photos.index') }}" class="nav-item">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                            <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                            <polyline points="21 15 16 10 5 21"></polyline>
+                        </svg>
+                        <span>Galeria Fotos</span>
                     </a>
                 </div>
             </nav>
         </aside>
 
         <main class="main-content">
-            <header class="content-header" style="display: flex; justify-content: space-between; align-items: flex-start;">
-                <div>
-                    <h1>Finanças de Casa</h1>
-                    <p>Planejamento de {{ \Carbon\Carbon::create(null, $mes)->translatedFormat('F') }} / {{ $ano }}</p>
+            <header class="content-header" style="display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem;">
+                <div style="display: flex; align-items: center; gap: 1rem;">
+                    <button type="button" class="btn-toggle-sidebar js-toggle-sidebar" title="Alternar barra lateral (Ctrl + \)">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="3" y1="12" x2="21" y2="12"></line>
+                            <line x1="3" y1="6" x2="21" y2="6"></line>
+                            <line x1="3" y1="18" x2="21" y2="18"></line>
+                        </svg>
+                    </button>
+                    <div>
+                        <h1>Finanças de Casa</h1>
+                        <p>Planejamento de {{ \Carbon\Carbon::create(null, $mes)->translatedFormat('F') }} / {{ $ano }}</p>
+                    </div>
                 </div>
                 <div style="display: flex; gap: 0.5rem;">
                     <button onclick="downloadPdf()" class="btn-add" style="background: #ef4444; font-size: 0.75rem; border: none; cursor: pointer; color: white;">PDF</button>
@@ -256,7 +288,16 @@
                         {{ session('success') }}
                     </div>
                     <script>
-                        if (typeof notifyDataUpdated === 'function') { notifyDataUpdated(); } else { localStorage.setItem('financeiro_data_updated', Date.now().toString()); }
+                        (function() {
+                            const msg = @json(session('success'));
+                            const key = 'financeiro_broadcasted_' + btoa(encodeURIComponent(msg)).substring(0, 16);
+                            if (!sessionStorage.getItem(key)) {
+                                sessionStorage.setItem(key, '1');
+                                if (typeof notifyDataUpdated === 'function') {
+                                    notifyDataUpdated();
+                                }
+                            }
+                        })();
                     </script>
                 @endif
                 @php
@@ -699,6 +740,7 @@
         let hasAddedTransactions = false;
         function closeModal() { 
             if (hasAddedTransactions || window.needsReloadOnModalClose) {
+                saveScrollPosition();
                 window.location.reload();
             } else {
                 document.getElementById('modalOverlay').style.display = 'none'; 
@@ -1586,40 +1628,6 @@
 
         // Key de armazenamento local para persisitir os lançamentos selecionados (destacados em verde)
         const STORAGE_KEY_TRANSACTIONS = 'financeiro_selected_transactions';
-        const dataSyncChannel = (typeof BroadcastChannel !== 'undefined') ? new BroadcastChannel('financeiro_sync_channel') : null;
-
-        function isAnyModalOpen() {
-            return Array.from(document.querySelectorAll('.modal-overlay')).some(overlay => {
-                const style = window.getComputedStyle(overlay);
-                return style.display !== 'none' && style.visibility !== 'hidden';
-            });
-        }
-
-        function notifyDataUpdated() {
-            localStorage.setItem('financeiro_data_updated', Date.now().toString());
-            if (dataSyncChannel) {
-                try {
-                    dataSyncChannel.postMessage({ action: 'DATA_UPDATED' });
-                } catch (err) {}
-            }
-        }
-
-        function handleDataUpdatedSignal() {
-            const isEditingInput = document.activeElement && ['INPUT', 'SELECT', 'TEXTAREA'].includes(document.activeElement.tagName) && document.activeElement.value !== '';
-            if (!isAnyModalOpen() && !isEditingInput) {
-                window.location.reload();
-            } else {
-                window.needsReloadOnModalClose = true;
-            }
-        }
-
-        if (dataSyncChannel) {
-            dataSyncChannel.onmessage = function(e) {
-                if (e.data && e.data.action === 'DATA_UPDATED') {
-                    handleDataUpdatedSignal();
-                }
-            };
-        }
 
         function restoreSelectedTransactions(tbody) {
             if (!tbody) return;
@@ -1653,38 +1661,62 @@
 
         const SCROLL_KEY = 'financeiro_scroll_pos_' + window.location.pathname;
 
-        function saveScrollPosition() {
-            if (window.scrollY > 0) {
-                sessionStorage.setItem(SCROLL_KEY, window.scrollY.toString());
-            }
+        function getScrollContainer() {
+            return document.querySelector('.content-body');
         }
 
-        window.addEventListener('scroll', function() {
-            if (window.scrollY > 0) {
-                sessionStorage.setItem(SCROLL_KEY, window.scrollY.toString());
+        function getCurrentScrollPosition() {
+            const container = getScrollContainer();
+            if (container && container.scrollTop > 0) {
+                return container.scrollTop;
             }
-        }, { passive: true });
+            return window.scrollY || window.pageYOffset || 0;
+        }
+
+        function saveScrollPosition() {
+            const pos = getCurrentScrollPosition();
+            sessionStorage.setItem(SCROLL_KEY, pos.toString());
+        }
+
+        function attachScrollListeners() {
+            const container = getScrollContainer();
+            if (container) {
+                container.addEventListener('scroll', function() {
+                    sessionStorage.setItem(SCROLL_KEY, container.scrollTop.toString());
+                }, { passive: true });
+            }
+            window.addEventListener('scroll', function() {
+                const pos = getCurrentScrollPosition();
+                sessionStorage.setItem(SCROLL_KEY, pos.toString());
+            }, { passive: true });
+        }
 
         window.addEventListener('beforeunload', saveScrollPosition);
 
         function restoreScrollPosition() {
             const saved = sessionStorage.getItem(SCROLL_KEY);
-            if (saved !== null && parseInt(saved, 10) > 0) {
+            if (saved !== null) {
                 const targetPos = parseInt(saved, 10);
-                
-                const doScroll = () => {
-                    window.scrollTo({
-                        top: targetPos,
-                        left: 0,
-                        behavior: 'instant'
-                    });
-                };
+                if (targetPos > 0) {
+                    const doScroll = () => {
+                        const container = getScrollContainer();
+                        if (container) {
+                            container.scrollTop = targetPos;
+                        }
+                        window.scrollTo({
+                            top: targetPos,
+                            left: 0,
+                            behavior: 'instant'
+                        });
+                    };
 
-                doScroll();
-                requestAnimationFrame(doScroll);
-                setTimeout(doScroll, 50);
-                setTimeout(doScroll, 200);
-                setTimeout(doScroll, 500);
+                    doScroll();
+                    requestAnimationFrame(doScroll);
+                    setTimeout(doScroll, 30);
+                    setTimeout(doScroll, 100);
+                    setTimeout(doScroll, 300);
+                    setTimeout(doScroll, 600);
+                }
             }
         }
 
@@ -1692,6 +1724,7 @@
 
         // Inicializar tabela
         document.addEventListener('DOMContentLoaded', function() {
+            attachScrollListeners();
             restoreScrollPosition();
             const table = document.getElementById('transactionsTable');
             makeTableInteractive(table);
@@ -1722,9 +1755,6 @@
                     window.addEventListener('storage', function(e) {
                         if (e.key === STORAGE_KEY_TRANSACTIONS) {
                             restoreSelectedTransactions(tbody);
-                        }
-                        if (e.key === 'financeiro_data_updated') {
-                            handleDataUpdatedSignal();
                         }
                     });
                 }

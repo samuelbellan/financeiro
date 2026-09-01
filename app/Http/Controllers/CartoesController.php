@@ -6,6 +6,9 @@ use App\Models\Cartao;
 use App\Models\CartaoCompra;
 use App\Models\CartaoParcela;
 use App\Models\CartaoPrevisao;
+use App\Models\Categoria;
+use App\Services\CategorySanitizer;
+use App\Services\CreditCardService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
@@ -20,9 +23,9 @@ class CartoesController extends Controller
         $currentMonth = $request->get('mes', now()->month);
         $currentYear = $request->get('ano', now()->year);
 
-        // Parcelas do período selecionado
+        // Parcelas do período selecionado (apenas cartões ativos)
         $faturas = CartaoParcela::whereHas('compra.cartao', function($query) use ($user) {
-                $query->where('user_id', $user->id);
+                $query->where('user_id', $user->id)->where('ativo', true);
             })
             ->whereMonth('data_vencimento', $currentMonth)
             ->whereYear('data_vencimento', $currentYear)
@@ -32,36 +35,44 @@ class CartoesController extends Controller
         // Agrupar parcelas por cartão
         $faturasPorCartao = $faturas->groupBy('compra.cartao_id');
 
-        // Análise de gastos por categoria (compras cujas parcelas vencem no mês selecionado)
-        $gastosPorCategoria = $faturas->groupBy(function($fatura) {
-            return $fatura->compra->categoria ?: 'Sem Categoria';
+        $userCategorias = Categoria::where('user_id', $user->id)->pluck('nome')->toArray();
+
+        // Análise de gastos por categoria (sanitizado e agrupado por nome canônico)
+        $gastosPorCategoria = $faturas->groupBy(function($fatura) use ($userCategorias) {
+            return CategorySanitizer::sanitize($fatura->compra->categoria, $userCategorias);
         })->map(function($parcelas) {
             return $parcelas->sum('valor_parcela');
         });
 
-        // Previsões do período selecionado
+        // Previsões do período selecionado (apenas cartões ativos)
         $previsoes = CartaoPrevisao::whereHas('cartao', function($query) use ($user) {
-                $query->where('user_id', $user->id);
+                $query->where('user_id', $user->id)->where('ativo', true);
             })
             ->where('mes', $currentMonth)
             ->where('ano', $currentYear)
             ->with('cartao')
             ->get();
 
+        // Buscar todas as compras do mês dos cartões ativos para bater com as previsões (sanitizado)
+        $comprasMes = CartaoCompra::whereHas('cartao', function($q) use ($user) {
+                $q->where('user_id', $user->id)->where('ativo', true);
+            })
+            ->whereMonth('data_compra', $currentMonth)
+            ->whereYear('data_compra', $currentYear)
+            ->get();
+
         // Calcular consumo real para cada previsão
         foreach ($previsoes as $p) {
-            $consumoReal = CartaoCompra::where('cartao_id', $p->cartao_id)
-                ->where('categoria', 'like', $p->categoria)
-                ->whereMonth('data_compra', $currentMonth)
-                ->whereYear('data_compra', $currentYear)
-                ->sum('valor_total');
+            $consumoReal = $comprasMes->filter(function($compra) use ($p) {
+                return $compra->cartao_id == $p->cartao_id && CategorySanitizer::isMatch($compra->categoria, $p->categoria);
+            })->sum('valor_total');
             
             $p->consumo_real = $consumoReal;
             $p->restante = max(0, $p->valor_previsto - $consumoReal);
             $p->porcentagem = $p->valor_previsto > 0 ? min(100, ($consumoReal / $p->valor_previsto) * 100) : 0;
         }
 
-        // Gastos do período para os gráficos (agrupados por categoria, baseados em vencimento)
+        // Gastos do período para os gráficos (agrupados por categoria sanitizada)
         $gastosChartAVista = [];
         $gastosChartAPrazo = [];
         
@@ -71,7 +82,7 @@ class CartoesController extends Controller
 
         foreach ($faturas as $fatura) {
             $compra = $fatura->compra;
-            $cat = $compra->categoria ?: 'Sem Categoria';
+            $cat = CategorySanitizer::sanitize($compra->categoria, $userCategorias);
             $isAVista = in_array($compra->tipo, ['avista', 'recorrente']);
             
             if ($isAVista) {
@@ -107,7 +118,7 @@ class CartoesController extends Controller
                     'descricao' => $compra->descricao,
                     'valor' => (float)$fatura->valor_parcela,
                     'cartao' => $compra->cartao->nome,
-                    'categoria' => $compra->categoria ?: 'Sem Categoria',
+                    'categoria' => CategorySanitizer::sanitize($compra->categoria, $userCategorias),
                     'tipo' => $compra->tipo
                 ];
             }
@@ -167,6 +178,12 @@ class CartoesController extends Controller
 
     public function store(Request $request)
     {
+        if ($request->has('limite')) {
+            $limite = str_replace(['R$', ' ', '.'], '', $request->input('limite'));
+            $limite = str_replace(',', '.', $limite);
+            $request->merge(['limite' => $limite]);
+        }
+
         $validated = $request->validate([
             'nome' => 'required|string|max:255',
             'cor' => 'required|string|max:7',
@@ -269,8 +286,7 @@ class CartoesController extends Controller
         $cartao = $compra->cartao;
 
         for ($i = 1; $i <= $numParcelas; $i++) {
-            $mesOffset = ($dataCompra->day > $cartao->dia_fechamento) ? $i + 1 : $i;
-            $vencimento = $dataCompra->copy()->addMonths($mesOffset)->day($cartao->dia_vencimento);
+            $vencimento = CreditCardService::calcularVencimentoParcela($cartao, $dataCompra, $i);
             
             CartaoParcela::create([
                 'cartao_compra_id' => $compra->id,
@@ -282,11 +298,12 @@ class CartoesController extends Controller
 
             if ($compra->tipo === 'recorrente' && $i === 1) {
                 for ($j = 2; $j <= 12; $j++) {
+                    $vencRecorrente = CreditCardService::calcularVencimentoParcela($cartao, $dataCompra->copy()->addMonths($j - 1), 1);
                     CartaoParcela::create([
                         'cartao_compra_id' => $compra->id,
                         'numero_parcela' => $j,
                         'valor_parcela' => $valorParcela,
-                        'data_vencimento' => $vencimento->copy()->addMonths($j-1),
+                        'data_vencimento' => $vencRecorrente,
                         'status' => 'aberta',
                     ]);
                 }
@@ -298,6 +315,12 @@ class CartoesController extends Controller
     {
         if ($cartao->user_id !== Auth::id()) abort(403);
 
+        if ($request->has('limite')) {
+            $limite = str_replace(['R$', ' ', '.'], '', $request->input('limite'));
+            $limite = str_replace(',', '.', $limite);
+            $request->merge(['limite' => $limite]);
+        }
+
         $validated = $request->validate([
             'nome' => 'required|string|max:255',
             'cor' => 'required|string|max:7',
@@ -307,9 +330,42 @@ class CartoesController extends Controller
             'dia_vencimento' => 'required|integer|min:1|max:31',
         ]);
 
+        $datesChanged = ($cartao->dia_fechamento != $validated['dia_fechamento'] || $cartao->dia_vencimento != $validated['dia_vencimento']);
         $cartao->update($validated);
 
-        return redirect()->back()->with('success', 'Cartão atualizado com sucesso!');
+        $recalculadas = 0;
+        if ($datesChanged || $request->has('recalcular_parcelas')) {
+            $recalculadas = CreditCardService::recalcularParcelasCartao($cartao, true);
+        }
+
+        $msg = 'Cartão atualizado com sucesso!';
+        if ($recalculadas > 0) {
+            $msg .= " ({$recalculadas} parcelas abertas tiveram vencimento recalculado).";
+        }
+
+        return redirect()->back()->with('success', $msg);
+    }
+
+    public function recalcular(Request $request, Cartao $cartao)
+    {
+        if ($cartao->user_id !== Auth::id()) abort(403);
+
+        $count = CreditCardService::recalcularParcelasCartao($cartao, true);
+        return redirect()->back()->with('success', "Faturas e parcelas recalculadas com sucesso! ({$count} parcelas ajustadas).");
+    }
+
+    public function updateParcela(Request $request, CartaoParcela $parcela)
+    {
+        if ($parcela->compra->cartao->user_id !== Auth::id()) abort(403);
+
+        $validated = $request->validate([
+            'data_vencimento' => 'required|date',
+            'valor_parcela' => 'nullable|numeric',
+        ]);
+
+        $parcela->update($validated);
+
+        return redirect()->back()->with('success', 'Vencimento da parcela flexibilizado/atualizado com sucesso!');
     }
 
     public function destroy(Cartao $cartao)
@@ -317,5 +373,16 @@ class CartoesController extends Controller
         if ($cartao->user_id !== Auth::id()) abort(403);
         $cartao->delete();
         return redirect()->back()->with('success', 'Cartão excluído!');
+    }
+
+    public function toggleStatus(Cartao $cartao)
+    {
+        if ($cartao->user_id !== Auth::id()) abort(403);
+        
+        $cartao->ativo = !$cartao->ativo;
+        $cartao->save();
+
+        $msg = $cartao->ativo ? "Cartão \"{$cartao->nome}\" habilitado com sucesso!" : "Cartão \"{$cartao->nome}\" desabilitado com sucesso!";
+        return redirect()->back()->with('success', $msg);
     }
 }

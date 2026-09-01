@@ -19,6 +19,11 @@ class Cartao extends Model
         'bandeira',
         'dia_fechamento',
         'dia_vencimento',
+        'ativo',
+    ];
+
+    protected $casts = [
+        'ativo' => 'boolean',
     ];
 
     public function user()

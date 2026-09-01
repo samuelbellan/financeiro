@@ -1,0 +1,52 @@
+services:
+  - type: web
+    name: financeiro-app
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    plan: free
+    region: oregon
+    healthCheckPath: /up
+    envVars:
+      - key: APP_NAME
+        value: Financeiro
+      - key: APP_ENV
+        value: production
+      - key: APP_DEBUG
+        value: "false"
+      - key: APP_KEY
+        generateValue: true
+      - key: APP_URL
+        sync: false
+      - key: DB_CONNECTION
+        value: pgsql
+      - key: DATABASE_URL
+        fromDatabase:
+          name: financeiro-db
+          property: connectionString
+      - key: SEED_ON_DEPLOY
+        value: "true"
+      - key: AUTO_SET_TELEGRAM_WEBHOOK
+        value: "true"
+      - key: SESSION_DRIVER
+        value: database
+      - key: CACHE_STORE
+        value: database
+      - key: QUEUE_CONNECTION
+        value: database
+      - key: TELEGRAM_BOT_TOKEN
+        sync: false
+      - key: TELEGRAM_ALLOWED_CHAT_ID
+        sync: false
+      - key: TELEGRAM_WEBHOOK_SECRET
+        generateValue: true
+      - key: TELEGRAM_USER_ID
+        value: "1"
+      - key: GEMINI_API_KEY
+        sync: false
+
+databases:
+  - name: financeiro-db
+    plan: free
+    region: oregon
+    databaseName: db_home
+    user: postgres

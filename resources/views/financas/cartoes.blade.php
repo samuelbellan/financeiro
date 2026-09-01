@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="{{ asset('css/home.css') }}">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="{{ asset('js/sidebar.js') }}"></script>
     <style>
         .dashboard-analysis { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem; background: #f8fafc; padding: 1.5rem; border-radius: 1rem; border: 1px solid #e2e8f0; }
         .analysis-card { background: white; padding: 1rem; border-radius: 0.75rem; border: 1px solid #e2e8f0; display: flex; flex-direction: column; }
@@ -83,7 +84,16 @@
 <body>
     <div class="layout">
         <aside class="sidebar">
-            <div class="sidebar-header"><h2>Financeiro</h2></div>
+            <div class="sidebar-header">
+                <h2>Financeiro</h2>
+                <button type="button" class="sidebar-toggle-btn js-toggle-sidebar" title="Ocultar barra lateral (Ctrl + \)">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                        <line x1="9" y1="3" x2="9" y2="21"></line>
+                        <path d="M15 9l-3 3 3 3"></path>
+                    </svg>
+                </button>
+            </div>
             <nav class="sidebar-nav">
                 <a href="{{ route('home') }}" class="nav-item">
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
@@ -106,26 +116,68 @@
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
                         <span>Categorias</span>
                     </a>
+                    <a href="{{ route('financas.mercado.index') }}" class="nav-item">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
+                        <span>Supermercado & NFs</span>
+                    </a>
                     <a href="{{ route('cartoes.index') }}" class="nav-item active">
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
                         <span>Meus Cartões</span>
+                    </a>
+
+                    <a href="{{ route('photos.index') }}" class="nav-item">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                            <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                            <polyline points="21 15 16 10 5 21"></polyline>
+                        </svg>
+                        <span>Galeria Fotos</span>
                     </a>
                 </div>
             </nav>
         </aside>
 
         <main class="main-content">
-            <header class="content-header">
-                <h1>Cartões de Crédito</h1>
-                <p>Gerencie seus gastos e faturas de forma independente</p>
+            <header class="content-header" style="display: flex; align-items: center; gap: 1rem;">
+                <button type="button" class="btn-toggle-sidebar js-toggle-sidebar" title="Alternar barra lateral (Ctrl + \)">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="3" y1="12" x2="21" y2="12"></line>
+                        <line x1="3" y1="6" x2="21" y2="6"></line>
+                        <line x1="3" y1="18" x2="21" y2="18"></line>
+                    </svg>
+                </button>
+                <div>
+                    <h1>Cartões de Crédito</h1>
+                    <p>Gerencie seus gastos e faturas de forma independente</p>
+                </div>
             </header>
 
             <div class="content-body">
                 @if(session('success'))
                     <div style="background: #dcfce7; color: #166534; padding: 1rem; border-radius: 0.5rem; margin-bottom: 1.5rem;">{{ session('success') }}</div>
                     <script>
-                        if (typeof notifyDataUpdated === 'function') { notifyDataUpdated(); } else { localStorage.setItem('financeiro_data_updated', Date.now().toString()); }
+                        (function() {
+                            const msg = @json(session('success'));
+                            const key = 'financeiro_broadcasted_' + btoa(encodeURIComponent(msg)).substring(0, 16);
+                            if (!sessionStorage.getItem(key)) {
+                                sessionStorage.setItem(key, '1');
+                                if (typeof notifyDataUpdated === 'function') {
+                                    notifyDataUpdated();
+                                }
+                            }
+                        })();
                     </script>
+                @endif
+
+                @if($errors->any())
+                    <div style="background: #fee2e2; color: #991b1b; padding: 1rem; border-radius: 0.5rem; margin-bottom: 1.5rem; border: 1px solid #fca5a5;">
+                        <strong style="font-weight: 700;">Ops! Não foi possível salvar:</strong>
+                        <ul style="margin-top: 0.5rem; margin-left: 1.25rem; margin-bottom: 0;">
+                            @foreach($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
                 @endif
 
                 @php
@@ -209,14 +261,29 @@
 
                 <div class="cards-container">
                     @foreach($cartoes as $cartao)
-                        <div class="credit-card-ui" style="background: linear-gradient(135deg, {{ $cartao->cor ?? '#1e293b' }} 0%, #0f172a 100%);">
+                        <div class="credit-card-ui" style="background: linear-gradient(135deg, {{ $cartao->cor ?? '#1e293b' }} 0%, #0f172a 100%); {{ !$cartao->ativo ? 'opacity: 0.65; filter: grayscale(0.4);' : '' }}">
                             <div class="card-chip"></div>
-                            <div class="card-name">{{ $cartao->nome }}</div>
-                            <div class="card-limit">Limite: R$ {{ number_format($cartao->limite, 2, ',', '.') }}</div>
-                            <div style="position: absolute; top: 1rem; right: 1rem; display: flex; gap: 5px;">
-                                <button onclick="editCard({{ json_encode($cartao) }})" style="background:rgba(255,255,255,0.1); border:none; color:white; padding:4px; border-radius:4px; cursor:pointer;"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4L18.5 2.5z"></path></svg></button>
+                            <div class="card-name">
+                                {{ $cartao->nome }}
+                                @if(!$cartao->ativo)
+                                    <span style="font-size: 0.65rem; background: #ef4444; color: white; padding: 2px 6px; border-radius: 4px; margin-left: 6px; font-weight: 700; text-transform: uppercase;">Desabilitado</span>
+                                @endif
                             </div>
-                            <div class="card-details" onclick="openPurchaseModal({{ $cartao->id }}, '{{ $cartao->nome }}')">
+                            <div class="card-limit">Limite: R$ {{ number_format($cartao->limite, 2, ',', '.') }}</div>
+                            <div style="position: absolute; top: 1rem; right: 1rem; display: flex; gap: 5px; align-items: center;">
+                                <form action="{{ route('cartoes.toggle-status', $cartao->id) }}" method="POST" style="display:inline;">
+                                    @csrf @method('PATCH')
+                                    <button type="submit" style="background:rgba(255,255,255,0.15); border:1px solid rgba(255,255,255,0.25); color:white; padding:4px 8px; border-radius:4px; cursor:pointer; font-size:0.7rem; display:flex; align-items:center; gap:4px;" title="{{ $cartao->ativo ? 'Desabilitar Cartão' : 'Habilitar Cartão' }}">
+                                        @if($cartao->ativo)
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"></line></svg> Desabilitar
+                                        @else
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg> Habilitar
+                                        @endif
+                                    </button>
+                                </form>
+                                <button onclick="editCard({{ json_encode($cartao) }})" style="background:rgba(255,255,255,0.15); border:1px solid rgba(255,255,255,0.25); color:white; padding:4px; border-radius:4px; cursor:pointer;" title="Editar Cartão"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4L18.5 2.5z"></path></svg></button>
+                            </div>
+                            <div class="card-details" @if($cartao->ativo) onclick="openPurchaseModal({{ $cartao->id }}, '{{ $cartao->nome }}')" style="cursor:pointer;" @else style="cursor:not-allowed;" title="Cartão desabilitado" @endif>
                                 <div class="card-dates">Fecha: dia {{ $cartao->dia_fechamento }}<br>Vence: dia {{ $cartao->dia_vencimento }}</div>
                                 <div class="card-brand">{{ $cartao->bandeira ?? 'VISA' }}</div>
                             </div>
@@ -227,17 +294,32 @@
                 <!-- Individual Invoices Section -->
                 <div class="section-header"><h2>Detalhamento de Faturas (Vencimento em {{ \Carbon\Carbon::create(null, $currentMonth)->translatedFormat('F') }})</h2></div>
                 @foreach($cartoes as $cartao)
-                    <div class="invoice-card">
-                        <div class="invoice-header">
+                    <div class="invoice-card" style="{{ !$cartao->ativo ? 'opacity: 0.75; border-color: #fca5a5;' : '' }}">
+                        <div class="invoice-header" style="{{ !$cartao->ativo ? 'background: #fef2f2;' : '' }}">
                             <div class="invoice-title">
                                 <div style="width: 12px; height: 12px; border-radius: 50%; background: {{ $cartao->cor }}"></div>
                                 {{ $cartao->nome }}
+                                @if(!$cartao->ativo)
+                                    <span style="background: #fee2e2; color: #991b1b; padding: 0.15rem 0.5rem; border-radius: 4px; font-size: 0.65rem; font-weight: 700; margin-left: 0.5rem; text-transform: uppercase;">Desabilitado - Ignorado nos Totais</span>
+                                @endif
                             </div>
                             <div style="display: flex; gap: 1rem; align-items: center;">
                                 <div class="invoice-total">
                                     Total: R$ {{ number_format($faturasPorCartao->get($cartao->id)?->sum('valor_parcela') ?? 0, 2, ',', '.') }}
                                 </div>
                                 <div style="display: flex; gap: 0.25rem;">
+                                    <form action="{{ route('cartoes.recalcular', $cartao->id) }}" method="POST" style="display:inline;" onsubmit="return confirm('Recalcular vencimentos de todas as parcelas abertas deste cartão?')">
+                                        @csrf
+                                        <button type="submit" class="btn-action" style="background:#3b82f6; padding:0.3rem 0.6rem; font-size:0.7rem;" title="Recalcular vencimentos de todas as parcelas abertas com base no fechamento/vencimento do cartão">
+                                            Recalcular Fatura
+                                        </button>
+                                    </form>
+                                    <form action="{{ route('cartoes.toggle-status', $cartao->id) }}" method="POST" style="display:inline;">
+                                        @csrf @method('PATCH')
+                                        <button type="submit" class="btn-action" style="background: {{ $cartao->ativo ? '#64748b' : '#10b981' }}; padding:0.3rem 0.6rem; font-size:0.7rem;">
+                                            {{ $cartao->ativo ? 'Desabilitar' : 'Habilitar' }}
+                                        </button>
+                                    </form>
                                     <a href="{{ route('export.fatura', ['cartao' => $cartao->id, 'format' => 'pdf', 'mes' => $currentMonth, 'ano' => $currentYear]) }}" class="btn-action" style="background:#ef4444; padding:0.3rem 0.6rem; font-size:0.7rem;">PDF</a>
                                     <a href="{{ route('export.fatura', ['cartao' => $cartao->id, 'format' => 'csv', 'mes' => $currentMonth, 'ano' => $currentYear]) }}" class="btn-action" style="background:#10b981; padding:0.3rem 0.6rem; font-size:0.7rem;">CSV</a>
                                 </div>
@@ -276,6 +358,9 @@
                                             </td>
                                             <td style="padding: 0.75rem 1.5rem; text-align: center;">
                                                 <div style="display: flex; gap: 5px; justify-content: center;">
+                                                    <button onclick="flexibilizarParcela({{ json_encode($f) }})" class="action-btn-small" title="Flexibilizar/Mudar Vencimento da Parcela">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                                                    </button>
                                                     <button onclick="editCompra({{ json_encode($f->compra) }})" class="action-btn-small" title="Editar Lançamento">
                                                         <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4L18.5 2.5z"></path></svg>
                                                     </button>
@@ -308,6 +393,9 @@
                                             </td>
                                             <td style="padding: 0.75rem 1.5rem; text-align: center;">
                                                 <div style="display: flex; gap: 5px; justify-content: center;">
+                                                    <button onclick="flexibilizarParcela({{ json_encode($f) }})" class="action-btn-small" title="Flexibilizar/Mudar Vencimento da Parcela">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                                                    </button>
                                                     <button onclick="editCompra({{ json_encode($f->compra) }})" class="action-btn-small" title="Editar Lançamento">
                                                         <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4L18.5 2.5z"></path></svg>
                                                     </button>
@@ -335,14 +423,14 @@
     </div>
 
     <!-- Modals -->
-    <div id="modalCard" class="modal-overlay"><div class="modal"><h3 id="cardModalTitle">Novo Cartão</h3><br><form id="cardForm" action="{{ route('cartoes.store') }}" method="POST">@csrf<div id="cardMethod"></div><div style="display: grid; grid-template-columns: 2fr 1fr; gap: 1rem;"><div class="form-group"><label>Nome</label><input type="text" name="nome" id="cardName" class="form-input" required></div><div class="form-group"><label>Cor</label><input type="color" name="cor" id="cardColor" class="color-input" value="#6366f1"></div></div><div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;"><div class="form-group"><label>Bandeira</label><input type="text" name="bandeira" id="cardBrand" class="form-input"></div><div class="form-group"><label>Limite</label><input type="number" step="0.01" name="limite" id="cardLimit" class="form-input" required></div></div><div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;"><div class="form-group"><label>Fechamento</label><input type="number" name="dia_fechamento" id="cardClose" class="form-input" required min="1" max="31"></div><div class="form-group"><label>Vencimento</label><input type="number" name="dia_vencimento" id="cardDue" class="form-input" required min="1" max="31"></div></div><div style="display: flex; justify-content: flex-end; gap: 0.5rem; margin-top: 1rem;"><button type="button" onclick="document.getElementById('modalCard').style.display='none'" class="btn-action" style="background: #94a3b8;">Cancelar</button><button type="submit" class="btn-action">Salvar</button></div></form></div></div>
+    <div id="modalCard" class="modal-overlay"><div class="modal"><h3 id="cardModalTitle">Novo Cartão</h3><br><form id="cardForm" action="{{ route('cartoes.store') }}" method="POST">@csrf<div id="cardMethod"></div><div style="display: grid; grid-template-columns: 2fr 1fr; gap: 1rem;"><div class="form-group"><label>Nome</label><input type="text" name="nome" id="cardName" class="form-input" required></div><div class="form-group"><label>Cor</label><input type="color" name="cor" id="cardColor" class="color-input" value="#6366f1"></div></div><div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;"><div class="form-group"><label>Bandeira</label><input type="text" name="bandeira" id="cardBrand" class="form-input"></div><div class="form-group"><label>Limite</label><input type="text" inputmode="decimal" name="limite" id="cardLimit" class="form-input" required placeholder="Ex: 5000,00"></div></div><div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;"><div class="form-group"><label>Fechamento</label><input type="number" name="dia_fechamento" id="cardClose" class="form-input" required min="1" max="31"></div><div class="form-group"><label>Vencimento</label><input type="number" name="dia_vencimento" id="cardDue" class="form-input" required min="1" max="31"></div></div><div style="display: flex; justify-content: flex-end; gap: 0.5rem; margin-top: 1rem;"><button type="button" onclick="document.getElementById('modalCard').style.display='none'" class="btn-action" style="background: #94a3b8;">Cancelar</button><button type="submit" class="btn-action">Salvar</button></div></form></div></div>
 
     <div id="modalPurchase" class="modal-overlay">
         <div class="modal">
             <h3 id="purchaseModalTitle">Lançamento</h3><br>
             <form id="purchaseForm" action="{{ route('cartoes.compras.store') }}" method="POST">
                 @csrf<div id="purchaseMethod"></div>
-                <div class="form-group"><label>Cartão</label><select name="cartao_id" id="purchaseCardId" class="form-input">@foreach($cartoes as $c)<option value="{{ $c->id }}">{{ $c->nome }}</option>@endforeach</select></div>
+                <div class="form-group"><label>Cartão</label><select name="cartao_id" id="purchaseCardId" class="form-input">@foreach($cartoes->where('ativo', true) as $c)<option value="{{ $c->id }}">{{ $c->nome }}</option>@endforeach</select></div>
                 <div class="form-group"><label>Descrição</label><input type="text" name="descricao" id="purchaseDesc" class="form-input" required></div>
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
                     <div class="form-group">
@@ -384,10 +472,48 @@
         </div>
     </div>
 
+    <!-- Modal Flexibilizar Parcela -->
+    <div id="modalFlexibilizarParcela" class="modal-overlay">
+        <div class="modal">
+            <h3 style="font-weight:700; color:#1e293b;">Flexibilizar Vencimento da Parcela</h3><br>
+            <form id="flexibilizarForm" action="" method="POST">
+                @csrf @method('PUT')
+                <div id="flexibilizarInfo" style="font-size: 0.875rem; color: #475569; margin-bottom: 1rem; background: #f8fafc; padding: 0.75rem; border-radius: 0.5rem; border: 1px solid #e2e8f0;"></div>
+                <div class="form-group">
+                    <label style="font-size:0.8rem; font-weight:600; color:#475569;">Nova Data de Vencimento (Define em qual Fatura Mensal esta parcela irá ser exibida)</label>
+                    <input type="date" name="data_vencimento" id="flexibilizarDataVencimento" class="form-input" required style="margin-top:0.25rem;">
+                </div>
+                <div style="display: flex; justify-content: flex-end; gap: 0.5rem; margin-top: 1.5rem;">
+                    <button type="button" onclick="document.getElementById('modalFlexibilizarParcela').style.display='none'" class="btn-action" style="background: #94a3b8;">Cancelar</button>
+                    <button type="submit" class="btn-action" style="background: #f59e0b;">Salvar Alteração</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <script>
+        function flexibilizarParcela(parcela) {
+            const form = document.getElementById('flexibilizarForm');
+            form.action = `/financas/cartoes/parcelas/${parcela.id}`;
+            
+            let info = `<strong>${parcela.compra.descricao}</strong>`;
+            if (parcela.compra.tipo === 'parcelada') {
+                info += ` (Parcela ${parcela.numero_parcela}/${parcela.compra.numero_parcelas})`;
+            }
+            info += `<br>Valor: R$ ${Math.abs(parseFloat(parcela.valor_parcela)).toFixed(2)}`;
+            document.getElementById('flexibilizarInfo').innerHTML = info;
+
+            let venc = parcela.data_vencimento;
+            if (typeof venc === 'string' && venc.includes('T')) {
+                venc = venc.split('T')[0];
+            }
+            document.getElementById('flexibilizarDataVencimento').value = venc;
+            document.getElementById('modalFlexibilizarParcela').style.display = 'flex';
+        }
         let hasAddedPurchases = false;
         function closePurchaseModal() {
             if (hasAddedPurchases || window.needsReloadOnModalClose) {
+                saveScrollPosition();
                 window.location.reload();
             } else {
                 document.getElementById('modalPurchase').style.display = 'none';
@@ -433,40 +559,6 @@
         function toggleInstallments() { const type = document.getElementById('purchaseType').value; document.getElementById('installmentsGroup').style.display = (type === 'parcelada') ? 'block' : 'none'; }
         
         const STORAGE_KEY_CARTOES = 'financeiro_selected_cartoes';
-        const dataSyncChannel = (typeof BroadcastChannel !== 'undefined') ? new BroadcastChannel('financeiro_sync_channel') : null;
-
-        function isAnyModalOpen() {
-            return Array.from(document.querySelectorAll('.modal-overlay')).some(overlay => {
-                const style = window.getComputedStyle(overlay);
-                return style.display !== 'none' && style.visibility !== 'hidden';
-            });
-        }
-
-        function notifyDataUpdated() {
-            localStorage.setItem('financeiro_data_updated', Date.now().toString());
-            if (dataSyncChannel) {
-                try {
-                    dataSyncChannel.postMessage({ action: 'DATA_UPDATED' });
-                } catch (err) {}
-            }
-        }
-
-        function handleDataUpdatedSignal() {
-            const isEditingInput = document.activeElement && ['INPUT', 'SELECT', 'TEXTAREA'].includes(document.activeElement.tagName) && document.activeElement.value !== '';
-            if (!isAnyModalOpen() && !isEditingInput) {
-                window.location.reload();
-            } else {
-                window.needsReloadOnModalClose = true;
-            }
-        }
-
-        if (dataSyncChannel) {
-            dataSyncChannel.onmessage = function(e) {
-                if (e.data && e.data.action === 'DATA_UPDATED') {
-                    handleDataUpdatedSignal();
-                }
-            };
-        }
 
         function restoreSelectedCartoes() {
             try {
@@ -1111,38 +1203,62 @@
 
         const SCROLL_KEY = 'financeiro_scroll_pos_' + window.location.pathname;
 
-        function saveScrollPosition() {
-            if (window.scrollY > 0) {
-                sessionStorage.setItem(SCROLL_KEY, window.scrollY.toString());
-            }
+        function getScrollContainer() {
+            return document.querySelector('.content-body');
         }
 
-        window.addEventListener('scroll', function() {
-            if (window.scrollY > 0) {
-                sessionStorage.setItem(SCROLL_KEY, window.scrollY.toString());
+        function getCurrentScrollPosition() {
+            const container = getScrollContainer();
+            if (container && container.scrollTop > 0) {
+                return container.scrollTop;
             }
-        }, { passive: true });
+            return window.scrollY || window.pageYOffset || 0;
+        }
+
+        function saveScrollPosition() {
+            const pos = getCurrentScrollPosition();
+            sessionStorage.setItem(SCROLL_KEY, pos.toString());
+        }
+
+        function attachScrollListeners() {
+            const container = getScrollContainer();
+            if (container) {
+                container.addEventListener('scroll', function() {
+                    sessionStorage.setItem(SCROLL_KEY, container.scrollTop.toString());
+                }, { passive: true });
+            }
+            window.addEventListener('scroll', function() {
+                const pos = getCurrentScrollPosition();
+                sessionStorage.setItem(SCROLL_KEY, pos.toString());
+            }, { passive: true });
+        }
 
         window.addEventListener('beforeunload', saveScrollPosition);
 
         function restoreScrollPosition() {
             const saved = sessionStorage.getItem(SCROLL_KEY);
-            if (saved !== null && parseInt(saved, 10) > 0) {
+            if (saved !== null) {
                 const targetPos = parseInt(saved, 10);
-                
-                const doScroll = () => {
-                    window.scrollTo({
-                        top: targetPos,
-                        left: 0,
-                        behavior: 'instant'
-                    });
-                };
+                if (targetPos > 0) {
+                    const doScroll = () => {
+                        const container = getScrollContainer();
+                        if (container) {
+                            container.scrollTop = targetPos;
+                        }
+                        window.scrollTo({
+                            top: targetPos,
+                            left: 0,
+                            behavior: 'instant'
+                        });
+                    };
 
-                doScroll();
-                requestAnimationFrame(doScroll);
-                setTimeout(doScroll, 50);
-                setTimeout(doScroll, 200);
-                setTimeout(doScroll, 500);
+                    doScroll();
+                    requestAnimationFrame(doScroll);
+                    setTimeout(doScroll, 30);
+                    setTimeout(doScroll, 100);
+                    setTimeout(doScroll, 300);
+                    setTimeout(doScroll, 600);
+                }
             }
         }
 
@@ -1150,6 +1266,7 @@
 
         // Inicializar tabelas de cartões
         document.addEventListener('DOMContentLoaded', function() {
+            attachScrollListeners();
             restoreScrollPosition();
             document.querySelectorAll('.invoice-table').forEach(table => {
                 makeTableInteractive(table, true);
@@ -1159,9 +1276,6 @@
             window.addEventListener('storage', function(e) {
                 if (e.key === STORAGE_KEY_CARTOES) {
                     restoreSelectedCartoes();
-                }
-                if (e.key === 'financeiro_data_updated') {
-                    handleDataUpdatedSignal();
                 }
             });
         });

@@ -6,6 +6,7 @@
     <title>Categorias | Finanças de Casa</title>
     <link rel="stylesheet" href="{{ asset('css/home.css') }}">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="{{ asset('js/sidebar.js') }}"></script>
     <style>
         .cat-grid {
             display: grid;
@@ -112,7 +113,16 @@
 <body>
     <div class="layout">
         <aside class="sidebar">
-            <div class="sidebar-header"><h2>Financeiro</h2></div>
+            <div class="sidebar-header">
+                <h2>Financeiro</h2>
+                <button type="button" class="sidebar-toggle-btn js-toggle-sidebar" title="Ocultar barra lateral (Ctrl + \)">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                        <line x1="9" y1="3" x2="9" y2="21"></line>
+                        <path d="M15 9l-3 3 3 3"></path>
+                    </svg>
+                </button>
+            </div>
             <nav class="sidebar-nav">
                 <a href="{{ route('home') }}" class="nav-item">
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
@@ -135,27 +145,63 @@
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
                         <span>Categorias</span>
                     </a>
+                    <a href="{{ route('financas.mercado.index') }}" class="nav-item">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
+                        <span>Supermercado & NFs</span>
+                    </a>
                     <a href="{{ route('cartoes.index') }}" class="nav-item">
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
                         <span>Meus Cartões</span>
+                    </a>
+
+                    <a href="{{ route('photos.index') }}" class="nav-item">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                            <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                            <polyline points="21 15 16 10 5 21"></polyline>
+                        </svg>
+                        <span>Galeria Fotos</span>
                     </a>
                 </div>
             </nav>
         </aside>
 
         <main class="main-content">
-            <header class="content-header">
-                <div class="header-breadcrumb">
-                    <a href="{{ route('home') }}">Home</a>
-                    <span>/</span>
-                    <span>Categorias</span>
+            <header class="content-header" style="display: flex; align-items: flex-start; gap: 1rem;">
+                <button type="button" class="btn-toggle-sidebar js-toggle-sidebar" title="Alternar barra lateral (Ctrl + \)">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="3" y1="12" x2="21" y2="12"></line>
+                        <line x1="3" y1="6" x2="21" y2="6"></line>
+                        <line x1="3" y1="18" x2="21" y2="18"></line>
+                    </svg>
+                </button>
+                <div>
+                    <div class="header-breadcrumb">
+                        <a href="{{ route('home') }}">Home</a>
+                        <span>/</span>
+                        <span>Categorias</span>
+                    </div>
+                    <h1>Categorias & Subcategorias</h1>
+                    <p>Organize seus lançamentos com precisão</p>
                 </div>
-                <h1>Categorias & Subcategorias</h1>
-                <p>Organize seus lançamentos com precisão</p>
             </header>
 
             <div class="content-body">
-                @if(session('success'))<div class="alert alert-success">{{ session('success') }}</div>@endif
+                @if(session('success'))
+                    <div class="alert alert-success">{{ session('success') }}</div>
+                    <script>
+                        (function() {
+                            const msg = @json(session('success'));
+                            const key = 'financeiro_broadcasted_' + btoa(encodeURIComponent(msg)).substring(0, 16);
+                            if (!sessionStorage.getItem(key)) {
+                                sessionStorage.setItem(key, '1');
+                                if (typeof notifyDataUpdated === 'function') {
+                                    notifyDataUpdated();
+                                }
+                            }
+                        })();
+                    </script>
+                @endif
 
                 <div style="display: flex; justify-content: flex-end;">
                     <button onclick="document.getElementById('modalCat').style.display='flex'" class="btn-primary" style="padding: 0.75rem 1.5rem; font-size: 0.875rem;">+ Nova Categoria</button>

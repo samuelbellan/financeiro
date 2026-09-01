@@ -15,7 +15,10 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
+        if (file_exists(database_path('dumps/production_data.json'))) {
+            $this->call(ProductionDataSeeder::class);
+            return;
+        }
 
         User::factory()->create([
             'name' => 'Test User',

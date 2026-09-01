@@ -8,6 +8,7 @@ use App\Models\Cartao;
 use App\Models\TransacaoPrevisao;
 use App\Models\Categoria;
 use App\Models\CartaoParcela;
+use App\Services\CategorySanitizer;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -42,7 +43,7 @@ class FinancasController extends Controller
             $ano = $carbonFim->year;
         }
 
-        $cartoes = Cartao::where('user_id', $user->id)->get();
+        $cartoes = Cartao::where('user_id', $user->id)->where('ativo', true)->get();
         
         $categorias = Categoria::where('user_id', $user->id)
             ->with('subcategorias')
@@ -78,29 +79,24 @@ class FinancasController extends Controller
         $totalPrevistoDespesa = $previsoes->where('tipo', 'despesa')->sum('valor_previsto');
 
         foreach ($previsoes as $p) {
-            $queryConsumo = Transacao::where('user_id', $user->id)
-                ->where('tipo', $p->tipo)
-                ->where('categoria', 'like', $p->categoria)
-                ->whereBetween('data', [$dataInicio, $dataFim]);
-
-            if ($p->subcategoria) {
-                $queryConsumo->where('subcategoria', 'like', $p->subcategoria);
-            } else {
-                $queryConsumo->where(function($q) {
-                    $q->whereNull('subcategoria')->orWhere('subcategoria', '');
-                });
-            }
-
-            $consumoReal = $queryConsumo->sum('valor');
+            $consumoReal = $transacoes->filter(function($t) use ($p) {
+                if ($p->tipo !== $t->tipo) return false;
+                if (!CategorySanitizer::isMatch($p->categoria, $t->categoria)) return false;
+                if ($p->subcategoria) {
+                    return CategorySanitizer::isMatch($p->subcategoria, $t->subcategoria);
+                } else {
+                    return empty($t->subcategoria);
+                }
+            })->sum('valor');
             
             $p->consumo_real = $consumoReal;
             $p->restante = max(0, $p->valor_previsto - $consumoReal);
             $p->porcentagem = $p->valor_previsto > 0 ? min(100, ($consumoReal / $p->valor_previsto) * 100) : 0;
         }
 
-        // Faturas de Cartão de Crédito
+        // Faturas de Cartão de Crédito (apenas cartões ativos)
         $faturas = CartaoParcela::whereHas('compra.cartao', function($query) use ($user) {
-                $query->where('user_id', $user->id);
+                $query->where('user_id', $user->id)->where('ativo', true);
             })
             ->whereBetween('data_vencimento', [$dataInicio, $dataFim])
             ->with('compra.cartao')
@@ -120,9 +116,9 @@ class FinancasController extends Controller
 
             $matched = false;
             foreach ($previsoes as $p) {
-                if ($p->tipo === $t->tipo && $p->categoria === $t->categoria) {
+                if ($p->tipo === $t->tipo && CategorySanitizer::isMatch($p->categoria, $t->categoria)) {
                     if ($p->subcategoria) {
-                        if ($p->subcategoria === $t->subcategoria) {
+                        if (CategorySanitizer::isMatch($p->subcategoria, $t->subcategoria)) {
                             $matched = true; break;
                         }
                     } else {
@@ -171,7 +167,7 @@ class FinancasController extends Controller
         $todasTransacoesAno = Transacao::where('user_id', $user->id)->whereYear('data', $ano)->get();
         $todasPrevisoesAno = TransacaoPrevisao::where('user_id', $user->id)->where('ano', $ano)->get();
         $todasFaturasAno = CartaoParcela::whereHas('compra.cartao', function($query) use ($user) {
-                $query->where('user_id', $user->id);
+                $query->where('user_id', $user->id)->where('ativo', true);
             })->whereYear('data_vencimento', $ano)->get();
 
         $consolidadoAnoMeses = [];
@@ -214,9 +210,9 @@ class FinancasController extends Controller
 
                 $matched = false;
                 foreach ($previsoesMes as $p) {
-                    if ($p->tipo === $t->tipo && strcasecmp($p->categoria, $t->categoria) == 0) {
+                    if ($p->tipo === $t->tipo && CategorySanitizer::isMatch($p->categoria, $t->categoria)) {
                         if ($p->subcategoria) {
-                            if (strcasecmp($p->subcategoria, $t->subcategoria) == 0) {
+                            if (CategorySanitizer::isMatch($p->subcategoria, $t->subcategoria)) {
                                 $matched = true; break;
                             }
                         } else {

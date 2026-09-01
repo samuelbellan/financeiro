@@ -8,12 +8,20 @@ use App\Models\WhatsappLog;
 use App\Models\Cartao;
 use App\Models\CartaoCompra;
 use App\Models\CartaoParcela;
+use App\Models\NotaFiscalItem;
+use App\Models\NotaFiscal;
 use App\Services\WhatsappMessageParser;
 use App\Services\TelegramService;
 use App\Services\GeminiService;
+use App\Services\CreditCardService;
+use App\Services\FiscalTelegramNotifierService;
+use App\Services\FiscalConcursoDataService;
+use App\Models\FiscalConcurso;
+use App\Models\FiscalNoticia;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Cache;
 use Barryvdh\DomPDF\Facade\Pdf;
 
 class TelegramWebhookController extends Controller
@@ -21,7 +29,9 @@ class TelegramWebhookController extends Controller
     public function __construct(
         protected WhatsappMessageParser $parser,
         protected TelegramService $telegram,
-        protected GeminiService $gemini
+        protected GeminiService $gemini,
+        protected FiscalTelegramNotifierService $fiscalNotifier,
+        protected FiscalConcursoDataService $fiscalData
     ) {}
 
     /**
@@ -48,16 +58,28 @@ class TelegramWebhookController extends Controller
             return response()->json(['ok' => true, 'skipped' => 'no message']);
         }
 
-        $chatId = $message['chat']['id'] ?? null;
-        $texto  = $message['text'] ?? null;
+        // ── 2.1. Trava de Idempotência (Anti-Loop por Retentativa do Telegram) ─
+        $updateId = $body['update_id'] ?? null;
+        if ($updateId) {
+            $lockKey = "tg_update_lock_{$updateId}";
+            if (!Cache::add($lockKey, true, 600)) {
+                Log::info('[Telegram Webhook] Update duplicado ignorado (anti-loop retentativa).', ['update_id' => $updateId]);
+                return response()->json(['ok' => true, 'skipped' => 'duplicate update']);
+            }
+        }
 
-        if (!$chatId || !$texto) {
-            return response()->json(['ok' => true, 'skipped' => 'no chat_id or text']);
+        $chatId = $message['chat']['id'] ?? null;
+        $texto  = $message['text'] ?? $message['caption'] ?? null;
+        $photos = $message['photo'] ?? null;
+
+        if (!$chatId || (!$texto && !$photos)) {
+            return response()->json(['ok' => true, 'skipped' => 'no chat_id, text, or photo']);
         }
 
         Log::info('[Telegram Webhook] Mensagem recebida.', [
-            'chat_id' => $chatId,
-            'texto'   => $texto,
+            'chat_id'  => $chatId,
+            'texto'    => $texto,
+            'has_photo' => !empty($photos),
         ]);
 
         // ── 3. Validar chat autorizado ────────────────────────────────────────
@@ -87,17 +109,69 @@ class TelegramWebhookController extends Controller
             return response()->json(['error' => 'No user found'], 500);
         }
 
-        // ── 5. Parsear mensagem (Gemini com fallback para Regex) ──────────────
-        $isGemini = !empty(env('GEMINI_API_KEY'));
-        if ($isGemini) {
-            $parsed = $this->gemini->parseMessage($texto, $user->id);
-        } else {
-            $parsed = $this->parser->parse($texto, $user->id);
-            // Fallback não tem destino de cartão por padrão no parser regex antigo
-            $parsed['transacao_destino'] = 'casa'; 
+        // ── 5. Processar foto de Nota Fiscal ──────────────────────────────────
+        if ($photos && is_array($photos)) {
+            @set_time_limit(180);
+
+            $largestPhoto = end($photos);
+            $fileId = $largestPhoto['file_id'] ?? null;
+            if ($fileId) {
+                // Notificar o usuário no Telegram instantaneamente
+                $this->telegram->sendMessage($chatId, "📸 *Foto recebida com sucesso!*\n\n⏳ _Analisando imagem e lendo itens da nota com IA, aguarde alguns segundos..._");
+
+                $fileInfo = $this->telegram->getFile($fileId);
+                if ($fileInfo && isset($fileInfo['file_path'])) {
+                    $fileBytes = $this->telegram->downloadFile($fileInfo['file_path']);
+                    if ($fileBytes) {
+                        [$base64Image, $mimeType] = $this->compressImageForOcr($fileBytes);
+
+                        // Salvar imagem da nota fiscal no storage público para visualização no sistema web
+                        $fotoPath = null;
+                        try {
+                            $filename = 'nf_' . uniqid() . '_' . time() . '.jpg';
+                            $fotoPath = 'notas_fiscais/' . $filename;
+                            \Illuminate\Support\Facades\Storage::disk('public')->put($fotoPath, base64_decode($base64Image));
+                        } catch (\Throwable $e) {
+                            Log::warning('[Telegram Webhook] Não foi possível salvar a imagem da NF no disco: ' . $e->getMessage());
+                        }
+
+                        $parsed = $this->gemini->parseReceiptImage($base64Image, $mimeType, $user->id, $texto);
+                        if (isset($parsed['tipo']) && $parsed['tipo'] === 'nota_fiscal') {
+                            $resposta = $this->handleNotaFiscalPhoto($user, $chatId, $parsed, $fotoPath);
+                            return response()->json(['ok' => true, 'processed' => 'nota_fiscal_photo']);
+                        } else {
+                            $erroMsg = $parsed['erro'] ?? 'Não consegui ler a foto da nota fiscal.';
+                            $this->telegram->sendMessage($chatId, "⚠️ {$erroMsg}");
+                            return response()->json(['ok' => true, 'error' => $erroMsg]);
+                        }
+                    }
+                }
+            }
         }
 
-        // ── 6. Processar resultado ────────────────────────────────────────────
+        // ── 5.5. Interceptar Comandos do Módulo Fiscal & Concursos ─────────────
+        $fiscalResponse = $this->handleFiscalTelegramCommand($texto ?? '', $chatId);
+        if ($fiscalResponse !== null) {
+            $this->telegram->sendMessage($chatId, $fiscalResponse);
+            WhatsappLog::create([
+                'numero'            => "tg:{$chatId}",
+                'mensagem_original' => $texto,
+                'status'            => 'ok',
+                'resposta'          => $fiscalResponse,
+            ]);
+            return response()->json(['ok' => true, 'processed' => 'fiscal_command']);
+        }
+
+        // ── 6. Parsear mensagem de texto (OmniRoute / Gemini IA com fallback para Regex) ──────
+        $parsed = $this->gemini->parseMessage($texto ?? '', $user->id);
+        if (isset($parsed['tipo']) && $parsed['tipo'] === 'invalido') {
+            $parsed = $this->parser->parse($texto ?? '', $user->id);
+            if (empty($parsed['transacao_destino'])) {
+                $parsed['transacao_destino'] = 'casa';
+            }
+        }
+
+        // ── 7. Processar resultado de texto ────────────────────────────────────
         if ($parsed['tipo'] === 'comando') {
             $comando = $parsed['comando'] ?? '';
             if ($comando === 'fatura_pdf') {
@@ -238,8 +312,7 @@ class TelegramWebhookController extends Controller
         $cartao = $compra->cartao;
 
         for ($i = 1; $i <= $numParcelas; $i++) {
-            $mesOffset = ($dataCompra->day > $cartao->dia_fechamento) ? $i + 1 : $i;
-            $vencimento = $dataCompra->copy()->addMonths($mesOffset)->day($cartao->dia_vencimento);
+            $vencimento = CreditCardService::calcularVencimentoParcela($cartao, $dataCompra, $i);
             
             CartaoParcela::create([
                 'cartao_compra_id' => $compra->id,
@@ -251,11 +324,12 @@ class TelegramWebhookController extends Controller
 
             if ($compra->tipo === 'recorrente' && $i === 1) {
                 for ($j = 2; $j <= 12; $j++) {
+                    $vencRecorrente = CreditCardService::calcularVencimentoParcela($cartao, $dataCompra->copy()->addMonths($j - 1), 1);
                     CartaoParcela::create([
                         'cartao_compra_id' => $compra->id,
                         'numero_parcela'   => $j,
                         'valor_parcela'    => $valorParcela,
-                        'data_vencimento'  => $vencimento->copy()->addMonths($j-1),
+                        'data_vencimento'  => $vencRecorrente,
                         'status'           => 'aberta',
                     ]);
                 }
@@ -355,15 +429,132 @@ class TelegramWebhookController extends Controller
 
     protected function cmdAjuda(): string
     {
-        return "🤖 *Comandos de Inteligência Artificial:*\n\n"
-            . "Você pode conversar comigo livremente! Exemplo:\n"
+        return "🤖 *Assistente Financeiro & Radar Fiscal:*\n\n"
+            . "💳 *Finanças e Cartões:*\n"
             . "• `lancei 35 de uber no cartao visa`\n"
             . "• `despesa de 50 de mercado no cartao vuon`\n"
-            . "• `recebi 3000 de pix do salario`\n\n"
-            . "📊 *Comandos rápidos:*\n"
             . "• `saldo` — ver saldo consolidado do mês\n"
-            . "• `listar` — ver últimos 5 lançamentos\n"
-            . "• `ajuda` — ver esta mensagem";
+            . "• `fatura visa pdf` — exportar fatura em PDF\n\n"
+            . "🏛️ *Radar de Concursos Fiscais:*\n"
+            . "• `/fiscal` ou `/concursos` — panorama dos editais quentes\n"
+            . "• `/sefaz sp` — raio-x e remuneração da SEFAZ (ou qualquer UF)\n"
+            . "• `/iss sp` — raio-x e remuneração do ISS (ou qualquer cidade)\n"
+            . "• `/receita` — detalhes de Auditor e Analista da Receita Federal\n"
+            . "• `/noticias_fiscal` — últimas notícias fiscais monitoradas\n"
+            . "• `/ajuda` — ver esta mensagem";
+    }
+
+    /**
+     * Trata comandos específicos do Radar Fiscal e Remunerações.
+     */
+    protected function handleFiscalTelegramCommand(string $texto, int|string $chatId): ?string
+    {
+        $limpo = trim($texto);
+        $termo = strtolower($limpo);
+
+        // 1. Comando Geral de Concursos Fiscais
+        if (in_array($termo, ['/fiscal', '/concursos', '/concurso', '/radar', 'concursos fiscais', 'concursos'])) {
+            return $this->fiscalNotifier->formatHotContestsSummary();
+        }
+
+        // 2. Notícias Fiscais Recentes
+        if (in_array($termo, ['/noticias_fiscal', '/noticias', '/noticia', 'noticias fiscais', 'noticias fiscal'])) {
+            $noticias = FiscalNoticia::recentes(5)->get();
+            if ($noticias->isEmpty()) {
+                return "📭 Nenhuma notícia fiscal cadastrada no momento. Execute a busca no sistema web.";
+            }
+
+            $msg = "📰 *ÚLTIMAS NOTÍCIAS DOS CONCURSOS FISCAIS* 📰\n";
+            $msg .= "━━━━━━━━━━━━━━━━━━━━━━\n\n";
+            foreach ($noticias as $n) {
+                $emoji = match ($n->esfera) {
+                    'federal'   => '🏛️',
+                    'estadual'  => '🗺️',
+                    'municipal' => '🏙️',
+                    default     => '📜',
+                };
+                $data = $n->publicado_em ? $n->publicado_em->format('d/m/Y') : '';
+                $msg .= "{$emoji} *{$n->titulo}*\n";
+                $msg .= "📅 {$data} | Fonte: {$n->fonte}\n";
+                $msg .= "🔗 [Ver Notícia]({$n->url})\n";
+                $msg .= "──────────────────────\n";
+            }
+            $msg .= "\n💡 _Para ver a análise salarial de um órgão, use /sefaz <uf> ou /iss <cidade>_";
+            return $msg;
+        }
+
+        // 3. Receita Federal Direta
+        if (in_array($termo, ['/receita', '/rfb', '/receita_federal', 'receita federal', 'auditor receita', 'analista receita'])) {
+            $auditor = FiscalConcurso::where('sigla', 'RFB - Auditor')->first();
+            $analista = FiscalConcurso::where('sigla', 'RFB - Analista')->first();
+
+            $msg = "🏛️ *RECEITA FEDERAL DO BRASIL (RFB)* 🏛️\n";
+            $msg .= "━━━━━━━━━━━━━━━━━━━━━━\n\n";
+
+            if ($auditor) {
+                $msg .= "👑 *AUDITOR-FISCAL (AFRFB)*\n";
+                $msg .= "💵 Inicial: `{$auditor->remuneracao_inicial_formatada}`\n";
+                $msg .= "▫️ Base: R$ " . number_format((float)$auditor->vencimento_basico, 2, ',', '.') . " + Bônus Eficiência (até R$ 11.500)\n";
+                $msg .= "💎 Real Transparência: `{$auditor->remuneracao_real_formatada}`\n";
+                $msg .= "🏆 Teto: `{$auditor->remuneracao_teto_formatada}`\n";
+                $msg .= "🎓 Requisito: {$auditor->requisito_escolaridade}\n\n";
+            }
+
+            if ($analista) {
+                $msg .= "🛡️ *ANALISTA-TRIBUTÁRIO (ATRFB)*\n";
+                $msg .= "💵 Inicial: `{$analista->remuneracao_inicial_formatada}`\n";
+                $msg .= "▫️ Base: R$ " . number_format((float)$analista->vencimento_basico, 2, ',', '.') . " + Bônus Eficiência\n";
+                $msg .= "💎 Real Transparência: `{$analista->remuneracao_real_formatada}`\n";
+                $msg .= "🏆 Teto: `{$analista->remuneracao_teto_formatada}`\n";
+                $msg .= "🎓 Requisito: {$analista->requisito_escolaridade}\n\n";
+            }
+
+            $msg .= "💡 _Novo pedido com mais de 2.000 vagas em tramitação no MGI._";
+            return $msg;
+        }
+
+        // 4. SEFAZ Estadual (/sefaz sp, /sefaz mg, etc.)
+        if (str_starts_with($termo, '/sefaz') || str_starts_with($termo, 'sefaz ')) {
+            $param = trim(preg_replace('/^\/?sefaz\s*/i', '', $limpo));
+            if (empty($param)) {
+                return "ℹ️ *Uso do comando SEFAZ:*\nEnvie `/sefaz <UF>` para pesquisar a remuneração detalhada.\nExemplo: `/sefaz sp`, `/sefaz rj`, `/sefaz mg`, `/sefaz sc`, `/sefaz pr`.";
+            }
+
+            $concurso = $this->fiscalData->search("SEFAZ " . $param) ?? $this->fiscalData->search($param);
+            if ($concurso) {
+                return $this->fiscalNotifier->formatConcursoProfileMessage($concurso);
+            }
+
+            return "❌ Não encontrei dados para a SEFAZ informada ('{$param}'). Tente a sigla do estado (ex: `/sefaz sp`).";
+        }
+
+        // 5. ISS Municipal (/iss sp, /iss curitiba, /iss bh, etc.)
+        if (str_starts_with($termo, '/iss') || str_starts_with($termo, 'iss ')) {
+            $param = trim(preg_replace('/^\/?iss\s*/i', '', $limpo));
+            if (empty($param)) {
+                return "ℹ️ *Uso do comando ISS:*\nEnvie `/iss <cidade ou sigla>` para pesquisar a remuneração detalhada.\nExemplo: `/iss sp`, `/iss curitiba`, `/iss rio`, `/iss bh`, `/iss campinas`, `/iss osasco`.";
+            }
+
+            $concurso = $this->fiscalData->search("ISS " . $param) ?? $this->fiscalData->search($param);
+            if ($concurso) {
+                return $this->fiscalNotifier->formatConcursoProfileMessage($concurso);
+            }
+
+            return "❌ Não encontrei dados para o ISS informado ('{$param}'). Tente o nome da cidade ou sigla (ex: `/iss curitiba`, `/iss sp`).";
+        }
+
+        // 6. Pesquisa livre de remuneração (/remuneracao <termo>)
+        if (str_starts_with($termo, '/remuneracao') || str_starts_with($termo, 'salario ')) {
+            $param = trim(preg_replace('/^\/?(remuneracao|salario)\s*/i', '', $limpo));
+            if (!empty($param)) {
+                $concurso = $this->fiscalData->search($param);
+                if ($concurso) {
+                    return $this->fiscalNotifier->formatConcursoProfileMessage($concurso);
+                }
+            }
+        }
+
+        return null;
     }
 
     /**
@@ -490,6 +681,176 @@ class TelegramWebhookController extends Controller
                 return "❌ Erro ao gerar o PDF do caixa: " . $e->getMessage();
             }
         }
+    }
+
+    private function handleNotaFiscalPhoto(User $user, int|string $chatId, array $parsed, ?string $fotoPath = null): string
+    {
+        $estabelecimento = $parsed['estabelecimento'] ?? 'Supermercado';
+        $valorTotal = (float)($parsed['valor_total'] ?? 0);
+        $transacaoDestino = $parsed['transacao_destino'] ?? 'casa';
+        $cartaoId = $parsed['cartao_id'] ?? null;
+        $itens = $parsed['itens'] ?? [];
+        $dataCompra = !empty($parsed['data_compra']) ? Carbon::parse($parsed['data_compra']) : Carbon::now();
+
+        if ($valorTotal <= 0) {
+            $this->telegram->sendMessage($chatId, "⚠️ Não consegui identificar o valor total na nota fiscal.");
+            return "Valor inválido";
+        }
+
+        $transacaoObj = null;
+        $cartaoCompraObj = null;
+        $cartao = null;
+
+        if ($transacaoDestino === 'cartao') {
+            if ($cartaoId) {
+                $cartao = Cartao::where('user_id', $user->id)->where('id', $cartaoId)->first();
+            } else {
+                $cartao = Cartao::where('user_id', $user->id)->where('ativo', true)->first();
+            }
+
+            if ($cartao) {
+                $cartaoCompraObj = CartaoCompra::create([
+                    'cartao_id' => $cartao->id,
+                    'descricao' => "Compra em {$estabelecimento} (Nota Fiscal)",
+                    'valor_total' => $valorTotal,
+                    'tipo' => 'avista',
+                    'numero_parcelas' => 1,
+                    'categoria' => 'Alimentação',
+                    'data_compra' => $dataCompra,
+                ]);
+
+                $this->gerarParcelasCartao($cartaoCompraObj);
+            }
+        }
+
+        if (!$cartaoCompraObj) {
+            $transacaoObj = Transacao::create([
+                'user_id' => $user->id,
+                'descricao' => "Mercado em {$estabelecimento} (Nota Fiscal)",
+                'valor' => $valorTotal,
+                'tipo' => 'despesa',
+                'categoria' => 'Alimentação',
+                'subcategoria' => 'Mercado',
+                'data' => $dataCompra,
+            ]);
+        }
+
+        // Criar registro da Nota Fiscal principal
+        $notaFiscal = NotaFiscal::create([
+            'user_id'          => $user->id,
+            'transacao_id'     => $transacaoObj?->id,
+            'cartao_compra_id' => $cartaoCompraObj?->id,
+            'estabelecimento'  => $estabelecimento,
+            'data_compra'      => $dataCompra,
+            'valor_total'      => $valorTotal,
+            'foto_path'        => $fotoPath,
+            'forma_pagamento'  => $cartaoCompraObj ? 'cartao' : 'casa',
+            'cartao_nome'      => $cartao?->nome,
+            'observacoes'      => 'Registrado via Telegram Bot com IA OCR',
+        ]);
+
+        $resumoCategorias = [];
+        foreach ($itens as $item) {
+            $nomeItem = $item['nome'] ?? 'Produto';
+            $catItem = $item['categoria_item'] ?? 'Outros';
+            $qtd = (float)($item['quantidade'] ?? 1);
+            $vUnit = (float)($item['valor_unitario'] ?? $item['valor_total'] ?? 0);
+            $vTotal = (float)($item['valor_total'] ?? ($qtd * $vUnit));
+
+            NotaFiscalItem::create([
+                'user_id'          => $user->id,
+                'nota_fiscal_id'   => $notaFiscal->id,
+                'transacao_id'     => $transacaoObj?->id,
+                'cartao_compra_id' => $cartaoCompraObj?->id,
+                'estabelecimento'  => $estabelecimento,
+                'data_compra'      => $dataCompra,
+                'nome_item'        => $nomeItem,
+                'categoria_item'   => $catItem,
+                'quantidade'       => $qtd,
+                'valor_unitario'   => $vUnit,
+                'valor_total'      => $vTotal,
+            ]);
+
+            if (!isset($resumoCategorias[$catItem])) {
+                $resumoCategorias[$catItem] = ['total' => 0.0, 'qtd' => 0];
+            }
+            $resumoCategorias[$catItem]['total'] += $vTotal;
+            $resumoCategorias[$catItem]['qtd'] += 1;
+        }
+
+        $emojis = [
+            'Carnes' => '🥩',
+            'Hortifruti' => '🥬',
+            'Laticínios' => '🥛',
+            'Padaria' => '🍞',
+            'Limpeza' => '🧹',
+            'Higiene' => '🧴',
+            'Bebidas' => '🥤',
+            'Mercearia' => '🌾',
+            'Outros' => '📦'
+        ];
+
+        $totalFmt = number_format($valorTotal, 2, ',', '.');
+        $destinoTxt = $cartaoCompraObj ? "Cartão " . ($cartao->nome ?? 'Crédito') : "Contas da Casa / Caixa";
+
+        $msg = "📄 *Nota Fiscal Processada com Sucesso!*\n\n";
+        $msg .= "🏬 *Estabelecimento:* {$estabelecimento}\n";
+        $msg .= "📅 *Data:* " . $dataCompra->format('d/m/Y') . "\n";
+        $msg .= "💰 *Valor Total:* R$ {$totalFmt} ({$destinoTxt})\n\n";
+        
+        if (!empty($resumoCategorias)) {
+            $msg .= "🛒 *Resumo dos Itens por Categoria:*\n";
+            foreach ($resumoCategorias as $cat => $info) {
+                $e = $emojis[$cat] ?? '📦';
+                $tFmt = number_format($info['total'], 2, ',', '.');
+                $msg .= "{$e} *{$cat}:* R$ {$tFmt} ({$info['qtd']} " . ($info['qtd'] > 1 ? 'itens' : 'item') . ")\n";
+            }
+        }
+
+        $msg .= "\n✅ Lançamento registrado e " . count($itens) . " itens salvos no seu histórico de mercado!";
+
+        $this->telegram->sendMessage($chatId, $msg);
+        return $msg;
+    }
+
+    /**
+     * Otimiza e redimensiona imagens grandes enviadas pelo Telegram para velocidade máxima na leitura OCR pela IA.
+     */
+    private function compressImageForOcr(string $imageBytes, int $maxDimension = 1200, int $quality = 75): array
+    {
+        if (!extension_loaded('gd')) {
+            return [base64_encode($imageBytes), 'image/jpeg'];
+        }
+
+        $img = @imagecreatefromstring($imageBytes);
+        if (!$img) {
+            return [base64_encode($imageBytes), 'image/jpeg'];
+        }
+
+        $width = imagesx($img);
+        $height = imagesy($img);
+
+        if ($width > $maxDimension || $height > $maxDimension) {
+            if ($width > $height) {
+                $newWidth = $maxDimension;
+                $newHeight = (int)($height * ($maxDimension / $width));
+            } else {
+                $newHeight = $maxDimension;
+                $newWidth = (int)($width * ($maxDimension / $height));
+            }
+
+            $resized = imagecreatetruecolor($newWidth, $newHeight);
+            imagecopyresampled($resized, $img, 0, 0, 0, 0, $newWidth, $newHeight, $width, $height);
+            imagedestroy($img);
+            $img = $resized;
+        }
+
+        ob_start();
+        imagejpeg($img, null, $quality);
+        $compressedBytes = ob_get_clean();
+        imagedestroy($img);
+
+        return [base64_encode($compressedBytes), 'image/jpeg'];
     }
 
     /**
