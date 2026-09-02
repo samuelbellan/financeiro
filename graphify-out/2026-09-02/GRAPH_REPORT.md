@@ -1,16 +1,16 @@
-# Graph Report - financeiro  (2026-09-02)
+# Graph Report - financeiro  (2026-09-01)
 
 ## Corpus Check
-- 142 files · ~267,737 words
+- 146 files · ~267,954 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 710 nodes · 1301 edges · 87 communities (70 shown, 17 thin omitted)
+- 714 nodes · 1301 edges · 91 communities (74 shown, 17 thin omitted)
 - Extraction: 98% EXTRACTED · 2% INFERRED · 0% AMBIGUOUS · INFERRED: 23 edges (avg confidence: 0.8)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `a2afa277`
+- Built from commit: `6a4102d4`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -79,7 +79,7 @@
 ## Import Cycles
 - None detected.
 
-## Communities (87 total, 17 thin omitted)
+## Communities (91 total, 17 thin omitted)
 
 ### Community 0 - "Illuminate\Http\Request"
 Cohesion: 0.07
@@ -166,9 +166,9 @@ Nodes (6): DatabaseSeeder, ProductionDataSeeder, UserSeeder, Illuminate\Database
 _Questions this graph is uniquely positioned to answer:_
 
 - **Why does `User` connect `User` to `Cartao`, `Illuminate\Database\Seeder`, `SalaryCalculatorService`, `PhotoModuleTest`, `FiscalConcursosController.php`, `TestCase`, `UserFactory.php`, `NotaFiscal`, `Illuminate\Database\Eloquent\Model`, `SalaryProjectionTest`?**
-  _High betweenness centrality (0.106) - this node is a cross-community bridge._
+  _High betweenness centrality (0.105) - this node is a cross-community bridge._
 - **Why does `FiscalConcurso` connect `FiscalConcurso` to `Cartao`, `FiscalNoticia`, `FiscalConcursosController.php`, `Illuminate\Database\Eloquent\Model`, `FiscalConcursoDataService`, `FiscalNewsAiService`, `FiscalNewsCrawlerService`, `FiscalConcursosController`, `User`?**
-  _High betweenness centrality (0.068) - this node is a cross-community bridge._
+  _High betweenness centrality (0.067) - this node is a cross-community bridge._
 - **Why does `Cartao` connect `Cartao` to `NotaFiscal`, `TelegramService`, `Illuminate\Database\Eloquent\Model`, `FiscalConcursosController.php`?**
   _High betweenness centrality (0.034) - this node is a cross-community bridge._
 - **What connects `$schema`, `name`, `type` to the rest of the system?**

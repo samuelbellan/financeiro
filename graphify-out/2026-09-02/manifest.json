@@ -1,4 +1,9 @@
 {
+  ".gemini/antigravity/brain/21fdf6d5-249a-46cd-b8cb-d592f1f38555/scratch/test_dirs.php": {
+    "mtime": 1786437758.475651,
+    "ast_hash": "ba0abf4851f538b5ae53c4c5e645fc52",
+    "semantic_hash": ""
+  },
   "app/Console/Commands/TelegramSetWebhook.php": {
     "mtime": 1784142549.9189825,
     "ast_hash": "adec6b29950cc5f371be0d3b8c9fffbb",
@@ -212,6 +217,21 @@
   "bootstrap/providers.php": {
     "mtime": 1777122485.4702425,
     "ast_hash": "888c810b5a4720916f07aa05dd2c2dd3",
+    "semantic_hash": ""
+  },
+  "check_db2.php": {
+    "mtime": 1777937998.3935504,
+    "ast_hash": "63c1df72adb78367afd7a7b69cc28ae2",
+    "semantic_hash": ""
+  },
+  "check_db3.php": {
+    "mtime": 1777938014.235453,
+    "ast_hash": "b51c54b3b61ff06069956257c6a86213",
+    "semantic_hash": ""
+  },
+  "check_db4.php": {
+    "mtime": 1777938055.8089285,
+    "ast_hash": "0872de20b93eb38345bc871a6b63e590",
     "semantic_hash": ""
   },
   "composer.json": {
@@ -740,8 +760,8 @@
     "semantic_hash": ""
   },
   "DEPLOY_NUVEM.md": {
-    "mtime": 1788334896.260835,
-    "ast_hash": "6077d36031f4dd7145c6c4a5439fdcc6",
+    "mtime": 1788274439.7681544,
+    "ast_hash": "4fa3f6832e673d2c15cbac0a3f3538d2",
     "semantic_hash": ""
   },
   "docker-compose.prod.yml": {
@@ -750,8 +770,8 @@
     "semantic_hash": ""
   },
   "render.yaml": {
-    "mtime": 1788334887.578106,
-    "ast_hash": "8716f87d79be9b378c1d69af67e2e099",
+    "mtime": 1788274415.7358022,
+    "ast_hash": "2a2c73e929726d84e32b8554ba4d3184",
     "semantic_hash": ""
   }
 }
