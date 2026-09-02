@@ -7,7 +7,7 @@ COPY . .
 RUN npm run build
 
 # Stage 2: Servidor de Produção PHP + Nginx
-FROM php:8.3-fpm-alpine
+FROM php:8.4-fpm-alpine
 
 # Instalação de dependências do sistema e pacotes do PostgreSQL/Nginx
 RUN apk add --no-cache \
