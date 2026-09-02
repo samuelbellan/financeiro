@@ -14,9 +14,9 @@ services:
       - key: APP_DEBUG
         value: "false"
       - key: APP_KEY
-        generateValue: true
-      - key: APP_URL
         sync: false
+      - key: APP_URL
+        value: https://financeiro-app-mrik.onrender.com
       - key: DB_CONNECTION
         value: pgsql
       - key: DATABASE_URL
@@ -38,7 +38,7 @@ services:
       - key: TELEGRAM_ALLOWED_CHAT_ID
         sync: false
       - key: TELEGRAM_WEBHOOK_SECRET
-        generateValue: true
+        sync: false
       - key: TELEGRAM_USER_ID
         value: "1"
       - key: GEMINI_API_KEY

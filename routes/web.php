@@ -15,7 +15,10 @@ use App\Http\Controllers\FiscalConcursosController;
 use App\Http\Controllers\MercadoController;
 
 Route::get('/', function () {
-    return view('welcome');
+    if (auth()->check()) {
+        return redirect()->route('home');
+    }
+    return redirect()->route('login');
 });
 
 // ── Telegram Webhook (rota pública, sem autenticação) ─────────────────────────
