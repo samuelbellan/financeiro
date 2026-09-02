@@ -4,45 +4,6 @@
   "graph": {},
   "nodes": [
     {
-      "label": "AuthController",
-      "file_type": "code",
-      "source_file": "app/Http/Controllers/AuthController.php",
-      "source_location": "L9",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "id": "app_http_controllers_authcontroller_authcontroller",
-      "community": 0,
-      "community_name": "Illuminate\\Http\\Request",
-      "norm_label": "authcontroller"
-    },
-    {
-      "label": "FinancasController",
-      "file_type": "code",
-      "source_file": "app/Http/Controllers/FinancasController.php",
-      "source_location": "L15",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "id": "app_http_controllers_financascontroller_financascontroller",
-      "community": 0,
-      "community_name": "Illuminate\\Http\\Request",
-      "norm_label": "financascontroller"
-    },
-    {
-      "label": "HomeController",
-      "file_type": "code",
-      "source_file": "app/Http/Controllers/HomeController.php",
-      "source_location": "L7",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "id": "app_http_controllers_homecontroller_homecontroller",
-      "community": 0,
-      "community_name": "Illuminate\\Http\\Request",
-      "norm_label": "homecontroller"
-    },
-    {
       "label": "PhotoController",
       "file_type": "code",
       "source_file": "app/Http/Controllers/PhotoController.php",
@@ -52,21 +13,34 @@
       "_origin": "ast",
       "id": "app_http_controllers_photocontroller_photocontroller",
       "community": 0,
-      "community_name": "Illuminate\\Http\\Request",
+      "community_name": "PhotoController",
       "norm_label": "photocontroller"
     },
     {
-      "label": "PhotoAuth",
+      "label": "UserFactory",
       "file_type": "code",
-      "source_file": "app/Http/Middleware/PhotoAuth.php",
+      "source_file": "database/factories/UserFactory.php",
+      "source_location": "L13",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "id": "database_factories_userfactory_userfactory",
+      "community": 0,
+      "community_name": "PhotoController",
+      "norm_label": "userfactory"
+    },
+    {
+      "label": "AuthController",
+      "file_type": "code",
+      "source_file": "app/Http/Controllers/AuthController.php",
       "source_location": "L9",
       "_callable": true,
       "_callable_class": true,
       "_origin": "ast",
-      "id": "app_http_middleware_photoauth_photoauth",
-      "community": 0,
+      "id": "app_http_controllers_authcontroller_authcontroller",
+      "community": 1,
       "community_name": "Illuminate\\Http\\Request",
-      "norm_label": "photoauth"
+      "norm_label": "authcontroller"
     },
     {
       "label": "CartoesController",
@@ -78,7 +52,7 @@
       "_origin": "ast",
       "id": "app_http_controllers_cartoescontroller_cartoescontroller",
       "community": 1,
-      "community_name": "Cartao",
+      "community_name": "Illuminate\\Http\\Request",
       "norm_label": "cartoescontroller"
     },
     {
@@ -91,7 +65,7 @@
       "_origin": "ast",
       "id": "app_http_controllers_controller_controller",
       "community": 1,
-      "community_name": "Cartao",
+      "community_name": "Illuminate\\Http\\Request",
       "norm_label": "controller"
     },
     {
@@ -104,8 +78,47 @@
       "_origin": "ast",
       "id": "app_http_controllers_exportcontroller_exportcontroller",
       "community": 1,
-      "community_name": "Cartao",
+      "community_name": "Illuminate\\Http\\Request",
       "norm_label": "exportcontroller"
+    },
+    {
+      "label": "FinancasController",
+      "file_type": "code",
+      "source_file": "app/Http/Controllers/FinancasController.php",
+      "source_location": "L15",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "id": "app_http_controllers_financascontroller_financascontroller",
+      "community": 1,
+      "community_name": "Illuminate\\Http\\Request",
+      "norm_label": "financascontroller"
+    },
+    {
+      "label": "HomeController",
+      "file_type": "code",
+      "source_file": "app/Http/Controllers/HomeController.php",
+      "source_location": "L7",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "id": "app_http_controllers_homecontroller_homecontroller",
+      "community": 1,
+      "community_name": "Illuminate\\Http\\Request",
+      "norm_label": "homecontroller"
+    },
+    {
+      "label": "MercadoController",
+      "file_type": "code",
+      "source_file": "app/Http/Controllers/MercadoController.php",
+      "source_location": "L19",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "id": "app_http_controllers_mercadocontroller_mercadocontroller",
+      "community": 1,
+      "community_name": "Illuminate\\Http\\Request",
+      "norm_label": "mercadocontroller"
     },
     {
       "label": "TelegramWebhookController",
@@ -117,7 +130,7 @@
       "_origin": "ast",
       "id": "app_http_controllers_telegramwebhookcontroller_telegramwebhookcontroller",
       "community": 1,
-      "community_name": "Cartao",
+      "community_name": "Illuminate\\Http\\Request",
       "norm_label": "telegramwebhookcontroller"
     },
     {
@@ -130,7 +143,7 @@
       "_origin": "ast",
       "id": "app_models_cartao_cartao",
       "community": 1,
-      "community_name": "Cartao",
+      "community_name": "Illuminate\\Http\\Request",
       "norm_label": "cartao"
     },
     {
@@ -143,7 +156,7 @@
       "_origin": "ast",
       "id": "app_models_cartaocompra_cartaocompra",
       "community": 1,
-      "community_name": "Cartao",
+      "community_name": "Illuminate\\Http\\Request",
       "norm_label": "cartaocompra"
     },
     {
@@ -156,7 +169,7 @@
       "_origin": "ast",
       "id": "app_models_cartaoparcela_cartaoparcela",
       "community": 1,
-      "community_name": "Cartao",
+      "community_name": "Illuminate\\Http\\Request",
       "norm_label": "cartaoparcela"
     },
     {
@@ -169,7 +182,7 @@
       "_origin": "ast",
       "id": "app_models_transacao_transacao",
       "community": 1,
-      "community_name": "Cartao",
+      "community_name": "Illuminate\\Http\\Request",
       "norm_label": "transacao"
     },
     {
@@ -182,21 +195,8 @@
       "_origin": "ast",
       "id": "app_models_transacaoprevisao_transacaoprevisao",
       "community": 1,
-      "community_name": "Cartao",
+      "community_name": "Illuminate\\Http\\Request",
       "norm_label": "transacaoprevisao"
-    },
-    {
-      "label": "WhatsappLog",
-      "file_type": "code",
-      "source_file": "app/Models/WhatsappLog.php",
-      "source_location": "L7",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "id": "app_models_whatsapplog_whatsapplog",
-      "community": 1,
-      "community_name": "Cartao",
-      "norm_label": "whatsapplog"
     },
     {
       "label": "CategorySanitizer",
@@ -208,7 +208,7 @@
       "_origin": "ast",
       "id": "app_services_categorysanitizer_categorysanitizer",
       "community": 1,
-      "community_name": "Cartao",
+      "community_name": "Illuminate\\Http\\Request",
       "norm_label": "categorysanitizer"
     },
     {
@@ -221,21 +221,8 @@
       "_origin": "ast",
       "id": "app_services_creditcardservice_creditcardservice",
       "community": 1,
-      "community_name": "Cartao",
+      "community_name": "Illuminate\\Http\\Request",
       "norm_label": "creditcardservice"
-    },
-    {
-      "label": "WhatsappMessageParser",
-      "file_type": "code",
-      "source_file": "app/Services/WhatsappMessageParser.php",
-      "source_location": "L12",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "id": "app_services_whatsappmessageparser_whatsappmessageparser",
-      "community": 1,
-      "community_name": "Cartao",
-      "norm_label": "whatsappmessageparser"
     },
     {
       "label": "NotaFiscal",
@@ -249,6 +236,19 @@
       "community": 10,
       "community_name": "NotaFiscal",
       "norm_label": "notafiscal"
+    },
+    {
+      "label": "NotaFiscalItem",
+      "file_type": "code",
+      "source_file": "app/Models/NotaFiscalItem.php",
+      "source_location": "L8",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "id": "app_models_notafiscalitem_notafiscalitem",
+      "community": 10,
+      "community_name": "NotaFiscal",
+      "norm_label": "notafiscalitem"
     },
     {
       "label": "MercadoModuleTest",
@@ -277,19 +277,6 @@
       "norm_label": "fiscalconcurso"
     },
     {
-      "label": "CategoriasController",
-      "file_type": "code",
-      "source_file": "app/Http/Controllers/CategoriasController.php",
-      "source_location": "L10",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "id": "app_http_controllers_categoriascontroller_categoriascontroller",
-      "community": 12,
-      "community_name": "Illuminate\\Database\\Eloquent\\Model",
-      "norm_label": "categoriascontroller"
-    },
-    {
       "label": "EstudosController",
       "file_type": "code",
       "source_file": "app/Http/Controllers/EstudosController.php",
@@ -314,45 +301,6 @@
       "community": 12,
       "community_name": "Illuminate\\Database\\Eloquent\\Model",
       "norm_label": "cartaoprevisao"
-    },
-    {
-      "label": "Categoria",
-      "file_type": "code",
-      "source_file": "app/Models/Categoria.php",
-      "source_location": "L7",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "id": "app_models_categoria_categoria",
-      "community": 12,
-      "community_name": "Illuminate\\Database\\Eloquent\\Model",
-      "norm_label": "categoria"
-    },
-    {
-      "label": "NotaFiscalItem",
-      "file_type": "code",
-      "source_file": "app/Models/NotaFiscalItem.php",
-      "source_location": "L8",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "id": "app_models_notafiscalitem_notafiscalitem",
-      "community": 12,
-      "community_name": "Illuminate\\Database\\Eloquent\\Model",
-      "norm_label": "notafiscalitem"
-    },
-    {
-      "label": "SalaryProfile",
-      "file_type": "code",
-      "source_file": "app/Models/SalaryProfile.php",
-      "source_location": "L10",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "id": "app_models_salaryprofile_salaryprofile",
-      "community": 12,
-      "community_name": "Illuminate\\Database\\Eloquent\\Model",
-      "norm_label": "salaryprofile"
     },
     {
       "label": "StudyGoal",
@@ -381,17 +329,17 @@
       "norm_label": "studylog"
     },
     {
-      "label": "Subcategoria",
+      "label": "WhatsappLog",
       "file_type": "code",
-      "source_file": "app/Models/Subcategoria.php",
+      "source_file": "app/Models/WhatsappLog.php",
       "source_location": "L7",
       "_callable": true,
       "_callable_class": true,
       "_origin": "ast",
-      "id": "app_models_subcategoria_subcategoria",
+      "id": "app_models_whatsapplog_whatsapplog",
       "community": 12,
       "community_name": "Illuminate\\Database\\Eloquent\\Model",
-      "norm_label": "subcategoria"
+      "norm_label": "whatsapplog"
     },
     {
       "label": "FiscalNewsAiService",
@@ -442,8 +390,21 @@
       "_origin": "ast",
       "id": "app_http_controllers_fiscalconcursoscontroller_fiscalconcursoscontroller",
       "community": 16,
-      "community_name": "FiscalConcursosController",
+      "community_name": "FiscalNoticia",
       "norm_label": "fiscalconcursoscontroller"
+    },
+    {
+      "label": "FiscalNoticia",
+      "file_type": "code",
+      "source_file": "app/Models/FiscalNoticia.php",
+      "source_location": "L9",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "id": "app_models_fiscalnoticia_fiscalnoticia",
+      "community": 16,
+      "community_name": "FiscalNoticia",
+      "norm_label": "fiscalnoticia"
     },
     {
       "label": "FiscalTelegramConfig",
@@ -455,7 +416,7 @@
       "_origin": "ast",
       "id": "app_models_fiscaltelegramconfig_fiscaltelegramconfig",
       "community": 16,
-      "community_name": "FiscalConcursosController",
+      "community_name": "FiscalNoticia",
       "norm_label": "fiscaltelegramconfig"
     },
     {
@@ -576,6 +537,19 @@
       "norm_label": "salarycontroller"
     },
     {
+      "label": "SalaryProfile",
+      "file_type": "code",
+      "source_file": "app/Models/SalaryProfile.php",
+      "source_location": "L10",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "id": "app_models_salaryprofile_salaryprofile",
+      "community": 2,
+      "community_name": "SalaryCalculatorService",
+      "norm_label": "salaryprofile"
+    },
+    {
       "label": "SalaryCalculatorService",
       "file_type": "code",
       "source_file": "app/Services/SalaryCalculatorService.php",
@@ -615,69 +589,56 @@
       "norm_label": "exampletest"
     },
     {
-      "label": "ExportProductionDataCommand",
+      "label": "WhatsappMessageParserTest",
       "file_type": "code",
-      "source_file": "app/Console/Commands/ExportProductionDataCommand.php",
+      "source_file": "tests/Unit/WhatsappMessageParserTest.php",
       "source_location": "L9",
       "_callable": true,
       "_callable_class": true,
       "_origin": "ast",
-      "id": "app_console_commands_exportproductiondatacommand_exportproductiondatacommand",
-      "community": 3,
-      "community_name": "TelegramService",
-      "norm_label": "exportproductiondatacommand"
+      "id": "tests_unit_whatsappmessageparsertest_whatsappmessageparsertest",
+      "community": 28,
+      "community_name": "Illuminate\\Foundation\\Testing\\RefreshDatabase",
+      "norm_label": "whatsappmessageparsertest"
     },
     {
-      "label": "FiscalCrawlCommand",
+      "label": "CategoriasController",
       "file_type": "code",
-      "source_file": "app/Console/Commands/FiscalCrawlCommand.php",
-      "source_location": "L9",
+      "source_file": "app/Http/Controllers/CategoriasController.php",
+      "source_location": "L10",
       "_callable": true,
       "_callable_class": true,
       "_origin": "ast",
-      "id": "app_console_commands_fiscalcrawlcommand_fiscalcrawlcommand",
+      "id": "app_http_controllers_categoriascontroller_categoriascontroller",
       "community": 3,
       "community_name": "TelegramService",
-      "norm_label": "fiscalcrawlcommand"
+      "norm_label": "categoriascontroller"
     },
     {
-      "label": "FiscalSeedDataCommand",
+      "label": "Categoria",
       "file_type": "code",
-      "source_file": "app/Console/Commands/FiscalSeedDataCommand.php",
-      "source_location": "L8",
+      "source_file": "app/Models/Categoria.php",
+      "source_location": "L7",
       "_callable": true,
       "_callable_class": true,
       "_origin": "ast",
-      "id": "app_console_commands_fiscalseeddatacommand_fiscalseeddatacommand",
+      "id": "app_models_categoria_categoria",
       "community": 3,
       "community_name": "TelegramService",
-      "norm_label": "fiscalseeddatacommand"
+      "norm_label": "categoria"
     },
     {
-      "label": "TelegramSetWebhook",
+      "label": "Subcategoria",
       "file_type": "code",
-      "source_file": "app/Console/Commands/TelegramSetWebhook.php",
-      "source_location": "L8",
+      "source_file": "app/Models/Subcategoria.php",
+      "source_location": "L7",
       "_callable": true,
       "_callable_class": true,
       "_origin": "ast",
-      "id": "app_console_commands_telegramsetwebhook_telegramsetwebhook",
+      "id": "app_models_subcategoria_subcategoria",
       "community": 3,
       "community_name": "TelegramService",
-      "norm_label": "telegramsetwebhook"
-    },
-    {
-      "label": "MercadoController",
-      "file_type": "code",
-      "source_file": "app/Http/Controllers/MercadoController.php",
-      "source_location": "L19",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "id": "app_http_controllers_mercadocontroller_mercadocontroller",
-      "community": 3,
-      "community_name": "TelegramService",
-      "norm_label": "mercadocontroller"
+      "norm_label": "subcategoria"
     },
     {
       "label": "GeminiService",
@@ -706,17 +667,30 @@
       "norm_label": "telegramservice"
     },
     {
-      "label": "FiscalNoticia",
+      "label": "WhatsappMessageParser",
       "file_type": "code",
-      "source_file": "app/Models/FiscalNoticia.php",
+      "source_file": "app/Services/WhatsappMessageParser.php",
+      "source_location": "L12",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "id": "app_services_whatsappmessageparser_whatsappmessageparser",
+      "community": 3,
+      "community_name": "TelegramService",
+      "norm_label": "whatsappmessageparser"
+    },
+    {
+      "label": "PhotoAuth",
+      "file_type": "code",
+      "source_file": "app/Http/Middleware/PhotoAuth.php",
       "source_location": "L9",
       "_callable": true,
       "_callable_class": true,
       "_origin": "ast",
-      "id": "app_models_fiscalnoticia_fiscalnoticia",
-      "community": 34,
-      "community_name": "FiscalNoticia",
-      "norm_label": "fiscalnoticia"
+      "id": "app_http_middleware_photoauth_photoauth",
+      "community": 31,
+      "community_name": "PhotoAuth.php",
+      "norm_label": "photoauth"
     },
     {
       "label": "FiscalConcursoDataService",
@@ -745,17 +719,56 @@
       "norm_label": "fiscaltelegramnotifierservice"
     },
     {
-      "label": "PhotoModuleTest",
+      "label": "ExportProductionDataCommand",
       "file_type": "code",
-      "source_file": "tests/Feature/PhotoModuleTest.php",
+      "source_file": "app/Console/Commands/ExportProductionDataCommand.php",
       "source_location": "L9",
       "_callable": true,
       "_callable_class": true,
       "_origin": "ast",
-      "id": "tests_feature_photomoduletest_photomoduletest",
+      "id": "app_console_commands_exportproductiondatacommand_exportproductiondatacommand",
       "community": 5,
-      "community_name": "PhotoModuleTest",
-      "norm_label": "photomoduletest"
+      "community_name": "Illuminate\\Console\\Command",
+      "norm_label": "exportproductiondatacommand"
+    },
+    {
+      "label": "FiscalCrawlCommand",
+      "file_type": "code",
+      "source_file": "app/Console/Commands/FiscalCrawlCommand.php",
+      "source_location": "L9",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "id": "app_console_commands_fiscalcrawlcommand_fiscalcrawlcommand",
+      "community": 5,
+      "community_name": "Illuminate\\Console\\Command",
+      "norm_label": "fiscalcrawlcommand"
+    },
+    {
+      "label": "FiscalSeedDataCommand",
+      "file_type": "code",
+      "source_file": "app/Console/Commands/FiscalSeedDataCommand.php",
+      "source_location": "L8",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "id": "app_console_commands_fiscalseeddatacommand_fiscalseeddatacommand",
+      "community": 5,
+      "community_name": "Illuminate\\Console\\Command",
+      "norm_label": "fiscalseeddatacommand"
+    },
+    {
+      "label": "TelegramSetWebhook",
+      "file_type": "code",
+      "source_file": "app/Console/Commands/TelegramSetWebhook.php",
+      "source_location": "L8",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "id": "app_console_commands_telegramsetwebhook_telegramsetwebhook",
+      "community": 5,
+      "community_name": "Illuminate\\Console\\Command",
+      "norm_label": "telegramsetwebhook"
     },
     {
       "label": "ExampleTest",
@@ -771,6 +784,19 @@
       "norm_label": "exampletest"
     },
     {
+      "label": "PhotoModuleTest",
+      "file_type": "code",
+      "source_file": "tests/Feature/PhotoModuleTest.php",
+      "source_location": "L9",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "id": "tests_feature_photomoduletest_photomoduletest",
+      "community": 7,
+      "community_name": "TestCase",
+      "norm_label": "photomoduletest"
+    },
+    {
       "label": "TestCase",
       "file_type": "code",
       "source_file": "tests/TestCase.php",
@@ -782,19 +808,6 @@
       "community": 7,
       "community_name": "TestCase",
       "norm_label": "testcase"
-    },
-    {
-      "label": "UserFactory",
-      "file_type": "code",
-      "source_file": "database/factories/UserFactory.php",
-      "source_location": "L13",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "id": "database_factories_userfactory_userfactory",
-      "community": 9,
-      "community_name": "UserFactory.php",
-      "norm_label": "userfactory"
     },
     {
       "label": "DatabaseSeeder",
@@ -836,126 +849,6 @@
       "norm_label": "userseeder"
     },
     {
-      "label": ".authenticate()",
-      "file_type": "code",
-      "source_file": "app/Http/Controllers/AuthController.php",
-      "source_location": "L22",
-      "_callable": true,
-      "_origin": "ast",
-      "id": "app_http_controllers_authcontroller_authcontroller_authenticate",
-      "community": 0,
-      "community_name": "Illuminate\\Http\\Request",
-      "norm_label": ".authenticate()"
-    },
-    {
-      "label": ".logout()",
-      "file_type": "code",
-      "source_file": "app/Http/Controllers/AuthController.php",
-      "source_location": "L43",
-      "_callable": true,
-      "_origin": "ast",
-      "id": "app_http_controllers_authcontroller_authcontroller_logout",
-      "community": 0,
-      "community_name": "Illuminate\\Http\\Request",
-      "norm_label": ".logout()"
-    },
-    {
-      "label": ".showLogin()",
-      "file_type": "code",
-      "source_file": "app/Http/Controllers/AuthController.php",
-      "source_location": "L14",
-      "_callable": true,
-      "_origin": "ast",
-      "id": "app_http_controllers_authcontroller_authcontroller_showlogin",
-      "community": 0,
-      "community_name": "Illuminate\\Http\\Request",
-      "norm_label": ".showlogin()"
-    },
-    {
-      "label": ".destroy()",
-      "file_type": "code",
-      "source_file": "app/Http/Controllers/FinancasController.php",
-      "source_location": "L438",
-      "_callable": true,
-      "_origin": "ast",
-      "id": "app_http_controllers_financascontroller_financascontroller_destroy",
-      "community": 0,
-      "community_name": "Illuminate\\Http\\Request",
-      "norm_label": ".destroy()"
-    },
-    {
-      "label": ".destroyPrevisao()",
-      "file_type": "code",
-      "source_file": "app/Http/Controllers/FinancasController.php",
-      "source_location": "L352",
-      "_callable": true,
-      "_origin": "ast",
-      "id": "app_http_controllers_financascontroller_financascontroller_destroyprevisao",
-      "community": 0,
-      "community_name": "Illuminate\\Http\\Request",
-      "norm_label": ".destroyprevisao()"
-    },
-    {
-      "label": ".store()",
-      "file_type": "code",
-      "source_file": "app/Http/Controllers/FinancasController.php",
-      "source_location": "L362",
-      "_callable": true,
-      "_origin": "ast",
-      "id": "app_http_controllers_financascontroller_financascontroller_store",
-      "community": 0,
-      "community_name": "Illuminate\\Http\\Request",
-      "norm_label": ".store()"
-    },
-    {
-      "label": ".storePrevisao()",
-      "file_type": "code",
-      "source_file": "app/Http/Controllers/FinancasController.php",
-      "source_location": "L300",
-      "_callable": true,
-      "_origin": "ast",
-      "id": "app_http_controllers_financascontroller_financascontroller_storeprevisao",
-      "community": 0,
-      "community_name": "Illuminate\\Http\\Request",
-      "norm_label": ".storeprevisao()"
-    },
-    {
-      "label": ".update()",
-      "file_type": "code",
-      "source_file": "app/Http/Controllers/FinancasController.php",
-      "source_location": "L415",
-      "_callable": true,
-      "_origin": "ast",
-      "id": "app_http_controllers_financascontroller_financascontroller_update",
-      "community": 0,
-      "community_name": "Illuminate\\Http\\Request",
-      "norm_label": ".update()"
-    },
-    {
-      "label": ".updatePrevisao()",
-      "file_type": "code",
-      "source_file": "app/Http/Controllers/FinancasController.php",
-      "source_location": "L335",
-      "_callable": true,
-      "_origin": "ast",
-      "id": "app_http_controllers_financascontroller_financascontroller_updateprevisao",
-      "community": 0,
-      "community_name": "Illuminate\\Http\\Request",
-      "norm_label": ".updateprevisao()"
-    },
-    {
-      "label": ".index()",
-      "file_type": "code",
-      "source_file": "app/Http/Controllers/HomeController.php",
-      "source_location": "L13",
-      "_callable": true,
-      "_origin": "ast",
-      "id": "app_http_controllers_homecontroller_homecontroller_index",
-      "community": 0,
-      "community_name": "Illuminate\\Http\\Request",
-      "norm_label": ".index()"
-    },
-    {
       "label": ".deleteAlbum()",
       "file_type": "code",
       "source_file": "app/Http/Controllers/PhotoController.php",
@@ -964,7 +857,7 @@
       "_origin": "ast",
       "id": "app_http_controllers_photocontroller_photocontroller_deletealbum",
       "community": 0,
-      "community_name": "Illuminate\\Http\\Request",
+      "community_name": "PhotoController",
       "norm_label": ".deletealbum()"
     },
     {
@@ -976,7 +869,7 @@
       "_origin": "ast",
       "id": "app_http_controllers_photocontroller_photocontroller_favoritealbum",
       "community": 0,
-      "community_name": "Illuminate\\Http\\Request",
+      "community_name": "PhotoController",
       "norm_label": ".favoritealbum()"
     },
     {
@@ -988,7 +881,7 @@
       "_origin": "ast",
       "id": "app_http_controllers_photocontroller_photocontroller_getmonthname",
       "community": 0,
-      "community_name": "Illuminate\\Http\\Request",
+      "community_name": "PhotoController",
       "norm_label": ".getmonthname()"
     },
     {
@@ -1000,7 +893,7 @@
       "_origin": "ast",
       "id": "app_http_controllers_photocontroller_photocontroller_getorcreatethumbnail",
       "community": 0,
-      "community_name": "Illuminate\\Http\\Request",
+      "community_name": "PhotoController",
       "norm_label": ".getorcreatethumbnail()"
     },
     {
@@ -1012,7 +905,7 @@
       "_origin": "ast",
       "id": "app_http_controllers_photocontroller_photocontroller_index",
       "community": 0,
-      "community_name": "Illuminate\\Http\\Request",
+      "community_name": "PhotoController",
       "norm_label": ".index()"
     },
     {
@@ -1024,7 +917,7 @@
       "_origin": "ast",
       "id": "app_http_controllers_photocontroller_photocontroller_login",
       "community": 0,
-      "community_name": "Illuminate\\Http\\Request",
+      "community_name": "PhotoController",
       "norm_label": ".login()"
     },
     {
@@ -1036,7 +929,7 @@
       "_origin": "ast",
       "id": "app_http_controllers_photocontroller_photocontroller_logout",
       "community": 0,
-      "community_name": "Illuminate\\Http\\Request",
+      "community_name": "PhotoController",
       "norm_label": ".logout()"
     },
     {
@@ -1048,7 +941,7 @@
       "_origin": "ast",
       "id": "app_http_controllers_photocontroller_photocontroller_parsealbumfolder",
       "community": 0,
-      "community_name": "Illuminate\\Http\\Request",
+      "community_name": "PhotoController",
       "norm_label": ".parsealbumfolder()"
     },
     {
@@ -1060,7 +953,7 @@
       "_origin": "ast",
       "id": "app_http_controllers_photocontroller_photocontroller_performsync",
       "community": 0,
-      "community_name": "Illuminate\\Http\\Request",
+      "community_name": "PhotoController",
       "norm_label": ".performsync()"
     },
     {
@@ -1072,7 +965,7 @@
       "_origin": "ast",
       "id": "app_http_controllers_photocontroller_photocontroller_pregeneratethumbs",
       "community": 0,
-      "community_name": "Illuminate\\Http\\Request",
+      "community_name": "PhotoController",
       "norm_label": ".pregeneratethumbs()"
     },
     {
@@ -1084,7 +977,7 @@
       "_origin": "ast",
       "id": "app_http_controllers_photocontroller_photocontroller_ratealbum",
       "community": 0,
-      "community_name": "Illuminate\\Http\\Request",
+      "community_name": "PhotoController",
       "norm_label": ".ratealbum()"
     },
     {
@@ -1096,7 +989,7 @@
       "_origin": "ast",
       "id": "app_http_controllers_photocontroller_photocontroller_safeglobimages",
       "community": 0,
-      "community_name": "Illuminate\\Http\\Request",
+      "community_name": "PhotoController",
       "norm_label": ".safeglobimages()"
     },
     {
@@ -1108,7 +1001,7 @@
       "_origin": "ast",
       "id": "app_http_controllers_photocontroller_photocontroller_servephoto",
       "community": 0,
-      "community_name": "Illuminate\\Http\\Request",
+      "community_name": "PhotoController",
       "norm_label": ".servephoto()"
     },
     {
@@ -1120,7 +1013,7 @@
       "_origin": "ast",
       "id": "app_http_controllers_photocontroller_photocontroller_showalbum",
       "community": 0,
-      "community_name": "Illuminate\\Http\\Request",
+      "community_name": "PhotoController",
       "norm_label": ".showalbum()"
     },
     {
@@ -1132,7 +1025,7 @@
       "_origin": "ast",
       "id": "app_http_controllers_photocontroller_photocontroller_showlogin",
       "community": 0,
-      "community_name": "Illuminate\\Http\\Request",
+      "community_name": "PhotoController",
       "norm_label": ".showlogin()"
     },
     {
@@ -1144,7 +1037,7 @@
       "_origin": "ast",
       "id": "app_http_controllers_photocontroller_photocontroller_sync",
       "community": 0,
-      "community_name": "Illuminate\\Http\\Request",
+      "community_name": "PhotoController",
       "norm_label": ".sync()"
     },
     {
@@ -1156,20 +1049,92 @@
       "_origin": "ast",
       "id": "app_http_controllers_photocontroller_photocontroller_updatetags",
       "community": 0,
-      "community_name": "Illuminate\\Http\\Request",
+      "community_name": "PhotoController",
       "norm_label": ".updatetags()"
     },
     {
-      "label": ".handle()",
+      "label": ".isMatch()",
       "file_type": "code",
-      "source_file": "app/Http/Middleware/PhotoAuth.php",
-      "source_location": "L18",
+      "source_file": "app/Services/CategorySanitizer.php",
+      "source_location": "L66",
       "_callable": true,
       "_origin": "ast",
-      "id": "app_http_middleware_photoauth_photoauth_handle",
+      "id": "app_services_categorysanitizer_categorysanitizer_ismatch",
       "community": 0,
+      "community_name": "PhotoController",
+      "norm_label": ".ismatch()"
+    },
+    {
+      "label": ".sanitize()",
+      "file_type": "code",
+      "source_file": "app/Services/CategorySanitizer.php",
+      "source_location": "L35",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "app_services_categorysanitizer_categorysanitizer_sanitize",
+      "community": 0,
+      "community_name": "PhotoController",
+      "norm_label": ".sanitize()"
+    },
+    {
+      "label": ".definition()",
+      "file_type": "code",
+      "source_file": "database/factories/UserFactory.php",
+      "source_location": "L25",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "database_factories_userfactory_userfactory_definition",
+      "community": 0,
+      "community_name": "PhotoController",
+      "norm_label": ".definition()"
+    },
+    {
+      "label": ".unverified()",
+      "file_type": "code",
+      "source_file": "database/factories/UserFactory.php",
+      "source_location": "L39",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "database_factories_userfactory_userfactory_unverified",
+      "community": 0,
+      "community_name": "PhotoController",
+      "norm_label": ".unverified()"
+    },
+    {
+      "label": ".authenticate()",
+      "file_type": "code",
+      "source_file": "app/Http/Controllers/AuthController.php",
+      "source_location": "L22",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "app_http_controllers_authcontroller_authcontroller_authenticate",
+      "community": 1,
       "community_name": "Illuminate\\Http\\Request",
-      "norm_label": ".handle()"
+      "norm_label": ".authenticate()"
+    },
+    {
+      "label": ".logout()",
+      "file_type": "code",
+      "source_file": "app/Http/Controllers/AuthController.php",
+      "source_location": "L43",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "app_http_controllers_authcontroller_authcontroller_logout",
+      "community": 1,
+      "community_name": "Illuminate\\Http\\Request",
+      "norm_label": ".logout()"
+    },
+    {
+      "label": ".showLogin()",
+      "file_type": "code",
+      "source_file": "app/Http/Controllers/AuthController.php",
+      "source_location": "L14",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "app_http_controllers_authcontroller_authcontroller_showlogin",
+      "community": 1,
+      "community_name": "Illuminate\\Http\\Request",
+      "norm_label": ".showlogin()"
     },
     {
       "label": ".destroy()",
@@ -1180,7 +1145,7 @@
       "_origin": "ast",
       "id": "app_http_controllers_cartoescontroller_cartoescontroller_destroy",
       "community": 1,
-      "community_name": "Cartao",
+      "community_name": "Illuminate\\Http\\Request",
       "norm_label": ".destroy()"
     },
     {
@@ -1192,7 +1157,7 @@
       "_origin": "ast",
       "id": "app_http_controllers_cartoescontroller_cartoescontroller_destroycompra",
       "community": 1,
-      "community_name": "Cartao",
+      "community_name": "Illuminate\\Http\\Request",
       "norm_label": ".destroycompra()"
     },
     {
@@ -1204,7 +1169,7 @@
       "_origin": "ast",
       "id": "app_http_controllers_cartoescontroller_cartoescontroller_gerarparcelas",
       "community": 1,
-      "community_name": "Cartao",
+      "community_name": "Illuminate\\Http\\Request",
       "norm_label": ".gerarparcelas()"
     },
     {
@@ -1216,7 +1181,7 @@
       "_origin": "ast",
       "id": "app_http_controllers_cartoescontroller_cartoescontroller_index",
       "community": 1,
-      "community_name": "Cartao",
+      "community_name": "Illuminate\\Http\\Request",
       "norm_label": ".index()"
     },
     {
@@ -1228,7 +1193,7 @@
       "_origin": "ast",
       "id": "app_http_controllers_cartoescontroller_cartoescontroller_recalcular",
       "community": 1,
-      "community_name": "Cartao",
+      "community_name": "Illuminate\\Http\\Request",
       "norm_label": ".recalcular()"
     },
     {
@@ -1240,7 +1205,7 @@
       "_origin": "ast",
       "id": "app_http_controllers_cartoescontroller_cartoescontroller_store",
       "community": 1,
-      "community_name": "Cartao",
+      "community_name": "Illuminate\\Http\\Request",
       "norm_label": ".store()"
     },
     {
@@ -1252,7 +1217,7 @@
       "_origin": "ast",
       "id": "app_http_controllers_cartoescontroller_cartoescontroller_storecompra",
       "community": 1,
-      "community_name": "Cartao",
+      "community_name": "Illuminate\\Http\\Request",
       "norm_label": ".storecompra()"
     },
     {
@@ -1264,7 +1229,7 @@
       "_origin": "ast",
       "id": "app_http_controllers_cartoescontroller_cartoescontroller_storeprevisao",
       "community": 1,
-      "community_name": "Cartao",
+      "community_name": "Illuminate\\Http\\Request",
       "norm_label": ".storeprevisao()"
     },
     {
@@ -1276,7 +1241,7 @@
       "_origin": "ast",
       "id": "app_http_controllers_cartoescontroller_cartoescontroller_togglestatus",
       "community": 1,
-      "community_name": "Cartao",
+      "community_name": "Illuminate\\Http\\Request",
       "norm_label": ".togglestatus()"
     },
     {
@@ -1288,7 +1253,7 @@
       "_origin": "ast",
       "id": "app_http_controllers_cartoescontroller_cartoescontroller_update",
       "community": 1,
-      "community_name": "Cartao",
+      "community_name": "Illuminate\\Http\\Request",
       "norm_label": ".update()"
     },
     {
@@ -1300,7 +1265,7 @@
       "_origin": "ast",
       "id": "app_http_controllers_cartoescontroller_cartoescontroller_updatecompra",
       "community": 1,
-      "community_name": "Cartao",
+      "community_name": "Illuminate\\Http\\Request",
       "norm_label": ".updatecompra()"
     },
     {
@@ -1312,7 +1277,7 @@
       "_origin": "ast",
       "id": "app_http_controllers_cartoescontroller_cartoescontroller_updateparcela",
       "community": 1,
-      "community_name": "Cartao",
+      "community_name": "Illuminate\\Http\\Request",
       "norm_label": ".updateparcela()"
     },
     {
@@ -1324,8 +1289,20 @@
       "_origin": "ast",
       "id": "app_http_controllers_cartoescontroller_cartoescontroller_updateprevisao",
       "community": 1,
-      "community_name": "Cartao",
+      "community_name": "Illuminate\\Http\\Request",
       "norm_label": ".updateprevisao()"
+    },
+    {
+      "label": ".index()",
+      "file_type": "code",
+      "source_file": "app/Http/Controllers/EstudosController.php",
+      "source_location": "L13",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "app_http_controllers_estudoscontroller_estudoscontroller_index",
+      "community": 1,
+      "community_name": "Illuminate\\Http\\Request",
+      "norm_label": ".index()"
     },
     {
       "label": ".exportFatura()",
@@ -1336,7 +1313,7 @@
       "_origin": "ast",
       "id": "app_http_controllers_exportcontroller_exportcontroller_exportfatura",
       "community": 1,
-      "community_name": "Cartao",
+      "community_name": "Illuminate\\Http\\Request",
       "norm_label": ".exportfatura()"
     },
     {
@@ -1348,7 +1325,7 @@
       "_origin": "ast",
       "id": "app_http_controllers_exportcontroller_exportcontroller_exportorcamento",
       "community": 1,
-      "community_name": "Cartao",
+      "community_name": "Illuminate\\Http\\Request",
       "norm_label": ".exportorcamento()"
     },
     {
@@ -1360,8 +1337,32 @@
       "_origin": "ast",
       "id": "app_http_controllers_exportcontroller_exportcontroller_exportorcamentopost",
       "community": 1,
-      "community_name": "Cartao",
+      "community_name": "Illuminate\\Http\\Request",
       "norm_label": ".exportorcamentopost()"
+    },
+    {
+      "label": ".destroy()",
+      "file_type": "code",
+      "source_file": "app/Http/Controllers/FinancasController.php",
+      "source_location": "L438",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "app_http_controllers_financascontroller_financascontroller_destroy",
+      "community": 1,
+      "community_name": "Illuminate\\Http\\Request",
+      "norm_label": ".destroy()"
+    },
+    {
+      "label": ".destroyPrevisao()",
+      "file_type": "code",
+      "source_file": "app/Http/Controllers/FinancasController.php",
+      "source_location": "L352",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "app_http_controllers_financascontroller_financascontroller_destroyprevisao",
+      "community": 1,
+      "community_name": "Illuminate\\Http\\Request",
+      "norm_label": ".destroyprevisao()"
     },
     {
       "label": ".index()",
@@ -1372,8 +1373,116 @@
       "_origin": "ast",
       "id": "app_http_controllers_financascontroller_financascontroller_index",
       "community": 1,
-      "community_name": "Cartao",
+      "community_name": "Illuminate\\Http\\Request",
       "norm_label": ".index()"
+    },
+    {
+      "label": ".store()",
+      "file_type": "code",
+      "source_file": "app/Http/Controllers/FinancasController.php",
+      "source_location": "L362",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "app_http_controllers_financascontroller_financascontroller_store",
+      "community": 1,
+      "community_name": "Illuminate\\Http\\Request",
+      "norm_label": ".store()"
+    },
+    {
+      "label": ".storePrevisao()",
+      "file_type": "code",
+      "source_file": "app/Http/Controllers/FinancasController.php",
+      "source_location": "L300",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "app_http_controllers_financascontroller_financascontroller_storeprevisao",
+      "community": 1,
+      "community_name": "Illuminate\\Http\\Request",
+      "norm_label": ".storeprevisao()"
+    },
+    {
+      "label": ".update()",
+      "file_type": "code",
+      "source_file": "app/Http/Controllers/FinancasController.php",
+      "source_location": "L415",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "app_http_controllers_financascontroller_financascontroller_update",
+      "community": 1,
+      "community_name": "Illuminate\\Http\\Request",
+      "norm_label": ".update()"
+    },
+    {
+      "label": ".updatePrevisao()",
+      "file_type": "code",
+      "source_file": "app/Http/Controllers/FinancasController.php",
+      "source_location": "L335",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "app_http_controllers_financascontroller_financascontroller_updateprevisao",
+      "community": 1,
+      "community_name": "Illuminate\\Http\\Request",
+      "norm_label": ".updateprevisao()"
+    },
+    {
+      "label": ".index()",
+      "file_type": "code",
+      "source_file": "app/Http/Controllers/HomeController.php",
+      "source_location": "L13",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "app_http_controllers_homecontroller_homecontroller_index",
+      "community": 1,
+      "community_name": "Illuminate\\Http\\Request",
+      "norm_label": ".index()"
+    },
+    {
+      "label": ".compressImageForOcr()",
+      "file_type": "code",
+      "source_file": "app/Http/Controllers/MercadoController.php",
+      "source_location": "L475",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "app_http_controllers_mercadocontroller_mercadocontroller_compressimageforocr",
+      "community": 1,
+      "community_name": "Illuminate\\Http\\Request",
+      "norm_label": ".compressimageforocr()"
+    },
+    {
+      "label": ".__construct()",
+      "file_type": "code",
+      "source_file": "app/Http/Controllers/MercadoController.php",
+      "source_location": "L21",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "app_http_controllers_mercadocontroller_mercadocontroller_construct",
+      "community": 1,
+      "community_name": "Illuminate\\Http\\Request",
+      "norm_label": ".__construct()"
+    },
+    {
+      "label": ".destroy()",
+      "file_type": "code",
+      "source_file": "app/Http/Controllers/MercadoController.php",
+      "source_location": "L415",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "app_http_controllers_mercadocontroller_mercadocontroller_destroy",
+      "community": 1,
+      "community_name": "Illuminate\\Http\\Request",
+      "norm_label": ".destroy()"
+    },
+    {
+      "label": ".destroyItem()",
+      "file_type": "code",
+      "source_file": "app/Http/Controllers/MercadoController.php",
+      "source_location": "L446",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "app_http_controllers_mercadocontroller_mercadocontroller_destroyitem",
+      "community": 1,
+      "community_name": "Illuminate\\Http\\Request",
+      "norm_label": ".destroyitem()"
     },
     {
       "label": ".index()",
@@ -1384,7 +1493,7 @@
       "_origin": "ast",
       "id": "app_http_controllers_mercadocontroller_mercadocontroller_index",
       "community": 1,
-      "community_name": "Cartao",
+      "community_name": "Illuminate\\Http\\Request",
       "norm_label": ".index()"
     },
     {
@@ -1396,20 +1505,8 @@
       "_origin": "ast",
       "id": "app_http_controllers_mercadocontroller_mercadocontroller_upload",
       "community": 1,
-      "community_name": "Cartao",
+      "community_name": "Illuminate\\Http\\Request",
       "norm_label": ".upload()"
-    },
-    {
-      "label": ".clearLogs()",
-      "file_type": "code",
-      "source_file": "app/Http/Controllers/TelegramWebhookController.php",
-      "source_location": "L859",
-      "_callable": true,
-      "_origin": "ast",
-      "id": "app_http_controllers_telegramwebhookcontroller_telegramwebhookcontroller_clearlogs",
-      "community": 1,
-      "community_name": "Cartao",
-      "norm_label": ".clearlogs()"
     },
     {
       "label": ".cmdAjuda()",
@@ -1420,7 +1517,7 @@
       "_origin": "ast",
       "id": "app_http_controllers_telegramwebhookcontroller_telegramwebhookcontroller_cmdajuda",
       "community": 1,
-      "community_name": "Cartao",
+      "community_name": "Illuminate\\Http\\Request",
       "norm_label": ".cmdajuda()"
     },
     {
@@ -1432,7 +1529,7 @@
       "_origin": "ast",
       "id": "app_http_controllers_telegramwebhookcontroller_telegramwebhookcontroller_cmdlistar",
       "community": 1,
-      "community_name": "Cartao",
+      "community_name": "Illuminate\\Http\\Request",
       "norm_label": ".cmdlistar()"
     },
     {
@@ -1444,7 +1541,7 @@
       "_origin": "ast",
       "id": "app_http_controllers_telegramwebhookcontroller_telegramwebhookcontroller_cmdsaldo",
       "community": 1,
-      "community_name": "Cartao",
+      "community_name": "Illuminate\\Http\\Request",
       "norm_label": ".cmdsaldo()"
     },
     {
@@ -1456,32 +1553,8 @@
       "_origin": "ast",
       "id": "app_http_controllers_telegramwebhookcontroller_telegramwebhookcontroller_compressimageforocr",
       "community": 1,
-      "community_name": "Cartao",
+      "community_name": "Illuminate\\Http\\Request",
       "norm_label": ".compressimageforocr()"
-    },
-    {
-      "label": ".__construct()",
-      "file_type": "code",
-      "source_file": "app/Http/Controllers/TelegramWebhookController.php",
-      "source_location": "L29",
-      "_callable": true,
-      "_origin": "ast",
-      "id": "app_http_controllers_telegramwebhookcontroller_telegramwebhookcontroller_construct",
-      "community": 1,
-      "community_name": "Cartao",
-      "norm_label": ".__construct()"
-    },
-    {
-      "label": ".destroyLog()",
-      "file_type": "code",
-      "source_file": "app/Http/Controllers/TelegramWebhookController.php",
-      "source_location": "L563",
-      "_callable": true,
-      "_origin": "ast",
-      "id": "app_http_controllers_telegramwebhookcontroller_telegramwebhookcontroller_destroylog",
-      "community": 1,
-      "community_name": "Cartao",
-      "norm_label": ".destroylog()"
     },
     {
       "label": ".gerarParcelasCartao()",
@@ -1492,7 +1565,7 @@
       "_origin": "ast",
       "id": "app_http_controllers_telegramwebhookcontroller_telegramwebhookcontroller_gerarparcelascartao",
       "community": 1,
-      "community_name": "Cartao",
+      "community_name": "Illuminate\\Http\\Request",
       "norm_label": ".gerarparcelascartao()"
     },
     {
@@ -1504,7 +1577,7 @@
       "_origin": "ast",
       "id": "app_http_controllers_telegramwebhookcontroller_telegramwebhookcontroller_handlecomando",
       "community": 1,
-      "community_name": "Cartao",
+      "community_name": "Illuminate\\Http\\Request",
       "norm_label": ".handlecomando()"
     },
     {
@@ -1516,7 +1589,7 @@
       "_origin": "ast",
       "id": "app_http_controllers_telegramwebhookcontroller_telegramwebhookcontroller_handlefaturapdf",
       "community": 1,
-      "community_name": "Cartao",
+      "community_name": "Illuminate\\Http\\Request",
       "norm_label": ".handlefaturapdf()"
     },
     {
@@ -1528,7 +1601,7 @@
       "_origin": "ast",
       "id": "app_http_controllers_telegramwebhookcontroller_telegramwebhookcontroller_handlefiscaltelegramcommand",
       "community": 1,
-      "community_name": "Cartao",
+      "community_name": "Illuminate\\Http\\Request",
       "norm_label": ".handlefiscaltelegramcommand()"
     },
     {
@@ -1540,7 +1613,7 @@
       "_origin": "ast",
       "id": "app_http_controllers_telegramwebhookcontroller_telegramwebhookcontroller_handlenotafiscalphoto",
       "community": 1,
-      "community_name": "Cartao",
+      "community_name": "Illuminate\\Http\\Request",
       "norm_label": ".handlenotafiscalphoto()"
     },
     {
@@ -1552,7 +1625,7 @@
       "_origin": "ast",
       "id": "app_http_controllers_telegramwebhookcontroller_telegramwebhookcontroller_receive",
       "community": 1,
-      "community_name": "Cartao",
+      "community_name": "Illuminate\\Http\\Request",
       "norm_label": ".receive()"
     },
     {
@@ -1564,7 +1637,7 @@
       "_origin": "ast",
       "id": "app_models_cartao_cartao_compras",
       "community": 1,
-      "community_name": "Cartao",
+      "community_name": "Illuminate\\Http\\Request",
       "norm_label": ".compras()"
     },
     {
@@ -1576,7 +1649,7 @@
       "_origin": "ast",
       "id": "app_models_cartao_cartao_user",
       "community": 1,
-      "community_name": "Cartao",
+      "community_name": "Illuminate\\Http\\Request",
       "norm_label": ".user()"
     },
     {
@@ -1588,7 +1661,7 @@
       "_origin": "ast",
       "id": "app_models_cartaocompra_cartaocompra_cartao",
       "community": 1,
-      "community_name": "Cartao",
+      "community_name": "Illuminate\\Http\\Request",
       "norm_label": ".cartao()"
     },
     {
@@ -1600,7 +1673,7 @@
       "_origin": "ast",
       "id": "app_models_cartaocompra_cartaocompra_parcelas",
       "community": 1,
-      "community_name": "Cartao",
+      "community_name": "Illuminate\\Http\\Request",
       "norm_label": ".parcelas()"
     },
     {
@@ -1612,7 +1685,7 @@
       "_origin": "ast",
       "id": "app_models_cartaoparcela_cartaoparcela_compra",
       "community": 1,
-      "community_name": "Cartao",
+      "community_name": "Illuminate\\Http\\Request",
       "norm_label": ".compra()"
     },
     {
@@ -1624,7 +1697,7 @@
       "_origin": "ast",
       "id": "app_models_transacao_transacao_user",
       "community": 1,
-      "community_name": "Cartao",
+      "community_name": "Illuminate\\Http\\Request",
       "norm_label": ".user()"
     },
     {
@@ -1636,20 +1709,8 @@
       "_origin": "ast",
       "id": "app_models_transacaoprevisao_transacaoprevisao_user",
       "community": 1,
-      "community_name": "Cartao",
+      "community_name": "Illuminate\\Http\\Request",
       "norm_label": ".user()"
-    },
-    {
-      "label": ".transacao()",
-      "file_type": "code",
-      "source_file": "app/Models/WhatsappLog.php",
-      "source_location": "L18",
-      "_callable": true,
-      "_origin": "ast",
-      "id": "app_models_whatsapplog_whatsapplog_transacao",
-      "community": 1,
-      "community_name": "Cartao",
-      "norm_label": ".transacao()"
     },
     {
       "label": ".slug()",
@@ -1660,7 +1721,7 @@
       "_origin": "ast",
       "id": "app_services_categorysanitizer_categorysanitizer_slug",
       "community": 1,
-      "community_name": "Cartao",
+      "community_name": "Illuminate\\Http\\Request",
       "norm_label": ".slug()"
     },
     {
@@ -1672,7 +1733,7 @@
       "_origin": "ast",
       "id": "app_services_creditcardservice_creditcardservice_calcularvencimentoparcela",
       "community": 1,
-      "community_name": "Cartao",
+      "community_name": "Illuminate\\Http\\Request",
       "norm_label": ".calcularvencimentoparcela()"
     },
     {
@@ -1684,20 +1745,8 @@
       "_origin": "ast",
       "id": "app_services_creditcardservice_creditcardservice_recalcularparcelascartao",
       "community": 1,
-      "community_name": "Cartao",
+      "community_name": "Illuminate\\Http\\Request",
       "norm_label": ".recalcularparcelascartao()"
-    },
-    {
-      "label": ".parse()",
-      "file_type": "code",
-      "source_file": "app/Services/WhatsappMessageParser.php",
-      "source_location": "L118",
-      "_callable": true,
-      "_origin": "ast",
-      "id": "app_services_whatsappmessageparser_whatsappmessageparser_parse",
-      "community": 1,
-      "community_name": "Cartao",
-      "norm_label": ".parse()"
     },
     {
       "label": ".cartaoCompra()",
@@ -1755,6 +1804,54 @@
       "_callable": true,
       "_origin": "ast",
       "id": "app_models_notafiscal_notafiscal_user",
+      "community": 10,
+      "community_name": "NotaFiscal",
+      "norm_label": ".user()"
+    },
+    {
+      "label": ".cartaoCompra()",
+      "file_type": "code",
+      "source_file": "app/Models/NotaFiscalItem.php",
+      "source_location": "L50",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "app_models_notafiscalitem_notafiscalitem_cartaocompra",
+      "community": 10,
+      "community_name": "NotaFiscal",
+      "norm_label": ".cartaocompra()"
+    },
+    {
+      "label": ".notaFiscal()",
+      "file_type": "code",
+      "source_file": "app/Models/NotaFiscalItem.php",
+      "source_location": "L40",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "app_models_notafiscalitem_notafiscalitem_notafiscal",
+      "community": 10,
+      "community_name": "NotaFiscal",
+      "norm_label": ".notafiscal()"
+    },
+    {
+      "label": ".transacao()",
+      "file_type": "code",
+      "source_file": "app/Models/NotaFiscalItem.php",
+      "source_location": "L45",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "app_models_notafiscalitem_notafiscalitem_transacao",
+      "community": 10,
+      "community_name": "NotaFiscal",
+      "norm_label": ".transacao()"
+    },
+    {
+      "label": ".user()",
+      "file_type": "code",
+      "source_file": "app/Models/NotaFiscalItem.php",
+      "source_location": "L35",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "app_models_notafiscalitem_notafiscalitem_user",
       "community": 10,
       "community_name": "NotaFiscal",
       "norm_label": ".user()"
@@ -2132,66 +2229,6 @@
       "norm_label": ".destroyprevisao()"
     },
     {
-      "label": ".destroy()",
-      "file_type": "code",
-      "source_file": "app/Http/Controllers/CategoriasController.php",
-      "source_location": "L47",
-      "_callable": true,
-      "_origin": "ast",
-      "id": "app_http_controllers_categoriascontroller_categoriascontroller_destroy",
-      "community": 12,
-      "community_name": "Illuminate\\Database\\Eloquent\\Model",
-      "norm_label": ".destroy()"
-    },
-    {
-      "label": ".destroySub()",
-      "file_type": "code",
-      "source_file": "app/Http/Controllers/CategoriasController.php",
-      "source_location": "L54",
-      "_callable": true,
-      "_origin": "ast",
-      "id": "app_http_controllers_categoriascontroller_categoriascontroller_destroysub",
-      "community": 12,
-      "community_name": "Illuminate\\Database\\Eloquent\\Model",
-      "norm_label": ".destroysub()"
-    },
-    {
-      "label": ".index()",
-      "file_type": "code",
-      "source_file": "app/Http/Controllers/CategoriasController.php",
-      "source_location": "L12",
-      "_callable": true,
-      "_origin": "ast",
-      "id": "app_http_controllers_categoriascontroller_categoriascontroller_index",
-      "community": 12,
-      "community_name": "Illuminate\\Database\\Eloquent\\Model",
-      "norm_label": ".index()"
-    },
-    {
-      "label": ".store()",
-      "file_type": "code",
-      "source_file": "app/Http/Controllers/CategoriasController.php",
-      "source_location": "L22",
-      "_callable": true,
-      "_origin": "ast",
-      "id": "app_http_controllers_categoriascontroller_categoriascontroller_store",
-      "community": 12,
-      "community_name": "Illuminate\\Database\\Eloquent\\Model",
-      "norm_label": ".store()"
-    },
-    {
-      "label": ".storeSub()",
-      "file_type": "code",
-      "source_file": "app/Http/Controllers/CategoriasController.php",
-      "source_location": "L35",
-      "_callable": true,
-      "_origin": "ast",
-      "id": "app_http_controllers_categoriascontroller_categoriascontroller_storesub",
-      "community": 12,
-      "community_name": "Illuminate\\Database\\Eloquent\\Model",
-      "norm_label": ".storesub()"
-    },
-    {
       "label": ".activateGoal()",
       "file_type": "code",
       "source_file": "app/Http/Controllers/EstudosController.php",
@@ -2226,18 +2263,6 @@
       "community": 12,
       "community_name": "Illuminate\\Database\\Eloquent\\Model",
       "norm_label": ".destroylog()"
-    },
-    {
-      "label": ".index()",
-      "file_type": "code",
-      "source_file": "app/Http/Controllers/EstudosController.php",
-      "source_location": "L13",
-      "_callable": true,
-      "_origin": "ast",
-      "id": "app_http_controllers_estudoscontroller_estudoscontroller_index",
-      "community": 12,
-      "community_name": "Illuminate\\Database\\Eloquent\\Model",
-      "norm_label": ".index()"
     },
     {
       "label": ".storeGoal()",
@@ -2276,6 +2301,30 @@
       "norm_label": ".updatelog()"
     },
     {
+      "label": ".clearLogs()",
+      "file_type": "code",
+      "source_file": "app/Http/Controllers/TelegramWebhookController.php",
+      "source_location": "L859",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "app_http_controllers_telegramwebhookcontroller_telegramwebhookcontroller_clearlogs",
+      "community": 12,
+      "community_name": "Illuminate\\Database\\Eloquent\\Model",
+      "norm_label": ".clearlogs()"
+    },
+    {
+      "label": ".destroyLog()",
+      "file_type": "code",
+      "source_file": "app/Http/Controllers/TelegramWebhookController.php",
+      "source_location": "L563",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "app_http_controllers_telegramwebhookcontroller_telegramwebhookcontroller_destroylog",
+      "community": 12,
+      "community_name": "Illuminate\\Database\\Eloquent\\Model",
+      "norm_label": ".destroylog()"
+    },
+    {
       "label": ".cartao()",
       "file_type": "code",
       "source_file": "app/Models/CartaoPrevisao.php",
@@ -2286,114 +2335,6 @@
       "community": 12,
       "community_name": "Illuminate\\Database\\Eloquent\\Model",
       "norm_label": ".cartao()"
-    },
-    {
-      "label": ".subcategorias()",
-      "file_type": "code",
-      "source_file": "app/Models/Categoria.php",
-      "source_location": "L16",
-      "_callable": true,
-      "_origin": "ast",
-      "id": "app_models_categoria_categoria_subcategorias",
-      "community": 12,
-      "community_name": "Illuminate\\Database\\Eloquent\\Model",
-      "norm_label": ".subcategorias()"
-    },
-    {
-      "label": ".user()",
-      "file_type": "code",
-      "source_file": "app/Models/Categoria.php",
-      "source_location": "L11",
-      "_callable": true,
-      "_origin": "ast",
-      "id": "app_models_categoria_categoria_user",
-      "community": 12,
-      "community_name": "Illuminate\\Database\\Eloquent\\Model",
-      "norm_label": ".user()"
-    },
-    {
-      "label": ".noticias()",
-      "file_type": "code",
-      "source_file": "app/Models/FiscalConcurso.php",
-      "source_location": "L68",
-      "_callable": true,
-      "_origin": "ast",
-      "id": "app_models_fiscalconcurso_fiscalconcurso_noticias",
-      "community": 12,
-      "community_name": "Illuminate\\Database\\Eloquent\\Model",
-      "norm_label": ".noticias()"
-    },
-    {
-      "label": ".concurso()",
-      "file_type": "code",
-      "source_file": "app/Models/FiscalNoticia.php",
-      "source_location": "L38",
-      "_callable": true,
-      "_origin": "ast",
-      "id": "app_models_fiscalnoticia_fiscalnoticia_concurso",
-      "community": 12,
-      "community_name": "Illuminate\\Database\\Eloquent\\Model",
-      "norm_label": ".concurso()"
-    },
-    {
-      "label": ".cartaoCompra()",
-      "file_type": "code",
-      "source_file": "app/Models/NotaFiscalItem.php",
-      "source_location": "L50",
-      "_callable": true,
-      "_origin": "ast",
-      "id": "app_models_notafiscalitem_notafiscalitem_cartaocompra",
-      "community": 12,
-      "community_name": "Illuminate\\Database\\Eloquent\\Model",
-      "norm_label": ".cartaocompra()"
-    },
-    {
-      "label": ".notaFiscal()",
-      "file_type": "code",
-      "source_file": "app/Models/NotaFiscalItem.php",
-      "source_location": "L40",
-      "_callable": true,
-      "_origin": "ast",
-      "id": "app_models_notafiscalitem_notafiscalitem_notafiscal",
-      "community": 12,
-      "community_name": "Illuminate\\Database\\Eloquent\\Model",
-      "norm_label": ".notafiscal()"
-    },
-    {
-      "label": ".transacao()",
-      "file_type": "code",
-      "source_file": "app/Models/NotaFiscalItem.php",
-      "source_location": "L45",
-      "_callable": true,
-      "_origin": "ast",
-      "id": "app_models_notafiscalitem_notafiscalitem_transacao",
-      "community": 12,
-      "community_name": "Illuminate\\Database\\Eloquent\\Model",
-      "norm_label": ".transacao()"
-    },
-    {
-      "label": ".user()",
-      "file_type": "code",
-      "source_file": "app/Models/NotaFiscalItem.php",
-      "source_location": "L35",
-      "_callable": true,
-      "_origin": "ast",
-      "id": "app_models_notafiscalitem_notafiscalitem_user",
-      "community": 12,
-      "community_name": "Illuminate\\Database\\Eloquent\\Model",
-      "norm_label": ".user()"
-    },
-    {
-      "label": ".user()",
-      "file_type": "code",
-      "source_file": "app/Models/SalaryProfile.php",
-      "source_location": "L27",
-      "_callable": true,
-      "_origin": "ast",
-      "id": "app_models_salaryprofile_salaryprofile_user",
-      "community": 12,
-      "community_name": "Illuminate\\Database\\Eloquent\\Model",
-      "norm_label": ".user()"
     },
     {
       "label": ".logs()",
@@ -2444,28 +2385,16 @@
       "norm_label": ".user()"
     },
     {
-      "label": ".categoria()",
+      "label": ".transacao()",
       "file_type": "code",
-      "source_file": "app/Models/Subcategoria.php",
-      "source_location": "L11",
+      "source_file": "app/Models/WhatsappLog.php",
+      "source_location": "L18",
       "_callable": true,
       "_origin": "ast",
-      "id": "app_models_subcategoria_subcategoria_categoria",
+      "id": "app_models_whatsapplog_whatsapplog_transacao",
       "community": 12,
       "community_name": "Illuminate\\Database\\Eloquent\\Model",
-      "norm_label": ".categoria()"
-    },
-    {
-      "label": ".salaryProfiles()",
-      "file_type": "code",
-      "source_file": "app/Models/User.php",
-      "source_location": "L38",
-      "_callable": true,
-      "_origin": "ast",
-      "id": "app_models_user_user_salaryprofiles",
-      "community": 12,
-      "community_name": "Illuminate\\Database\\Eloquent\\Model",
-      "norm_label": ".salaryprofiles()"
+      "norm_label": ".transacao()"
     },
     {
       "label": ".analyzeWithOmniRouteAi()",
@@ -2768,6 +2697,18 @@
       "norm_label": ".test_salary_routes_require_authentication()"
     },
     {
+      "label": ".__construct()",
+      "file_type": "code",
+      "source_file": "app/Http/Controllers/FiscalConcursosController.php",
+      "source_location": "L18",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "app_http_controllers_fiscalconcursoscontroller_fiscalconcursoscontroller_construct",
+      "community": 16,
+      "community_name": "FiscalNoticia",
+      "norm_label": ".__construct()"
+    },
+    {
       "label": ".crawl()",
       "file_type": "code",
       "source_file": "app/Http/Controllers/FiscalConcursosController.php",
@@ -2776,7 +2717,7 @@
       "_origin": "ast",
       "id": "app_http_controllers_fiscalconcursoscontroller_fiscalconcursoscontroller_crawl",
       "community": 16,
-      "community_name": "FiscalConcursosController",
+      "community_name": "FiscalNoticia",
       "norm_label": ".crawl()"
     },
     {
@@ -2788,7 +2729,7 @@
       "_origin": "ast",
       "id": "app_http_controllers_fiscalconcursoscontroller_fiscalconcursoscontroller_extractfromurl",
       "community": 16,
-      "community_name": "FiscalConcursosController",
+      "community_name": "FiscalNoticia",
       "norm_label": ".extractfromurl()"
     },
     {
@@ -2800,7 +2741,7 @@
       "_origin": "ast",
       "id": "app_http_controllers_fiscalconcursoscontroller_fiscalconcursoscontroller_index",
       "community": 16,
-      "community_name": "FiscalConcursosController",
+      "community_name": "FiscalNoticia",
       "norm_label": ".index()"
     },
     {
@@ -2812,7 +2753,7 @@
       "_origin": "ast",
       "id": "app_http_controllers_fiscalconcursoscontroller_fiscalconcursoscontroller_reset",
       "community": 16,
-      "community_name": "FiscalConcursosController",
+      "community_name": "FiscalNoticia",
       "norm_label": ".reset()"
     },
     {
@@ -2824,7 +2765,7 @@
       "_origin": "ast",
       "id": "app_http_controllers_fiscalconcursoscontroller_fiscalconcursoscontroller_savetelegramconfig",
       "community": 16,
-      "community_name": "FiscalConcursosController",
+      "community_name": "FiscalNoticia",
       "norm_label": ".savetelegramconfig()"
     },
     {
@@ -2836,7 +2777,7 @@
       "_origin": "ast",
       "id": "app_http_controllers_fiscalconcursoscontroller_fiscalconcursoscontroller_sendconcursototelegram",
       "community": 16,
-      "community_name": "FiscalConcursosController",
+      "community_name": "FiscalNoticia",
       "norm_label": ".sendconcursototelegram()"
     },
     {
@@ -2848,7 +2789,7 @@
       "_origin": "ast",
       "id": "app_http_controllers_fiscalconcursoscontroller_fiscalconcursoscontroller_sendnewstotelegram",
       "community": 16,
-      "community_name": "FiscalConcursosController",
+      "community_name": "FiscalNoticia",
       "norm_label": ".sendnewstotelegram()"
     },
     {
@@ -2860,7 +2801,7 @@
       "_origin": "ast",
       "id": "app_http_controllers_fiscalconcursoscontroller_fiscalconcursoscontroller_show",
       "community": 16,
-      "community_name": "FiscalConcursosController",
+      "community_name": "FiscalNoticia",
       "norm_label": ".show()"
     },
     {
@@ -2872,7 +2813,7 @@
       "_origin": "ast",
       "id": "app_http_controllers_fiscalconcursoscontroller_fiscalconcursoscontroller_testtelegram",
       "community": 16,
-      "community_name": "FiscalConcursosController",
+      "community_name": "FiscalNoticia",
       "norm_label": ".testtelegram()"
     },
     {
@@ -2884,8 +2825,56 @@
       "_origin": "ast",
       "id": "app_http_controllers_fiscalconcursoscontroller_fiscalconcursoscontroller_update",
       "community": 16,
-      "community_name": "FiscalConcursosController",
+      "community_name": "FiscalNoticia",
       "norm_label": ".update()"
+    },
+    {
+      "label": ".concurso()",
+      "file_type": "code",
+      "source_file": "app/Models/FiscalNoticia.php",
+      "source_location": "L38",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "app_models_fiscalnoticia_fiscalnoticia_concurso",
+      "community": 16,
+      "community_name": "FiscalNoticia",
+      "norm_label": ".concurso()"
+    },
+    {
+      "label": ".scopeApenasFuturosOuAbertos()",
+      "file_type": "code",
+      "source_file": "app/Models/FiscalNoticia.php",
+      "source_location": "L53",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "app_models_fiscalnoticia_fiscalnoticia_scopeapenasfuturosouabertos",
+      "community": 16,
+      "community_name": "FiscalNoticia",
+      "norm_label": ".scopeapenasfuturosouabertos()"
+    },
+    {
+      "label": ".scopeNaoNotificadas()",
+      "file_type": "code",
+      "source_file": "app/Models/FiscalNoticia.php",
+      "source_location": "L43",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "app_models_fiscalnoticia_fiscalnoticia_scopenaonotificadas",
+      "community": 16,
+      "community_name": "FiscalNoticia",
+      "norm_label": ".scopenaonotificadas()"
+    },
+    {
+      "label": ".scopeRecentes()",
+      "file_type": "code",
+      "source_file": "app/Models/FiscalNoticia.php",
+      "source_location": "L48",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "app_models_fiscalnoticia_fiscalnoticia_scoperecentes",
+      "community": 16,
+      "community_name": "FiscalNoticia",
+      "norm_label": ".scoperecentes()"
     },
     {
       "label": ".user()",
@@ -2896,7 +2885,7 @@
       "_origin": "ast",
       "id": "app_models_fiscaltelegramconfig_fiscaltelegramconfig_user",
       "community": 16,
-      "community_name": "FiscalConcursosController",
+      "community_name": "FiscalNoticia",
       "norm_label": ".user()"
     },
     {
@@ -3308,6 +3297,18 @@
       "norm_label": ".updateprofile()"
     },
     {
+      "label": ".user()",
+      "file_type": "code",
+      "source_file": "app/Models/SalaryProfile.php",
+      "source_location": "L27",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "app_models_salaryprofile_salaryprofile_user",
+      "community": 2,
+      "community_name": "SalaryCalculatorService",
+      "norm_label": ".user()"
+    },
+    {
       "label": ".calcularHolerite()",
       "file_type": "code",
       "source_file": "app/Services/SalaryCalculatorService.php",
@@ -3584,6 +3585,54 @@
       "norm_label": ".test_that_true_is_true()"
     },
     {
+      "label": ".setUp()",
+      "file_type": "code",
+      "source_file": "tests/Unit/WhatsappMessageParserTest.php",
+      "source_location": "L15",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "tests_unit_whatsappmessageparsertest_whatsappmessageparsertest_setup",
+      "community": 28,
+      "community_name": "Illuminate\\Foundation\\Testing\\RefreshDatabase",
+      "norm_label": ".setup()"
+    },
+    {
+      "label": ".test_parses_direct_saldo_command()",
+      "file_type": "code",
+      "source_file": "tests/Unit/WhatsappMessageParserTest.php",
+      "source_location": "L30",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "tests_unit_whatsappmessageparsertest_whatsappmessageparsertest_test_parses_direct_saldo_command",
+      "community": 28,
+      "community_name": "Illuminate\\Foundation\\Testing\\RefreshDatabase",
+      "norm_label": ".test_parses_direct_saldo_command()"
+    },
+    {
+      "label": ".test_parses_listar_and_ajuda_variations()",
+      "file_type": "code",
+      "source_file": "tests/Unit/WhatsappMessageParserTest.php",
+      "source_location": "L38",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "tests_unit_whatsappmessageparsertest_whatsappmessageparsertest_test_parses_listar_and_ajuda_variations",
+      "community": 28,
+      "community_name": "Illuminate\\Foundation\\Testing\\RefreshDatabase",
+      "norm_label": ".test_parses_listar_and_ajuda_variations()"
+    },
+    {
+      "label": ".test_parses_saldo_conta_corrente_variation()",
+      "file_type": "code",
+      "source_file": "tests/Unit/WhatsappMessageParserTest.php",
+      "source_location": "L21",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "tests_unit_whatsappmessageparsertest_whatsappmessageparsertest_test_parses_saldo_conta_corrente_variation",
+      "community": 28,
+      "community_name": "Illuminate\\Foundation\\Testing\\RefreshDatabase",
+      "norm_label": ".test_parses_saldo_conta_corrente_variation()"
+    },
+    {
       "label": "down()",
       "file_type": "code",
       "source_file": "database/migrations/0001_01_01_000000_create_users_table.php",
@@ -3632,112 +3681,112 @@
       "norm_label": "up()"
     },
     {
-      "label": ".handle()",
-      "file_type": "code",
-      "source_file": "app/Console/Commands/ExportProductionDataCommand.php",
-      "source_location": "L54",
-      "_callable": true,
-      "_origin": "ast",
-      "id": "app_console_commands_exportproductiondatacommand_exportproductiondatacommand_handle",
-      "community": 3,
-      "community_name": "TelegramService",
-      "norm_label": ".handle()"
-    },
-    {
-      "label": ".handle()",
-      "file_type": "code",
-      "source_file": "app/Console/Commands/FiscalCrawlCommand.php",
-      "source_location": "L28",
-      "_callable": true,
-      "_origin": "ast",
-      "id": "app_console_commands_fiscalcrawlcommand_fiscalcrawlcommand_handle",
-      "community": 3,
-      "community_name": "TelegramService",
-      "norm_label": ".handle()"
-    },
-    {
-      "label": ".handle()",
-      "file_type": "code",
-      "source_file": "app/Console/Commands/FiscalSeedDataCommand.php",
-      "source_location": "L27",
-      "_callable": true,
-      "_origin": "ast",
-      "id": "app_console_commands_fiscalseeddatacommand_fiscalseeddatacommand_handle",
-      "community": 3,
-      "community_name": "TelegramService",
-      "norm_label": ".handle()"
-    },
-    {
-      "label": ".handle()",
-      "file_type": "code",
-      "source_file": "app/Console/Commands/TelegramSetWebhook.php",
-      "source_location": "L16",
-      "_callable": true,
-      "_origin": "ast",
-      "id": "app_console_commands_telegramsetwebhook_telegramsetwebhook_handle",
-      "community": 3,
-      "community_name": "TelegramService",
-      "norm_label": ".handle()"
-    },
-    {
-      "label": ".compressImageForOcr()",
-      "file_type": "code",
-      "source_file": "app/Http/Controllers/MercadoController.php",
-      "source_location": "L475",
-      "_callable": true,
-      "_origin": "ast",
-      "id": "app_http_controllers_mercadocontroller_mercadocontroller_compressimageforocr",
-      "community": 3,
-      "community_name": "TelegramService",
-      "norm_label": ".compressimageforocr()"
-    },
-    {
-      "label": ".__construct()",
-      "file_type": "code",
-      "source_file": "app/Http/Controllers/MercadoController.php",
-      "source_location": "L21",
-      "_callable": true,
-      "_origin": "ast",
-      "id": "app_http_controllers_mercadocontroller_mercadocontroller_construct",
-      "community": 3,
-      "community_name": "TelegramService",
-      "norm_label": ".__construct()"
-    },
-    {
       "label": ".destroy()",
       "file_type": "code",
-      "source_file": "app/Http/Controllers/MercadoController.php",
-      "source_location": "L415",
+      "source_file": "app/Http/Controllers/CategoriasController.php",
+      "source_location": "L47",
       "_callable": true,
       "_origin": "ast",
-      "id": "app_http_controllers_mercadocontroller_mercadocontroller_destroy",
+      "id": "app_http_controllers_categoriascontroller_categoriascontroller_destroy",
       "community": 3,
       "community_name": "TelegramService",
       "norm_label": ".destroy()"
     },
     {
-      "label": ".destroyItem()",
+      "label": ".destroySub()",
       "file_type": "code",
-      "source_file": "app/Http/Controllers/MercadoController.php",
-      "source_location": "L446",
+      "source_file": "app/Http/Controllers/CategoriasController.php",
+      "source_location": "L54",
       "_callable": true,
       "_origin": "ast",
-      "id": "app_http_controllers_mercadocontroller_mercadocontroller_destroyitem",
+      "id": "app_http_controllers_categoriascontroller_categoriascontroller_destroysub",
       "community": 3,
       "community_name": "TelegramService",
-      "norm_label": ".destroyitem()"
+      "norm_label": ".destroysub()"
+    },
+    {
+      "label": ".index()",
+      "file_type": "code",
+      "source_file": "app/Http/Controllers/CategoriasController.php",
+      "source_location": "L12",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "app_http_controllers_categoriascontroller_categoriascontroller_index",
+      "community": 3,
+      "community_name": "TelegramService",
+      "norm_label": ".index()"
+    },
+    {
+      "label": ".store()",
+      "file_type": "code",
+      "source_file": "app/Http/Controllers/CategoriasController.php",
+      "source_location": "L22",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "app_http_controllers_categoriascontroller_categoriascontroller_store",
+      "community": 3,
+      "community_name": "TelegramService",
+      "norm_label": ".store()"
+    },
+    {
+      "label": ".storeSub()",
+      "file_type": "code",
+      "source_file": "app/Http/Controllers/CategoriasController.php",
+      "source_location": "L35",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "app_http_controllers_categoriascontroller_categoriascontroller_storesub",
+      "community": 3,
+      "community_name": "TelegramService",
+      "norm_label": ".storesub()"
     },
     {
       "label": ".__construct()",
       "file_type": "code",
-      "source_file": "app/Services/FiscalTelegramNotifierService.php",
-      "source_location": "L12",
+      "source_file": "app/Http/Controllers/TelegramWebhookController.php",
+      "source_location": "L29",
       "_callable": true,
       "_origin": "ast",
-      "id": "app_services_fiscaltelegramnotifierservice_fiscaltelegramnotifierservice_construct",
+      "id": "app_http_controllers_telegramwebhookcontroller_telegramwebhookcontroller_construct",
       "community": 3,
       "community_name": "TelegramService",
       "norm_label": ".__construct()"
+    },
+    {
+      "label": ".subcategorias()",
+      "file_type": "code",
+      "source_file": "app/Models/Categoria.php",
+      "source_location": "L16",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "app_models_categoria_categoria_subcategorias",
+      "community": 3,
+      "community_name": "TelegramService",
+      "norm_label": ".subcategorias()"
+    },
+    {
+      "label": ".user()",
+      "file_type": "code",
+      "source_file": "app/Models/Categoria.php",
+      "source_location": "L11",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "app_models_categoria_categoria_user",
+      "community": 3,
+      "community_name": "TelegramService",
+      "norm_label": ".user()"
+    },
+    {
+      "label": ".categoria()",
+      "file_type": "code",
+      "source_file": "app/Models/Subcategoria.php",
+      "source_location": "L11",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "app_models_subcategoria_subcategoria_categoria",
+      "community": 3,
+      "community_name": "TelegramService",
+      "norm_label": ".categoria()"
     },
     {
       "label": ".__construct()",
@@ -3839,7 +3888,7 @@
       "label": ".deleteWebhook()",
       "file_type": "code",
       "source_file": "app/Services/TelegramService.php",
-      "source_location": "L140",
+      "source_location": "L153",
       "_callable": true,
       "_origin": "ast",
       "id": "app_services_telegramservice_telegramservice_deletewebhook",
@@ -3851,7 +3900,7 @@
       "label": ".downloadFile()",
       "file_type": "code",
       "source_file": "app/Services/TelegramService.php",
-      "source_location": "L173",
+      "source_location": "L186",
       "_callable": true,
       "_origin": "ast",
       "id": "app_services_telegramservice_telegramservice_downloadfile",
@@ -3863,7 +3912,7 @@
       "label": ".getFile()",
       "file_type": "code",
       "source_file": "app/Services/TelegramService.php",
-      "source_location": "L149",
+      "source_location": "L162",
       "_callable": true,
       "_origin": "ast",
       "id": "app_services_telegramservice_telegramservice_getfile",
@@ -3875,13 +3924,25 @@
       "label": ".getUpdates()",
       "file_type": "code",
       "source_file": "app/Services/TelegramService.php",
-      "source_location": "L195",
+      "source_location": "L208",
       "_callable": true,
       "_origin": "ast",
       "id": "app_services_telegramservice_telegramservice_getupdates",
       "community": 3,
       "community_name": "TelegramService",
       "norm_label": ".getupdates()"
+    },
+    {
+      "label": ".getWebhookInfo()",
+      "file_type": "code",
+      "source_file": "app/Services/TelegramService.php",
+      "source_location": "L144",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "app_services_telegramservice_telegramservice_getwebhookinfo",
+      "community": 3,
+      "community_name": "TelegramService",
+      "norm_label": ".getwebhookinfo()"
     },
     {
       "label": ".http()",
@@ -3932,6 +3993,18 @@
       "norm_label": ".setwebhook()"
     },
     {
+      "label": ".parse()",
+      "file_type": "code",
+      "source_file": "app/Services/WhatsappMessageParser.php",
+      "source_location": "L118",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "app_services_whatsappmessageparser_whatsappmessageparser_parse",
+      "community": 3,
+      "community_name": "TelegramService",
+      "norm_label": ".parse()"
+    },
+    {
       "label": ".test_crawler_parses_and_matches_fiscal_news()",
       "file_type": "code",
       "source_file": "tests/Feature/FiscalModuleTest.php",
@@ -3966,6 +4039,18 @@
       "community": 30,
       "community_name": "0001_01_01_000002_create_jobs_table.php",
       "norm_label": "up()"
+    },
+    {
+      "label": ".handle()",
+      "file_type": "code",
+      "source_file": "app/Http/Middleware/PhotoAuth.php",
+      "source_location": "L18",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "app_http_middleware_photoauth_photoauth_handle",
+      "community": 31,
+      "community_name": "PhotoAuth.php",
+      "norm_label": ".handle()"
     },
     {
       "label": "down()",
@@ -4014,78 +4099,6 @@
       "community": 33,
       "community_name": "2026_04_24_184002_create_cartao_parcelas_table.php",
       "norm_label": "up()"
-    },
-    {
-      "label": ".scopeApenasFuturosOuAbertos()",
-      "file_type": "code",
-      "source_file": "app/Models/FiscalNoticia.php",
-      "source_location": "L53",
-      "_callable": true,
-      "_origin": "ast",
-      "id": "app_models_fiscalnoticia_fiscalnoticia_scopeapenasfuturosouabertos",
-      "community": 34,
-      "community_name": "FiscalNoticia",
-      "norm_label": ".scopeapenasfuturosouabertos()"
-    },
-    {
-      "label": ".scopeNaoNotificadas()",
-      "file_type": "code",
-      "source_file": "app/Models/FiscalNoticia.php",
-      "source_location": "L43",
-      "_callable": true,
-      "_origin": "ast",
-      "id": "app_models_fiscalnoticia_fiscalnoticia_scopenaonotificadas",
-      "community": 34,
-      "community_name": "FiscalNoticia",
-      "norm_label": ".scopenaonotificadas()"
-    },
-    {
-      "label": ".scopeRecentes()",
-      "file_type": "code",
-      "source_file": "app/Models/FiscalNoticia.php",
-      "source_location": "L48",
-      "_callable": true,
-      "_origin": "ast",
-      "id": "app_models_fiscalnoticia_fiscalnoticia_scoperecentes",
-      "community": 34,
-      "community_name": "FiscalNoticia",
-      "norm_label": ".scoperecentes()"
-    },
-    {
-      "label": ".formatNewsMessage()",
-      "file_type": "code",
-      "source_file": "app/Services/FiscalTelegramNotifierService.php",
-      "source_location": "L20",
-      "_callable": true,
-      "_origin": "ast",
-      "id": "app_services_fiscaltelegramnotifierservice_fiscaltelegramnotifierservice_formatnewsmessage",
-      "community": 34,
-      "community_name": "FiscalNoticia",
-      "norm_label": ".formatnewsmessage()"
-    },
-    {
-      "label": ".notifyPendingNews()",
-      "file_type": "code",
-      "source_file": "app/Services/FiscalTelegramNotifierService.php",
-      "source_location": "L190",
-      "_callable": true,
-      "_origin": "ast",
-      "id": "app_services_fiscaltelegramnotifierservice_fiscaltelegramnotifierservice_notifypendingnews",
-      "community": 34,
-      "community_name": "FiscalNoticia",
-      "norm_label": ".notifypendingnews()"
-    },
-    {
-      "label": ".sendNewsAlert()",
-      "file_type": "code",
-      "source_file": "app/Services/FiscalTelegramNotifierService.php",
-      "source_location": "L154",
-      "_callable": true,
-      "_origin": "ast",
-      "id": "app_services_fiscaltelegramnotifierservice_fiscaltelegramnotifierservice_sendnewsalert",
-      "community": 34,
-      "community_name": "FiscalNoticia",
-      "norm_label": ".sendnewsalert()"
     },
     {
       "label": "down()",
@@ -4280,18 +4293,6 @@
       "norm_label": "up()"
     },
     {
-      "label": ".__construct()",
-      "file_type": "code",
-      "source_file": "app/Http/Controllers/FiscalConcursosController.php",
-      "source_location": "L18",
-      "_callable": true,
-      "_origin": "ast",
-      "id": "app_http_controllers_fiscalconcursoscontroller_fiscalconcursoscontroller_construct",
-      "community": 45,
-      "community_name": "FiscalConcursoDataService",
-      "norm_label": ".__construct()"
-    },
-    {
       "label": ".getMasterCatalog()",
       "file_type": "code",
       "source_file": "app/Services/FiscalConcursoDataService.php",
@@ -4364,6 +4365,18 @@
       "norm_label": ".__construct()"
     },
     {
+      "label": ".__construct()",
+      "file_type": "code",
+      "source_file": "app/Services/FiscalTelegramNotifierService.php",
+      "source_location": "L12",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "app_services_fiscaltelegramnotifierservice_fiscaltelegramnotifierservice_construct",
+      "community": 45,
+      "community_name": "FiscalConcursoDataService",
+      "norm_label": ".__construct()"
+    },
+    {
       "label": ".formatConcursoProfileMessage()",
       "file_type": "code",
       "source_file": "app/Services/FiscalTelegramNotifierService.php",
@@ -4386,6 +4399,42 @@
       "community": 45,
       "community_name": "FiscalConcursoDataService",
       "norm_label": ".formathotcontestssummary()"
+    },
+    {
+      "label": ".formatNewsMessage()",
+      "file_type": "code",
+      "source_file": "app/Services/FiscalTelegramNotifierService.php",
+      "source_location": "L20",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "app_services_fiscaltelegramnotifierservice_fiscaltelegramnotifierservice_formatnewsmessage",
+      "community": 45,
+      "community_name": "FiscalConcursoDataService",
+      "norm_label": ".formatnewsmessage()"
+    },
+    {
+      "label": ".notifyPendingNews()",
+      "file_type": "code",
+      "source_file": "app/Services/FiscalTelegramNotifierService.php",
+      "source_location": "L190",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "app_services_fiscaltelegramnotifierservice_fiscaltelegramnotifierservice_notifypendingnews",
+      "community": 45,
+      "community_name": "FiscalConcursoDataService",
+      "norm_label": ".notifypendingnews()"
+    },
+    {
+      "label": ".sendNewsAlert()",
+      "file_type": "code",
+      "source_file": "app/Services/FiscalTelegramNotifierService.php",
+      "source_location": "L154",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "app_services_fiscaltelegramnotifierservice_fiscaltelegramnotifierservice_sendnewsalert",
+      "community": 45,
+      "community_name": "FiscalConcursoDataService",
+      "norm_label": ".sendnewsalert()"
     },
     {
       "label": "down()",
@@ -4436,76 +4485,52 @@
       "norm_label": "up()"
     },
     {
-      "label": ".test_authenticated_user_can_access_photo_gallery()",
+      "label": ".handle()",
       "file_type": "code",
-      "source_file": "tests/Feature/PhotoModuleTest.php",
-      "source_location": "L23",
+      "source_file": "app/Console/Commands/ExportProductionDataCommand.php",
+      "source_location": "L54",
       "_callable": true,
       "_origin": "ast",
-      "id": "tests_feature_photomoduletest_photomoduletest_test_authenticated_user_can_access_photo_gallery",
+      "id": "app_console_commands_exportproductiondatacommand_exportproductiondatacommand_handle",
       "community": 5,
-      "community_name": "PhotoModuleTest",
-      "norm_label": ".test_authenticated_user_can_access_photo_gallery()"
+      "community_name": "Illuminate\\Console\\Command",
+      "norm_label": ".handle()"
     },
     {
-      "label": ".test_photo_gallery_requires_authentication()",
+      "label": ".handle()",
       "file_type": "code",
-      "source_file": "tests/Feature/PhotoModuleTest.php",
-      "source_location": "L11",
+      "source_file": "app/Console/Commands/FiscalCrawlCommand.php",
+      "source_location": "L28",
       "_callable": true,
       "_origin": "ast",
-      "id": "tests_feature_photomoduletest_photomoduletest_test_photo_gallery_requires_authentication",
+      "id": "app_console_commands_fiscalcrawlcommand_fiscalcrawlcommand_handle",
       "community": 5,
-      "community_name": "PhotoModuleTest",
-      "norm_label": ".test_photo_gallery_requires_authentication()"
+      "community_name": "Illuminate\\Console\\Command",
+      "norm_label": ".handle()"
     },
     {
-      "label": ".test_pregenerate_thumbs_generates_thumbnails()",
+      "label": ".handle()",
       "file_type": "code",
-      "source_file": "tests/Feature/PhotoModuleTest.php",
-      "source_location": "L192",
+      "source_file": "app/Console/Commands/FiscalSeedDataCommand.php",
+      "source_location": "L27",
       "_callable": true,
       "_origin": "ast",
-      "id": "tests_feature_photomoduletest_photomoduletest_test_pregenerate_thumbs_generates_thumbnails",
+      "id": "app_console_commands_fiscalseeddatacommand_fiscalseeddatacommand_handle",
       "community": 5,
-      "community_name": "PhotoModuleTest",
-      "norm_label": ".test_pregenerate_thumbs_generates_thumbnails()"
+      "community_name": "Illuminate\\Console\\Command",
+      "norm_label": ".handle()"
     },
     {
-      "label": ".test_pregenerate_thumbs_requires_authentication()",
+      "label": ".handle()",
       "file_type": "code",
-      "source_file": "tests/Feature/PhotoModuleTest.php",
-      "source_location": "L181",
+      "source_file": "app/Console/Commands/TelegramSetWebhook.php",
+      "source_location": "L17",
       "_callable": true,
       "_origin": "ast",
-      "id": "tests_feature_photomoduletest_photomoduletest_test_pregenerate_thumbs_requires_authentication",
+      "id": "app_console_commands_telegramsetwebhook_telegramsetwebhook_handle",
       "community": 5,
-      "community_name": "PhotoModuleTest",
-      "norm_label": ".test_pregenerate_thumbs_requires_authentication()"
-    },
-    {
-      "label": ".test_sync_falls_back_to_first_image_when_no_cover_exists()",
-      "file_type": "code",
-      "source_file": "tests/Feature/PhotoModuleTest.php",
-      "source_location": "L111",
-      "_callable": true,
-      "_origin": "ast",
-      "id": "tests_feature_photomoduletest_photomoduletest_test_sync_falls_back_to_first_image_when_no_cover_exists",
-      "community": 5,
-      "community_name": "PhotoModuleTest",
-      "norm_label": ".test_sync_falls_back_to_first_image_when_no_cover_exists()"
-    },
-    {
-      "label": ".test_sync_prioritizes_cover_images()",
-      "file_type": "code",
-      "source_file": "tests/Feature/PhotoModuleTest.php",
-      "source_location": "L34",
-      "_callable": true,
-      "_origin": "ast",
-      "id": "tests_feature_photomoduletest_photomoduletest_test_sync_prioritizes_cover_images",
-      "community": 5,
-      "community_name": "PhotoModuleTest",
-      "norm_label": ".test_sync_prioritizes_cover_images()"
+      "community_name": "Illuminate\\Console\\Command",
+      "norm_label": ".handle()"
     },
     {
       "label": ".test_the_application_returns_a_successful_response()",
@@ -4518,6 +4543,78 @@
       "community": 7,
       "community_name": "TestCase",
       "norm_label": ".test_the_application_returns_a_successful_response()"
+    },
+    {
+      "label": ".test_authenticated_user_can_access_photo_gallery()",
+      "file_type": "code",
+      "source_file": "tests/Feature/PhotoModuleTest.php",
+      "source_location": "L23",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "tests_feature_photomoduletest_photomoduletest_test_authenticated_user_can_access_photo_gallery",
+      "community": 7,
+      "community_name": "TestCase",
+      "norm_label": ".test_authenticated_user_can_access_photo_gallery()"
+    },
+    {
+      "label": ".test_photo_gallery_requires_authentication()",
+      "file_type": "code",
+      "source_file": "tests/Feature/PhotoModuleTest.php",
+      "source_location": "L11",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "tests_feature_photomoduletest_photomoduletest_test_photo_gallery_requires_authentication",
+      "community": 7,
+      "community_name": "TestCase",
+      "norm_label": ".test_photo_gallery_requires_authentication()"
+    },
+    {
+      "label": ".test_pregenerate_thumbs_generates_thumbnails()",
+      "file_type": "code",
+      "source_file": "tests/Feature/PhotoModuleTest.php",
+      "source_location": "L192",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "tests_feature_photomoduletest_photomoduletest_test_pregenerate_thumbs_generates_thumbnails",
+      "community": 7,
+      "community_name": "TestCase",
+      "norm_label": ".test_pregenerate_thumbs_generates_thumbnails()"
+    },
+    {
+      "label": ".test_pregenerate_thumbs_requires_authentication()",
+      "file_type": "code",
+      "source_file": "tests/Feature/PhotoModuleTest.php",
+      "source_location": "L181",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "tests_feature_photomoduletest_photomoduletest_test_pregenerate_thumbs_requires_authentication",
+      "community": 7,
+      "community_name": "TestCase",
+      "norm_label": ".test_pregenerate_thumbs_requires_authentication()"
+    },
+    {
+      "label": ".test_sync_falls_back_to_first_image_when_no_cover_exists()",
+      "file_type": "code",
+      "source_file": "tests/Feature/PhotoModuleTest.php",
+      "source_location": "L111",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "tests_feature_photomoduletest_photomoduletest_test_sync_falls_back_to_first_image_when_no_cover_exists",
+      "community": 7,
+      "community_name": "TestCase",
+      "norm_label": ".test_sync_falls_back_to_first_image_when_no_cover_exists()"
+    },
+    {
+      "label": ".test_sync_prioritizes_cover_images()",
+      "file_type": "code",
+      "source_file": "tests/Feature/PhotoModuleTest.php",
+      "source_location": "L34",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "tests_feature_photomoduletest_photomoduletest_test_sync_prioritizes_cover_images",
+      "community": 7,
+      "community_name": "TestCase",
+      "norm_label": ".test_sync_prioritizes_cover_images()"
     },
     {
       "label": "down()",
@@ -4640,52 +4737,28 @@
       "norm_label": "up()"
     },
     {
-      "label": ".isMatch()",
+      "label": ".noticias()",
       "file_type": "code",
-      "source_file": "app/Services/CategorySanitizer.php",
-      "source_location": "L66",
+      "source_file": "app/Models/FiscalConcurso.php",
+      "source_location": "L68",
       "_callable": true,
       "_origin": "ast",
-      "id": "app_services_categorysanitizer_categorysanitizer_ismatch",
+      "id": "app_models_fiscalconcurso_fiscalconcurso_noticias",
       "community": 9,
-      "community_name": "UserFactory.php",
-      "norm_label": ".ismatch()"
+      "community_name": "User.php",
+      "norm_label": ".noticias()"
     },
     {
-      "label": ".sanitize()",
+      "label": ".salaryProfiles()",
       "file_type": "code",
-      "source_file": "app/Services/CategorySanitizer.php",
-      "source_location": "L35",
+      "source_file": "app/Models/User.php",
+      "source_location": "L38",
       "_callable": true,
       "_origin": "ast",
-      "id": "app_services_categorysanitizer_categorysanitizer_sanitize",
+      "id": "app_models_user_user_salaryprofiles",
       "community": 9,
-      "community_name": "UserFactory.php",
-      "norm_label": ".sanitize()"
-    },
-    {
-      "label": ".definition()",
-      "file_type": "code",
-      "source_file": "database/factories/UserFactory.php",
-      "source_location": "L25",
-      "_callable": true,
-      "_origin": "ast",
-      "id": "database_factories_userfactory_userfactory_definition",
-      "community": 9,
-      "community_name": "UserFactory.php",
-      "norm_label": ".definition()"
-    },
-    {
-      "label": ".unverified()",
-      "file_type": "code",
-      "source_file": "database/factories/UserFactory.php",
-      "source_location": "L39",
-      "_callable": true,
-      "_origin": "ast",
-      "id": "database_factories_userfactory_userfactory_unverified",
-      "community": 9,
-      "community_name": "UserFactory.php",
-      "norm_label": ".unverified()"
+      "community_name": "User.php",
+      "norm_label": ".salaryprofiles()"
     },
     {
       "label": "down()",
@@ -4892,28 +4965,6 @@
       "norm_label": "up()"
     },
     {
-      "label": "AuthController.php",
-      "file_type": "code",
-      "source_file": "app/Http/Controllers/AuthController.php",
-      "source_location": "L1",
-      "_origin": "ast",
-      "id": "app_http_controllers_authcontroller",
-      "community": 0,
-      "community_name": "Illuminate\\Http\\Request",
-      "norm_label": "authcontroller.php"
-    },
-    {
-      "label": "HomeController.php",
-      "file_type": "code",
-      "source_file": "app/Http/Controllers/HomeController.php",
-      "source_location": "L1",
-      "_origin": "ast",
-      "id": "app_http_controllers_homecontroller",
-      "community": 0,
-      "community_name": "Illuminate\\Http\\Request",
-      "norm_label": "homecontroller.php"
-    },
-    {
       "label": "PhotoController.php",
       "file_type": "code",
       "source_file": "app/Http/Controllers/PhotoController.php",
@@ -4921,140 +4972,118 @@
       "_origin": "ast",
       "id": "app_http_controllers_photocontroller",
       "community": 0,
-      "community_name": "Illuminate\\Http\\Request",
+      "community_name": "PhotoController",
       "norm_label": "photocontroller.php"
     },
     {
-      "label": "PhotoAuth.php",
+      "label": "cache.php",
       "file_type": "code",
-      "source_file": "app/Http/Middleware/PhotoAuth.php",
+      "source_file": "config/cache.php",
       "source_location": "L1",
       "_origin": "ast",
-      "id": "app_http_middleware_photoauth",
+      "id": "config_cache",
       "community": 0,
-      "community_name": "Illuminate\\Http\\Request",
-      "norm_label": "photoauth.php"
+      "community_name": "PhotoController",
+      "norm_label": "cache.php"
     },
     {
-      "label": "bootstrap/app.php",
+      "label": "database.php",
       "file_type": "code",
-      "source_file": "bootstrap/app.php",
+      "source_file": "config/database.php",
       "source_location": "L1",
       "_origin": "ast",
-      "id": "bootstrap_app",
+      "id": "config_database",
       "community": 0,
-      "community_name": "Illuminate\\Http\\Request",
-      "norm_label": "bootstrap/app.php"
+      "community_name": "PhotoController",
+      "norm_label": "database.php"
     },
     {
-      "label": "Closure",
+      "label": "session.php",
       "file_type": "code",
-      "source_file": "",
-      "source_location": "",
-      "_origin": "ast",
-      "id": "closure",
-      "community": 0,
-      "community_name": "Illuminate\\Http\\Request",
-      "norm_label": "closure"
-    },
-    {
-      "label": "Illuminate\\Foundation\\Application",
-      "file_type": "code",
-      "source_file": "",
-      "source_location": "",
-      "_origin": "ast",
-      "id": "illuminate_foundation_application",
-      "community": 0,
-      "community_name": "Illuminate\\Http\\Request",
-      "norm_label": "illuminate\\foundation\\application"
-    },
-    {
-      "label": "Illuminate\\Foundation\\Configuration\\Exceptions",
-      "file_type": "code",
-      "source_file": "",
-      "source_location": "",
-      "_origin": "ast",
-      "id": "illuminate_foundation_configuration_exceptions",
-      "community": 0,
-      "community_name": "Illuminate\\Http\\Request",
-      "norm_label": "illuminate\\foundation\\configuration\\exceptions"
-    },
-    {
-      "label": "Illuminate\\Foundation\\Configuration\\Middleware",
-      "file_type": "code",
-      "source_file": "",
-      "source_location": "",
-      "_origin": "ast",
-      "id": "illuminate_foundation_configuration_middleware",
-      "community": 0,
-      "community_name": "Illuminate\\Http\\Request",
-      "norm_label": "illuminate\\foundation\\configuration\\middleware"
-    },
-    {
-      "label": "Illuminate\\Http\\RedirectResponse",
-      "file_type": "code",
-      "source_file": "",
-      "source_location": "",
-      "_origin": "ast",
-      "id": "illuminate_http_redirectresponse",
-      "community": 0,
-      "community_name": "Illuminate\\Http\\Request",
-      "norm_label": "illuminate\\http\\redirectresponse"
-    },
-    {
-      "label": "Illuminate\\Http\\Request",
-      "file_type": "code",
-      "source_file": "",
-      "source_location": "",
-      "_origin": "ast",
-      "id": "illuminate_http_request",
-      "community": 0,
-      "community_name": "Illuminate\\Http\\Request",
-      "norm_label": "illuminate\\http\\request"
-    },
-    {
-      "label": "Illuminate\\Support\\Facades\\Route",
-      "file_type": "code",
-      "source_file": "",
-      "source_location": "",
-      "_origin": "ast",
-      "id": "illuminate_support_facades_route",
-      "community": 0,
-      "community_name": "Illuminate\\Http\\Request",
-      "norm_label": "illuminate\\support\\facades\\route"
-    },
-    {
-      "label": "index.php",
-      "file_type": "code",
-      "source_file": "public/index.php",
+      "source_file": "config/session.php",
       "source_location": "L1",
       "_origin": "ast",
-      "id": "public_index",
+      "id": "config_session",
       "community": 0,
-      "community_name": "Illuminate\\Http\\Request",
-      "norm_label": "index.php"
+      "community_name": "PhotoController",
+      "norm_label": "session.php"
     },
     {
-      "label": "web.php",
+      "label": "UserFactory.php",
       "file_type": "code",
-      "source_file": "routes/web.php",
+      "source_file": "database/factories/UserFactory.php",
       "source_location": "L1",
       "_origin": "ast",
-      "id": "routes_web",
+      "id": "database_factories_userfactory",
       "community": 0,
-      "community_name": "Illuminate\\Http\\Request",
-      "norm_label": "web.php"
+      "community_name": "PhotoController",
+      "norm_label": "userfactory.php"
     },
     {
-      "label": "Symfony\\Component\\HttpFoundation\\Response",
+      "label": "Illuminate\\Database\\Eloquent\\Factories\\Factory",
       "file_type": "code",
       "source_file": "",
       "source_location": "",
       "_origin": "ast",
-      "id": "symfony_component_httpfoundation_response",
+      "id": "illuminate_database_eloquent_factories_factory",
       "community": 0,
+      "community_name": "PhotoController",
+      "norm_label": "illuminate\\database\\eloquent\\factories\\factory"
+    },
+    {
+      "label": "Illuminate\\Support\\Facades\\Hash",
+      "file_type": "code",
+      "source_file": "",
+      "source_location": "",
+      "_origin": "ast",
+      "id": "illuminate_support_facades_hash",
+      "community": 0,
+      "community_name": "PhotoController",
+      "norm_label": "illuminate\\support\\facades\\hash"
+    },
+    {
+      "label": "Illuminate\\Support\\Str",
+      "file_type": "code",
+      "source_file": "",
+      "source_location": "",
+      "_origin": "ast",
+      "id": "illuminate_support_str",
+      "community": 0,
+      "community_name": "PhotoController",
+      "norm_label": "illuminate\\support\\str"
+    },
+    {
+      "label": "Pdo\\Mysql",
+      "file_type": "code",
+      "source_file": "",
+      "source_location": "",
+      "_origin": "ast",
+      "id": "pdo_mysql",
+      "community": 0,
+      "community_name": "PhotoController",
+      "norm_label": "pdo\\mysql"
+    },
+    {
+      "label": "static",
+      "file_type": "code",
+      "source_file": "",
+      "source_location": "",
+      "_origin": "ast",
+      "id": "static",
+      "community": 0,
+      "community_name": "PhotoController",
+      "norm_label": "static"
+    },
+    {
+      "label": "AuthController.php",
+      "file_type": "code",
+      "source_file": "app/Http/Controllers/AuthController.php",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "app_http_controllers_authcontroller",
+      "community": 1,
       "community_name": "Illuminate\\Http\\Request",
-      "norm_label": "symfony\\component\\httpfoundation\\response"
+      "norm_label": "authcontroller.php"
     },
     {
       "label": "CartoesController.php",
@@ -5064,8 +5093,19 @@
       "_origin": "ast",
       "id": "app_http_controllers_cartoescontroller",
       "community": 1,
-      "community_name": "Cartao",
+      "community_name": "Illuminate\\Http\\Request",
       "norm_label": "cartoescontroller.php"
+    },
+    {
+      "label": "CategoriasController.php",
+      "file_type": "code",
+      "source_file": "app/Http/Controllers/CategoriasController.php",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "app_http_controllers_categoriascontroller",
+      "community": 1,
+      "community_name": "Illuminate\\Http\\Request",
+      "norm_label": "categoriascontroller.php"
     },
     {
       "label": "Controller.php",
@@ -5075,7 +5115,7 @@
       "_origin": "ast",
       "id": "app_http_controllers_controller",
       "community": 1,
-      "community_name": "Cartao",
+      "community_name": "Illuminate\\Http\\Request",
       "norm_label": "controller.php"
     },
     {
@@ -5086,7 +5126,7 @@
       "_origin": "ast",
       "id": "app_http_controllers_estudoscontroller",
       "community": 1,
-      "community_name": "Cartao",
+      "community_name": "Illuminate\\Http\\Request",
       "norm_label": "estudoscontroller.php"
     },
     {
@@ -5097,7 +5137,7 @@
       "_origin": "ast",
       "id": "app_http_controllers_exportcontroller",
       "community": 1,
-      "community_name": "Cartao",
+      "community_name": "Illuminate\\Http\\Request",
       "norm_label": "exportcontroller.php"
     },
     {
@@ -5108,8 +5148,19 @@
       "_origin": "ast",
       "id": "app_http_controllers_financascontroller",
       "community": 1,
-      "community_name": "Cartao",
+      "community_name": "Illuminate\\Http\\Request",
       "norm_label": "financascontroller.php"
+    },
+    {
+      "label": "HomeController.php",
+      "file_type": "code",
+      "source_file": "app/Http/Controllers/HomeController.php",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "app_http_controllers_homecontroller",
+      "community": 1,
+      "community_name": "Illuminate\\Http\\Request",
+      "norm_label": "homecontroller.php"
     },
     {
       "label": "MercadoController.php",
@@ -5119,7 +5170,7 @@
       "_origin": "ast",
       "id": "app_http_controllers_mercadocontroller",
       "community": 1,
-      "community_name": "Cartao",
+      "community_name": "Illuminate\\Http\\Request",
       "norm_label": "mercadocontroller.php"
     },
     {
@@ -5130,19 +5181,8 @@
       "_origin": "ast",
       "id": "app_http_controllers_telegramwebhookcontroller",
       "community": 1,
-      "community_name": "Cartao",
+      "community_name": "Illuminate\\Http\\Request",
       "norm_label": "telegramwebhookcontroller.php"
-    },
-    {
-      "label": "WhatsappLog.php",
-      "file_type": "code",
-      "source_file": "app/Models/WhatsappLog.php",
-      "source_location": "L1",
-      "_origin": "ast",
-      "id": "app_models_whatsapplog",
-      "community": 1,
-      "community_name": "Cartao",
-      "norm_label": "whatsapplog.php"
     },
     {
       "label": "CategorySanitizer.php",
@@ -5152,7 +5192,7 @@
       "_origin": "ast",
       "id": "app_services_categorysanitizer",
       "community": 1,
-      "community_name": "Cartao",
+      "community_name": "Illuminate\\Http\\Request",
       "norm_label": "categorysanitizer.php"
     },
     {
@@ -5163,19 +5203,8 @@
       "_origin": "ast",
       "id": "app_services_creditcardservice",
       "community": 1,
-      "community_name": "Cartao",
+      "community_name": "Illuminate\\Http\\Request",
       "norm_label": "creditcardservice.php"
-    },
-    {
-      "label": "WhatsappMessageParser.php",
-      "file_type": "code",
-      "source_file": "app/Services/WhatsappMessageParser.php",
-      "source_location": "L1",
-      "_origin": "ast",
-      "id": "app_services_whatsappmessageparser",
-      "community": 1,
-      "community_name": "Cartao",
-      "norm_label": "whatsappmessageparser.php"
     },
     {
       "label": "Barryvdh\\DomPDF\\Facade\\Pdf",
@@ -5185,7 +5214,7 @@
       "_origin": "ast",
       "id": "barryvdh_dompdf_facade_pdf",
       "community": 1,
-      "community_name": "Cartao",
+      "community_name": "Illuminate\\Http\\Request",
       "norm_label": "barryvdh\\dompdf\\facade\\pdf"
     },
     {
@@ -5196,7 +5225,7 @@
       "_origin": "ast",
       "id": "carbon",
       "community": 1,
-      "community_name": "Cartao",
+      "community_name": "Illuminate\\Http\\Request",
       "norm_label": "carbon"
     },
     {
@@ -5207,8 +5236,30 @@
       "_origin": "ast",
       "id": "carbon_carbon",
       "community": 1,
-      "community_name": "Cartao",
+      "community_name": "Illuminate\\Http\\Request",
       "norm_label": "carbon\\carbon"
+    },
+    {
+      "label": "Illuminate\\Http\\RedirectResponse",
+      "file_type": "code",
+      "source_file": "",
+      "source_location": "",
+      "_origin": "ast",
+      "id": "illuminate_http_redirectresponse",
+      "community": 1,
+      "community_name": "Illuminate\\Http\\Request",
+      "norm_label": "illuminate\\http\\redirectresponse"
+    },
+    {
+      "label": "Illuminate\\Http\\Request",
+      "file_type": "code",
+      "source_file": "",
+      "source_location": "",
+      "_origin": "ast",
+      "id": "illuminate_http_request",
+      "community": 1,
+      "community_name": "Illuminate\\Http\\Request",
+      "norm_label": "illuminate\\http\\request"
     },
     {
       "label": "Illuminate\\Support\\Facades\\Auth",
@@ -5218,7 +5269,7 @@
       "_origin": "ast",
       "id": "illuminate_support_facades_auth",
       "community": 1,
-      "community_name": "Cartao",
+      "community_name": "Illuminate\\Http\\Request",
       "norm_label": "illuminate\\support\\facades\\auth"
     },
     {
@@ -5229,19 +5280,30 @@
       "_origin": "ast",
       "id": "illuminate_support_facades_cache",
       "community": 1,
-      "community_name": "Cartao",
+      "community_name": "Illuminate\\Http\\Request",
       "norm_label": "illuminate\\support\\facades\\cache"
     },
     {
-      "label": "Illuminate\\Foundation\\Testing\\RefreshDatabase",
+      "label": "Illuminate\\Support\\Facades\\Route",
       "file_type": "code",
       "source_file": "",
       "source_location": "",
       "_origin": "ast",
-      "id": "illuminate_foundation_testing_refreshdatabase",
-      "community": 10,
-      "community_name": "NotaFiscal",
-      "norm_label": "illuminate\\foundation\\testing\\refreshdatabase"
+      "id": "illuminate_support_facades_route",
+      "community": 1,
+      "community_name": "Illuminate\\Http\\Request",
+      "norm_label": "illuminate\\support\\facades\\route"
+    },
+    {
+      "label": "web.php",
+      "file_type": "code",
+      "source_file": "routes/web.php",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "routes_web",
+      "community": 1,
+      "community_name": "Illuminate\\Http\\Request",
+      "norm_label": "web.php"
     },
     {
       "label": "MercadoModuleTest.php",
@@ -5266,17 +5328,6 @@
       "norm_label": "2026_08_26_000002_add_editado_manualmente_to_fiscal_concursos_table.php"
     },
     {
-      "label": "FiscalConcursosController.php",
-      "file_type": "code",
-      "source_file": "app/Http/Controllers/FiscalConcursosController.php",
-      "source_location": "L1",
-      "_origin": "ast",
-      "id": "app_http_controllers_fiscalconcursoscontroller",
-      "community": 103,
-      "community_name": "FiscalConcursosController.php",
-      "norm_label": "fiscalconcursoscontroller.php"
-    },
-    {
       "label": "FiscalConcursoDataService.php",
       "file_type": "code",
       "source_file": "app/Services/FiscalConcursoDataService.php",
@@ -5284,7 +5335,7 @@
       "_origin": "ast",
       "id": "app_services_fiscalconcursodataservice",
       "community": 103,
-      "community_name": "FiscalConcursosController.php",
+      "community_name": "Illuminate\\Support\\Facades\\Log",
       "norm_label": "fiscalconcursodataservice.php"
     },
     {
@@ -5295,7 +5346,7 @@
       "_origin": "ast",
       "id": "app_services_fiscalnewsaiservice",
       "community": 103,
-      "community_name": "FiscalConcursosController.php",
+      "community_name": "Illuminate\\Support\\Facades\\Log",
       "norm_label": "fiscalnewsaiservice.php"
     },
     {
@@ -5306,7 +5357,7 @@
       "_origin": "ast",
       "id": "app_services_fiscalnewscrawlerservice",
       "community": 103,
-      "community_name": "FiscalConcursosController.php",
+      "community_name": "Illuminate\\Support\\Facades\\Log",
       "norm_label": "fiscalnewscrawlerservice.php"
     },
     {
@@ -5317,7 +5368,7 @@
       "_origin": "ast",
       "id": "app_services_geminiservice",
       "community": 103,
-      "community_name": "FiscalConcursosController.php",
+      "community_name": "Illuminate\\Support\\Facades\\Log",
       "norm_label": "geminiservice.php"
     },
     {
@@ -5328,7 +5379,7 @@
       "_origin": "ast",
       "id": "app_services_telegramservice",
       "community": 103,
-      "community_name": "FiscalConcursosController.php",
+      "community_name": "Illuminate\\Support\\Facades\\Log",
       "norm_label": "telegramservice.php"
     },
     {
@@ -5339,7 +5390,7 @@
       "_origin": "ast",
       "id": "illuminate_support_facades_http",
       "community": 103,
-      "community_name": "FiscalConcursosController.php",
+      "community_name": "Illuminate\\Support\\Facades\\Log",
       "norm_label": "illuminate\\support\\facades\\http"
     },
     {
@@ -5350,30 +5401,8 @@
       "_origin": "ast",
       "id": "illuminate_support_facades_log",
       "community": 103,
-      "community_name": "FiscalConcursosController.php",
+      "community_name": "Illuminate\\Support\\Facades\\Log",
       "norm_label": "illuminate\\support\\facades\\log"
-    },
-    {
-      "label": "FiscalModuleTest.php",
-      "file_type": "code",
-      "source_file": "tests/Feature/FiscalModuleTest.php",
-      "source_location": "L1",
-      "_origin": "ast",
-      "id": "tests_feature_fiscalmoduletest",
-      "community": 103,
-      "community_name": "FiscalConcursosController.php",
-      "norm_label": "fiscalmoduletest.php"
-    },
-    {
-      "label": "CategoriasController.php",
-      "file_type": "code",
-      "source_file": "app/Http/Controllers/CategoriasController.php",
-      "source_location": "L1",
-      "_origin": "ast",
-      "id": "app_http_controllers_categoriascontroller",
-      "community": 12,
-      "community_name": "Illuminate\\Database\\Eloquent\\Model",
-      "norm_label": "categoriascontroller.php"
     },
     {
       "label": "Cartao.php",
@@ -5420,17 +5449,6 @@
       "norm_label": "cartaoprevisao.php"
     },
     {
-      "label": "Categoria.php",
-      "file_type": "code",
-      "source_file": "app/Models/Categoria.php",
-      "source_location": "L1",
-      "_origin": "ast",
-      "id": "app_models_categoria",
-      "community": 12,
-      "community_name": "Illuminate\\Database\\Eloquent\\Model",
-      "norm_label": "categoria.php"
-    },
-    {
       "label": "FiscalConcurso.php",
       "file_type": "code",
       "source_file": "app/Models/FiscalConcurso.php",
@@ -5462,6 +5480,17 @@
       "community": 12,
       "community_name": "Illuminate\\Database\\Eloquent\\Model",
       "norm_label": "fiscaltelegramconfig.php"
+    },
+    {
+      "label": "NotaFiscal.php",
+      "file_type": "code",
+      "source_file": "app/Models/NotaFiscal.php",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "app_models_notafiscal",
+      "community": 12,
+      "community_name": "Illuminate\\Database\\Eloquent\\Model",
+      "norm_label": "notafiscal.php"
     },
     {
       "label": "NotaFiscalItem.php",
@@ -5508,17 +5537,6 @@
       "norm_label": "studylog.php"
     },
     {
-      "label": "Subcategoria.php",
-      "file_type": "code",
-      "source_file": "app/Models/Subcategoria.php",
-      "source_location": "L1",
-      "_origin": "ast",
-      "id": "app_models_subcategoria",
-      "community": 12,
-      "community_name": "Illuminate\\Database\\Eloquent\\Model",
-      "norm_label": "subcategoria.php"
-    },
-    {
       "label": "Transacao.php",
       "file_type": "code",
       "source_file": "app/Models/Transacao.php",
@@ -5541,37 +5559,15 @@
       "norm_label": "transacaoprevisao.php"
     },
     {
-      "label": "User.php",
+      "label": "WhatsappLog.php",
       "file_type": "code",
-      "source_file": "app/Models/User.php",
+      "source_file": "app/Models/WhatsappLog.php",
       "source_location": "L1",
       "_origin": "ast",
-      "id": "app_models_user",
+      "id": "app_models_whatsapplog",
       "community": 12,
       "community_name": "Illuminate\\Database\\Eloquent\\Model",
-      "norm_label": "user.php"
-    },
-    {
-      "label": "Illuminate\\Database\\Eloquent\\Attributes\\Fillable",
-      "file_type": "code",
-      "source_file": "",
-      "source_location": "",
-      "_origin": "ast",
-      "id": "illuminate_database_eloquent_attributes_fillable",
-      "community": 12,
-      "community_name": "Illuminate\\Database\\Eloquent\\Model",
-      "norm_label": "illuminate\\database\\eloquent\\attributes\\fillable"
-    },
-    {
-      "label": "Illuminate\\Database\\Eloquent\\Attributes\\Hidden",
-      "file_type": "code",
-      "source_file": "",
-      "source_location": "",
-      "_origin": "ast",
-      "id": "illuminate_database_eloquent_attributes_hidden",
-      "community": 12,
-      "community_name": "Illuminate\\Database\\Eloquent\\Model",
-      "norm_label": "illuminate\\database\\eloquent\\attributes\\hidden"
+      "norm_label": "whatsapplog.php"
     },
     {
       "label": "Illuminate\\Database\\Eloquent\\Factories\\HasFactory",
@@ -5607,26 +5603,15 @@
       "norm_label": "illuminate\\database\\eloquent\\relations\\belongsto"
     },
     {
-      "label": "Illuminate\\Database\\Eloquent\\Relations\\HasMany",
+      "label": "FiscalConcursosController.php",
       "file_type": "code",
-      "source_file": "",
-      "source_location": "",
+      "source_file": "app/Http/Controllers/FiscalConcursosController.php",
+      "source_location": "L1",
       "_origin": "ast",
-      "id": "illuminate_database_eloquent_relations_hasmany",
-      "community": 12,
-      "community_name": "Illuminate\\Database\\Eloquent\\Model",
-      "norm_label": "illuminate\\database\\eloquent\\relations\\hasmany"
-    },
-    {
-      "label": "Illuminate\\Notifications\\Notifiable",
-      "file_type": "code",
-      "source_file": "",
-      "source_location": "",
-      "_origin": "ast",
-      "id": "illuminate_notifications_notifiable",
-      "community": 12,
-      "community_name": "Illuminate\\Database\\Eloquent\\Model",
-      "norm_label": "illuminate\\notifications\\notifiable"
+      "id": "app_http_controllers_fiscalconcursoscontroller",
+      "community": 16,
+      "community_name": "FiscalNoticia",
+      "norm_label": "fiscalconcursoscontroller.php"
     },
     {
       "label": "FiscalTelegramNotifierService.php",
@@ -5636,7 +5621,7 @@
       "_origin": "ast",
       "id": "app_services_fiscaltelegramnotifierservice",
       "community": 16,
-      "community_name": "FiscalConcursosController",
+      "community_name": "FiscalNoticia",
       "norm_label": "fiscaltelegramnotifierservice.php"
     },
     {
@@ -6344,6 +6329,28 @@
       "norm_label": "unit/exampletest.php"
     },
     {
+      "label": "Illuminate\\Foundation\\Testing\\RefreshDatabase",
+      "file_type": "code",
+      "source_file": "",
+      "source_location": "",
+      "_origin": "ast",
+      "id": "illuminate_foundation_testing_refreshdatabase",
+      "community": 28,
+      "community_name": "Illuminate\\Foundation\\Testing\\RefreshDatabase",
+      "norm_label": "illuminate\\foundation\\testing\\refreshdatabase"
+    },
+    {
+      "label": "WhatsappMessageParserTest.php",
+      "file_type": "code",
+      "source_file": "tests/Unit/WhatsappMessageParserTest.php",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "tests_unit_whatsappmessageparsertest",
+      "community": 28,
+      "community_name": "Illuminate\\Foundation\\Testing\\RefreshDatabase",
+      "norm_label": "whatsappmessageparsertest.php"
+    },
+    {
       "label": "0001_01_01_000000_create_users_table.php",
       "file_type": "code",
       "source_file": "database/migrations/0001_01_01_000000_create_users_table.php",
@@ -6377,81 +6384,37 @@
       "norm_label": "illuminate\\database\\schema\\blueprint"
     },
     {
-      "label": "ExportProductionDataCommand.php",
+      "label": "Categoria.php",
       "file_type": "code",
-      "source_file": "app/Console/Commands/ExportProductionDataCommand.php",
+      "source_file": "app/Models/Categoria.php",
       "source_location": "L1",
       "_origin": "ast",
-      "id": "app_console_commands_exportproductiondatacommand",
+      "id": "app_models_categoria",
       "community": 3,
       "community_name": "TelegramService",
-      "norm_label": "exportproductiondatacommand.php"
+      "norm_label": "categoria.php"
     },
     {
-      "label": "FiscalCrawlCommand.php",
+      "label": "Subcategoria.php",
       "file_type": "code",
-      "source_file": "app/Console/Commands/FiscalCrawlCommand.php",
+      "source_file": "app/Models/Subcategoria.php",
       "source_location": "L1",
       "_origin": "ast",
-      "id": "app_console_commands_fiscalcrawlcommand",
+      "id": "app_models_subcategoria",
       "community": 3,
       "community_name": "TelegramService",
-      "norm_label": "fiscalcrawlcommand.php"
+      "norm_label": "subcategoria.php"
     },
     {
-      "label": "FiscalSeedDataCommand.php",
+      "label": "WhatsappMessageParser.php",
       "file_type": "code",
-      "source_file": "app/Console/Commands/FiscalSeedDataCommand.php",
+      "source_file": "app/Services/WhatsappMessageParser.php",
       "source_location": "L1",
       "_origin": "ast",
-      "id": "app_console_commands_fiscalseeddatacommand",
+      "id": "app_services_whatsappmessageparser",
       "community": 3,
       "community_name": "TelegramService",
-      "norm_label": "fiscalseeddatacommand.php"
-    },
-    {
-      "label": "TelegramSetWebhook.php",
-      "file_type": "code",
-      "source_file": "app/Console/Commands/TelegramSetWebhook.php",
-      "source_location": "L1",
-      "_origin": "ast",
-      "id": "app_console_commands_telegramsetwebhook",
-      "community": 3,
-      "community_name": "TelegramService",
-      "norm_label": "telegramsetwebhook.php"
-    },
-    {
-      "label": "Command",
-      "file_type": "code",
-      "source_file": "",
-      "source_location": "",
-      "_origin": "ast",
-      "id": "command",
-      "community": 3,
-      "community_name": "TelegramService",
-      "norm_label": "command"
-    },
-    {
-      "label": "Illuminate\\Console\\Command",
-      "file_type": "code",
-      "source_file": "",
-      "source_location": "",
-      "_origin": "ast",
-      "id": "illuminate_console_command",
-      "community": 3,
-      "community_name": "TelegramService",
-      "norm_label": "illuminate\\console\\command"
-    },
-    {
-      "label": "Illuminate\\Support\\Facades\\DB",
-      "file_type": "code",
-      "source_file": "",
-      "source_location": "",
-      "_origin": "ast",
-      "id": "illuminate_support_facades_db",
-      "community": 3,
-      "community_name": "TelegramService",
-      "norm_label": "illuminate\\support\\facades\\db"
+      "norm_label": "whatsappmessageparser.php"
     },
     {
       "label": "PendingRequest",
@@ -6476,6 +6439,39 @@
       "norm_label": "0001_01_01_000002_create_jobs_table.php"
     },
     {
+      "label": "PhotoAuth.php",
+      "file_type": "code",
+      "source_file": "app/Http/Middleware/PhotoAuth.php",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "app_http_middleware_photoauth",
+      "community": 31,
+      "community_name": "PhotoAuth.php",
+      "norm_label": "photoauth.php"
+    },
+    {
+      "label": "Closure",
+      "file_type": "code",
+      "source_file": "",
+      "source_location": "",
+      "_origin": "ast",
+      "id": "closure",
+      "community": 31,
+      "community_name": "PhotoAuth.php",
+      "norm_label": "closure"
+    },
+    {
+      "label": "Symfony\\Component\\HttpFoundation\\Response",
+      "file_type": "code",
+      "source_file": "",
+      "source_location": "",
+      "_origin": "ast",
+      "id": "symfony_component_httpfoundation_response",
+      "community": 31,
+      "community_name": "PhotoAuth.php",
+      "norm_label": "symfony\\component\\httpfoundation\\response"
+    },
+    {
       "label": "2026_04_24_184001_create_cartao_compras_table.php",
       "file_type": "code",
       "source_file": "database/migrations/2026_04_24_184001_create_cartao_compras_table.php",
@@ -6496,6 +6492,61 @@
       "community": 33,
       "community_name": "2026_04_24_184002_create_cartao_parcelas_table.php",
       "norm_label": "2026_04_24_184002_create_cartao_parcelas_table.php"
+    },
+    {
+      "label": "bootstrap/app.php",
+      "file_type": "code",
+      "source_file": "bootstrap/app.php",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "bootstrap_app",
+      "community": 34,
+      "community_name": "bootstrap/app.php",
+      "norm_label": "bootstrap/app.php"
+    },
+    {
+      "label": "Illuminate\\Foundation\\Application",
+      "file_type": "code",
+      "source_file": "",
+      "source_location": "",
+      "_origin": "ast",
+      "id": "illuminate_foundation_application",
+      "community": 34,
+      "community_name": "bootstrap/app.php",
+      "norm_label": "illuminate\\foundation\\application"
+    },
+    {
+      "label": "Illuminate\\Foundation\\Configuration\\Exceptions",
+      "file_type": "code",
+      "source_file": "",
+      "source_location": "",
+      "_origin": "ast",
+      "id": "illuminate_foundation_configuration_exceptions",
+      "community": 34,
+      "community_name": "bootstrap/app.php",
+      "norm_label": "illuminate\\foundation\\configuration\\exceptions"
+    },
+    {
+      "label": "Illuminate\\Foundation\\Configuration\\Middleware",
+      "file_type": "code",
+      "source_file": "",
+      "source_location": "",
+      "_origin": "ast",
+      "id": "illuminate_foundation_configuration_middleware",
+      "community": 34,
+      "community_name": "bootstrap/app.php",
+      "norm_label": "illuminate\\foundation\\configuration\\middleware"
+    },
+    {
+      "label": "index.php",
+      "file_type": "code",
+      "source_file": "public/index.php",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "public_index",
+      "community": 34,
+      "community_name": "bootstrap/app.php",
+      "norm_label": "index.php"
     },
     {
       "label": "2026_04_24_185347_create_transacao_previsaos_table.php",
@@ -7037,6 +7088,17 @@
       "norm_label": "2026_07_18_143226_create_study_logs_table.php"
     },
     {
+      "label": "FiscalModuleTest.php",
+      "file_type": "code",
+      "source_file": "tests/Feature/FiscalModuleTest.php",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "tests_feature_fiscalmoduletest",
+      "community": 45,
+      "community_name": "FiscalConcursoDataService",
+      "norm_label": "fiscalmoduletest.php"
+    },
+    {
       "label": "2026_08_09_000000_create_nota_fiscal_itens_table.php",
       "file_type": "code",
       "source_file": "database/migrations/2026_08_09_000000_create_nota_fiscal_itens_table.php",
@@ -7112,6 +7174,83 @@
       "community": 49,
       "community_name": "rules/graphify.md",
       "norm_label": "graphify"
+    },
+    {
+      "label": "ExportProductionDataCommand.php",
+      "file_type": "code",
+      "source_file": "app/Console/Commands/ExportProductionDataCommand.php",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "app_console_commands_exportproductiondatacommand",
+      "community": 5,
+      "community_name": "Illuminate\\Console\\Command",
+      "norm_label": "exportproductiondatacommand.php"
+    },
+    {
+      "label": "FiscalCrawlCommand.php",
+      "file_type": "code",
+      "source_file": "app/Console/Commands/FiscalCrawlCommand.php",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "app_console_commands_fiscalcrawlcommand",
+      "community": 5,
+      "community_name": "Illuminate\\Console\\Command",
+      "norm_label": "fiscalcrawlcommand.php"
+    },
+    {
+      "label": "FiscalSeedDataCommand.php",
+      "file_type": "code",
+      "source_file": "app/Console/Commands/FiscalSeedDataCommand.php",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "app_console_commands_fiscalseeddatacommand",
+      "community": 5,
+      "community_name": "Illuminate\\Console\\Command",
+      "norm_label": "fiscalseeddatacommand.php"
+    },
+    {
+      "label": "TelegramSetWebhook.php",
+      "file_type": "code",
+      "source_file": "app/Console/Commands/TelegramSetWebhook.php",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "app_console_commands_telegramsetwebhook",
+      "community": 5,
+      "community_name": "Illuminate\\Console\\Command",
+      "norm_label": "telegramsetwebhook.php"
+    },
+    {
+      "label": "Command",
+      "file_type": "code",
+      "source_file": "",
+      "source_location": "",
+      "_origin": "ast",
+      "id": "command",
+      "community": 5,
+      "community_name": "Illuminate\\Console\\Command",
+      "norm_label": "command"
+    },
+    {
+      "label": "Illuminate\\Console\\Command",
+      "file_type": "code",
+      "source_file": "",
+      "source_location": "",
+      "_origin": "ast",
+      "id": "illuminate_console_command",
+      "community": 5,
+      "community_name": "Illuminate\\Console\\Command",
+      "norm_label": "illuminate\\console\\command"
+    },
+    {
+      "label": "Illuminate\\Support\\Facades\\DB",
+      "file_type": "code",
+      "source_file": "",
+      "source_location": "",
+      "_origin": "ast",
+      "id": "illuminate_support_facades_db",
+      "community": 5,
+      "community_name": "Illuminate\\Console\\Command",
+      "norm_label": "illuminate\\support\\facades\\db"
     },
     {
       "label": "workflows/graphify.md",
@@ -7595,17 +7734,6 @@
       "norm_label": "orcamento_pdf.blade.php"
     },
     {
-      "label": "NotaFiscal.php",
-      "file_type": "code",
-      "source_file": "app/Models/NotaFiscal.php",
-      "source_location": "L1",
-      "_origin": "ast",
-      "id": "app_models_notafiscal",
-      "community": 7,
-      "community_name": "TestCase",
-      "norm_label": "notafiscal.php"
-    },
-    {
       "label": "Illuminate\\Foundation\\Testing\\TestCase",
       "file_type": "code",
       "source_file": "",
@@ -8035,92 +8163,59 @@
       "norm_label": "2026_08_25_000001_create_fiscal_concursos_table.php"
     },
     {
-      "label": "cache.php",
+      "label": "User.php",
       "file_type": "code",
-      "source_file": "config/cache.php",
+      "source_file": "app/Models/User.php",
       "source_location": "L1",
       "_origin": "ast",
-      "id": "config_cache",
+      "id": "app_models_user",
       "community": 9,
-      "community_name": "UserFactory.php",
-      "norm_label": "cache.php"
+      "community_name": "User.php",
+      "norm_label": "user.php"
     },
     {
-      "label": "database.php",
-      "file_type": "code",
-      "source_file": "config/database.php",
-      "source_location": "L1",
-      "_origin": "ast",
-      "id": "config_database",
-      "community": 9,
-      "community_name": "UserFactory.php",
-      "norm_label": "database.php"
-    },
-    {
-      "label": "session.php",
-      "file_type": "code",
-      "source_file": "config/session.php",
-      "source_location": "L1",
-      "_origin": "ast",
-      "id": "config_session",
-      "community": 9,
-      "community_name": "UserFactory.php",
-      "norm_label": "session.php"
-    },
-    {
-      "label": "UserFactory.php",
-      "file_type": "code",
-      "source_file": "database/factories/UserFactory.php",
-      "source_location": "L1",
-      "_origin": "ast",
-      "id": "database_factories_userfactory",
-      "community": 9,
-      "community_name": "UserFactory.php",
-      "norm_label": "userfactory.php"
-    },
-    {
-      "label": "Illuminate\\Database\\Eloquent\\Factories\\Factory",
+      "label": "Illuminate\\Database\\Eloquent\\Attributes\\Fillable",
       "file_type": "code",
       "source_file": "",
       "source_location": "",
       "_origin": "ast",
-      "id": "illuminate_database_eloquent_factories_factory",
+      "id": "illuminate_database_eloquent_attributes_fillable",
       "community": 9,
-      "community_name": "UserFactory.php",
-      "norm_label": "illuminate\\database\\eloquent\\factories\\factory"
+      "community_name": "User.php",
+      "norm_label": "illuminate\\database\\eloquent\\attributes\\fillable"
     },
     {
-      "label": "Illuminate\\Support\\Str",
+      "label": "Illuminate\\Database\\Eloquent\\Attributes\\Hidden",
       "file_type": "code",
       "source_file": "",
       "source_location": "",
       "_origin": "ast",
-      "id": "illuminate_support_str",
+      "id": "illuminate_database_eloquent_attributes_hidden",
       "community": 9,
-      "community_name": "UserFactory.php",
-      "norm_label": "illuminate\\support\\str"
+      "community_name": "User.php",
+      "norm_label": "illuminate\\database\\eloquent\\attributes\\hidden"
     },
     {
-      "label": "Pdo\\Mysql",
+      "label": "Illuminate\\Database\\Eloquent\\Relations\\HasMany",
       "file_type": "code",
       "source_file": "",
       "source_location": "",
       "_origin": "ast",
-      "id": "pdo_mysql",
+      "id": "illuminate_database_eloquent_relations_hasmany",
       "community": 9,
-      "community_name": "UserFactory.php",
-      "norm_label": "pdo\\mysql"
+      "community_name": "User.php",
+      "norm_label": "illuminate\\database\\eloquent\\relations\\hasmany"
     },
     {
-      "label": "static",
+      "label": "Illuminate\\Notifications\\Notifiable",
       "file_type": "code",
       "source_file": "",
       "source_location": "",
       "_origin": "ast",
-      "id": "static",
+      "id": "illuminate_notifications_notifiable",
       "community": 9,
-      "community_name": "UserFactory.php",
-      "norm_label": "static"
+      "community_name": "User.php",
+      "norm_label": "illuminate\\notifications\\notifiable"
     },
     {
       "label": "2026_08_25_000002_create_fiscal_noticias_table.php",
@@ -8253,17 +8348,6 @@
       "community": 97,
       "community_name": "Illuminate\\Database\\Seeder",
       "norm_label": "illuminate\\database\\seeder"
-    },
-    {
-      "label": "Illuminate\\Support\\Facades\\Hash",
-      "file_type": "code",
-      "source_file": "",
-      "source_location": "",
-      "_origin": "ast",
-      "id": "illuminate_support_facades_hash",
-      "community": 97,
-      "community_name": "Illuminate\\Database\\Seeder",
-      "norm_label": "illuminate\\support\\facades\\hash"
     },
     {
       "label": "2026_04_24_185117_create_cartao_previsaos_table.php",
@@ -10166,7 +10250,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "app/Services/TelegramService.php",
-      "source_location": "L142",
+      "source_location": "L155",
       "weight": 1.0,
       "_origin": "ast",
       "source": "app_services_telegramservice_telegramservice_deletewebhook",
@@ -10178,7 +10262,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "app/Services/TelegramService.php",
-      "source_location": "L181",
+      "source_location": "L194",
       "weight": 1.0,
       "_origin": "ast",
       "source": "app_services_telegramservice_telegramservice_downloadfile",
@@ -10190,7 +10274,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "app/Services/TelegramService.php",
-      "source_location": "L156",
+      "source_location": "L169",
       "weight": 1.0,
       "_origin": "ast",
       "source": "app_services_telegramservice_telegramservice_getfile",
@@ -10202,10 +10286,22 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "app/Services/TelegramService.php",
-      "source_location": "L197",
+      "source_location": "L210",
       "weight": 1.0,
       "_origin": "ast",
       "source": "app_services_telegramservice_telegramservice_getupdates",
+      "target": "app_services_telegramservice_telegramservice_http",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "app/Services/TelegramService.php",
+      "source_location": "L146",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "app_services_telegramservice_telegramservice_getwebhookinfo",
       "target": "app_services_telegramservice_telegramservice_http",
       "confidence_score": 1.0
     },
@@ -10238,7 +10334,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "app/Services/TelegramService.php",
-      "source_location": "L132",
+      "source_location": "L136",
       "weight": 1.0,
       "_origin": "ast",
       "source": "app_services_telegramservice_telegramservice_setwebhook",
@@ -10251,7 +10347,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "app/Services/WhatsappMessageParser.php",
-      "source_location": "L168",
+      "source_location": "L132",
       "weight": 1.0,
       "_origin": "ast",
       "source": "app_services_whatsappmessageparser_whatsappmessageparser_parse",
@@ -10263,7 +10359,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "app/Services/WhatsappMessageParser.php",
-      "source_location": "L300",
+      "source_location": "L332",
       "weight": 1.0,
       "_origin": "ast",
       "source": "app_services_whatsappmessageparser_whatsappmessageparser_parse",
@@ -10891,6 +10987,18 @@
       "_origin": "ast",
       "source": "app_services_fiscaltelegramnotifierservice_fiscaltelegramnotifierservice",
       "target": "app_services_telegramservice_telegramservice",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/Unit/WhatsappMessageParserTest.php",
+      "source_location": "L13",
+      "weight": 1.0,
+      "context": "field",
+      "_origin": "ast",
+      "source": "tests_unit_whatsappmessageparsertest_whatsappmessageparsertest",
+      "target": "app_services_whatsappmessageparser_whatsappmessageparser",
       "confidence_score": 1.0
     },
     {
@@ -15490,6 +15598,42 @@
       "confidence_score": 1.0
     },
     {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/Unit/WhatsappMessageParserTest.php",
+      "source_location": "L5",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "tests_unit_whatsappmessageparsertest",
+      "target": "app_services_whatsappmessageparser_whatsappmessageparser",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/Unit/WhatsappMessageParserTest.php",
+      "source_location": "L6",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "tests_unit_whatsappmessageparsertest",
+      "target": "tests_testcase_testcase",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/Unit/WhatsappMessageParserTest.php",
+      "source_location": "L7",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "tests_unit_whatsappmessageparsertest",
+      "target": "illuminate_foundation_testing_refreshdatabase",
+      "confidence_score": 1.0
+    },
+    {
       "relation": "references",
       "confidence": "EXTRACTED",
       "source_file": "app/Console/Commands/FiscalCrawlCommand.php",
@@ -15529,7 +15673,7 @@
       "relation": "references",
       "confidence": "EXTRACTED",
       "source_file": "app/Console/Commands/TelegramSetWebhook.php",
-      "source_location": "L16",
+      "source_location": "L17",
       "weight": 1.0,
       "context": "parameter_type",
       "_origin": "ast",
@@ -19374,6 +19518,17 @@
       "confidence_score": 1.0
     },
     {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/Unit/WhatsappMessageParserTest.php",
+      "source_location": "L9",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "tests_unit_whatsappmessageparsertest",
+      "target": "tests_unit_whatsappmessageparsertest_whatsappmessageparsertest",
+      "confidence_score": 1.0
+    },
+    {
       "relation": "inherits",
       "confidence": "EXTRACTED",
       "source_file": "app/Console/Commands/ExportProductionDataCommand.php",
@@ -19880,6 +20035,17 @@
       "confidence_score": 1.0
     },
     {
+      "relation": "inherits",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/Unit/WhatsappMessageParserTest.php",
+      "source_location": "L9",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "tests_unit_whatsappmessageparsertest_whatsappmessageparsertest",
+      "target": "tests_testcase_testcase",
+      "confidence_score": 1.0
+    },
+    {
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "app/Console/Commands/ExportProductionDataCommand.php",
@@ -19916,7 +20082,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "app/Console/Commands/TelegramSetWebhook.php",
-      "source_location": "L16",
+      "source_location": "L17",
       "weight": 1.0,
       "_origin": "ast",
       "source": "app_console_commands_telegramsetwebhook_telegramsetwebhook",
@@ -22292,7 +22458,18 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "app/Services/TelegramService.php",
-      "source_location": "L140",
+      "source_location": "L144",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "app_services_telegramservice_telegramservice",
+      "target": "app_services_telegramservice_telegramservice_getwebhookinfo",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "app/Services/TelegramService.php",
+      "source_location": "L153",
       "weight": 1.0,
       "_origin": "ast",
       "source": "app_services_telegramservice_telegramservice",
@@ -22303,7 +22480,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "app/Services/TelegramService.php",
-      "source_location": "L149",
+      "source_location": "L162",
       "weight": 1.0,
       "_origin": "ast",
       "source": "app_services_telegramservice_telegramservice",
@@ -22314,7 +22491,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "app/Services/TelegramService.php",
-      "source_location": "L173",
+      "source_location": "L186",
       "weight": 1.0,
       "_origin": "ast",
       "source": "app_services_telegramservice_telegramservice",
@@ -22325,7 +22502,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "app/Services/TelegramService.php",
-      "source_location": "L195",
+      "source_location": "L208",
       "weight": 1.0,
       "_origin": "ast",
       "source": "app_services_telegramservice_telegramservice",
@@ -22839,6 +23016,50 @@
       "confidence_score": 1.0
     },
     {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/Unit/WhatsappMessageParserTest.php",
+      "source_location": "L15",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "tests_unit_whatsappmessageparsertest_whatsappmessageparsertest",
+      "target": "tests_unit_whatsappmessageparsertest_whatsappmessageparsertest_setup",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/Unit/WhatsappMessageParserTest.php",
+      "source_location": "L21",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "tests_unit_whatsappmessageparsertest_whatsappmessageparsertest",
+      "target": "tests_unit_whatsappmessageparsertest_whatsappmessageparsertest_test_parses_saldo_conta_corrente_variation",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/Unit/WhatsappMessageParserTest.php",
+      "source_location": "L30",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "tests_unit_whatsappmessageparsertest_whatsappmessageparsertest",
+      "target": "tests_unit_whatsappmessageparsertest_whatsappmessageparsertest_test_parses_direct_saldo_command",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/Unit/WhatsappMessageParserTest.php",
+      "source_location": "L38",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "tests_unit_whatsappmessageparsertest_whatsappmessageparsertest",
+      "target": "tests_unit_whatsappmessageparsertest_whatsappmessageparsertest_test_parses_listar_and_ajuda_variations",
+      "confidence_score": 1.0
+    },
+    {
       "relation": "mixes_in",
       "confidence": "EXTRACTED",
       "source_file": "app/Models/Cartao.php",
@@ -23033,6 +23254,17 @@
       "weight": 1.0,
       "_origin": "ast",
       "source": "tests_feature_salaryprojectiontest_salaryprojectiontest",
+      "target": "illuminate_foundation_testing_refreshdatabase",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "mixes_in",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/Unit/WhatsappMessageParserTest.php",
+      "source_location": "L11",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "tests_unit_whatsappmessageparsertest_whatsappmessageparsertest",
       "target": "illuminate_foundation_testing_refreshdatabase",
       "confidence_score": 1.0
     },
@@ -23347,5 +23579,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "a2afa277c5fa97de0e6cd9a7185f7c11963a0e10"
+  "built_at_commit": "0142b2d630bec4212518357d2cd8c9347bb4fb28"
 }

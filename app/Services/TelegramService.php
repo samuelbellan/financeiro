@@ -126,12 +126,25 @@ class TelegramService
         ];
 
         if (!empty($secret)) {
-            $params['secret_token'] = $secret;
+            // Telegram Bot API: secret_token must consist only of latin letters, digits, '_' and '-'
+            $cleanSecret = preg_replace('/[^a-zA-Z0-9_-]/', '', $secret);
+            if (!empty($cleanSecret)) {
+                $params['secret_token'] = substr($cleanSecret, 0, 256);
+            }
         }
 
         $response = $this->http()->post("{$this->baseUrl}/setWebhook", $params);
 
         return $response->json() ?? ['ok' => false, 'description' => 'No response'];
+    }
+
+    /**
+     * Consulta as informações atuais do webhook configurado no Telegram.
+     */
+    public function getWebhookInfo(): array
+    {
+        $response = $this->http()->get("{$this->baseUrl}/getWebhookInfo");
+        return $response->json() ?? ['ok' => false];
     }
 
     /**

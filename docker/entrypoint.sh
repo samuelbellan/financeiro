@@ -42,9 +42,13 @@ php artisan view:cache
 php artisan storage:link --force || true
 
 # Configura automaticamente o webhook do Telegram se solicitado e APP_URL for HTTPS
-if [ "$AUTO_SET_TELEGRAM_WEBHOOK" = "true" ] && [ -n "$APP_URL" ] && [ -n "$TELEGRAM_BOT_TOKEN" ]; then
-    echo "Configurando Webhook do Telegram para: $APP_URL/webhook/telegram..."
-    php artisan telegram:set-webhook "$APP_URL/webhook/telegram" || echo "Aviso: Falha ao registrar webhook do Telegram."
+if [ "$AUTO_SET_TELEGRAM_WEBHOOK" = "true" ]; then
+    if [ -n "$APP_URL" ] && [ -n "$TELEGRAM_BOT_TOKEN" ]; then
+        echo "Configurando Webhook do Telegram para: $APP_URL/webhook/telegram..."
+        php artisan telegram:set-webhook "$APP_URL/webhook/telegram" || echo "Aviso: Falha ao registrar webhook do Telegram."
+    else
+        echo "Aviso: AUTO_SET_TELEGRAM_WEBHOOK está ativo, mas TELEGRAM_BOT_TOKEN ou APP_URL não foram configurados nas variáveis de ambiente."
+    fi
 fi
 
 # Inicia o PHP-FPM em segundo plano

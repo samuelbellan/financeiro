@@ -125,6 +125,38 @@ class WhatsappMessageParser
             return ['tipo' => 'comando', 'comando' => $texto];
         }
 
+        // Variações de Saldo (ex: "saldo conta corrente", "saldo da conta", "ver saldo", "meu saldo")
+        if (preg_match('/^(?:saldo|ver saldo|consultar saldo|meu saldo)\b/iu', $texto) || in_array($texto, ['saldo conta corrente', 'saldo da conta', 'saldo conta', 'saldo caixa'])) {
+            $saldoDestino = 'casa';
+            $cartaoId = null;
+            $cartoes = Cartao::where('user_id', $userId)->get();
+            foreach ($cartoes as $c) {
+                if (str_contains($texto, mb_strtolower($c->nome)) || ($c->bandeira && str_contains($texto, mb_strtolower($c->bandeira)))) {
+                    $saldoDestino = 'cartao';
+                    $cartaoId = $c->id;
+                    break;
+                }
+            }
+            return [
+                'tipo' => 'comando',
+                'comando' => 'saldo',
+                'saldo_destino' => $saldoDestino,
+                'cartao_id' => $cartaoId,
+                'mes' => now()->month,
+                'ano' => now()->year,
+            ];
+        }
+
+        // Variações de Listar / Extrato
+        if (preg_match('/^(?:listar|ultimos lancamentos|últimos lançamentos|ultimas transacoes|últimas transações|extrato)\b/iu', $texto)) {
+            return ['tipo' => 'comando', 'comando' => 'listar'];
+        }
+
+        // Variações de Ajuda
+        if (preg_match('/^(?:ajuda|help|como usar|\/help|\/ajuda)\b/iu', $texto)) {
+            return ['tipo' => 'comando', 'comando' => 'ajuda'];
+        }
+
         // 2. Fatura / PDF
         if (preg_match('/^(?:fatura|pdf|exportar|extrato)\b/iu', $texto) || str_contains($texto, 'fatura') || str_contains($texto, 'pdf')) {
             $faturaDestino = 'casa';

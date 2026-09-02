@@ -3442,11 +3442,11 @@
     {
       "label": "down()",
       "file_type": "code",
-      "source_file": "database/migrations/2026_05_02_133147_alter_valor_total_to_decimal_in_cartao_compras_table.php",
-      "source_location": "L22",
+      "source_file": "database/migrations/2026_07_18_164532_add_weekly_schedule_to_study_goals_table.php",
+      "source_location": "L28",
       "_callable": true,
       "_origin": "ast",
-      "id": "database_migrations_2026_05_02_133147_alter_valor_total_to_decimal_in_cartao_compras_table_down",
+      "id": "database_migrations_2026_07_18_164532_add_weekly_schedule_to_study_goals_table_down",
       "community": 20,
       "community_name": "Illuminate\\Support\\Facades\\Schema",
       "norm_label": "down()"
@@ -3454,11 +3454,11 @@
     {
       "label": "up()",
       "file_type": "code",
-      "source_file": "database/migrations/2026_05_02_133147_alter_valor_total_to_decimal_in_cartao_compras_table.php",
+      "source_file": "database/migrations/2026_07_18_164532_add_weekly_schedule_to_study_goals_table.php",
       "source_location": "L12",
       "_callable": true,
       "_origin": "ast",
-      "id": "database_migrations_2026_05_02_133147_alter_valor_total_to_decimal_in_cartao_compras_table_up",
+      "id": "database_migrations_2026_07_18_164532_add_weekly_schedule_to_study_goals_table_up",
       "community": 20,
       "community_name": "Illuminate\\Support\\Facades\\Schema",
       "norm_label": "up()"
@@ -4546,11 +4546,11 @@
     {
       "label": "down()",
       "file_type": "code",
-      "source_file": "database/migrations/2026_07_18_164532_add_weekly_schedule_to_study_goals_table.php",
-      "source_location": "L28",
+      "source_file": "database/migrations/2026_05_02_133147_alter_valor_total_to_decimal_in_cartao_compras_table.php",
+      "source_location": "L22",
       "_callable": true,
       "_origin": "ast",
-      "id": "database_migrations_2026_07_18_164532_add_weekly_schedule_to_study_goals_table_down",
+      "id": "database_migrations_2026_05_02_133147_alter_valor_total_to_decimal_in_cartao_compras_table_down",
       "community": 83,
       "community_name": "Illuminate\\Database\\Migrations\\Migration",
       "norm_label": "down()"
@@ -4558,11 +4558,11 @@
     {
       "label": "up()",
       "file_type": "code",
-      "source_file": "database/migrations/2026_07_18_164532_add_weekly_schedule_to_study_goals_table.php",
+      "source_file": "database/migrations/2026_05_02_133147_alter_valor_total_to_decimal_in_cartao_compras_table.php",
       "source_location": "L12",
       "_callable": true,
       "_origin": "ast",
-      "id": "database_migrations_2026_07_18_164532_add_weekly_schedule_to_study_goals_table_up",
+      "id": "database_migrations_2026_05_02_133147_alter_valor_total_to_decimal_in_cartao_compras_table_up",
       "community": 83,
       "community_name": "Illuminate\\Database\\Migrations\\Migration",
       "norm_label": "up()"
@@ -5937,15 +5937,15 @@
       "norm_label": "2026_04_24_190322_add_tipo_to_transacao_previsoes_table.php"
     },
     {
-      "label": "2026_05_02_133147_alter_valor_total_to_decimal_in_cartao_compras_table.php",
+      "label": "2026_07_18_164532_add_weekly_schedule_to_study_goals_table.php",
       "file_type": "code",
-      "source_file": "database/migrations/2026_05_02_133147_alter_valor_total_to_decimal_in_cartao_compras_table.php",
+      "source_file": "database/migrations/2026_07_18_164532_add_weekly_schedule_to_study_goals_table.php",
       "source_location": "L1",
       "_origin": "ast",
-      "id": "database_migrations_2026_05_02_133147_alter_valor_total_to_decimal_in_cartao_compras_table",
+      "id": "database_migrations_2026_07_18_164532_add_weekly_schedule_to_study_goals_table",
       "community": 20,
       "community_name": "Illuminate\\Support\\Facades\\Schema",
-      "norm_label": "2026_05_02_133147_alter_valor_total_to_decimal_in_cartao_compras_table.php"
+      "norm_label": "2026_07_18_164532_add_weekly_schedule_to_study_goals_table.php"
     },
     {
       "label": "Illuminate\\Support\\Facades\\Schema",
@@ -7177,39 +7177,6 @@
       "norm_label": "artisan"
     },
     {
-      "label": "check_db2.php",
-      "file_type": "code",
-      "source_file": "check_db2.php",
-      "source_location": "L1",
-      "_origin": "ast",
-      "id": "check_db2",
-      "community": 53,
-      "community_name": "check_db2.php",
-      "norm_label": "check_db2.php"
-    },
-    {
-      "label": "check_db3.php",
-      "file_type": "code",
-      "source_file": "check_db3.php",
-      "source_location": "L1",
-      "_origin": "ast",
-      "id": "check_db3",
-      "community": 54,
-      "community_name": "check_db3.php",
-      "norm_label": "check_db3.php"
-    },
-    {
-      "label": "check_db4.php",
-      "file_type": "code",
-      "source_file": "check_db4.php",
-      "source_location": "L1",
-      "_origin": "ast",
-      "id": "check_db4",
-      "community": 55,
-      "community_name": "check_db4.php",
-      "norm_label": "check_db4.php"
-    },
-    {
       "label": "config/app.php",
       "file_type": "code",
       "source_file": "config/app.php",
@@ -7571,17 +7538,6 @@
       "community": 62,
       "community_name": "telegram.php",
       "norm_label": "telegram.php"
-    },
-    {
-      "label": "test_dirs.php",
-      "file_type": "code",
-      "source_file": ".gemini/antigravity/brain/21fdf6d5-249a-46cd-b8cb-d592f1f38555/scratch/test_dirs.php",
-      "source_location": "L1",
-      "_origin": "ast",
-      "id": "gemini_antigravity_brain_21fdf6d5_249a_46cd_b8cb_d592f1f38555_scratch_test_dirs",
-      "community": 63,
-      "community_name": "test_dirs.php",
-      "norm_label": "test_dirs.php"
     },
     {
       "label": "app.js",
@@ -8024,15 +7980,15 @@
       "norm_label": "2026_04_24_183542_create_transacaos_table.php"
     },
     {
-      "label": "2026_07_18_164532_add_weekly_schedule_to_study_goals_table.php",
+      "label": "2026_05_02_133147_alter_valor_total_to_decimal_in_cartao_compras_table.php",
       "file_type": "code",
-      "source_file": "database/migrations/2026_07_18_164532_add_weekly_schedule_to_study_goals_table.php",
+      "source_file": "database/migrations/2026_05_02_133147_alter_valor_total_to_decimal_in_cartao_compras_table.php",
       "source_location": "L1",
       "_origin": "ast",
-      "id": "database_migrations_2026_07_18_164532_add_weekly_schedule_to_study_goals_table",
+      "id": "database_migrations_2026_05_02_133147_alter_valor_total_to_decimal_in_cartao_compras_table",
       "community": 83,
       "community_name": "Illuminate\\Database\\Migrations\\Migration",
-      "norm_label": "2026_07_18_164532_add_weekly_schedule_to_study_goals_table.php"
+      "norm_label": "2026_05_02_133147_alter_valor_total_to_decimal_in_cartao_compras_table.php"
     },
     {
       "label": "Illuminate\\Database\\Migrations\\Migration",
@@ -23391,5 +23347,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "6a4102d4b771bd4e7c0623af6e8462896494b447"
+  "built_at_commit": "a2afa277c5fa97de0e6cd9a7185f7c11963a0e10"
 }
