@@ -120,13 +120,16 @@ class WhatsappMessageParser
         $rawText = trim($mensagem);
         $texto = trim(mb_strtolower($mensagem));
 
-        // 1. Comandos especiais diretos
-        if (in_array($texto, self::COMANDOS)) {
-            return ['tipo' => 'comando', 'comando' => $texto];
+        // 1. Comandos especiais diretos (listar, ajuda, etc., exceto saldo que possui handler específico)
+        $cleanCmd = ltrim($texto, '/');
+        if ($cleanCmd !== 'saldo' && (in_array($texto, self::COMANDOS) || in_array($cleanCmd, self::COMANDOS))) {
+            $cmd = in_array($texto, self::COMANDOS) ? $texto : $cleanCmd;
+            return ['tipo' => 'comando', 'comando' => $cmd];
         }
 
-        // Variações de Saldo (ex: "saldo conta corrente", "saldo da conta", "ver saldo", "meu saldo")
-        if (preg_match('/^(?:saldo|ver saldo|consultar saldo|meu saldo)\b/iu', $texto) || in_array($texto, ['saldo conta corrente', 'saldo da conta', 'saldo conta', 'saldo caixa'])) {
+        // Variações de Saldo (ex: "saldo conta corrente", "qual o saldo", "/saldo", "quanto tenho na conta", etc.)
+        $saldoPattern = '/(?:^\/?saldo\b|^\/?ver saldo\b|^\/?consultar saldo\b|^\/?meu saldo\b|\bsaldo\b.*(?:conta|corrente|geral|caixa|banco)|qual\s+(?:é\s+)?(?:o\s+)?(?:meu\s+)?saldo|quanto\s+tenho)/iu';
+        if (preg_match($saldoPattern, $texto) || in_array($texto, ['saldo conta corrente', 'saldo da conta', 'saldo conta', 'saldo caixa', 'saldo em conta', 'saldo cc'])) {
             $saldoDestino = 'casa';
             $cartaoId = null;
             $cartoes = Cartao::where('user_id', $userId)->get();
@@ -148,12 +151,12 @@ class WhatsappMessageParser
         }
 
         // Variações de Listar / Extrato
-        if (preg_match('/^(?:listar|ultimos lancamentos|últimos lançamentos|ultimas transacoes|últimas transações|extrato)\b/iu', $texto)) {
+        if (preg_match('/^(?:\/?listar|ultimos lancamentos|últimos lançamentos|ultimas transacoes|últimas transações|\/?extrato)\b/iu', $texto)) {
             return ['tipo' => 'comando', 'comando' => 'listar'];
         }
 
         // Variações de Ajuda
-        if (preg_match('/^(?:ajuda|help|como usar|\/help|\/ajuda)\b/iu', $texto)) {
+        if (preg_match('/^(?:\/?ajuda|\/?help|como usar)\b/iu', $texto)) {
             return ['tipo' => 'comando', 'comando' => 'ajuda'];
         }
 

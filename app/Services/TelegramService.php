@@ -55,11 +55,24 @@ class TelegramService
             ]);
 
             if (!$response->successful()) {
-                Log::error('[Telegram] Falha ao enviar mensagem.', [
-                    'status' => $response->status(),
-                    'body'   => $response->body(),
+                Log::warning('[Telegram] Falha ao enviar com Markdown (' . $response->status() . '), tentando sem formatação...', [
+                    'body' => $response->body(),
                 ]);
-                return false;
+
+                // Fallback automático para envio sem parse_mode (texto simples)
+                $plainText = str_replace(['*', '`', '_', '~'], '', $message);
+                $fallback = $this->http()->post("{$this->baseUrl}/sendMessage", [
+                    'chat_id' => $chatId,
+                    'text'    => $plainText,
+                ]);
+
+                if (!$fallback->successful()) {
+                    Log::error('[Telegram] Falha também no fallback sem formatação.', [
+                        'status' => $fallback->status(),
+                        'body'   => $fallback->body(),
+                    ]);
+                    return false;
+                }
             }
 
             return true;

@@ -43,9 +43,13 @@ class TelegramWebhookController extends Controller
         // ── 1. Validar secret token (header enviado pelo Telegram) ────────────
         $secret = config('telegram.webhook_secret');
         if (!empty($secret)) {
+            $cleanSecret = substr(preg_replace('/[^a-zA-Z0-9_-]/', '', $secret), 0, 256);
             $headerSecret = $request->header('X-Telegram-Bot-Api-Secret-Token');
-            if ($headerSecret !== $secret) {
-                Log::warning('[Telegram Webhook] Secret token inválido.', ['ip' => $request->ip()]);
+            if ($headerSecret !== $cleanSecret && $headerSecret !== $secret) {
+                Log::warning('[Telegram Webhook] Secret token inválido.', [
+                    'ip'              => $request->ip(),
+                    'received_length' => strlen($headerSecret ?? ''),
+                ]);
                 return response()->json(['error' => 'Unauthorized'], 401);
             }
         }
@@ -88,7 +92,8 @@ class TelegramWebhookController extends Controller
         if (!empty($allowedChatId)) {
             $allowedChatIds = explode(',', $allowedChatId);
             foreach ($allowedChatIds as $id) {
-                if ((string)$chatId === trim((string)$id)) {
+                $cleanId = trim(trim((string)$id), "\"' \t\n\r\0\x0B");
+                if ((string)$chatId === $cleanId) {
                     $matchChat = true;
                     break;
                 }
@@ -99,6 +104,7 @@ class TelegramWebhookController extends Controller
 
         if (!$matchChat) {
             Log::warning('[Telegram Webhook] Chat não autorizado.', ['chat_id' => $chatId]);
+            $this->telegram->sendMessage($chatId, "🔒 *Acesso Não Autorizado*\n\nSeu Chat ID no Telegram é: `{$chatId}`\nPara autorizar seu acesso, adicione este número à variável `TELEGRAM_ALLOWED_CHAT_ID` nas configurações do sistema.");
             return response()->json(['ok' => true, 'skipped' => 'unauthorized chat']);
         }
 
