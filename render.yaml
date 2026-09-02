@@ -49,4 +49,4 @@ databases:
     plan: free
     region: oregon
     databaseName: db_home
-    user: postgres
+    user: financeiro_user
