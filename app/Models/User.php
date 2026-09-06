@@ -39,4 +39,43 @@ class User extends Authenticatable
     {
         return $this->hasMany(SalaryProfile::class);
     }
+
+    /**
+     * Relacionamentos do Módulo de Exercícios Físicos
+     */
+    public function workoutSessions(): HasMany
+    {
+        return $this->hasMany(WorkoutSession::class);
+    }
+
+    public function workoutPlans(): HasMany
+    {
+        return $this->hasMany(WorkoutPlan::class);
+    }
+
+    public function bodyMetrics(): HasMany
+    {
+        return $this->hasMany(UserBodyMetric::class)->orderByDesc('data_medicao');
+    }
+
+    public function gearItems(): HasMany
+    {
+        return $this->hasMany(GearItem::class);
+    }
+
+    public function exercisePersonalRecords(): HasMany
+    {
+        return $this->hasMany(ExercisePersonalRecord::class);
+    }
+
+    public function workoutGoals(): HasMany
+    {
+        return $this->hasMany(WorkoutGoal::class);
+    }
+
+    public function customExercises(): HasMany
+    {
+        return $this->hasMany(Exercise::class);
+    }
 }
+

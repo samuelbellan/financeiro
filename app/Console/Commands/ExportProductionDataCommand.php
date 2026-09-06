@@ -46,6 +46,19 @@ class ExportProductionDataCommand extends Command
         'notas_fiscais',
         'nota_fiscal_itens',
         'whatsapp_logs',
+        'exercises',
+        'workout_plans',
+        'workout_plan_items',
+        'workout_sessions',
+        'workout_session_exercises',
+        'workout_sets',
+        'running_logs',
+        'running_splits',
+        'stretching_logs',
+        'gear_items',
+        'exercise_personal_records',
+        'workout_goals',
+        'user_body_metrics',
     ];
 
     /**

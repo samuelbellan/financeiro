@@ -25,26 +25,30 @@ Este guia foi preparado para que você possa colocar seu sistema no ar em poucos
 
 ---
 
-## 🌟 Opção 1: Deploy no Render.com (Recomendado)
+## 🌟 Opção 1: Deploy no Render.com com Banco Vitalício no Neon.tech (Recomendado)
 
-O Render permite rodar a aplicação em Docker e fornece banco PostgreSQL gratuito/baixo custo.
+O Render hospeda sua aplicação web gratuitamente, e o **Neon.tech** hospeda o banco de dados PostgreSQL gratuito para sempre (sem risco de expirar após 30 dias). Ambos o seu computador local e o Render se conectam ao mesmo banco do Neon.
 
-### Passo 1: Enviar o código para o GitHub
-Certifique-se de que o commit com os arquivos foi enviado:
+### Passo 1: Criar o banco gratuito no Neon.tech
+1. Acesse [neon.tech](https://neon.tech/) e faça login (pode ser com GitHub).
+2. Crie um projeto chamado `financeiro`.
+3. Copie a **Connection String** gerada (exemplo: `postgresql://neondb_owner:SENHA@ep-xxx.us-east-2.aws.neon.tech/neondb?sslmode=require`).
+
+### Passo 2: Enviar o código para o GitHub
 ```bash
 git push origin main
 ```
 
-### Passo 2: Criar o serviço no Render
+### Passo 3: Criar o serviço no Render
 1. Acesse [dashboard.render.com](https://dashboard.render.com/) e faça login com seu GitHub.
 2. Clique no botão **"New +"** no topo e selecione **"Blueprint"**.
 3. Selecione o repositório `samuelbellan/financeiro`.
-4. O Render detectará automaticamente o arquivo `render.yaml`, que cria:
-   - O banco de dados PostgreSQL `financeiro-db`
-   - O serviço web `financeiro-app` com as variáveis já configuradas!
+4. O Render detectará o arquivo `render.yaml` e solicitará as variáveis de ambiente necessárias:
+   - `DATABASE_URL`: Cole a Connection String que você copiou do Neon.tech.
+   - Demais variáveis de Telegram e Gemini.
 5. Clique em **"Apply"**.
 
-### Passo 3: Atualizar a URL da aplicação
+### Passo 4: Atualizar a URL da aplicação
 1. Quando o deploy inicial concluir, copie a URL gerada (exemplo: `https://financeiro-app-xxxx.onrender.com`).
 2. No painel do serviço no Render, vá na aba **"Environment"** e ajuste `APP_URL` para a sua URL real:
    ```env

@@ -70,21 +70,19 @@
                         <span>Horas de Estudo</span>
                     </a>
 
-                    <a href="{{ route('photos.index') }}" class="nav-item">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-                            <circle cx="8.5" cy="8.5" r="1.5"></circle>
-                            <polyline points="21 15 16 10 5 21"></polyline>
-                        </svg>
-                        <span>Galeria Fotos</span>
-                    </a>
-
                     <a href="{{ route('salary.index') }}" class="nav-item">
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
                             <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
                         </svg>
                         <span>Projetor Salarial</span>
+                    </a>
+
+                    <a href="{{ route('treinos.index') }}" class="nav-item">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M6 5v14M18 5v14M2 9v6M22 9v6M6 12h12"></path>
+                        </svg>
+                        <span>Treinos & Exercícios</span>
                     </a>
                 </div>
             </nav>
@@ -168,18 +166,7 @@
 
 
 
-                    <div class="info-card">
-                        <div class="card-icon card-icon-purple" style="background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-                                <circle cx="8.5" cy="8.5" r="1.5"></circle>
-                                <polyline points="21 15 16 10 5 21"></polyline>
-                            </svg>
-                        </div>
-                        <h3>Galeria de Fotos</h3>
-                        <p>Mapeamento inteligente de fotos divididos por produtores, modelos, datas e álbuns.</p>
-                        <a href="{{ route('photos.index') }}" class="card-link">Acessar →</a>
-                    </div>
+
 
                     <div class="info-card">
                         <div class="card-icon card-icon-green" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);">
@@ -204,6 +191,17 @@
                         <h3>Concursos Fiscais & Salários</h3>
                         <p>Radar de notícias e pesquisa aprofundada de remunerações da área fiscal (RFB, 27 SEFAZ e 30+ ISS) com alertas no Telegram.</p>
                         <a href="{{ route('fiscal.index') }}" class="card-link">Acessar →</a>
+                    </div>
+
+                    <div class="info-card">
+                        <div class="card-icon card-icon-blue" style="background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M6 5v14M18 5v14M2 9v6M22 9v6M6 12h12"></path>
+                            </svg>
+                        </div>
+                        <h3>Treinos & Exercícios</h3>
+                        <p>Acompanhamento completo de musculação, corrida, alongamento, composição corporal e PRs.</p>
+                        <a href="{{ route('treinos.index') }}" class="card-link">Acessar →</a>
                     </div>
                 </div>
             </div>
