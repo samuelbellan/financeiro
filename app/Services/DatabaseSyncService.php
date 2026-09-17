@@ -175,6 +175,19 @@ class DatabaseSyncService
         $destDb = DB::connection($destinationConnection);
         $isDestPgsql = $destDb->getDriverName() === 'pgsql';
 
+        if ($sourceConnection === $destinationConnection || (
+            !empty($sourceDb->getConfig('host')) &&
+            $sourceDb->getConfig('host') === $destDb->getConfig('host') &&
+            $sourceDb->getConfig('database') === $destDb->getConfig('database')
+        )) {
+            return [
+                'success' => true,
+                'total_rows' => 0,
+                'tables' => [],
+                'message' => 'Origem e destino apontam para a mesma base de dados. Sincronização não necessária.',
+            ];
+        }
+
         $totalRows = 0;
         $tableCounts = [];
 
