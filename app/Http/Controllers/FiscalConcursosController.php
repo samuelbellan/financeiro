@@ -270,7 +270,7 @@ class FiscalConcursosController extends Controller
     }
 
     /**
-     * Extrai e atualiza automaticamente os dados de um concurso a partir da URL de uma matéria ou texto livre via IA OmniRoute / Gemini.
+     * Extrai e atualiza automaticamente os dados de um concurso a partir da URL de uma matéria ou texto livre via IA Gemini.
      */
     public function extractFromUrl(Request $request)
     {

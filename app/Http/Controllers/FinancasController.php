@@ -9,6 +9,7 @@ use App\Models\TransacaoPrevisao;
 use App\Models\Categoria;
 use App\Models\CartaoParcela;
 use App\Services\CategorySanitizer;
+use App\Services\TransactionSuggestionService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -287,14 +288,29 @@ class FinancasController extends Controller
         $totalDespesasPeriodo = array_sum($despesasDiariasValues);
         $mediaDiariaDespesa = $diffInDays > 0 ? $totalDespesasPeriodo / $diffInDays : 0;
 
+        $sugestoesDescricao = TransactionSuggestionService::getSuggestions($user->id, limit: 150);
+
         return view('financas.index', compact(
             'transacoes', 'saldo', 'receitasMes', 'despesasMes', 'cartoes', 
             'previsoes', 'mes', 'ano', 'categorias', 'totalPrevistoReceita', 
             'totalPrevistoDespesa', 'faturasPorCartao', 'totalFaturas',
             'consolidadoMaisPrevisao', 'listaImprevistos', 'listaExcessos',
             'consolidadoAnoMeses', 'totalConsolidadoAno', 'dataInicio', 'dataFim',
-            'labelsDiarios', 'despesasDiariasValues', 'datesMap', 'despesasDetalhado', 'mediaDiariaDespesa'
+            'labelsDiarios', 'despesasDiariasValues', 'datesMap', 'despesasDetalhado', 'mediaDiariaDespesa',
+            'sugestoesDescricao'
         ));
+    }
+
+    /**
+     * Retorna sugestões de lançamentos para autocomplete.
+     */
+    public function sugestoesDescricao(Request $request)
+    {
+        $user = Auth::user();
+        $q = $request->get('q', '');
+        $limit = min(50, max(1, (int)$request->get('limit', 15)));
+        $sugestoes = TransactionSuggestionService::getSuggestions($user->id, $q, $limit);
+        return response()->json($sugestoes);
     }
 
     public function storePrevisao(Request $request)

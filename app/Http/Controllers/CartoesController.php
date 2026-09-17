@@ -9,6 +9,7 @@ use App\Models\CartaoPrevisao;
 use App\Models\Categoria;
 use App\Services\CategorySanitizer;
 use App\Services\CreditCardService;
+use App\Services\TransactionSuggestionService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
@@ -124,10 +125,13 @@ class CartoesController extends Controller
             }
         }
 
+        $sugestoesDescricao = TransactionSuggestionService::getSuggestions($user->id, limit: 150);
+
         return view('financas.cartoes', compact(
             'cartoes', 'faturasPorCartao', 'previsoes', 'gastosPorCategoria', 
             'currentMonth', 'currentYear', 'gastosChartAVista', 'gastosChartAPrazo',
-            'gastosDiariosAVista', 'mediaDiaria', 'diasNoMes', 'comprasAVistaDetalhado'
+            'gastosDiariosAVista', 'mediaDiaria', 'diasNoMes', 'comprasAVistaDetalhado',
+            'sugestoesDescricao', 'userCategorias'
         ));
     }
 
@@ -206,6 +210,17 @@ class CartoesController extends Controller
 
     public function storeCompra(Request $request)
     {
+        // Se for compra parcelada e o usuário informou valor_parcela em vez de valor_total
+        if ($request->tipo === 'parcelada' && $request->filled('valor_parcela') && (int)$request->numero_parcelas > 0) {
+            if (!$request->filled('valor_total') || (float)$request->valor_total == 0) {
+                $valorParcela = $this->parseCurrencyValue($request->valor_parcela);
+                $numParcelas = (int)$request->numero_parcelas;
+                $request->merge([
+                    'valor_total' => round($valorParcela * $numParcelas, 2),
+                ]);
+            }
+        }
+
         $validated = $request->validate([
             'cartao_id' => 'required|exists:cartoes,id',
             'descricao' => 'required|string|max:255',
@@ -246,6 +261,16 @@ class CartoesController extends Controller
     {
         if ($compra->cartao->user_id !== Auth::id()) abort(403);
 
+        if ($request->tipo === 'parcelada' && $request->filled('valor_parcela') && (int)$request->numero_parcelas > 0) {
+            if (!$request->filled('valor_total') || (float)$request->valor_total == 0) {
+                $valorParcela = $this->parseCurrencyValue($request->valor_parcela);
+                $numParcelas = (int)$request->numero_parcelas;
+                $request->merge([
+                    'valor_total' => round($valorParcela * $numParcelas, 2),
+                ]);
+            }
+        }
+
         $validated = $request->validate([
             'cartao_id' => 'required|exists:cartoes,id',
             'descricao' => 'required|string|max:255',
@@ -280,18 +305,25 @@ class CartoesController extends Controller
 
     protected function gerarParcelas(CartaoCompra $compra)
     {
-        $numParcelas = $compra->tipo === 'parcelada' ? $compra->numero_parcelas : 1;
-        $valorParcela = $compra->valor_total / $numParcelas;
+        $numParcelas = $compra->tipo === 'parcelada' ? (int)$compra->numero_parcelas : 1;
+        $valorTotal = (float)$compra->valor_total;
+        $valorBase = round($valorTotal / $numParcelas, 2);
+        $diferencaCentavos = round($valorTotal - ($valorBase * $numParcelas), 2);
         $dataCompra = Carbon::parse($compra->data_compra);
         $cartao = $compra->cartao;
 
         for ($i = 1; $i <= $numParcelas; $i++) {
             $vencimento = CreditCardService::calcularVencimentoParcela($cartao, $dataCompra, $i);
+            $valorAtual = $valorBase;
+            // Ajusta centavo excedente/faltante na primeira parcela
+            if ($i === 1) {
+                $valorAtual = round($valorAtual + $diferencaCentavos, 2);
+            }
             
             CartaoParcela::create([
                 'cartao_compra_id' => $compra->id,
                 'numero_parcela' => $i,
-                'valor_parcela' => $valorParcela,
+                'valor_parcela' => $valorAtual,
                 'data_vencimento' => $vencimento,
                 'status' => 'aberta',
             ]);
@@ -302,7 +334,7 @@ class CartoesController extends Controller
                     CartaoParcela::create([
                         'cartao_compra_id' => $compra->id,
                         'numero_parcela' => $j,
-                        'valor_parcela' => $valorParcela,
+                        'valor_parcela' => $valorAtual,
                         'data_vencimento' => $vencRecorrente,
                         'status' => 'aberta',
                     ]);
@@ -384,5 +416,23 @@ class CartoesController extends Controller
 
         $msg = $cartao->ativo ? "Cartão \"{$cartao->nome}\" habilitado com sucesso!" : "Cartão \"{$cartao->nome}\" desabilitado com sucesso!";
         return redirect()->back()->with('success', $msg);
+    }
+
+    /**
+     * Normaliza valores monetários em formatos numéricos, float ou strings formatadas brasileiras (ex: 119,90 ou 1.199,90).
+     */
+    protected function parseCurrencyValue(mixed $val): float
+    {
+        if (is_numeric($val)) {
+            return (float)$val;
+        }
+
+        $val = trim((string)$val);
+        if (str_contains($val, ',')) {
+            $val = str_replace('.', '', $val);
+            $val = str_replace(',', '.', $val);
+        }
+
+        return (float)$val;
     }
 }

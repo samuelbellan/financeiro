@@ -1151,7 +1151,7 @@
                 </div>
             </div>
 
-            <!-- Smart AI News Extractor Card (OmniRoute AI Integration) -->
+            <!-- Smart AI News Extractor Card (Gemini AI Integration) -->
             <div class="ai-url-extractor-card" style="margin-bottom: 2rem;">
                 <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; margin-bottom: 1rem;">
                     <div style="display: flex; align-items: center; gap: 0.75rem;">
@@ -2174,7 +2174,7 @@
                         ⚡
                     </div>
                     <div>
-                        <h3 id="quickAiModalTitle" style="font-size: 1.2rem; font-weight: 800; color: #fff; margin: 0;">Atualizar Concurso com IA OmniRoute</h3>
+                        <h3 id="quickAiModalTitle" style="font-size: 1.2rem; font-weight: 800; color: #fff; margin: 0;">Atualizar Concurso com IA</h3>
                         <p id="quickAiModalSubtitle" style="font-size: 0.8rem; color: var(--text-muted); margin: 0.2rem 0 0 0;">
                             Cole a URL de uma notícia ou o texto da matéria para atualizar automaticamente este certame.
                         </p>
@@ -2208,7 +2208,7 @@
                             <input type="checkbox" id="checkQuickNotifyTelegram" style="cursor: pointer;">
                             <span>🔔 Enviar Alerta do Resultado ao Telegram</span>
                         </label>
-                        <span class="ai-badge">Motor OmniRoute</span>
+                        <span class="ai-badge">Motor Gemini IA</span>
                     </div>
 
                     <div style="display: flex; justify-content: flex-end; gap: 0.75rem; border-top: 1px solid var(--border-glass); padding-top: 1.25rem;">
@@ -2359,7 +2359,7 @@
             }, 4500);
         }
 
-        // Funções de Extração e Análise com IA (OmniRoute)
+        // Funções de Extração e Análise com IA (Gemini)
         function abrirModalExtratorUrl(concursoId = null, sigla = '') {
             document.getElementById('quickAiConcursoId').value = concursoId || '';
             document.getElementById('inputQuickAiUrl').value = '';

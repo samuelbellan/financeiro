@@ -168,7 +168,7 @@ class TelegramWebhookController extends Controller
             return response()->json(['ok' => true, 'processed' => 'fiscal_command']);
         }
 
-        // ── 6. Parsear mensagem de texto (OmniRoute / Gemini IA com fallback para Regex) ──────
+        // ── 6. Parsear mensagem de texto (Gemini IA com fallback para Regex) ──────────────────
         $parsed = $this->gemini->parseMessage($texto ?? '', $user->id);
         if (isset($parsed['tipo']) && $parsed['tipo'] === 'invalido') {
             $parsed = $this->parser->parse($texto ?? '', $user->id);

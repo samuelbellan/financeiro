@@ -20,7 +20,7 @@ class GeminiService
     }
 
     /**
-     * Envia a mensagem livre do usuário para a IA (OmniRoute com fallback para Gemini) interpretar no contexto de finanças.
+     * Envia a mensagem livre do usuário para a IA (Gemini API) interpretar no contexto de finanças.
      * Retorna um array com o JSON parseado.
      */
     public function parseMessage(string $mensagem, int $userId): array
@@ -84,16 +84,10 @@ Esquema do JSON esperado:
   \"categoria\": string | null,
   \"subcategoria\": string | null,
   \"resposta_texto\": string | null (uma mensagem amigável de confirmação)
-}";
+}
+";
 
-        // 1. Tentar OmniRoute AI Router (Local) primeiro (com timeout curto para não travar se offline)
-        $omniRouteParsed = $this->parseWithOmniRoute($mensagem, $systemInstruction);
-        if ($omniRouteParsed !== null) {
-            Log::info('[Telegram Bot] Mensagem interpretada via OmniRoute AI Gateway.');
-            return $omniRouteParsed;
-        }
-
-        // 2. Fallback para Google Gemini API se a API Key estiver configurada
+        // Processar diretamente via Google Gemini API se a API Key estiver configurada
         if (!empty($this->apiKey)) {
             $geminiParsed = $this->parseWithGeminiApi($mensagem, $systemInstruction);
             if ($geminiParsed !== null) {
@@ -103,61 +97,6 @@ Esquema do JSON esperado:
         }
 
         return ['tipo' => 'invalido', 'erro' => 'Nenhuma Inteligência Artificial respondeu no momento.'];
-    }
-
-    private function parseWithOmniRoute(string $mensagem, string $systemInstruction): ?array
-    {
-        $endpoints = array_filter(array_unique([
-            env('OMNIROUTE_URL'),
-            env('OMNIROUTE_BASE_URL'),
-            'http://localhost:20128/v1'
-        ]));
-
-        if (empty($endpoints)) {
-            return null;
-        }
-
-        $apiKey = env('OMNIROUTE_API_KEY', 'sk-0a283590febce995-ecd196-29791878');
-        $models = ['auto/best-chat', 'oc/hy3-free', 'auto/best-fast'];
-
-        foreach ($endpoints as $endpoint) {
-            foreach ($models as $model) {
-                try {
-                    $response = Http::withToken($apiKey)->timeout(3)->post(rtrim($endpoint, '/') . '/chat/completions', [
-                        'model'       => $model,
-                        'messages'    => [
-                            ['role' => 'system', 'content' => $systemInstruction],
-                            ['role' => 'user', 'content' => $mensagem],
-                        ],
-                        'temperature' => 0.1,
-                        'max_tokens'  => 800,
-                        'stream'      => false,
-                    ]);
-
-                    if ($response->successful()) {
-                        $result = $response->json();
-                        $text = $result['choices'][0]['message']['content'] ?? null;
-                        if (empty($text) && isset($result['choices'][0]['message']['reasoning_content'])) {
-                            $text = $result['choices'][0]['message']['reasoning_content'];
-                        }
-
-                        if (!empty($text)) {
-                            $cleanJson = preg_replace('/^```(?:json)?\s*|\s*```$/i', '', trim($text));
-                            $parsed = json_decode($cleanJson, true);
-
-                            if (json_last_error() === JSON_ERROR_NONE && is_array($parsed) && isset($parsed['tipo'])) {
-                                return $parsed;
-                            }
-                        }
-                    }
-                } catch (\Throwable $e) {
-                    // OmniRoute offline ou timeout rápido, prossegue para o Gemini
-                    break;
-                }
-            }
-        }
-
-        return null;
     }
 
     private function parseWithGeminiApi(string $mensagem, string $systemInstruction): ?array
@@ -275,7 +214,7 @@ Esquema JSON esperado:
   ]
 }";
 
-        // 1. Tentar Gemini Vision API primeiro se a API Key estiver configurada (rápido e preciso)
+        // Processar via Gemini Vision API se a API Key estiver configurada (rápido e preciso)
         if (!empty($this->apiKey)) {
             $geminiVisionResult = $this->parseVisionWithGeminiApi($base64Image, $mimeType, $systemInstruction);
             if ($geminiVisionResult !== null) {
@@ -284,69 +223,7 @@ Esquema JSON esperado:
             }
         }
 
-        // 2. Fallback para OmniRoute Vision (se disponível)
-        $omniVisionResult = $this->parseVisionWithOmniRoute($base64Image, $mimeType, $systemInstruction);
-        if ($omniVisionResult !== null) {
-            Log::info('[GeminiService] Nota fiscal processada via OmniRoute Vision.');
-            return $omniVisionResult;
-        }
-
         return ['tipo' => 'invalido', 'erro' => 'Não foi possível ler a foto da nota fiscal no momento (o serviço de visão com IA está temporariamente indisponível). Lance os dados via texto como: Compra no visa [valor] [local] alimentação.'];
-    }
-
-    private function parseVisionWithOmniRoute(string $base64Image, string $mimeType, string $systemInstruction): ?array
-    {
-        $primaryEndpoint = env('OMNIROUTE_URL') ?: env('OMNIROUTE_BASE_URL') ?: 'http://localhost:20128/v1';
-        $endpoints = array_filter(array_unique([$primaryEndpoint, 'http://localhost:20128/v1']));
-        $apiKey = env('OMNIROUTE_API_KEY', 'sk-0a283590febce995-ecd196-29791878');
-        $models = ['auto/best-vision', 'opencode/mimo-v2.5-free', 'oc/mimo-v2.5-free'];
-
-        foreach ($endpoints as $endpoint) {
-            foreach ($models as $model) {
-                try {
-                    $response = Http::withToken($apiKey)->timeout(3)->post(rtrim($endpoint, '/') . '/chat/completions', [
-                        'model' => $model,
-                        'messages' => [
-                            ['role' => 'system', 'content' => $systemInstruction],
-                            [
-                                'role' => 'user',
-                                'content' => [
-                                    ['type' => 'text', 'text' => 'Analise a imagem deste cupom/nota fiscal de mercado e extraia os dados e itens em JSON.'],
-                                    [
-                                        'type' => 'image_url',
-                                        'image_url' => [
-                                            'url' => "data:{$mimeType};base64,{$base64Image}"
-                                        ]
-                                    ]
-                                ]
-                            ]
-                        ],
-                        'temperature' => 0.1,
-                    ]);
-
-                    if ($response->successful()) {
-                        $result = $response->json();
-                        $text = $result['choices'][0]['message']['content'] ?? null;
-                        if (empty($text) && isset($result['choices'][0]['message']['reasoning_content'])) {
-                            $text = $result['choices'][0]['message']['reasoning_content'];
-                        }
-
-                        if (!empty($text)) {
-                            $cleanJson = preg_replace('/^```(?:json)?\s*|\s*```$/i', '', trim($text));
-                            $parsed = json_decode($cleanJson, true);
-
-                            if (json_last_error() === JSON_ERROR_NONE && is_array($parsed) && isset($parsed['tipo'])) {
-                                return $parsed;
-                            }
-                        }
-                    }
-                } catch (\Throwable $e) {
-                    break;
-                }
-            }
-        }
-
-        return null;
     }
 
     private function parseVisionWithGeminiApi(string $base64Image, string $mimeType, string $systemInstruction): ?array

@@ -101,7 +101,7 @@ class FiscalNewsAiService
     }
 
     /**
-     * Processa a matéria (seja por URL ou texto direto) usando a IA do OmniRoute (com fallback Gemini).
+     * Processa a matéria (seja por URL ou texto direto) usando a IA do Gemini (com fallback heurístico).
      * Atualiza o concurso fiscal correspondente e cria o registro de notícia.
      */
     public function processNewsWithAi(
@@ -123,8 +123,8 @@ class FiscalNewsAiService
             ];
         }
 
-        // Enviar para OmniRoute / Gemini
-        $aiAnalysis = $this->analyzeWithOmniRouteAi($articleData['texto_limpo'], $articleData['titulo']);
+        // Enviar para Gemini IA
+        $aiAnalysis = $this->analyzeWithGeminiAi($articleData['texto_limpo'], $articleData['titulo']);
 
         // Se a IA não conseguiu identificar, usar o extrator heurístico de fallback
         if (!$aiAnalysis || empty($aiAnalysis['sigla'])) {
@@ -317,10 +317,15 @@ class FiscalNewsAiService
     }
 
     /**
-     * Envia o texto da notícia para a IA OmniRoute Router com timeout rápido e fallback.
+     * Envia o texto da notícia para a IA Google Gemini com extração estruturada e fallback heurístico.
      */
-    protected function analyzeWithOmniRouteAi(string $texto, string $titulo): ?array
+    protected function analyzeWithGeminiAi(string $texto, string $titulo): ?array
     {
+        $apiKey = env('GEMINI_API_KEY');
+        if (empty($apiKey)) {
+            return null;
+        }
+
         $textoConciso = mb_substr($texto, 0, 2500);
 
         $systemInstruction = "Você é um especialista sênior em Concursos Públicos da Área Fiscal no Brasil (Receita Federal, 27 Secretarias de Fazenda Estaduais SEFAZ e ISS Municipais / Prefeituras).
@@ -373,45 +378,43 @@ Campos obrigatórios a extrair:
 
         $userPrompt = "Título da Matéria: {$titulo}\n\nConteúdo:\n{$textoConciso}";
 
-        // Tentar OmniRoute AI Router com timeout de 3.5 segundos para não travar a experiência do usuário
-        $endpoints = [
-            env('OMNIROUTE_URL'),
-            'http://localhost:20128/v1',
-            'http://localhost:3000/v1',
-        ];
-        $apiKey = env('OMNIROUTE_API_KEY', 'sk-0a283590febce995-ecd196-29791878');
-
-        foreach (array_unique(array_filter($endpoints)) as $endpoint) {
+        $models = ['gemini-2.0-flash', 'gemini-1.5-flash'];
+        foreach ($models as $model) {
             try {
-                $response = Http::withToken($apiKey)->timeout(3.5)->post(rtrim($endpoint, '/') . '/chat/completions', [
-                    'model'       => 'auto/best-fast',
-                    'messages'    => [
-                        ['role' => 'system', 'content' => $systemInstruction],
-                        ['role' => 'user', 'content' => $userPrompt],
+                $url = "https://generativelanguage.googleapis.com/v1beta/models/{$model}:generateContent?key={$apiKey}";
+                $response = Http::timeout(8)->withoutVerifying()->post($url, [
+                    'contents' => [
+                        ['parts' => [['text' => $userPrompt]]]
                     ],
-                    'temperature' => 0.1,
-                    'max_tokens'  => 800,
-                    'stream'      => false,
+                    'systemInstruction' => [
+                        'parts' => [['text' => $systemInstruction]]
+                    ],
+                    'generationConfig' => [
+                        'responseMimeType' => 'application/json'
+                    ]
                 ]);
 
                 if ($response->successful()) {
                     $result = $response->json();
-                    $text = $result['choices'][0]['message']['content'] ?? null;
-                    if (empty($text) && isset($result['choices'][0]['message']['reasoning_content'])) {
-                        $text = $result['choices'][0]['message']['reasoning_content'];
+                    $parts = $result['candidates'][0]['content']['parts'] ?? [];
+                    $text = '';
+                    foreach ($parts as $part) {
+                        if (isset($part['text'])) {
+                            $text .= $part['text'];
+                        }
                     }
 
                     if (!empty($text)) {
                         $cleanJson = preg_replace('/^```(?:json)?\s*|\s*```$/i', '', trim($text));
                         $parsed = json_decode($cleanJson, true);
                         if (json_last_error() === JSON_ERROR_NONE && is_array($parsed) && isset($parsed['sigla'])) {
-                            Log::info("[FiscalNewsAiService] Artigo interpretado com sucesso via OmniRoute.");
+                            Log::info("[FiscalNewsAiService] Artigo interpretado com sucesso via Gemini ({$model}).");
                             return $parsed;
                         }
                     }
                 }
             } catch (\Throwable $e) {
-                // Se o OmniRoute estiver com rate limit nos modelos livres (429), continua sem travar
+                Log::warning("[FiscalNewsAiService] Falha na chamada do modelo {$model}: " . $e->getMessage());
             }
         }
 

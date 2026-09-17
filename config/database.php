@@ -86,7 +86,7 @@ return [
 
         'pgsql' => [
             'driver' => 'pgsql',
-            'url' => env('DB_URL', env('DATABASE_URL')),
+            'url' => env('DB_URL'),
             'host' => env('DB_HOST', '127.0.0.1'),
             'port' => env('DB_PORT', '5432'),
             'database' => env('DB_DATABASE', 'laravel'),
@@ -97,6 +97,21 @@ return [
             'prefix_indexes' => true,
             'search_path' => 'public',
             'sslmode' => env('DB_SSLMODE', 'prefer'),
+        ],
+
+        'pgsql_cloud' => [
+            'driver' => 'pgsql',
+            'url' => env('CLOUD_DATABASE_URL', env('DATABASE_URL')),
+            'host' => env('CLOUD_DB_HOST', '127.0.0.1'),
+            'port' => env('CLOUD_DB_PORT', '5432'),
+            'database' => env('CLOUD_DB_DATABASE', 'neondb'),
+            'username' => env('CLOUD_DB_USERNAME', 'neondb_owner'),
+            'password' => env('CLOUD_DB_PASSWORD', ''),
+            'charset' => env('CLOUD_DB_CHARSET', 'utf8'),
+            'prefix' => '',
+            'prefix_indexes' => true,
+            'search_path' => 'public',
+            'sslmode' => env('CLOUD_DB_SSLMODE', 'require'),
         ],
 
         'sqlsrv' => [

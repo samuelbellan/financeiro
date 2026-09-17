@@ -65,6 +65,66 @@
         .invoice-row { cursor: pointer; transition: background-color 0.2s; }
         .invoice-row:hover { background-color: #f8fafc; }
         .row-checked { background-color: #dcfce7 !important; }
+        .row-checked td { background-color: #dcfce7 !important; }
+
+        .floating-selection-footer {
+            position: fixed;
+            bottom: 1.5rem;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #0f172a;
+            color: white;
+            padding: 0.65rem 1.25rem;
+            border-radius: 9999px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3), 0 8px 10px -6px rgba(0, 0, 0, 0.2);
+            z-index: 1050;
+            display: flex;
+            align-items: center;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(8px);
+            animation: slideUpFooter 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .floating-footer-content {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        .floating-footer-info {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        .floating-footer-badge {
+            background: rgba(255, 255, 255, 0.15);
+            color: #f1f5f9;
+            padding: 0.2rem 0.6rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        .floating-footer-sum {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #38bdf8;
+        }
+        .floating-footer-btn {
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            color: white;
+            padding: 0.3rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.15s;
+        }
+        .floating-footer-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+        @keyframes slideUpFooter {
+            from { opacity: 0; transform: translate(-50%, 20px); }
+            to { opacity: 1; transform: translate(-50%, 0); }
+        }
 
         /* Floating Action Button */
         .fab-container { position: fixed; bottom: 2rem; right: 2rem; z-index: 1000; display: flex; flex-direction: column-reverse; align-items: center; gap: 1rem; }
@@ -342,7 +402,7 @@
                                 @if($avista->isNotEmpty())
                                     <tr class="subheader-row" style="background: #f1f5f9;"><td colspan="5" style="padding: 0.5rem 1.5rem; font-weight: 700; font-size: 0.75rem; color: #475569; text-transform: uppercase;">Compras à Vista / Recorrentes</td></tr>
                                     @foreach($avista as $f)
-                                        <tr class="invoice-row" data-id="{{ $f->id }}" onclick="toggleRow(event, this)" style="border-bottom: 1px solid #f1f5f9; font-size: 0.875rem;">
+                                        <tr class="invoice-row" data-id="{{ $f->id }}" data-valor="{{ $f->valor_parcela }}" onclick="toggleRow(event, this)" style="border-bottom: 1px solid #f1f5f9; font-size: 0.875rem;">
                                             <td style="padding: 0.75rem 1.5rem;">{{ \Carbon\Carbon::parse($f->compra->data_compra)->format('d/m/Y') }}</td>
                                             <td style="padding: 0.75rem 1.5rem;">
                                                 {{ $f->compra->descricao }}
@@ -376,7 +436,7 @@
                                 @if($parceladas->isNotEmpty())
                                     <tr class="subheader-row" style="background: #f1f5f9;"><td colspan="5" style="padding: 0.5rem 1.5rem; font-weight: 700; font-size: 0.75rem; color: #475569; text-transform: uppercase;">Compras Parceladas</td></tr>
                                     @foreach($parceladas as $f)
-                                        <tr class="invoice-row" data-id="{{ $f->id }}" onclick="toggleRow(event, this)" style="border-bottom: 1px solid #f1f5f9; font-size: 0.875rem;">
+                                        <tr class="invoice-row" data-id="{{ $f->id }}" data-valor="{{ $f->valor_parcela }}" onclick="toggleRow(event, this)" style="border-bottom: 1px solid #f1f5f9; font-size: 0.875rem;">
                                             <td style="padding: 0.75rem 1.5rem;">{{ \Carbon\Carbon::parse($f->compra->data_compra)->format('d/m/Y') }}</td>
                                             <td style="padding: 0.75rem 1.5rem;">
                                                 {{ $f->compra->descricao }}
@@ -412,6 +472,22 @@
                                     <tr><td colspan="5" style="padding: 2rem; text-align: center; color: #94a3b8;">Vazio.</td></tr>
                                 @endif
                             </tbody>
+                            <tfoot class="invoice-tfoot" style="background: #f8fafc; border-top: 1px solid #e2e8f0; font-weight: 600; font-size: 0.85rem;">
+                                <tr>
+                                    <td colspan="3" style="padding: 0.75rem 1.5rem; color: #64748b;">
+                                        <div style="display: flex; align-items: center; gap: 0.75rem;">
+                                            <span class="selected-cartao-count">0 selecionados</span>
+                                            <button type="button" class="btn-clear-cartao" onclick="clearCardSelection(this)" style="display: none; background: #e2e8f0; border: none; padding: 0.15rem 0.5rem; border-radius: 4px; font-size: 0.7rem; color: #475569; cursor: pointer; font-weight: 600;">
+                                                Limpar
+                                            </button>
+                                        </div>
+                                    </td>
+                                    <td style="padding: 0.75rem 1.5rem; text-align: right; color: #1e293b; font-weight: 700;" class="selected-cartao-sum">
+                                        R$ 0,00
+                                    </td>
+                                    <td></td>
+                                </tr>
+                            </tfoot>
                         </table>
                     </div>
                 @endforeach
@@ -428,10 +504,10 @@
             <form id="purchaseForm" action="{{ route('cartoes.compras.store') }}" method="POST">
                 @csrf<div id="purchaseMethod"></div>
                 <div class="form-group"><label>Cartão</label><select name="cartao_id" id="purchaseCardId" class="form-input">@foreach($cartoes->where('ativo', true) as $c)<option value="{{ $c->id }}">{{ $c->nome }}</option>@endforeach</select></div>
-                <div class="form-group"><label>Descrição</label><input type="text" name="descricao" id="purchaseDesc" class="form-input" required></div>
+                <div class="form-group" style="position: relative;"><label>Descrição</label><input type="text" name="descricao" id="purchaseDesc" class="form-input" required autocomplete="off"></div>
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
                     <div class="form-group">
-                        <label>Valor Total</label>
+                        <label id="lblPurchaseVal">Valor Total</label>
                         <input type="text" id="purchaseValDisplay" class="form-input" required placeholder="0,00" inputmode="numeric">
                         <input type="hidden" name="valor_total" id="purchaseVal">
                     </div>
@@ -441,10 +517,47 @@
                     <input type="checkbox" name="is_estorno" id="purchaseEstorno" value="1" style="width: 1rem; height: 1rem; accent-color: var(--primary);">
                     <label for="purchaseEstorno" style="margin: 0; font-weight: 600; color: #b91c1c;">Lançar como Estorno (Crédito na fatura)</label>
                 </div>
-                <div id="installmentsGroup" class="form-group" style="display: none;"><label>Parcelas</label><input type="number" name="numero_parcelas" id="purchaseInstallments" class="form-input" value="1" min="1"></div>
+
+                <!-- Bloco de Parcelamento Avançado -->
+                <div id="installmentsGroup" style="display: none; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 0.85rem; margin-bottom: 1rem;">
+                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.6rem;">
+                        <span style="font-size: 0.8rem; font-weight: 700; color: #334155;">Como deseja lançar o valor?</span>
+                        <div style="display: flex; gap: 0.25rem; background: #e2e8f0; padding: 0.2rem; border-radius: 6px;">
+                            <button type="button" id="btnModoTotal" onclick="setModoCalculo('total')" style="border: none; padding: 0.25rem 0.65rem; font-size: 0.75rem; font-weight: 600; border-radius: 4px; cursor: pointer; background: #6366f1; color: #fff; transition: all 0.15s;">
+                                Valor Total
+                            </button>
+                            <button type="button" id="btnModoParcela" onclick="setModoCalculo('parcela')" style="border: none; padding: 0.25rem 0.65rem; font-size: 0.75rem; font-weight: 600; border-radius: 4px; cursor: pointer; background: transparent; color: #64748b; transition: all 0.15s;">
+                                Valor da Parcela
+                            </button>
+                        </div>
+                    </div>
+
+                    <div style="grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; display: grid;">
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label style="font-size: 0.8rem; font-weight: 600; color: #475569;">Qtd. de Parcelas</label>
+                            <input type="number" name="numero_parcelas" id="purchaseInstallments" class="form-input" value="1" min="1" oninput="onInstallmentsQtyChange()">
+                        </div>
+                        <div class="form-group" id="groupValorParcela" style="margin-bottom: 0;">
+                            <label id="lblValorParcela" style="font-size: 0.8rem; font-weight: 600; color: #475569;">Valor de Cada Parcela</label>
+                            <input type="text" id="purchaseInstallmentValDisplay" class="form-input" placeholder="0,00" inputmode="numeric">
+                            <input type="hidden" name="valor_parcela" id="purchaseInstallmentVal">
+                        </div>
+                    </div>
+                    <div id="installmentsSummaryNote" style="font-size: 0.75rem; color: #6366f1; font-weight: 600; margin-top: 0.5rem; display: none;"></div>
+                </div>
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
                     <div class="form-group"><label>Data</label><input type="date" name="data_compra" id="purchaseDate" class="form-input" required></div>
-                    <div class="form-group"><label>Categoria</label><input type="text" name="categoria" id="purchaseCat" class="form-input"></div>
+                    <div class="form-group">
+                        <label>Categoria</label>
+                        <input type="text" name="categoria" id="purchaseCat" class="form-input" list="cardCategoriesList">
+                        <datalist id="cardCategoriesList">
+                            @if(isset($userCategorias))
+                                @foreach($userCategorias as $uc)
+                                    <option value="{{ $uc }}">
+                                @endforeach
+                            @endif
+                        </datalist>
+                    </div>
                 </div>
                 <div style="display: flex; justify-content: flex-end; gap: 0.5rem; margin-top: 1rem;">
                     <button type="button" onclick="closePurchaseModal()" class="btn-action" style="background: #94a3b8;">Cancelar</button>
@@ -488,7 +601,10 @@
         </div>
     </div>
 
+    <script src="{{ asset('js/transaction-autocomplete.js') }}"></script>
     <script>
+        const sugestoesIniciaisCartao = @json($sugestoesDescricao ?? []);
+        let purchaseAutocomplete = null;
         function flexibilizarParcela(parcela) {
             const form = document.getElementById('flexibilizarForm');
             form.action = `/financas/cartoes/parcelas/${parcela.id}`;
@@ -519,7 +635,116 @@
         function openCardModal() { document.getElementById('cardModalTitle').innerText = 'Novo Cartão'; document.getElementById('cardForm').action = "{{ route('cartoes.store') }}"; document.getElementById('cardMethod').innerHTML = ''; document.getElementById('modalCard').style.display = 'flex'; }
         function editCard(card) { document.getElementById('cardModalTitle').innerText = 'Editar Cartão'; document.getElementById('cardForm').action = `/financas/cartoes/${card.id}`; document.getElementById('cardMethod').innerHTML = '@method("PUT")'; document.getElementById('cardName').value = card.nome; document.getElementById('cardColor').value = card.cor || '#6366f1'; document.getElementById('cardBrand').value = card.bandeira || ''; document.getElementById('cardLimit').value = card.limite; document.getElementById('cardClose').value = card.dia_fechamento; document.getElementById('cardDue').value = card.dia_vencimento; document.getElementById('modalCard').style.display = 'flex'; }
         
+        let currentModoCalculo = 'total';
+
+        function setModoCalculo(modo) {
+            currentModoCalculo = modo;
+            const btnTotal = document.getElementById('btnModoTotal');
+            const btnParcela = document.getElementById('btnModoParcela');
+            const lblTotal = document.getElementById('lblPurchaseVal');
+            const inputTotalDisplay = document.getElementById('purchaseValDisplay');
+            const lblParcela = document.getElementById('lblValorParcela');
+            const inputParcelaDisplay = document.getElementById('purchaseInstallmentValDisplay');
+
+            if (modo === 'total') {
+                if (btnTotal) { btnTotal.style.background = '#6366f1'; btnTotal.style.color = '#ffffff'; }
+                if (btnParcela) { btnParcela.style.background = 'transparent'; btnParcela.style.color = '#64748b'; }
+                if (lblTotal) lblTotal.innerText = 'Valor Total (R$)';
+                if (lblParcela) lblParcela.innerText = 'Valor de Cada Parcela (Calculado)';
+                if (inputTotalDisplay) {
+                    inputTotalDisplay.readOnly = false;
+                    inputTotalDisplay.style.background = '#ffffff';
+                }
+                if (inputParcelaDisplay) {
+                    inputParcelaDisplay.readOnly = true;
+                    inputParcelaDisplay.style.background = '#f1f5f9';
+                }
+                if (inputTotalDisplay) setTimeout(() => inputTotalDisplay.focus(), 50);
+            } else {
+                if (btnParcela) { btnParcela.style.background = '#6366f1'; btnParcela.style.color = '#ffffff'; }
+                if (btnTotal) { btnTotal.style.background = 'transparent'; btnTotal.style.color = '#64748b'; }
+                if (lblTotal) lblTotal.innerText = 'Valor Total (Calculado)';
+                if (lblParcela) lblParcela.innerText = 'Valor de Cada Parcela (R$)';
+                if (inputTotalDisplay) {
+                    inputTotalDisplay.readOnly = true;
+                    inputTotalDisplay.style.background = '#f1f5f9';
+                }
+                if (inputParcelaDisplay) {
+                    inputParcelaDisplay.readOnly = false;
+                    inputParcelaDisplay.style.background = '#ffffff';
+                }
+                if (inputParcelaDisplay) setTimeout(() => inputParcelaDisplay.focus(), 50);
+            }
+            recalcInstallments();
+        }
+
+        function recalcInstallments() {
+            const type = document.getElementById('purchaseType') ? document.getElementById('purchaseType').value : 'avista';
+            if (type !== 'parcelada') return;
+
+            const inputTotal = document.getElementById('purchaseVal');
+            const inputTotalDisplay = document.getElementById('purchaseValDisplay');
+            const inputParcela = document.getElementById('purchaseInstallmentVal');
+            const inputParcelaDisplay = document.getElementById('purchaseInstallmentValDisplay');
+            const inputQty = document.getElementById('purchaseInstallments');
+            const note = document.getElementById('installmentsSummaryNote');
+
+            const qty = Math.max(1, parseInt(inputQty ? inputQty.value : 1) || 1);
+
+            if (currentModoCalculo === 'parcela') {
+                const valParcela = parseFloat(inputParcela ? inputParcela.value : 0) || 0;
+                const total = Math.round(valParcela * qty * 100) / 100;
+                if (inputTotal) inputTotal.value = total > 0 ? total.toFixed(2) : '';
+                if (inputTotalDisplay) inputTotalDisplay.value = total > 0 ? total.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '';
+                if (note) {
+                    if (valParcela > 0) {
+                        note.innerHTML = `ℹ️ <strong>${qty}x</strong> de <strong>R$ ${valParcela.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong> = Total: <strong>R$ ${total.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong>`;
+                        note.style.display = 'block';
+                    } else {
+                        note.style.display = 'none';
+                    }
+                }
+            } else {
+                const total = parseFloat(inputTotal ? inputTotal.value : 0) || 0;
+                const valParcela = qty > 0 ? (Math.round((total / qty) * 100) / 100) : total;
+                if (inputParcela) inputParcela.value = valParcela > 0 ? valParcela.toFixed(2) : '';
+                if (inputParcelaDisplay) inputParcelaDisplay.value = valParcela > 0 ? valParcela.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '';
+                if (note) {
+                    if (total > 0) {
+                        note.innerHTML = `ℹ️ <strong>${qty}</strong> parcelas de <strong>R$ ${valParcela.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong> (Total: <strong>R$ ${total.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong>)`;
+                        note.style.display = 'block';
+                    } else {
+                        note.style.display = 'none';
+                    }
+                }
+            }
+        }
+
+        function onInstallmentsQtyChange() {
+            recalcInstallments();
+        }
+
+        function toggleInstallments() {
+            const type = document.getElementById('purchaseType').value;
+            const group = document.getElementById('installmentsGroup');
+            const lblTotal = document.getElementById('lblPurchaseVal');
+            const inputTotalDisplay = document.getElementById('purchaseValDisplay');
+
+            if (type === 'parcelada') {
+                group.style.display = 'block';
+                setModoCalculo(currentModoCalculo);
+            } else {
+                group.style.display = 'none';
+                if (lblTotal) lblTotal.innerText = 'Valor Total';
+                if (inputTotalDisplay) {
+                    inputTotalDisplay.readOnly = false;
+                    inputTotalDisplay.style.background = '#ffffff';
+                }
+            }
+        }
+
         function openPurchaseModal(id, name) { 
+            if (purchaseAutocomplete) purchaseAutocomplete.close();
             document.getElementById('purchaseModalTitle').innerText = 'Nova Compra - ' + name;
             document.getElementById('purchaseForm').action = "{{ route('cartoes.compras.store') }}";
             document.getElementById('purchaseMethod').innerHTML = '';
@@ -527,10 +752,17 @@
             document.getElementById('purchaseDesc').value = '';
             document.getElementById('purchaseVal').value = '';
             document.getElementById('purchaseValDisplay').value = '';
+            document.getElementById('purchaseInstallments').value = '1';
+            document.getElementById('purchaseInstallmentVal').value = '';
+            document.getElementById('purchaseInstallmentValDisplay').value = '';
             document.getElementById('purchaseEstorno').checked = false;
             document.getElementById('purchaseType').value = 'avista';
             document.getElementById('purchaseDate').value = "{{ date('Y-m-d') }}";
             document.getElementById('purchaseCat').value = '';
+            const note = document.getElementById('installmentsSummaryNote');
+            if (note) note.style.display = 'none';
+            currentModoCalculo = 'total';
+            setModoCalculo('total');
             toggleInstallments();
             document.getElementById('modalPurchase').style.display = 'flex'; 
         }
@@ -548,12 +780,16 @@
             document.getElementById('purchaseType').value = compra.tipo;
             document.getElementById('purchaseDate').value = compra.data_compra;
             document.getElementById('purchaseCat').value = compra.categoria || '';
-            document.getElementById('purchaseInstallments').value = compra.numero_parcelas || 1;
+            const qty = compra.numero_parcelas || 1;
+            document.getElementById('purchaseInstallments').value = qty;
+            const valParcela = qty > 0 ? (Math.round((absVal / qty) * 100) / 100) : absVal;
+            document.getElementById('purchaseInstallmentVal').value = valParcela.toFixed(2);
+            document.getElementById('purchaseInstallmentValDisplay').value = valParcela.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            currentModoCalculo = 'total';
+            setModoCalculo('total');
             toggleInstallments();
             document.getElementById('modalPurchase').style.display = 'flex';
         }
-
-        function toggleInstallments() { const type = document.getElementById('purchaseType').value; document.getElementById('installmentsGroup').style.display = (type === 'parcelada') ? 'block' : 'none'; }
         
         const STORAGE_KEY_CARTOES = 'financeiro_selected_cartoes';
 
@@ -569,6 +805,7 @@
                         row.classList.remove('row-checked');
                     }
                 });
+                updateSelectedCartoesSummary();
             } catch (err) {}
         }
 
@@ -578,11 +815,81 @@
             localStorage.setItem(STORAGE_KEY_CARTOES, JSON.stringify(selectedIds));
         }
 
+        function updateSelectedCartoesSummary() {
+            let totalCheckedAcrossCards = 0;
+            let totalSumAcrossCards = 0;
+
+            document.querySelectorAll('.invoice-card').forEach(card => {
+                const checkedRows = card.querySelectorAll('tr.invoice-row.row-checked');
+                const count = checkedRows.length;
+                let sum = 0;
+                checkedRows.forEach(r => {
+                    let val = parseFloat(r.getAttribute('data-valor'));
+                    if (isNaN(val)) {
+                        const text = r.cells[3]?.innerText || '';
+                        val = parseFloat(text.replace(/[^\d,-]/g, '').replace(',', '.')) || 0;
+                        if (text.includes('-')) val = -val;
+                    }
+                    sum += val;
+                });
+
+                totalCheckedAcrossCards += count;
+                totalSumAcrossCards += sum;
+
+                const countEl = card.querySelector('.selected-cartao-count');
+                const sumEl = card.querySelector('.selected-cartao-sum');
+                const clearBtn = card.querySelector('.btn-clear-cartao');
+
+                if (countEl && sumEl) {
+                    if (count === 0) {
+                        countEl.innerText = '0 selecionados';
+                        sumEl.innerText = 'R$ 0,00';
+                        sumEl.style.color = '#94a3b8';
+                        if (clearBtn) clearBtn.style.display = 'none';
+                    } else {
+                        countEl.innerText = `${count} lançamento${count > 1 ? 's' : ''} selecionado${count > 1 ? 's' : ''}`;
+                        sumEl.innerText = 'R$ ' + sum.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                        sumEl.style.color = sum < 0 ? '#10b981' : '#1e293b';
+                        if (clearBtn) clearBtn.style.display = 'inline-block';
+                    }
+                }
+            });
+
+            const floatBar = document.getElementById('floatingSelectionFooter');
+            const floatCount = document.getElementById('floatingSelectedCount');
+            const floatSum = document.getElementById('floatingSelectedSum');
+
+            if (floatBar && floatCount && floatSum) {
+                if (totalCheckedAcrossCards === 0) {
+                    floatBar.style.display = 'none';
+                } else {
+                    floatBar.style.display = 'flex';
+                    floatCount.innerText = `${totalCheckedAcrossCards} selecionado${totalCheckedAcrossCards > 1 ? 's' : ''}`;
+                    floatSum.innerText = 'R$ ' + totalSumAcrossCards.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                }
+            }
+        }
+
+        function clearCardSelection(btn) {
+            const card = btn.closest('.invoice-card');
+            if (!card) return;
+            card.querySelectorAll('tr.invoice-row.row-checked').forEach(r => r.classList.remove('row-checked'));
+            updateSelectedCartoesStorage();
+            updateSelectedCartoesSummary();
+        }
+
+        function clearAllSelectedCartoes() {
+            document.querySelectorAll('tr.invoice-row.row-checked').forEach(r => r.classList.remove('row-checked'));
+            updateSelectedCartoesStorage();
+            updateSelectedCartoesSummary();
+        }
+
         function toggleRow(event, row) {
             // Evita marcar a linha se clicar em botões ou formulários
             if (event.target.closest('button') || event.target.closest('form')) return;
             row.classList.toggle('row-checked');
             updateSelectedCartoesStorage();
+            updateSelectedCartoesSummary();
         }
 
         function submitMonthForm(val) {
@@ -599,7 +906,12 @@
             const purchaseForm = document.getElementById('purchaseForm');
             
             // Initialize currency masks
-            applyCurrencyMask('purchaseValDisplay', 'purchaseVal');
+            applyCurrencyMask('purchaseValDisplay', 'purchaseVal', function() {
+                if (currentModoCalculo === 'total') recalcInstallments();
+            });
+            applyCurrencyMask('purchaseInstallmentValDisplay', 'purchaseInstallmentVal', function() {
+                if (currentModoCalculo === 'parcela') recalcInstallments();
+            });
             
             // Initialize Purchases Doughnut Charts
             const chartAVistaCtx = document.getElementById('chartAVista');
@@ -825,6 +1137,20 @@
             }
             
             if (purchaseForm) {
+                // Autocomplete para Descrição e Categoria do Cartão
+                purchaseAutocomplete = initTransactionAutocomplete({
+                    input: '#purchaseDesc',
+                    initialSuggestions: sugestoesIniciaisCartao,
+                    onSelect: function(item) {
+                        if (item.categoria) {
+                            const catInput = document.getElementById('purchaseCat');
+                            if (catInput) catInput.value = item.categoria;
+                        }
+                        const valDisplay = document.getElementById('purchaseValDisplay');
+                        if (valDisplay) valDisplay.focus();
+                    }
+                });
+
                 // Ctrl + Enter to submit
                 purchaseForm.addEventListener('keydown', function(e) {
                     if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
@@ -869,12 +1195,25 @@
                             showToast(data.compra);
                             hasAddedPurchases = true;
                             notifyDataUpdated();
+
+                            if (purchaseAutocomplete && data.compra) {
+                                purchaseAutocomplete.addSuggestion({
+                                    descricao: data.compra.descricao,
+                                    categoria: data.compra.categoria,
+                                    tipo: 'despesa'
+                                });
+                            }
                             
                             // Reset description and value
                             document.getElementById('purchaseDesc').value = '';
                             document.getElementById('purchaseVal').value = '';
                             document.getElementById('purchaseValDisplay').value = '';
+                            document.getElementById('purchaseInstallmentVal').value = '';
+                            document.getElementById('purchaseInstallmentValDisplay').value = '';
+                            document.getElementById('purchaseInstallments').value = '1';
                             document.getElementById('purchaseEstorno').checked = false;
+                            const note = document.getElementById('installmentsSummaryNote');
+                            if (note) note.style.display = 'none';
                             
                             // Focus back on description
                             document.getElementById('purchaseDesc').focus();
@@ -961,7 +1300,7 @@
             }, 4000);
         }
 
-        function applyCurrencyMask(displayInputId, hiddenInputId) {
+        function applyCurrencyMask(displayInputId, hiddenInputId, onInputCallback) {
             const displayInput = document.getElementById(displayInputId);
             const hiddenInput = document.getElementById(hiddenInputId);
             if (!displayInput || !hiddenInput) return;
@@ -980,6 +1319,9 @@
                 const res = formatValue(this.value);
                 this.value = res.formatted;
                 hiddenInput.value = res.raw;
+                if (typeof onInputCallback === 'function') {
+                    onInputCallback(parseFloat(res.raw));
+                }
             });
             
             // On focus, put cursor at the end
@@ -1277,5 +1619,18 @@
             });
         });
     </script>
+
+    <!-- Barra flutuante de rodapé para soma dos lançamentos selecionados -->
+    <div id="floatingSelectionFooter" class="floating-selection-footer" style="display: none;">
+        <div class="floating-footer-content">
+            <div class="floating-footer-info">
+                <span class="floating-footer-badge" id="floatingSelectedCount">0 selecionados</span>
+                <span class="floating-footer-sum" id="floatingSelectedSum">R$ 0,00</span>
+            </div>
+            <button type="button" onclick="clearAllSelectedCartoes()" class="floating-footer-btn" title="Desmarcar todos os lançamentos">
+                Desmarcar todos
+            </button>
+        </div>
+    </div>
 </body>
 </html>

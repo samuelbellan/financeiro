@@ -202,6 +202,71 @@
         #transactionsTable tbody tr.selected-audit td {
             background-color: #dcfce7 !important;
         }
+        #transactionsTable tfoot td {
+            border-bottom: none;
+        }
+        .floating-selection-footer {
+            position: fixed;
+            bottom: 1.5rem;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #0f172a;
+            color: white;
+            padding: 0.65rem 1.25rem;
+            border-radius: 9999px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3), 0 8px 10px -6px rgba(0, 0, 0, 0.2);
+            z-index: 1050;
+            display: flex;
+            align-items: center;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(8px);
+            animation: slideUpFooter 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .floating-footer-content {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        .floating-footer-info {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        .floating-footer-badge {
+            background: rgba(255, 255, 255, 0.15);
+            color: #f1f5f9;
+            padding: 0.2rem 0.6rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        .floating-footer-sum {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #38bdf8;
+        }
+        .floating-footer-sub {
+            font-size: 0.75rem;
+            color: #94a3b8;
+        }
+        .floating-footer-btn {
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            color: white;
+            padding: 0.3rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.15s;
+        }
+        .floating-footer-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+        @keyframes slideUpFooter {
+            from { opacity: 0; transform: translate(-50%, 20px); }
+            to { opacity: 1; transform: translate(-50%, 0); }
+        }
     </style>
 </head>
 <body>
@@ -488,7 +553,7 @@
                         </thead>
                         <tbody>
                             @foreach($transacoes as $t)
-                                <tr data-id="{{ $t->id }}">
+                                <tr data-id="{{ $t->id }}" data-tipo="{{ $t->tipo }}" data-valor="{{ $t->valor }}">
                                     <td>{{ \Carbon\Carbon::parse($t->data)->format('d/m/Y') }}</td>
                                     <td style="font-weight: 600;">{{ $t->descricao }}</td>
                                     <td>
@@ -514,6 +579,25 @@
                                 </tr>
                             @endforeach
                         </tbody>
+                        <tfoot id="transactionsFooter" style="background: #f8fafc; border-top: 2px solid var(--border); font-weight: 600;">
+                            <tr>
+                                <td colspan="3" style="padding: 0.85rem 1.5rem;">
+                                    <div style="display: flex; align-items: center; gap: 0.75rem;">
+                                        <span id="selectedCountText" style="font-size: 0.85rem; color: var(--text-muted);">
+                                            0 lançamentos selecionados (clique nos lançamentos para somar)
+                                        </span>
+                                        <button type="button" id="btnClearSelected" onclick="clearSelectedTransactions()" style="display: none; background: #e2e8f0; border: none; padding: 0.2rem 0.5rem; border-radius: 4px; font-size: 0.75rem; color: #475569; cursor: pointer; font-weight: 600;">
+                                            Desmarcar todos
+                                        </button>
+                                    </div>
+                                </td>
+                                <td style="padding: 0.85rem 1.5rem; font-size: 0.95rem;" id="selectedSumCell">
+                                    <span style="font-size: 0.75rem; color: var(--text-muted); display: block; font-weight: 500;">Soma dos Selecionados:</span>
+                                    <span id="selectedSumValue" style="font-weight: 700; color: var(--text-main);">R$ 0,00</span>
+                                </td>
+                                <td style="padding: 0.85rem 1.5rem; text-align: right;"></td>
+                            </tr>
+                        </tfoot>
                     </table>
                     </div>
                 </div>
@@ -622,7 +706,7 @@
             <form id="transactionForm" method="POST" action="{{ route('financas.store') }}">
                 @csrf<div id="methodField"></div>
                 <div class="modal-body">
-                    <div class="form-group"><label>Descrição</label><input type="text" name="descricao" id="inputDescricao" class="form-input" required></div>
+                    <div class="form-group" style="position: relative;"><label>Descrição</label><input type="text" name="descricao" id="inputDescricao" class="form-input" required autocomplete="off"></div>
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1rem;">
                         <div class="form-group">
                             <label>Valor (R$)</label>
@@ -710,8 +794,11 @@
         </div>
     </div>
 
+    <script src="{{ asset('js/transaction-autocomplete.js') }}"></script>
     <script>
         const categoriesData = @json($categorias);
+        const sugestoesIniciais = @json($sugestoesDescricao ?? []);
+        let txAutocomplete = null;
         function filterCategoriesByTipo(tipo) {
             const sel = document.getElementById('selectCategoria');
             for (let opt of sel.options) { if (opt.value) opt.style.display = opt.getAttribute('data-tipo') === tipo ? 'block' : 'none'; }
@@ -1068,6 +1155,62 @@
             // Initialize currency masks
             applyCurrencyMask('inputValorDisplay', 'inputValor');
             applyCurrencyMask('previsaoValorDisplay', 'previsaoValor');
+
+            // Initialize autocomplete for transaction description
+            txAutocomplete = initTransactionAutocomplete({
+                input: '#inputDescricao',
+                initialSuggestions: sugestoesIniciais,
+                onSelect: function(item) {
+                    const norm = s => (s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
+
+                    // 1. Ajustar Tipo se informado
+                    if (item.tipo) {
+                        const tipoSelect = document.getElementById('inputTipo');
+                        if (tipoSelect && tipoSelect.value !== item.tipo) {
+                            tipoSelect.value = item.tipo;
+                            filterCategoriesByTipo(item.tipo);
+                        }
+                    }
+
+                    // 2. Selecionar Categoria correspondente
+                    if (item.categoria) {
+                        const catSelect = document.getElementById('selectCategoria');
+                        if (catSelect) {
+                            const targetNorm = norm(item.categoria);
+                            let matchedCat = null;
+                            for (let opt of catSelect.options) {
+                                if (norm(opt.value) === targetNorm) {
+                                    opt.selected = true;
+                                    catSelect.value = opt.value;
+                                    matchedCat = opt.value;
+                                    break;
+                                }
+                            }
+
+                            if (matchedCat) {
+                                updateSubcategories(matchedCat, 'selectSubcategoria');
+
+                                // 3. Selecionar Subcategoria se informada
+                                if (item.subcategoria) {
+                                    const subSelect = document.getElementById('selectSubcategoria');
+                                    const targetSubNorm = norm(item.subcategoria);
+                                    for (let opt of subSelect.options) {
+                                        if (norm(opt.value) === targetSubNorm) {
+                                            opt.selected = true;
+                                            subSelect.value = opt.value;
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    // Foco direto no valor para agilizar preenchimento
+                    const valDisplay = document.getElementById('inputValorDisplay');
+                    if (valDisplay) valDisplay.focus();
+                }
+            });
             
             if (form) {
                 // Ctrl + Enter to submit
@@ -1115,6 +1258,15 @@
                             showToast(data.transacao);
                             hasAddedTransactions = true;
                             notifyDataUpdated();
+
+                            if (txAutocomplete && data.transacao) {
+                                txAutocomplete.addSuggestion({
+                                    descricao: data.transacao.descricao,
+                                    categoria: data.transacao.categoria,
+                                    subcategoria: data.transacao.subcategoria,
+                                    tipo: data.transacao.tipo
+                                });
+                            }
                             
                             // Reset description and value
                             document.getElementById('inputDescricao').value = '';
@@ -1639,6 +1791,7 @@
                         row.classList.remove('selected-audit');
                     }
                 });
+                updateSelectedTransactionsSummary(tbody);
             } catch (err) {
                 console.error('Erro ao restaurar lançamentos selecionados:', err);
             }
@@ -1649,6 +1802,109 @@
             const selectedIds = Array.from(tbody.querySelectorAll('tr.selected-audit[data-id]'))
                 .map(r => r.getAttribute('data-id'));
             localStorage.setItem(STORAGE_KEY_TRANSACTIONS, JSON.stringify(selectedIds));
+        }
+
+        function updateSelectedTransactionsSummary(tbody) {
+            if (!tbody) {
+                tbody = document.querySelector('#transactionsTable tbody');
+            }
+            if (!tbody) return;
+
+            const selectedRows = tbody.querySelectorAll('tr.selected-audit[data-id]');
+            let count = selectedRows.length;
+            let totalReceitas = 0;
+            let totalDespesas = 0;
+            let countReceitas = 0;
+            let countDespesas = 0;
+
+            selectedRows.forEach(row => {
+                const tipo = row.getAttribute('data-tipo');
+                let val = parseFloat(row.getAttribute('data-valor'));
+                if (isNaN(val)) {
+                    const text = row.cells[3]?.innerText || '';
+                    val = parseFloat(text.replace(/[^\d,-]/g, '').replace(',', '.')) || 0;
+                }
+                if (tipo === 'receita') {
+                    totalReceitas += val;
+                    countReceitas++;
+                } else {
+                    totalDespesas += val;
+                    countDespesas++;
+                }
+            });
+
+            const countEl = document.getElementById('selectedCountText');
+            const sumEl = document.getElementById('selectedSumValue');
+            const clearBtn = document.getElementById('btnClearSelected');
+            const floatBar = document.getElementById('floatingSelectionFooter');
+            const floatCount = document.getElementById('floatingSelectedCount');
+            const floatSum = document.getElementById('floatingSelectedSum');
+            const floatSub = document.getElementById('floatingSelectedSub');
+
+            if (count === 0) {
+                if (countEl) countEl.innerText = '0 lançamentos selecionados (clique nos lançamentos para somar)';
+                if (sumEl) {
+                    sumEl.innerText = 'R$ 0,00';
+                    sumEl.style.color = 'var(--text-main)';
+                }
+                if (clearBtn) clearBtn.style.display = 'none';
+                if (floatBar) floatBar.style.display = 'none';
+            } else {
+                if (clearBtn) clearBtn.style.display = 'inline-block';
+                if (floatBar) floatBar.style.display = 'flex';
+                if (floatCount) floatCount.innerText = `${count} selecionado${count > 1 ? 's' : ''}`;
+
+                if (countReceitas > 0 && countDespesas === 0) {
+                    const formatted = '+ R$ ' + totalReceitas.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                    if (countEl) countEl.innerText = `${count} lançamento${count > 1 ? 's' : ''} selecionado${count > 1 ? 's' : ''} (Receitas)`;
+                    if (sumEl) {
+                        sumEl.innerText = formatted;
+                        sumEl.style.color = 'var(--success)';
+                    }
+                    if (floatSum) {
+                        floatSum.innerText = formatted;
+                        floatSum.style.color = '#4ade80';
+                    }
+                    if (floatSub) floatSub.style.display = 'none';
+                } else if (countDespesas > 0 && countReceitas === 0) {
+                    const formatted = 'R$ ' + totalDespesas.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                    if (countEl) countEl.innerText = `${count} lançamento${count > 1 ? 's' : ''} selecionado${count > 1 ? 's' : ''} (Despesas)`;
+                    if (sumEl) {
+                        sumEl.innerText = '- ' + formatted;
+                        sumEl.style.color = 'var(--danger)';
+                    }
+                    if (floatSum) {
+                        floatSum.innerText = '- ' + formatted;
+                        floatSum.style.color = '#f87171';
+                    }
+                    if (floatSub) floatSub.style.display = 'none';
+                } else {
+                    const saldo = totalReceitas - totalDespesas;
+                    const sign = saldo >= 0 ? '+' : '-';
+                    const formattedSaldo = `${sign} R$ ${Math.abs(saldo).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+                    if (countEl) countEl.innerText = `${count} lançamentos selecionados (${countReceitas} rec., ${countDespesas} desp.)`;
+                    if (sumEl) {
+                        sumEl.innerHTML = `${formattedSaldo} <span style="font-size: 0.7rem; font-weight: 500; display: block; color: var(--text-muted);">(Rec: +R$ ${totalReceitas.toLocaleString('pt-BR', { minimumFractionDigits: 2 })} | Desp: -R$ ${totalDespesas.toLocaleString('pt-BR', { minimumFractionDigits: 2 })})</span>`;
+                        sumEl.style.color = saldo >= 0 ? 'var(--success)' : 'var(--danger)';
+                    }
+                    if (floatSum) {
+                        floatSum.innerText = formattedSaldo;
+                        floatSum.style.color = saldo >= 0 ? '#4ade80' : '#f87171';
+                    }
+                    if (floatSub) {
+                        floatSub.style.display = 'inline';
+                        floatSub.innerText = `(+R$ ${totalReceitas.toLocaleString('pt-BR', { minimumFractionDigits: 2 })} / -R$ ${totalDespesas.toLocaleString('pt-BR', { minimumFractionDigits: 2 })})`;
+                    }
+                }
+            }
+        }
+
+        function clearSelectedTransactions() {
+            const tbody = document.querySelector('#transactionsTable tbody');
+            if (!tbody) return;
+            tbody.querySelectorAll('tr.selected-audit').forEach(row => row.classList.remove('selected-audit'));
+            updateSelectedTransactionsStorage(tbody);
+            updateSelectedTransactionsSummary(tbody);
         }
 
         // Desativar restauração de scroll automática do navegador para termos controle total
@@ -1745,6 +2001,7 @@
                         if (row && row.parentElement.tagName.toLowerCase() === 'tbody') {
                             row.classList.toggle('selected-audit');
                             updateSelectedTransactionsStorage(tbody);
+                            updateSelectedTransactionsSummary(tbody);
                         }
                     });
 
@@ -1758,5 +2015,19 @@
             }
         });
     </script>
+
+    <!-- Barra flutuante de rodapé para soma dos lançamentos selecionados -->
+    <div id="floatingSelectionFooter" class="floating-selection-footer" style="display: none;">
+        <div class="floating-footer-content">
+            <div class="floating-footer-info">
+                <span class="floating-footer-badge" id="floatingSelectedCount">0 selecionados</span>
+                <span class="floating-footer-sum" id="floatingSelectedSum">R$ 0,00</span>
+                <span class="floating-footer-sub" id="floatingSelectedSub" style="display: none;"></span>
+            </div>
+            <button type="button" onclick="clearSelectedTransactions()" class="floating-footer-btn" title="Desmarcar todos os lançamentos">
+                Desmarcar
+            </button>
+        </div>
+    </div>
 </body>
 </html>

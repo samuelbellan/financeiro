@@ -13,6 +13,7 @@ use App\Http\Controllers\SalaryController;
 use App\Http\Controllers\FiscalConcursosController;
 use App\Http\Controllers\MercadoController;
 use App\Http\Controllers\TreinosController;
+use App\Http\Controllers\DatabaseSyncController;
 
 Route::get('/', function () {
     if (auth()->check()) {
@@ -31,6 +32,10 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 Route::middleware('auth')->group(function () {
     Route::get('/home', [HomeController::class, 'index'])->name('home');
+
+    // Sincronização Nuvem Neon
+    Route::get('/sync/status', [DatabaseSyncController::class, 'status'])->name('sync.status');
+    Route::post('/sync/run', [DatabaseSyncController::class, 'sync'])->name('sync.run');
     
     // Finanças de Casa & Supermercado
     Route::get('/financas', [FinancasController::class, 'index'])->name('financas.index');
@@ -38,6 +43,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/financas/mercado/upload', [MercadoController::class, 'upload'])->name('financas.mercado.upload');
     Route::delete('/financas/mercado/notas/{notaFiscal}', [MercadoController::class, 'destroy'])->name('financas.mercado.notas.destroy');
     Route::delete('/financas/mercado/itens/{item}', [MercadoController::class, 'destroyItem'])->name('financas.mercado.itens.destroy');
+    Route::get('/financas/sugestoes-descricao', [FinancasController::class, 'sugestoesDescricao'])->name('financas.sugestoes-descricao');
     Route::post('/financas', [FinancasController::class, 'store'])->name('financas.store');
     Route::post('/financas/previsoes', [FinancasController::class, 'storePrevisao'])->name('financas.previsoes.store');
     Route::put('/financas/previsoes/{previsao}', [FinancasController::class, 'updatePrevisao'])->name('financas.previsoes.update');
