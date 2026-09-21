@@ -259,4 +259,128 @@ class WorkoutModuleTest extends TestCase
         $response->assertSee('Treinos & Exercícios Físicos', false);
         $response->assertSee('Sessões nesta Semana', false);
     }
+
+    public function test_user_can_generate_default_abc_plans_via_http()
+    {
+        $response = $this->actingAs($this->user)->postJson(route('treinos.plans.generate-default'));
+        $response->assertStatus(200);
+        $response->assertJson(['success' => true]);
+
+        $this->assertDatabaseHas('workout_plans', [
+            'user_id' => $this->user->id,
+            'identificador_letra' => 'A',
+            'nome' => 'Treino A - Peitoral, Deltoides & Tríceps',
+        ]);
+        $this->assertDatabaseHas('workout_plans', [
+            'user_id' => $this->user->id,
+            'identificador_letra' => 'B',
+            'nome' => 'Treino B - Dorsais, Bíceps & Trapézio',
+        ]);
+        $this->assertDatabaseHas('workout_plans', [
+            'user_id' => $this->user->id,
+            'identificador_letra' => 'C',
+            'nome' => 'Treino C - Pernas Completas & Abdômen',
+        ]);
+    }
+
+    public function test_user_can_create_and_delete_workout_plan_via_http()
+    {
+        $supino = Exercise::where('nome', 'Supino Reto com Barra')->first();
+
+        $response = $this->actingAs($this->user)->postJson(route('treinos.plans.store'), [
+            'nome' => 'Treino Full Body Custom',
+            'identificador_letra' => 'F',
+            'modalidade' => 'musculacao',
+            'frequencia_semanal_sugerida' => 3,
+            'exercise_ids' => [$supino->id],
+        ]);
+
+        $response->assertStatus(200);
+        $response->assertJson(['success' => true]);
+
+        $plan = WorkoutPlan::where('user_id', $this->user->id)->where('identificador_letra', 'F')->first();
+        $this->assertNotNull($plan);
+        $this->assertCount(1, $plan->items);
+
+        // Delete plan
+        $delResponse = $this->actingAs($this->user)->deleteJson(route('treinos.plans.destroy', $plan->id));
+        $delResponse->assertStatus(200);
+        $this->assertDatabaseMissing('workout_plans', ['id' => $plan->id]);
+    }
+
+    public function test_user_can_create_and_delete_gear_via_http()
+    {
+        $response = $this->actingAs($this->user)->postJson(route('treinos.gears.store'), [
+            'marca' => 'Nike',
+            'modelo' => 'Vaporfly 3',
+            'tipo' => 'tenis_prova',
+            'quilometragem_inicial_km' => 15.0,
+            'vida_util_limite_km' => 500,
+            'data_aquisicao' => now()->toDateString(),
+        ]);
+
+        $response->assertStatus(200);
+        $response->assertJson(['success' => true]);
+
+        $gear = GearItem::where('user_id', $this->user->id)->where('modelo', 'Vaporfly 3')->first();
+        $this->assertNotNull($gear);
+
+        // Delete gear
+        $delResponse = $this->actingAs($this->user)->deleteJson(route('treinos.gears.destroy', $gear->id));
+        $delResponse->assertStatus(200);
+        $this->assertDatabaseMissing('gear_items', ['id' => $gear->id]);
+    }
+
+    public function test_user_can_create_and_delete_personal_record_via_http()
+    {
+        $supino = Exercise::where('nome', 'Supino Reto com Barra')->first();
+
+        $response = $this->actingAs($this->user)->postJson(route('treinos.prs.store'), [
+            'modalidade' => 'musculacao',
+            'exercise_id' => $supino->id,
+            'tipo_recorde' => 'carga_maxima_1rm',
+            'valor_numerico' => 110,
+            'valor_formatado' => '110 kg',
+            'data_recorde' => now()->toDateString(),
+            'notas' => 'Recorde pessoal batido com pausa de 1s',
+        ]);
+
+        $response->assertStatus(200);
+        $response->assertJson(['success' => true]);
+
+        $pr = ExercisePersonalRecord::where('user_id', $this->user->id)->first();
+        $this->assertNotNull($pr);
+        $this->assertEquals('110 kg', $pr->valor_formatado);
+
+        // Delete PR
+        $delResponse = $this->actingAs($this->user)->deleteJson(route('treinos.prs.destroy', $pr->id));
+        $delResponse->assertStatus(200);
+        $this->assertDatabaseMissing('exercise_personal_records', ['id' => $pr->id]);
+    }
+
+    public function test_user_can_create_and_delete_workout_session_via_http()
+    {
+        $response = $this->actingAs($this->user)->postJson(route('treinos.sessions.store'), [
+            'nome_sessao' => 'Corrida Matinal 6k',
+            'modalidade' => 'corrida',
+            'data_hora_inicio' => now()->toIso8601String(),
+            'duracao_minutos' => 32,
+            'esforco_percebido_rpe' => 7,
+            'distancia_km' => 6.0,
+            'observacoes' => 'Ritmo constante e controlado',
+        ]);
+
+        $response->assertStatus(200);
+        $response->assertJson(['success' => true]);
+
+        $session = WorkoutSession::where('user_id', $this->user->id)->where('nome_sessao', 'Corrida Matinal 6k')->first();
+        $this->assertNotNull($session);
+        $this->assertNotNull($session->runningLog);
+        $this->assertEquals(6.0, (float)$session->runningLog->distancia_km);
+
+        // Delete session
+        $delResponse = $this->actingAs($this->user)->deleteJson(route('treinos.sessions.destroy', $session->id));
+        $delResponse->assertStatus(200);
+        $this->assertDatabaseMissing('workout_sessions', ['id' => $session->id]);
+    }
 }

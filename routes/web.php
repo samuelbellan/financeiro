@@ -117,7 +117,36 @@ Route::middleware('auth')->group(function () {
     Route::post('/concursos-fiscais/test-telegram', [FiscalConcursosController::class, 'testTelegram'])->name('fiscal.test-telegram');
     Route::post('/concursos-fiscais/telegram-config', [FiscalConcursosController::class, 'saveTelegramConfig'])->name('fiscal.telegram-config');
 
-    // Sistema 10 - Treinos & Exercícios Físicos
+    // Sistema 10 - Treinos & Exercícios Físicos & BodyTracker
     Route::get('/treinos', [TreinosController::class, 'index'])->name('treinos.index');
+    Route::post('/treinos/plans', [TreinosController::class, 'storePlan'])->name('treinos.plans.store');
+    Route::delete('/treinos/plans/{id}', [TreinosController::class, 'destroyPlan'])->name('treinos.plans.destroy');
+    Route::post('/treinos/plans/generate-default', [TreinosController::class, 'generateDefaultPlans'])->name('treinos.plans.generate-default');
+
+    Route::post('/treinos/gears', [TreinosController::class, 'storeGear'])->name('treinos.gears.store');
+    Route::delete('/treinos/gears/{id}', [TreinosController::class, 'destroyGear'])->name('treinos.gears.destroy');
+
+    Route::post('/treinos/prs', [TreinosController::class, 'storePr'])->name('treinos.prs.store');
+    Route::delete('/treinos/prs/{id}', [TreinosController::class, 'destroyPr'])->name('treinos.prs.destroy');
+
+    Route::post('/treinos/sessions', [TreinosController::class, 'storeSession'])->name('treinos.sessions.store');
+    Route::delete('/treinos/sessions/{id}', [TreinosController::class, 'destroySession'])->name('treinos.sessions.destroy');
+
+    Route::get('/tracker/photos/{id}', [\App\Http\Controllers\BodyTrackerController::class, 'showPhotoFile'])->name('tracker.photo.show');
+
+    // Endpoints REST do BodyTracker (documentação técnica)
+    Route::prefix('api/tracker')->group(function () {
+        Route::post('/daily-log', [\App\Http\Controllers\BodyTrackerController::class, 'saveDailyLog'])->name('api.tracker.daily-log.save');
+        Route::get('/daily-log/today', [\App\Http\Controllers\BodyTrackerController::class, 'todayDailyLog'])->name('api.tracker.daily-log.today');
+        Route::get('/daily-log', [\App\Http\Controllers\BodyTrackerController::class, 'getDailyLogs'])->name('api.tracker.daily-log.index');
+
+        Route::post('/measurements', [\App\Http\Controllers\BodyTrackerController::class, 'saveMeasurement'])->name('api.tracker.measurements.save');
+        Route::get('/measurements/latest', [\App\Http\Controllers\BodyTrackerController::class, 'latestMeasurement'])->name('api.tracker.measurements.latest');
+        Route::get('/measurements/summary-deltas', [\App\Http\Controllers\BodyTrackerController::class, 'summaryDeltas'])->name('api.tracker.measurements.summary-deltas');
+
+        Route::post('/photos', [\App\Http\Controllers\BodyTrackerController::class, 'uploadPhoto'])->name('api.tracker.photos.upload');
+        Route::get('/photos', [\App\Http\Controllers\BodyTrackerController::class, 'getPhotos'])->name('api.tracker.photos.index');
+        Route::delete('/photos/{id}', [\App\Http\Controllers\BodyTrackerController::class, 'deletePhoto'])->name('api.tracker.photos.delete');
+    });
 });
 
