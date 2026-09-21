@@ -132,12 +132,19 @@ Route::middleware('auth')->group(function () {
     Route::post('/treinos/sessions', [TreinosController::class, 'storeSession'])->name('treinos.sessions.store');
     Route::delete('/treinos/sessions/{id}', [TreinosController::class, 'destroySession'])->name('treinos.sessions.destroy');
 
+    // Módulo Coach IA Gemini (Almoço/Refeição Livre, Treino Extra, Revisão Diária)
+    Route::post('/treinos/ai/analyze-meal', [TreinosController::class, 'analyzeMeal'])->name('treinos.ai.analyze-meal');
+    Route::post('/treinos/ai/analyze-workout', [TreinosController::class, 'analyzeWorkout'])->name('treinos.ai.analyze-workout');
+    Route::post('/treinos/ai/daily-review', [TreinosController::class, 'dailyReview'])->name('treinos.ai.daily-review');
+    Route::post('/treinos/ai/apply-suggestion', [TreinosController::class, 'applyAiSuggestion'])->name('treinos.ai.apply-suggestion');
+
     Route::get('/tracker/photos/{id}', [\App\Http\Controllers\BodyTrackerController::class, 'showPhotoFile'])->name('tracker.photo.show');
 
     // Endpoints REST do BodyTracker (documentação técnica)
     Route::prefix('api/tracker')->group(function () {
         Route::post('/daily-log', [\App\Http\Controllers\BodyTrackerController::class, 'saveDailyLog'])->name('api.tracker.daily-log.save');
         Route::get('/daily-log/today', [\App\Http\Controllers\BodyTrackerController::class, 'todayDailyLog'])->name('api.tracker.daily-log.today');
+        Route::get('/daily-log/by-date', [\App\Http\Controllers\BodyTrackerController::class, 'getDailyLogByDate'])->name('api.tracker.daily-log.by-date');
         Route::get('/daily-log', [\App\Http\Controllers\BodyTrackerController::class, 'getDailyLogs'])->name('api.tracker.daily-log.index');
 
         Route::post('/measurements', [\App\Http\Controllers\BodyTrackerController::class, 'saveMeasurement'])->name('api.tracker.measurements.save');

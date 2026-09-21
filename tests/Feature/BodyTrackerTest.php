@@ -188,8 +188,82 @@ class BodyTrackerTest extends TestCase
         $response->assertStatus(200);
         $response->assertSee('Treinos & Recomposição Corporal', false);
         $response->assertSee('Registro Diário de Hábitos & Dieta', false);
+        $response->assertSee('Mapa de Consistência & Adesão aos Dados', false);
+        $response->assertSee('daily-log-picker', false);
+        $response->assertSee('heatmap-grid-container', false);
         $response->assertSee('Manequim & Antropometria', false);
         $response->assertSee('Fotos de Evolução & Comparador', false);
         $response->assertSee('body-mapper-svg', false);
+    }
+
+    public function test_can_get_daily_log_by_specific_date()
+    {
+        $pastDate = '2026-09-15';
+
+        // 1. Data sem registro deve retornar exists: false e defaults
+        $responseEmpty = $this->actingAs($this->user)->getJson(route('api.tracker.daily-log.by-date', ['date' => $pastDate]));
+        $responseEmpty->assertStatus(200);
+        $responseEmpty->assertJson([
+            'exists' => false,
+            'data' => [
+                'date' => $pastDate,
+                'water_volume_ml' => 0,
+            ],
+        ]);
+
+        // 2. Cria registro para a data passada
+        $saveResponse = $this->actingAs($this->user)->postJson(route('api.tracker.daily-log.save'), [
+            'date' => $pastDate,
+            'workout_done' => true,
+            'workout_type' => 'STREET_RUN',
+            'workout_duration_min' => 45,
+            'breakfast_clean' => true,
+            'lunch_clean' => true,
+            'snack_done' => true,
+            'dinner_clean' => true,
+            'water_volume_ml' => 3000,
+            'notes' => 'Treino retroativo registrado com sucesso.',
+        ]);
+        $saveResponse->assertStatus(200);
+        $saveResponse->assertJson([
+            'success' => true,
+            'adherence_score' => 100,
+        ]);
+
+        // 3. Consulta novamente a data passada
+        $responseFilled = $this->actingAs($this->user)->getJson(route('api.tracker.daily-log.by-date', ['date' => $pastDate]));
+        $responseFilled->assertStatus(200);
+        $responseFilled->assertJson([
+            'exists' => true,
+            'data' => [
+                'date' => $pastDate,
+                'workout_done' => true,
+                'workout_type' => 'STREET_RUN',
+                'workout_duration_min' => 45,
+                'water_volume_ml' => 3000,
+            ],
+            'adherence_score' => 100,
+            'water_progress_percent' => 100,
+        ]);
+    }
+
+    public function test_daily_log_appends_adherence_score_in_json_and_array()
+    {
+        $log = DailyLog::create([
+            'user_id' => $this->user->id,
+            'date' => '2026-09-10',
+            'workout_done' => true,
+            'breakfast_clean' => true,
+            'lunch_clean' => true,
+            'snack_done' => false,
+            'dinner_clean' => false,
+            'water_volume_ml' => 1500,
+        ]);
+
+        $array = $log->toArray();
+        $this->assertArrayHasKey('adherence_score', $array);
+        $this->assertArrayHasKey('water_progress_percent', $array);
+        $this->assertEquals(60, $array['adherence_score']); // 3 de 5 hábitos = 60%
+        $this->assertEquals(50, $array['water_progress_percent']); // 1500/3000 = 50%
     }
 }

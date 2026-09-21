@@ -706,17 +706,17 @@
       "norm_label": "exercise"
     },
     {
-      "label": "WorkoutGoal",
+      "label": "WorkoutPlanItem",
       "file_type": "code",
-      "source_file": "app/Models/WorkoutGoal.php",
+      "source_file": "app/Models/WorkoutPlanItem.php",
       "source_location": "L8",
       "_callable": true,
       "_callable_class": true,
       "_origin": "ast",
-      "id": "app_models_workoutgoal_workoutgoal",
+      "id": "app_models_workoutplanitem_workoutplanitem",
       "community": 44,
       "community_name": "Exercise",
-      "norm_label": "workoutgoal"
+      "norm_label": "workoutplanitem"
     },
     {
       "label": "ExerciseCatalogSeeder",
@@ -886,6 +886,19 @@
       "community": 55,
       "community_name": ".index",
       "norm_label": "userbodymetric"
+    },
+    {
+      "label": "WorkoutGoal",
+      "file_type": "code",
+      "source_file": "app/Models/WorkoutGoal.php",
+      "source_location": "L8",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "id": "app_models_workoutgoal_workoutgoal",
+      "community": 55,
+      "community_name": ".index",
+      "norm_label": "workoutgoal"
     },
     {
       "label": "Subcategoria",
@@ -1120,19 +1133,6 @@
       "community": 86,
       "community_name": "WorkoutPlan",
       "norm_label": "workoutplan"
-    },
-    {
-      "label": "WorkoutPlanItem",
-      "file_type": "code",
-      "source_file": "app/Models/WorkoutPlanItem.php",
-      "source_location": "L8",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "id": "app_models_workoutplanitem_workoutplanitem",
-      "community": 86,
-      "community_name": "WorkoutPlan",
-      "norm_label": "workoutplanitem"
     },
     {
       "label": "Cartao",
@@ -2681,7 +2681,7 @@
       "label": ".getWaterProgressPercentAttribute()",
       "file_type": "code",
       "source_file": "app/Models/DailyLog.php",
-      "source_location": "L70",
+      "source_location": "L71",
       "_callable": true,
       "_origin": "ast",
       "id": "app_models_dailylog_dailylog_getwaterprogresspercentattribute",
@@ -2981,7 +2981,7 @@
       "label": ".callGemini()",
       "file_type": "code",
       "source_file": "app/Services/FitnessAiService.php",
-      "source_location": "L169",
+      "source_location": "L170",
       "_callable": true,
       "_origin": "ast",
       "id": "app_services_fitnessaiservice_fitnessaiservice_callgemini",
@@ -2993,7 +2993,7 @@
       "label": ".cleanJsonString()",
       "file_type": "code",
       "source_file": "app/Services/FitnessAiService.php",
-      "source_location": "L225",
+      "source_location": "L226",
       "_callable": true,
       "_origin": "ast",
       "id": "app_services_fitnessaiservice_fitnessaiservice_cleanjsonstring",
@@ -3029,7 +3029,7 @@
       "label": ".fallbackExtraWorkout()",
       "file_type": "code",
       "source_file": "app/Services/FitnessAiService.php",
-      "source_location": "L260",
+      "source_location": "L261",
       "_callable": true,
       "_origin": "ast",
       "id": "app_services_fitnessaiservice_fitnessaiservice_fallbackextraworkout",
@@ -3041,7 +3041,7 @@
       "label": ".fallbackMealDeviation()",
       "file_type": "code",
       "source_file": "app/Services/FitnessAiService.php",
-      "source_location": "L242",
+      "source_location": "L243",
       "_callable": true,
       "_origin": "ast",
       "id": "app_services_fitnessaiservice_fitnessaiservice_fallbackmealdeviation",
@@ -3244,30 +3244,6 @@
     {
       "label": "down()",
       "file_type": "code",
-      "source_file": "database/migrations/2026_04_24_184002_create_cartao_parcelas_table.php",
-      "source_location": "L28",
-      "_callable": true,
-      "_origin": "ast",
-      "id": "database_migrations_2026_04_24_184002_create_cartao_parcelas_table_down",
-      "community": 19,
-      "community_name": "Illuminate\\Database\\Schema\\Blueprint",
-      "norm_label": "down()"
-    },
-    {
-      "label": "up()",
-      "file_type": "code",
-      "source_file": "database/migrations/2026_04_24_184002_create_cartao_parcelas_table.php",
-      "source_location": "L12",
-      "_callable": true,
-      "_origin": "ast",
-      "id": "database_migrations_2026_04_24_184002_create_cartao_parcelas_table_up",
-      "community": 19,
-      "community_name": "Illuminate\\Database\\Schema\\Blueprint",
-      "norm_label": "up()"
-    },
-    {
-      "label": "down()",
-      "file_type": "code",
       "source_file": "database/migrations/2026_05_02_133147_alter_valor_total_to_decimal_in_cartao_compras_table.php",
       "source_location": "L22",
       "_callable": true,
@@ -3285,6 +3261,30 @@
       "_callable": true,
       "_origin": "ast",
       "id": "database_migrations_2026_05_02_133147_alter_valor_total_to_decimal_in_cartao_compras_table_up",
+      "community": 19,
+      "community_name": "Illuminate\\Database\\Schema\\Blueprint",
+      "norm_label": "up()"
+    },
+    {
+      "label": "down()",
+      "file_type": "code",
+      "source_file": "database/migrations/2026_08_08_000000_make_study_goals_and_logs_flexible.php",
+      "source_location": "L26",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "database_migrations_2026_08_08_000000_make_study_goals_and_logs_flexible_down",
+      "community": 19,
+      "community_name": "Illuminate\\Database\\Schema\\Blueprint",
+      "norm_label": "down()"
+    },
+    {
+      "label": "up()",
+      "file_type": "code",
+      "source_file": "database/migrations/2026_08_08_000000_make_study_goals_and_logs_flexible.php",
+      "source_location": "L12",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "database_migrations_2026_08_08_000000_make_study_goals_and_logs_flexible_up",
       "community": 19,
       "community_name": "Illuminate\\Database\\Schema\\Blueprint",
       "norm_label": "up()"
@@ -4036,25 +4036,25 @@
     {
       "label": "down()",
       "file_type": "code",
-      "source_file": "database/migrations/2026_04_24_184000_create_cartaos_table.php",
+      "source_file": "database/migrations/2026_04_24_183542_create_transacaos_table.php",
       "source_location": "L29",
       "_callable": true,
       "_origin": "ast",
-      "id": "database_migrations_2026_04_24_184000_create_cartaos_table_down",
+      "id": "database_migrations_2026_04_24_183542_create_transacaos_table_down",
       "community": 3,
-      "community_name": "2026_04_24_184000_create_cartaos_table.php",
+      "community_name": "2026_04_24_183542_create_transacaos_table.php",
       "norm_label": "down()"
     },
     {
       "label": "up()",
       "file_type": "code",
-      "source_file": "database/migrations/2026_04_24_184000_create_cartaos_table.php",
+      "source_file": "database/migrations/2026_04_24_183542_create_transacaos_table.php",
       "source_location": "L12",
       "_callable": true,
       "_origin": "ast",
-      "id": "database_migrations_2026_04_24_184000_create_cartaos_table_up",
+      "id": "database_migrations_2026_04_24_183542_create_transacaos_table_up",
       "community": 3,
-      "community_name": "2026_04_24_184000_create_cartaos_table.php",
+      "community_name": "2026_04_24_183542_create_transacaos_table.php",
       "norm_label": "up()"
     },
     {
@@ -4862,28 +4862,28 @@
       "norm_label": ".user()"
     },
     {
-      "label": ".scopeAtivo()",
+      "label": ".exercise()",
       "file_type": "code",
-      "source_file": "app/Models/WorkoutGoal.php",
-      "source_location": "L34",
+      "source_file": "app/Models/WorkoutPlanItem.php",
+      "source_location": "L45",
       "_callable": true,
       "_origin": "ast",
-      "id": "app_models_workoutgoal_workoutgoal_scopeativo",
+      "id": "app_models_workoutplanitem_workoutplanitem_exercise",
       "community": 44,
       "community_name": "Exercise",
-      "norm_label": ".scopeativo()"
+      "norm_label": ".exercise()"
     },
     {
-      "label": ".user()",
+      "label": ".plan()",
       "file_type": "code",
-      "source_file": "app/Models/WorkoutGoal.php",
-      "source_location": "L29",
+      "source_file": "app/Models/WorkoutPlanItem.php",
+      "source_location": "L40",
       "_callable": true,
       "_origin": "ast",
-      "id": "app_models_workoutgoal_workoutgoal_user",
+      "id": "app_models_workoutplanitem_workoutplanitem_plan",
       "community": 44,
       "community_name": "Exercise",
-      "norm_label": ".user()"
+      "norm_label": ".plan()"
     },
     {
       "label": ".run()",
@@ -4922,6 +4922,18 @@
       "norm_label": ".test_authenticated_user_can_access_treinos_dashboard()"
     },
     {
+      "label": ".test_can_create_workout_plan_with_items()",
+      "file_type": "code",
+      "source_file": "tests/Feature/WorkoutModuleTest.php",
+      "source_location": "L53",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "tests_feature_workoutmoduletest_workoutmoduletest_test_can_create_workout_plan_with_items",
+      "community": 44,
+      "community_name": "Exercise",
+      "norm_label": ".test_can_create_workout_plan_with_items()"
+    },
+    {
       "label": ".test_exercise_catalog_is_seeded_and_categorized()",
       "file_type": "code",
       "source_file": "tests/Feature/WorkoutModuleTest.php",
@@ -4932,18 +4944,6 @@
       "community": 44,
       "community_name": "Exercise",
       "norm_label": ".test_exercise_catalog_is_seeded_and_categorized()"
-    },
-    {
-      "label": ".test_exercise_personal_records_and_workout_goals()",
-      "file_type": "code",
-      "source_file": "tests/Feature/WorkoutModuleTest.php",
-      "source_location": "L219",
-      "_callable": true,
-      "_origin": "ast",
-      "id": "tests_feature_workoutmoduletest_workoutmoduletest_test_exercise_personal_records_and_workout_goals",
-      "community": 44,
-      "community_name": "Exercise",
-      "norm_label": ".test_exercise_personal_records_and_workout_goals()"
     },
     {
       "label": ".test_treinos_route_requires_authentication()",
@@ -5664,6 +5664,42 @@
       "community": 55,
       "community_name": ".index",
       "norm_label": ".user()"
+    },
+    {
+      "label": ".scopeAtivo()",
+      "file_type": "code",
+      "source_file": "app/Models/WorkoutGoal.php",
+      "source_location": "L34",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "app_models_workoutgoal_workoutgoal_scopeativo",
+      "community": 55,
+      "community_name": ".index",
+      "norm_label": ".scopeativo()"
+    },
+    {
+      "label": ".user()",
+      "file_type": "code",
+      "source_file": "app/Models/WorkoutGoal.php",
+      "source_location": "L29",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "app_models_workoutgoal_workoutgoal_user",
+      "community": 55,
+      "community_name": ".index",
+      "norm_label": ".user()"
+    },
+    {
+      "label": ".test_exercise_personal_records_and_workout_goals()",
+      "file_type": "code",
+      "source_file": "tests/Feature/WorkoutModuleTest.php",
+      "source_location": "L219",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "tests_feature_workoutmoduletest_workoutmoduletest_test_exercise_personal_records_and_workout_goals",
+      "community": 55,
+      "community_name": ".index",
+      "norm_label": ".test_exercise_personal_records_and_workout_goals()"
     },
     {
       "label": ".test_user_body_metrics_calculates_imc_and_fat_mass()",
@@ -6592,6 +6628,30 @@
     {
       "label": "down()",
       "file_type": "code",
+      "source_file": "database/migrations/2026_04_24_184002_create_cartao_parcelas_table.php",
+      "source_location": "L28",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "database_migrations_2026_04_24_184002_create_cartao_parcelas_table_down",
+      "community": 83,
+      "community_name": "Illuminate\\Support\\Facades\\Schema",
+      "norm_label": "down()"
+    },
+    {
+      "label": "up()",
+      "file_type": "code",
+      "source_file": "database/migrations/2026_04_24_184002_create_cartao_parcelas_table.php",
+      "source_location": "L12",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "database_migrations_2026_04_24_184002_create_cartao_parcelas_table_up",
+      "community": 83,
+      "community_name": "Illuminate\\Support\\Facades\\Schema",
+      "norm_label": "up()"
+    },
+    {
+      "label": "down()",
+      "file_type": "code",
       "source_file": "database/migrations/2026_04_24_190322_add_tipo_to_transacao_previsoes_table.php",
       "source_location": "L22",
       "_callable": true,
@@ -6609,30 +6669,6 @@
       "_callable": true,
       "_origin": "ast",
       "id": "database_migrations_2026_04_24_190322_add_tipo_to_transacao_previsoes_table_up",
-      "community": 83,
-      "community_name": "Illuminate\\Support\\Facades\\Schema",
-      "norm_label": "up()"
-    },
-    {
-      "label": "down()",
-      "file_type": "code",
-      "source_file": "database/migrations/2026_08_26_000001_add_vigencia_fields_to_fiscal_concursos_table.php",
-      "source_location": "L25",
-      "_callable": true,
-      "_origin": "ast",
-      "id": "database_migrations_2026_08_26_000001_add_vigencia_fields_to_fiscal_concursos_table_down",
-      "community": 83,
-      "community_name": "Illuminate\\Support\\Facades\\Schema",
-      "norm_label": "down()"
-    },
-    {
-      "label": "up()",
-      "file_type": "code",
-      "source_file": "database/migrations/2026_08_26_000001_add_vigencia_fields_to_fiscal_concursos_table.php",
-      "source_location": "L12",
-      "_callable": true,
-      "_origin": "ast",
-      "id": "database_migrations_2026_08_26_000001_add_vigencia_fields_to_fiscal_concursos_table_up",
       "community": 83,
       "community_name": "Illuminate\\Support\\Facades\\Schema",
       "norm_label": "up()"
@@ -6664,11 +6700,11 @@
     {
       "label": "down()",
       "file_type": "code",
-      "source_file": "database/migrations/2026_04_24_183542_create_transacaos_table.php",
+      "source_file": "database/migrations/2026_04_24_184000_create_cartaos_table.php",
       "source_location": "L29",
       "_callable": true,
       "_origin": "ast",
-      "id": "database_migrations_2026_04_24_183542_create_transacaos_table_down",
+      "id": "database_migrations_2026_04_24_184000_create_cartaos_table_down",
       "community": 85,
       "community_name": "Illuminate\\Database\\Migrations\\Migration",
       "norm_label": "down()"
@@ -6676,35 +6712,11 @@
     {
       "label": "up()",
       "file_type": "code",
-      "source_file": "database/migrations/2026_04_24_183542_create_transacaos_table.php",
+      "source_file": "database/migrations/2026_04_24_184000_create_cartaos_table.php",
       "source_location": "L12",
       "_callable": true,
       "_origin": "ast",
-      "id": "database_migrations_2026_04_24_183542_create_transacaos_table_up",
-      "community": 85,
-      "community_name": "Illuminate\\Database\\Migrations\\Migration",
-      "norm_label": "up()"
-    },
-    {
-      "label": "down()",
-      "file_type": "code",
-      "source_file": "database/migrations/2026_08_08_000000_make_study_goals_and_logs_flexible.php",
-      "source_location": "L26",
-      "_callable": true,
-      "_origin": "ast",
-      "id": "database_migrations_2026_08_08_000000_make_study_goals_and_logs_flexible_down",
-      "community": 85,
-      "community_name": "Illuminate\\Database\\Migrations\\Migration",
-      "norm_label": "down()"
-    },
-    {
-      "label": "up()",
-      "file_type": "code",
-      "source_file": "database/migrations/2026_08_08_000000_make_study_goals_and_logs_flexible.php",
-      "source_location": "L12",
-      "_callable": true,
-      "_origin": "ast",
-      "id": "database_migrations_2026_08_08_000000_make_study_goals_and_logs_flexible_up",
+      "id": "database_migrations_2026_04_24_184000_create_cartaos_table_up",
       "community": 85,
       "community_name": "Illuminate\\Database\\Migrations\\Migration",
       "norm_label": "up()"
@@ -6729,6 +6741,30 @@
       "_callable": true,
       "_origin": "ast",
       "id": "database_migrations_2026_08_25_000001_create_fiscal_concursos_table_up",
+      "community": 85,
+      "community_name": "Illuminate\\Database\\Migrations\\Migration",
+      "norm_label": "up()"
+    },
+    {
+      "label": "down()",
+      "file_type": "code",
+      "source_file": "database/migrations/2026_08_26_000001_add_vigencia_fields_to_fiscal_concursos_table.php",
+      "source_location": "L25",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "database_migrations_2026_08_26_000001_add_vigencia_fields_to_fiscal_concursos_table_down",
+      "community": 85,
+      "community_name": "Illuminate\\Database\\Migrations\\Migration",
+      "norm_label": "down()"
+    },
+    {
+      "label": "up()",
+      "file_type": "code",
+      "source_file": "database/migrations/2026_08_26_000001_add_vigencia_fields_to_fiscal_concursos_table.php",
+      "source_location": "L12",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "database_migrations_2026_08_26_000001_add_vigencia_fields_to_fiscal_concursos_table_up",
       "community": 85,
       "community_name": "Illuminate\\Database\\Migrations\\Migration",
       "norm_label": "up()"
@@ -6816,42 +6852,6 @@
       "community": 86,
       "community_name": "WorkoutPlan",
       "norm_label": ".user()"
-    },
-    {
-      "label": ".exercise()",
-      "file_type": "code",
-      "source_file": "app/Models/WorkoutPlanItem.php",
-      "source_location": "L45",
-      "_callable": true,
-      "_origin": "ast",
-      "id": "app_models_workoutplanitem_workoutplanitem_exercise",
-      "community": 86,
-      "community_name": "WorkoutPlan",
-      "norm_label": ".exercise()"
-    },
-    {
-      "label": ".plan()",
-      "file_type": "code",
-      "source_file": "app/Models/WorkoutPlanItem.php",
-      "source_location": "L40",
-      "_callable": true,
-      "_origin": "ast",
-      "id": "app_models_workoutplanitem_workoutplanitem_plan",
-      "community": 86,
-      "community_name": "WorkoutPlan",
-      "norm_label": ".plan()"
-    },
-    {
-      "label": ".test_can_create_workout_plan_with_items()",
-      "file_type": "code",
-      "source_file": "tests/Feature/WorkoutModuleTest.php",
-      "source_location": "L53",
-      "_callable": true,
-      "_origin": "ast",
-      "id": "tests_feature_workoutmoduletest_workoutmoduletest_test_can_create_workout_plan_with_items",
-      "community": 86,
-      "community_name": "WorkoutPlan",
-      "norm_label": ".test_can_create_workout_plan_with_items()"
     },
     {
       "label": "down()",
@@ -7934,17 +7934,6 @@
       "norm_label": "0001_01_01_000001_create_cache_table.php"
     },
     {
-      "label": "2026_04_24_184002_create_cartao_parcelas_table.php",
-      "file_type": "code",
-      "source_file": "database/migrations/2026_04_24_184002_create_cartao_parcelas_table.php",
-      "source_location": "L1",
-      "_origin": "ast",
-      "id": "database_migrations_2026_04_24_184002_create_cartao_parcelas_table",
-      "community": 19,
-      "community_name": "Illuminate\\Database\\Schema\\Blueprint",
-      "norm_label": "2026_04_24_184002_create_cartao_parcelas_table.php"
-    },
-    {
       "label": "2026_05_02_133147_alter_valor_total_to_decimal_in_cartao_compras_table.php",
       "file_type": "code",
       "source_file": "database/migrations/2026_05_02_133147_alter_valor_total_to_decimal_in_cartao_compras_table.php",
@@ -7954,6 +7943,17 @@
       "community": 19,
       "community_name": "Illuminate\\Database\\Schema\\Blueprint",
       "norm_label": "2026_05_02_133147_alter_valor_total_to_decimal_in_cartao_compras_table.php"
+    },
+    {
+      "label": "2026_08_08_000000_make_study_goals_and_logs_flexible.php",
+      "file_type": "code",
+      "source_file": "database/migrations/2026_08_08_000000_make_study_goals_and_logs_flexible.php",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "database_migrations_2026_08_08_000000_make_study_goals_and_logs_flexible",
+      "community": 19,
+      "community_name": "Illuminate\\Database\\Schema\\Blueprint",
+      "norm_label": "2026_08_08_000000_make_study_goals_and_logs_flexible.php"
     },
     {
       "label": "Illuminate\\Database\\Schema\\Blueprint",
@@ -8550,15 +8550,15 @@
       "norm_label": "workoutsession.php"
     },
     {
-      "label": "2026_04_24_184000_create_cartaos_table.php",
+      "label": "2026_04_24_183542_create_transacaos_table.php",
       "file_type": "code",
-      "source_file": "database/migrations/2026_04_24_184000_create_cartaos_table.php",
+      "source_file": "database/migrations/2026_04_24_183542_create_transacaos_table.php",
       "source_location": "L1",
       "_origin": "ast",
-      "id": "database_migrations_2026_04_24_184000_create_cartaos_table",
+      "id": "database_migrations_2026_04_24_183542_create_transacaos_table",
       "community": 3,
-      "community_name": "2026_04_24_184000_create_cartaos_table.php",
-      "norm_label": "2026_04_24_184000_create_cartaos_table.php"
+      "community_name": "2026_04_24_183542_create_transacaos_table.php",
+      "norm_label": "2026_04_24_183542_create_transacaos_table.php"
     },
     {
       "label": "0001_01_01_000002_create_jobs_table.php",
@@ -9485,15 +9485,15 @@
       "norm_label": "exercise.php"
     },
     {
-      "label": "WorkoutGoal.php",
+      "label": "WorkoutPlanItem.php",
       "file_type": "code",
-      "source_file": "app/Models/WorkoutGoal.php",
+      "source_file": "app/Models/WorkoutPlanItem.php",
       "source_location": "L1",
       "_origin": "ast",
-      "id": "app_models_workoutgoal",
+      "id": "app_models_workoutplanitem",
       "community": 44,
       "community_name": "Exercise",
-      "norm_label": "workoutgoal.php"
+      "norm_label": "workoutplanitem.php"
     },
     {
       "label": "WorkoutModuleTest.php",
@@ -9821,6 +9821,17 @@
       "community": 55,
       "community_name": ".index",
       "norm_label": "userbodymetric.php"
+    },
+    {
+      "label": "WorkoutGoal.php",
+      "file_type": "code",
+      "source_file": "app/Models/WorkoutGoal.php",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "app_models_workoutgoal",
+      "community": 55,
+      "community_name": ".index",
+      "norm_label": "workoutgoal.php"
     },
     {
       "label": "config/app.php",
@@ -10747,6 +10758,17 @@
       "norm_label": "2026_04_24_184001_create_cartao_compras_table.php"
     },
     {
+      "label": "2026_04_24_184002_create_cartao_parcelas_table.php",
+      "file_type": "code",
+      "source_file": "database/migrations/2026_04_24_184002_create_cartao_parcelas_table.php",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "database_migrations_2026_04_24_184002_create_cartao_parcelas_table",
+      "community": 83,
+      "community_name": "Illuminate\\Support\\Facades\\Schema",
+      "norm_label": "2026_04_24_184002_create_cartao_parcelas_table.php"
+    },
+    {
       "label": "2026_04_24_190322_add_tipo_to_transacao_previsoes_table.php",
       "file_type": "code",
       "source_file": "database/migrations/2026_04_24_190322_add_tipo_to_transacao_previsoes_table.php",
@@ -10756,17 +10778,6 @@
       "community": 83,
       "community_name": "Illuminate\\Support\\Facades\\Schema",
       "norm_label": "2026_04_24_190322_add_tipo_to_transacao_previsoes_table.php"
-    },
-    {
-      "label": "2026_08_26_000001_add_vigencia_fields_to_fiscal_concursos_table.php",
-      "file_type": "code",
-      "source_file": "database/migrations/2026_08_26_000001_add_vigencia_fields_to_fiscal_concursos_table.php",
-      "source_location": "L1",
-      "_origin": "ast",
-      "id": "database_migrations_2026_08_26_000001_add_vigencia_fields_to_fiscal_concursos_table",
-      "community": 83,
-      "community_name": "Illuminate\\Support\\Facades\\Schema",
-      "norm_label": "2026_08_26_000001_add_vigencia_fields_to_fiscal_concursos_table.php"
     },
     {
       "label": "Illuminate\\Support\\Facades\\Schema",
@@ -10791,26 +10802,15 @@
       "norm_label": "2026_09_04_060000_create_workout_and_fitness_tables.php"
     },
     {
-      "label": "2026_04_24_183542_create_transacaos_table.php",
+      "label": "2026_04_24_184000_create_cartaos_table.php",
       "file_type": "code",
-      "source_file": "database/migrations/2026_04_24_183542_create_transacaos_table.php",
+      "source_file": "database/migrations/2026_04_24_184000_create_cartaos_table.php",
       "source_location": "L1",
       "_origin": "ast",
-      "id": "database_migrations_2026_04_24_183542_create_transacaos_table",
+      "id": "database_migrations_2026_04_24_184000_create_cartaos_table",
       "community": 85,
       "community_name": "Illuminate\\Database\\Migrations\\Migration",
-      "norm_label": "2026_04_24_183542_create_transacaos_table.php"
-    },
-    {
-      "label": "2026_08_08_000000_make_study_goals_and_logs_flexible.php",
-      "file_type": "code",
-      "source_file": "database/migrations/2026_08_08_000000_make_study_goals_and_logs_flexible.php",
-      "source_location": "L1",
-      "_origin": "ast",
-      "id": "database_migrations_2026_08_08_000000_make_study_goals_and_logs_flexible",
-      "community": 85,
-      "community_name": "Illuminate\\Database\\Migrations\\Migration",
-      "norm_label": "2026_08_08_000000_make_study_goals_and_logs_flexible.php"
+      "norm_label": "2026_04_24_184000_create_cartaos_table.php"
     },
     {
       "label": "2026_08_25_000001_create_fiscal_concursos_table.php",
@@ -10822,6 +10822,17 @@
       "community": 85,
       "community_name": "Illuminate\\Database\\Migrations\\Migration",
       "norm_label": "2026_08_25_000001_create_fiscal_concursos_table.php"
+    },
+    {
+      "label": "2026_08_26_000001_add_vigencia_fields_to_fiscal_concursos_table.php",
+      "file_type": "code",
+      "source_file": "database/migrations/2026_08_26_000001_add_vigencia_fields_to_fiscal_concursos_table.php",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "database_migrations_2026_08_26_000001_add_vigencia_fields_to_fiscal_concursos_table",
+      "community": 85,
+      "community_name": "Illuminate\\Database\\Migrations\\Migration",
+      "norm_label": "2026_08_26_000001_add_vigencia_fields_to_fiscal_concursos_table.php"
     },
     {
       "label": "Illuminate\\Database\\Migrations\\Migration",
@@ -10844,17 +10855,6 @@
       "community": 86,
       "community_name": "WorkoutPlan",
       "norm_label": "workoutplan.php"
-    },
-    {
-      "label": "WorkoutPlanItem.php",
-      "file_type": "code",
-      "source_file": "app/Models/WorkoutPlanItem.php",
-      "source_location": "L1",
-      "_origin": "ast",
-      "id": "app_models_workoutplanitem",
-      "community": 86,
-      "community_name": "WorkoutPlan",
-      "norm_label": "workoutplanitem.php"
     },
     {
       "label": "2026_07_18_143223_create_study_goals_table.php",
@@ -13388,7 +13388,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "app/Services/FitnessAiService.php",
-      "source_location": "L204",
+      "source_location": "L205",
       "weight": 1.0,
       "_origin": "ast",
       "source": "app_services_fitnessaiservice_fitnessaiservice_callgemini",
@@ -28666,7 +28666,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "app/Models/DailyLog.php",
-      "source_location": "L70",
+      "source_location": "L71",
       "weight": 1.0,
       "_origin": "ast",
       "source": "app_models_dailylog_dailylog",
@@ -30569,7 +30569,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "app/Services/FitnessAiService.php",
-      "source_location": "L169",
+      "source_location": "L170",
       "weight": 1.0,
       "_origin": "ast",
       "source": "app_services_fitnessaiservice_fitnessaiservice",
@@ -30580,7 +30580,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "app/Services/FitnessAiService.php",
-      "source_location": "L225",
+      "source_location": "L226",
       "weight": 1.0,
       "_origin": "ast",
       "source": "app_services_fitnessaiservice_fitnessaiservice",
@@ -30602,7 +30602,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "app/Services/FitnessAiService.php",
-      "source_location": "L242",
+      "source_location": "L243",
       "weight": 1.0,
       "_origin": "ast",
       "source": "app_services_fitnessaiservice_fitnessaiservice",
@@ -30613,7 +30613,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "app/Services/FitnessAiService.php",
-      "source_location": "L260",
+      "source_location": "L261",
       "weight": 1.0,
       "_origin": "ast",
       "source": "app_services_fitnessaiservice_fitnessaiservice",
@@ -32671,7 +32671,7 @@
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "app/Services/FitnessAiService.php",
-      "source_location": "L187",
+      "source_location": "L188",
       "weight": 1.0,
       "_origin": "ast",
       "source": "app_services_fitnessaiservice_fitnessaiservice_callgemini",

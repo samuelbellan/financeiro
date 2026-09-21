@@ -219,68 +219,487 @@
             margin-top: 0.1rem;
         }
 
-        /* Water Section */
-        .water-card {
-            background: #eff6ff;
-            border: 1px solid #bfdbfe;
-            border-radius: 0.75rem;
-            padding: 1rem;
+        /* Date Navigator Styles */
+        .date-navigator-group {
+            display: inline-flex;
+            align-items: center;
+            background: #f8fafc;
+            border: 1px solid #cbd5e1;
+            border-radius: 0.5rem;
+            padding: 0.15rem;
+            gap: 0.25rem;
         }
 
-        .water-header {
+        .date-nav-btn {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            color: #334155;
+            padding: 0.3rem 0.6rem;
+            font-size: 0.78rem;
+            font-weight: 700;
+            border-radius: 0.35rem;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            user-select: none;
+        }
+
+        .date-nav-btn:hover:not(:disabled) {
+            background: #f1f5f9;
+            color: var(--primary);
+            border-color: #cbd5e1;
+        }
+
+        .date-nav-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            background: #f8fafc;
+        }
+
+        .date-nav-today-btn {
+            background: #eff6ff;
+            color: #2563eb;
+            border-color: #bfdbfe;
+        }
+
+        .date-nav-today-btn:hover {
+            background: #dbeafe;
+            color: #1d4ed8;
+        }
+
+        .date-input-wrapper input[type="date"] {
+            padding: 0.25rem 0.5rem;
+            border: 1px solid #cbd5e1;
+            border-radius: 0.35rem;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #1e293b;
+            background: #ffffff;
+            outline: none;
+            cursor: pointer;
+        }
+
+        .daily-status-badge {
+            font-size: 0.72rem;
+            font-weight: 700;
+            padding: 0.2rem 0.55rem;
+            border-radius: 9999px;
+            background: #fee2e2;
+            color: #991b1b;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+        }
+
+        .daily-status-badge.today {
+            background: #ffedd5;
+            color: #c2410c;
+        }
+
+        .daily-status-badge.completed {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .daily-status-badge.partial {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        /* Heatmap Section Styles - GitHub Contribution Calendar Style */
+        .heatmap-section {
+            background: #ffffff;
+            border: 1px solid #d0d7de;
+            border-radius: 6px;
+            padding: 1rem 1.25rem;
+            margin-bottom: 1.25rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+        }
+
+        .heatmap-top-bar {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 0.5rem;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            margin-bottom: 0.85rem;
         }
 
-        .water-title {
-            font-size: 0.9rem;
+        .heatmap-title-box {
+            display: flex;
+            flex-direction: column;
+            gap: 0.15rem;
+        }
+
+        .heatmap-title {
+            font-size: 0.95rem;
             font-weight: 700;
-            color: #1e40af;
+            color: #1f2328;
             display: flex;
             align-items: center;
             gap: 0.4rem;
         }
 
-        .water-progress-bar {
-            height: 12px;
-            background: #dbeafe;
-            border-radius: 9999px;
-            overflow: hidden;
-            margin-bottom: 0.75rem;
-            position: relative;
+        .heatmap-subtitle {
+            font-size: 0.75rem;
+            color: #656d76;
         }
 
-        .water-progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #3b82f6 0%, #06b6d4 100%);
-            border-radius: 9999px;
-            transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .water-btn-group {
+        .heatmap-stats {
             display: flex;
-            gap: 0.4rem;
+            gap: 0.5rem;
             flex-wrap: wrap;
         }
 
-        .water-btn {
-            background: #ffffff;
-            border: 1px solid #93c5fd;
-            color: #1d4ed8;
-            padding: 0.35rem 0.65rem;
-            border-radius: 0.4rem;
-            font-size: 0.8rem;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.15s ease;
+        .heatmap-stat-chip {
+            background: #f6f8fa;
+            border: 1px solid #d0d7de;
+            padding: 0.2rem 0.6rem;
+            border-radius: 9999px;
+            font-size: 0.72rem;
+            font-weight: 600;
+            color: #24292f;
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
         }
 
-        .water-btn:hover {
-            background: #3b82f6;
+        .heatmap-scroll-area {
+            overflow-x: auto;
+            padding-bottom: 0.35rem;
+        }
+
+        .gh-calendar-wrapper {
+            display: inline-flex;
+            flex-direction: column;
+            gap: 4px;
+            min-width: 780px;
+        }
+
+        .gh-months-row {
+            display: grid;
+            grid-template-columns: repeat(53, 11px);
+            gap: 3px;
+            margin-left: 28px; /* Space matching weekday labels */
+            height: 14px;
+        }
+
+        .gh-month-label {
+            font-size: 10px;
+            color: #656d76;
+            font-weight: 600;
+            line-height: 14px;
+            white-space: nowrap;
+            user-select: none;
+        }
+
+        .gh-grid-body {
+            display: flex;
+            gap: 6px;
+            align-items: flex-start;
+        }
+
+        .gh-weekdays {
+            display: grid;
+            grid-template-rows: repeat(7, 11px);
+            gap: 3px;
+            width: 22px;
+            text-align: right;
+            user-select: none;
+        }
+
+        .gh-weekday-label {
+            font-size: 9px;
+            color: #656d76;
+            font-weight: 500;
+            line-height: 11px;
+            height: 11px;
+        }
+
+        .gh-weeks-grid {
+            display: flex;
+            gap: 3px;
+        }
+
+        .gh-week-col {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+
+        .gh-day-cell {
+            width: 11px;
+            height: 11px;
+            border-radius: 2px;
+            box-sizing: border-box;
+            cursor: pointer;
+            transition: transform 0.08s ease, outline 0.08s ease;
+        }
+
+        .gh-day-cell:hover:not(.future-cell) {
+            outline: 1.5px solid rgba(31, 35, 40, 0.4);
+            transform: scale(1.3);
+            z-index: 10;
+        }
+
+        .gh-day-cell.active-day {
+            outline: 2px solid #0969da !important;
+            outline-offset: 1px;
+            z-index: 11;
+            transform: scale(1.25);
+        }
+
+        .gh-day-cell.today-cell {
+            box-shadow: inset 0 0 0 1px #0969da;
+        }
+
+        .gh-day-cell.future-cell {
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        /* GitHub Contribution Theme Palette */
+        .gh-lvl-0 {
+            background-color: #ebedf0;
+            border: 1px solid rgba(27, 31, 35, 0.06);
+        }
+
+        .gh-lvl-1 {
+            background-color: #9be9a8;
+            border: 1px solid rgba(27, 31, 35, 0.06);
+        }
+
+        .gh-lvl-2 {
+            background-color: #40c463;
+            border: 1px solid rgba(27, 31, 35, 0.06);
+        }
+
+        .gh-lvl-3 {
+            background-color: #30a14e;
+            border: 1px solid rgba(27, 31, 35, 0.06);
+        }
+
+        .gh-lvl-4 {
+            background-color: #216e39;
+            border: 1px solid rgba(27, 31, 35, 0.06);
+            box-shadow: 0 0 3px rgba(33, 110, 57, 0.4);
+        }
+
+        .heatmap-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 0.75rem;
+            padding-top: 0.5rem;
+            border-top: 1px solid #d0d7de;
+        }
+
+        .heatmap-tip {
+            font-size: 0.73rem;
+            color: #656d76;
+        }
+
+        .heatmap-legend {
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+        }
+
+        .legend-scale {
+            display: flex;
+            gap: 3px;
+        }
+
+        .legend-swatch {
+            width: 11px;
+            height: 11px;
+            border-radius: 2px;
+            display: inline-block;
+        }
+
+        .swatch-lvl-0 { background-color: #ebedf0; border: 1px solid rgba(27, 31, 35, 0.06); }
+        .swatch-lvl-1 { background-color: #9be9a8; border: 1px solid rgba(27, 31, 35, 0.06); }
+        .swatch-lvl-2 { background-color: #40c463; border: 1px solid rgba(27, 31, 35, 0.06); }
+        .swatch-lvl-3 { background-color: #30a14e; border: 1px solid rgba(27, 31, 35, 0.06); }
+        .swatch-lvl-4 { background-color: #216e39; border: 1px solid rgba(27, 31, 35, 0.06); }
+
+        /* Floating Tooltip */
+        #heatmap-tooltip {
+            position: fixed;
+            display: none;
+            z-index: 99999;
+            background: #1e293b;
             color: #ffffff;
-            transform: scale(1.04);
+            padding: 0.5rem 0.75rem;
+            border-radius: 0.5rem;
+            font-size: 0.75rem;
+            pointer-events: none;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            max-width: 250px;
+            line-height: 1.35;
+        }
+
+        /* Coach IA Gemini Styles */
+        .ai-coach-banner {
+            background: linear-gradient(135deg, #f8fafc 0%, #eff6ff 50%, #f5f3ff 100%);
+            border: 1.5px solid #c7d2fe;
+            border-radius: 0.85rem;
+            padding: 1rem 1.25rem;
+            margin: 1.25rem 0;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(99, 102, 241, 0.06);
+        }
+
+        .ai-coach-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 0.85rem;
+        }
+
+        .ai-coach-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            color: #ffffff;
+            font-size: 0.75rem;
+            font-weight: 800;
+            padding: 0.25rem 0.65rem;
+            border-radius: 9999px;
+            letter-spacing: 0.03em;
+            text-transform: uppercase;
+            box-shadow: 0 2px 6px rgba(79, 70, 229, 0.25);
+        }
+
+        .ai-coach-actions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 0.75rem;
+        }
+
+        .ai-action-card {
+            background: #ffffff;
+            border: 1px solid #e0e7ff;
+            border-radius: 0.65rem;
+            padding: 0.75rem 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            cursor: pointer;
+            text-align: left;
+            transition: all 0.2s ease;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+            width: 100%;
+        }
+
+        .ai-action-card:hover {
+            transform: translateY(-2px);
+            border-color: #818cf8;
+            box-shadow: 0 6px 16px rgba(99, 102, 241, 0.12);
+            background: #ffffff;
+        }
+
+        .ai-action-icon {
+            font-size: 1.6rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 42px;
+            height: 42px;
+            border-radius: 0.6rem;
+            background: #f1f5f9;
+            flex-shrink: 0;
+        }
+
+        .ai-action-title {
+            display: block;
+            font-size: 0.88rem;
+            font-weight: 700;
+            color: #1e293b;
+        }
+
+        .ai-action-desc {
+            display: block;
+            font-size: 0.75rem;
+            color: #64748b;
+            margin-top: 0.1rem;
+        }
+
+        /* AI Result Card in Modal */
+        .ai-result-box {
+            background: #f8fafc;
+            border: 1px solid #cbd5e1;
+            border-radius: 0.75rem;
+            padding: 1.25rem;
+            margin-top: 1rem;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .ai-kpi-row {
+            display: flex;
+            gap: 0.6rem;
+            flex-wrap: wrap;
+            margin-bottom: 0.85rem;
+        }
+
+        .ai-kpi-badge {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            padding: 0.45rem 0.75rem;
+            border-radius: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            font-size: 0.82rem;
+            font-weight: 700;
+            color: #1e293b;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+        }
+
+        .ai-recommendation-item {
+            background: #ffffff;
+            border-left: 3.5px solid #6366f1;
+            padding: 0.75rem 0.9rem;
+            border-radius: 0 0.5rem 0.5rem 0;
+            margin-bottom: 0.65rem;
+            font-size: 0.85rem;
+            line-height: 1.45;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+        }
+
+        .ai-recommendation-title {
+            font-weight: 800;
+            font-size: 0.78rem;
+            text-transform: uppercase;
+            color: #4f46e5;
+            margin-bottom: 0.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+        }
+
+        .ai-chip-example {
+            display: inline-block;
+            background: #f1f5f9;
+            border: 1px solid #cbd5e1;
+            padding: 0.25rem 0.6rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            color: #475569;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            margin-right: 0.35rem;
+            margin-bottom: 0.35rem;
+        }
+
+        .ai-chip-example:hover {
+            background: #e0e7ff;
+            color: #4338ca;
+            border-color: #c7d2fe;
         }
 
         /* Mannequin & Heatmap */
@@ -1095,17 +1514,121 @@
                     <form id="daily-log-form" onchange="triggerAutoSave()">
                         @csrf
                         <div class="daily-header">
-                            <div class="daily-title">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                                    <circle cx="12" cy="12" r="10"></circle>
-                                    <polyline points="12 6 12 12 16 14"></polyline>
-                                </svg>
-                                Registro Diário de Hábitos & Dieta (< 60s)
-                                <span style="font-size: 0.85rem; font-weight: 600; color: var(--text-muted); margin-left: 0.5rem;">Hoje, {{ now()->format('d/m/Y') }}</span>
+                            <div style="display: flex; flex-direction: column; gap: 0.45rem;">
+                                <div class="daily-title">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                        <circle cx="12" cy="12" r="10"></circle>
+                                        <polyline points="12 6 12 12 16 14"></polyline>
+                                    </svg>
+                                    Registro Diário de Hábitos & Dieta (< 60s)
+                                    <span id="daily-log-badge-status" class="daily-status-badge today">Hoje</span>
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap;">
+                                    <div class="date-navigator-group">
+                                        <button type="button" class="date-nav-btn" onclick="navigateDailyDate(-1)" title="Dia anterior">◀ Anterior</button>
+                                        <div class="date-input-wrapper">
+                                            <input type="date" id="daily-log-picker" value="{{ now()->toDateString() }}" max="{{ now()->toDateString() }}" onchange="handleDateSelect(this.value)">
+                                        </div>
+                                        <button type="button" class="date-nav-btn" id="btn-next-day" onclick="navigateDailyDate(1)" title="Próximo dia" disabled>Próximo ▶</button>
+                                        <button type="button" class="date-nav-btn date-nav-today-btn" onclick="goToToday()">Ir para Hoje</button>
+                                    </div>
+                                    <span id="daily-log-selected-label" style="font-size: 0.85rem; font-weight: 700; color: #475569;">
+                                        Hoje, {{ now()->format('d/m/Y') }}
+                                    </span>
+                                </div>
                             </div>
+
                             <div style="display: flex; align-items: center; gap: 0.75rem;">
                                 <span class="auto-save-pill" id="auto-save-status">✓ Sincronizado</span>
-                                <span style="font-size: 0.75rem; color: #94a3b8;" title="Teclas 1 a 5 alternam hábitos; + e - controlam a água">Atalhos: [1-5], [+/-]</span>
+                                <span style="font-size: 0.75rem; color: #94a3b8;" title="Teclas 1 a 5 alternam hábitos de alimentação e treino">Atalhos: [1-5]</span>
+                            </div>
+                        </div>
+
+                        <!-- MAPA DE DIAS / HEATMAP DE CONSISTÊNCIA & ADESÃO -->
+                        <div class="heatmap-section">
+                            <div class="heatmap-top-bar">
+                                <div class="heatmap-title-box">
+                                    <span class="heatmap-title">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                            <line x1="16" y1="2" x2="16" y2="6"></line>
+                                            <line x1="8" y1="2" x2="8" y2="6"></line>
+                                            <line x1="3" y1="10" x2="21" y2="10"></line>
+                                        </svg>
+                                        Mapa de Consistência & Adesão aos Dados
+                                    </span>
+                                    <span class="heatmap-subtitle">Dias com maior cumprimento de hábitos ganham destaque visual mais intenso. Clique em qualquer dia para visualizá-lo ou editá-lo.</span>
+                                </div>
+                                <div class="heatmap-stats" id="heatmap-summary-stats">
+                                    <!-- Injetado por JS -->
+                                </div>
+                            </div>
+
+                            <div class="heatmap-scroll-area">
+                                <div id="heatmap-grid-container">
+                                    <!-- GitHub style calendar injected via JS -->
+                                </div>
+                            </div>
+
+                            <div class="heatmap-footer">
+                                <span class="heatmap-tip">💡 Clique em qualquer quadrado do mapa para carregar o histórico ou lançar dados retroativos</span>
+                                <div class="heatmap-legend">
+                                    <span style="font-size: 0.75rem; color: #656d76;">Menos</span>
+                                    <div class="legend-scale">
+                                        <span class="legend-swatch swatch-lvl-0" title="0% - Sem registros"></span>
+                                        <span class="legend-swatch swatch-lvl-1" title="1-33% - Poucos dados"></span>
+                                        <span class="legend-swatch swatch-lvl-2" title="34-66% - Parcial"></span>
+                                        <span class="legend-swatch swatch-lvl-3" title="67-99% - Alto preenchimento"></span>
+                                        <span class="legend-swatch swatch-lvl-4" title="100% - Metas completas"></span>
+                                    </div>
+                                    <span style="font-size: 0.75rem; color: #656d76;">Mais</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- COACH IA GEMINI (DIETA FLEXÍVEL, COMPENSAÇÃO INTELIGENTE & TREINOS EXTRAS) -->
+                        <div class="ai-coach-banner">
+                            <div class="ai-coach-header">
+                                <div style="display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap;">
+                                    <div class="ai-coach-badge">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                                        </svg>
+                                        Coach IA Gemini
+                                    </div>
+                                    <span style="font-size: 0.9rem; font-weight: 700; color: #1e293b;">
+                                        Compensação de Dieta & Ajuste de Treinos Extras
+                                    </span>
+                                </div>
+                                <span style="font-size: 0.75rem; font-weight: 600; color: #6366f1; background: #eef2ff; padding: 0.2rem 0.6rem; border-radius: 9999px;">
+                                    Gemini 2.5 Flash Ativo
+                                </span>
+                            </div>
+
+                            <div class="ai-coach-actions-grid">
+                                <button type="button" class="ai-action-card" onclick="openAiCoachModal('meal_deviation')">
+                                    <span class="ai-action-icon">🍕</span>
+                                    <div>
+                                        <span class="ai-action-title">Almocei Fora da Dieta</span>
+                                        <span class="ai-action-desc">Compensação do almoço/refeição livre no jantar e cardio</span>
+                                    </div>
+                                </button>
+
+                                <button type="button" class="ai-action-card" onclick="openAiCoachModal('extra_workout')">
+                                    <span class="ai-action-icon">🏃‍♂️</span>
+                                    <div>
+                                        <span class="ai-action-title">Fiz Mais Exercícios / Treino Extra</span>
+                                        <span class="ai-action-desc">Cálculo de queima, reposição nutricional e descanso</span>
+                                    </div>
+                                </button>
+
+                                <button type="button" class="ai-action-card" onclick="runAiDailyReview()">
+                                    <span class="ai-action-icon">📊</span>
+                                    <div>
+                                        <span class="ai-action-title">Avaliar Meu Dia de Hoje</span>
+                                        <span class="ai-action-desc">Parecer rápido de consistência, foco e pontos de atenção</span>
+                                    </div>
+                                </button>
                             </div>
                         </div>
 
@@ -1147,9 +1670,8 @@
                                 </label>
                             </div>
 
-                            <!-- Treino & Hidratação -->
+                            <!-- Exercício do Dia -->
                             <div style="display: flex; flex-direction: column; gap: 1rem;">
-                                <!-- Treino Realizado -->
                                 <div>
                                     <span style="font-size: 0.8rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Exercício do Dia</span>
                                     <div style="background: #ffffff; border: 1px solid #fed7aa; padding: 0.85rem; border-radius: 0.6rem; margin-top: 0.4rem;">
@@ -1173,34 +1695,6 @@
                                                 <span style="font-size: 0.75rem; color: var(--text-muted); font-weight: 600;">min</span>
                                             </div>
                                         </div>
-                                    </div>
-                                </div>
-
-                                <!-- Hidratação (3000ml) -->
-                                <div class="water-card">
-                                    <div class="water-header">
-                                        <div class="water-title">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                                <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"></path>
-                                            </svg>
-                                            Meta de Água (3.000 ml)
-                                        </div>
-                                        <div style="font-size: 0.85rem; font-weight: 800; color: #1e40af;" id="water-display-val">
-                                            {{ $todayDailyLog ? $todayDailyLog->water_volume_ml : 0 }} / 3000 ml
-                                        </div>
-                                    </div>
-
-                                    <div class="water-progress-bar">
-                                        <div class="water-progress-fill" id="water-progress-fill" style="width: {{ $todayDailyLog ? $todayDailyLog->water_progress_percent : 0 }}%;"></div>
-                                    </div>
-
-                                    <input type="hidden" name="water_volume_ml" id="water-volume-input" value="{{ $todayDailyLog ? $todayDailyLog->water_volume_ml : 0 }}">
-
-                                    <div class="water-btn-group">
-                                        <button type="button" class="water-btn" onclick="addWater(250)">+250 ml</button>
-                                        <button type="button" class="water-btn" onclick="addWater(500)">+500 ml</button>
-                                        <button type="button" class="water-btn" onclick="addWater(1000)">+1 L</button>
-                                        <button type="button" class="water-btn" style="color: #ef4444; border-color: #fca5a5;" onclick="resetWater()">Zerar</button>
                                     </div>
                                 </div>
                             </div>
@@ -2120,6 +2614,67 @@
         </div>
     </div>
 
+    <!-- MODAL: COACH IA GEMINI (DIETA & TREINO) -->
+    <div class="modal-overlay" id="ai-coach-modal">
+        <div class="modal-box" style="max-width: 620px;">
+            <div class="modal-header">
+                <div style="display: flex; align-items: center; gap: 0.6rem;">
+                    <span id="ai-modal-icon" style="font-size: 1.5rem;">🤖</span>
+                    <div>
+                        <h3 id="ai-modal-title" style="font-size: 1.2rem; font-weight: 800; color: var(--text-dark); margin: 0;">
+                            Coach IA Gemini
+                        </h3>
+                        <span id="ai-modal-subtitle" style="font-size: 0.78rem; color: #64748b;">
+                            Compensação inteligente de dieta & flexibilidade metabólica
+                        </span>
+                    </div>
+                </div>
+                <button type="button" style="background: none; border: none; font-size: 1.4rem; cursor: pointer; color: var(--text-muted);" onclick="closeAiCoachModal()">&times;</button>
+            </div>
+
+            <div id="ai-modal-input-section" style="margin-top: 0.5rem;">
+                <label id="ai-input-label" style="display: block; font-size: 0.85rem; font-weight: 700; color: #334155; margin-bottom: 0.4rem;">
+                    Descreva o que comeu ou realizou:
+                </label>
+                
+                <textarea id="ai-coach-input" placeholder="Ex: Almocei 3 fatias de pizza de calabresa e tomei um refrigerante..." style="width: 100%; height: 90px; padding: 0.65rem; border: 1.5px solid #cbd5e1; border-radius: 0.6rem; font-size: 0.9rem; font-family: inherit; resize: vertical;"></textarea>
+
+                <div id="ai-chips-container" style="margin-top: 0.5rem; display: flex; flex-wrap: wrap;">
+                    <!-- Chips de exemplo injetados via JS -->
+                </div>
+
+                <div style="display: flex; justify-content: flex-end; gap: 0.75rem; margin-top: 1rem;">
+                    <button type="button" class="btn-outline" onclick="closeAiCoachModal()">Fechar</button>
+                    <button type="button" class="btn-primary" id="btn-submit-ai" onclick="submitAiCoach()" style="background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%); border: none; display: flex; align-items: center; gap: 0.4rem;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                        </svg>
+                        <span id="ai-submit-btn-text">Consultar Gemini IA</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- LOADING SPINNER -->
+            <div id="ai-coach-loading" style="display: none; padding: 2rem 1rem; text-align: center;">
+                <div style="display: inline-block; width: 40px; height: 40px; border: 3.5px solid #e0e7ff; border-top-color: #6366f1; border-radius: 50%; animation: spin 0.8s linear infinite;"></div>
+                <div style="margin-top: 0.85rem; font-weight: 700; color: #4338ca; font-size: 0.95rem;">
+                    Consultando o Coach IA Gemini...
+                </div>
+                <div style="font-size: 0.78rem; color: #64748b; margin-top: 0.25rem;">
+                    Calculando estimativa de calorias, impacto metabólico e estratégias de compensação.
+                </div>
+            </div>
+
+            <!-- RESULTADOS DA IA -->
+            <div id="ai-coach-result" style="display: none;">
+                <!-- Preenchido dinamicamente pelo JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- FLOATING HEATMAP TOOLTIP -->
+    <div id="heatmap-tooltip"></div>
+
     <!-- TOAST NOTIFICATION -->
     <div class="toast-notification" id="toast">
         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -2131,10 +2686,387 @@
     <script>
         // Dados do backend
         let trackerSummaryData = @json($trackerSummary);
+        let dailyLogsMap = @json($dailyLogsMap);
+        const todayStr = '{{ now()->toDateString() }}';
+        let selectedDailyDate = todayStr;
         const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
         let autoSaveTimer = null;
         let timeLapsePlaying = false;
         let timeLapseInterval = null;
+
+        // Formatação de data amigável em Português
+        function formatPtBrDate(dateStr) {
+            if (!dateStr) return '';
+            const parts = dateStr.split('-');
+            if (parts.length !== 3) return dateStr;
+            const d = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+            const daysOfWeek = ['Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado'];
+            const months = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
+            return `${daysOfWeek[d.getDay()]}, ${parts[2]} de ${months[d.getMonth()]} de ${parts[0]}`;
+        }
+
+        // Navegação de Datas no Diário de Hábitos
+        function handleDateSelect(dateVal) {
+            if (!dateVal) return;
+            if (dateVal > todayStr) {
+                showToast('Não é possível lançar dados em datas futuras.');
+                dateVal = todayStr;
+            }
+            switchDailyLogDate(dateVal);
+        }
+
+        function navigateDailyDate(deltaDays) {
+            const parts = selectedDailyDate.split('-');
+            const cur = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+            cur.setDate(cur.getDate() + deltaDays);
+            const y = cur.getFullYear();
+            const m = String(cur.getMonth() + 1).padStart(2, '0');
+            const d = String(cur.getDate()).padStart(2, '0');
+            const targetStr = `${y}-${m}-${d}`;
+            if (targetStr > todayStr) {
+                return;
+            }
+            switchDailyLogDate(targetStr);
+        }
+
+        function goToToday() {
+            switchDailyLogDate(todayStr);
+        }
+
+        async function switchDailyLogDate(dateStr) {
+            selectedDailyDate = dateStr;
+            const picker = document.getElementById('daily-log-picker');
+            if (picker) picker.value = dateStr;
+            const nextBtn = document.getElementById('btn-next-day');
+            if (nextBtn) nextBtn.disabled = (dateStr >= todayStr);
+
+            const label = document.getElementById('daily-log-selected-label');
+            if (label) {
+                label.innerText = (dateStr === todayStr) ? `Hoje, ${formatPtBrDate(dateStr)}` : formatPtBrDate(dateStr);
+            }
+
+            const badge = document.getElementById('daily-log-badge-status');
+            if (badge) {
+                if (dateStr === todayStr) {
+                    badge.innerText = 'Hoje';
+                    badge.className = 'daily-status-badge today';
+                } else {
+                    badge.innerText = 'Histórico';
+                    badge.className = 'daily-status-badge';
+                }
+            }
+
+            // Destacar célula ativa no heatmap
+            document.querySelectorAll('.gh-day-cell').forEach(cell => {
+                if (cell.getAttribute('data-date') === dateStr) {
+                    cell.classList.add('active-day');
+                } else {
+                    cell.classList.remove('active-day');
+                }
+            });
+
+            // Verificar se temos em cache local
+            if (dailyLogsMap[dateStr]) {
+                populateDailyForm(dailyLogsMap[dateStr]);
+            } else {
+                // Buscar da API
+                try {
+                    const statusPill = document.getElementById('auto-save-status');
+                    if (statusPill) {
+                        statusPill.style.background = '#fef3c7';
+                        statusPill.style.color = '#92400e';
+                        statusPill.innerText = '⟳ Carregando dia...';
+                    }
+
+                    const res = await fetch(`{{ route('api.tracker.daily-log.by-date') }}?date=${dateStr}`);
+                    const json = await res.json();
+                    if (json.exists && json.data) {
+                        dailyLogsMap[dateStr] = {
+                            ...json.data,
+                            adherence_score: json.adherence_score,
+                            water_progress_percent: json.water_progress_percent,
+                        };
+                        populateDailyForm(dailyLogsMap[dateStr]);
+                    } else {
+                        populateDailyForm({
+                            date: dateStr,
+                            workout_done: false,
+                            workout_type: 'STRENGTH_CIRCUIT',
+                            workout_duration_min: 30,
+                            breakfast_clean: false,
+                            lunch_clean: false,
+                            snack_done: false,
+                            dinner_clean: false,
+                            water_volume_ml: 0,
+                            notes: '',
+                            adherence_score: 0,
+                        });
+                    }
+                } catch (e) {
+                    console.error('Erro ao buscar diário da data:', e);
+                }
+            }
+        }
+
+        function populateDailyForm(data) {
+            document.getElementById('hk-breakfast').checked = !!data.breakfast_clean;
+            document.getElementById('hk-lunch').checked = !!data.lunch_clean;
+            document.getElementById('hk-snack').checked = !!data.snack_done;
+            document.getElementById('hk-dinner').checked = !!data.dinner_clean;
+            document.getElementById('hk-workout').checked = !!data.workout_done;
+
+            const workoutTypeSelect = document.querySelector('select[name="workout_type"]');
+            if (workoutTypeSelect && data.workout_type) {
+                workoutTypeSelect.value = data.workout_type;
+            }
+
+            const durationInput = document.querySelector('input[name="workout_duration_min"]');
+            if (durationInput) {
+                durationInput.value = data.workout_duration_min !== null && data.workout_duration_min !== undefined ? data.workout_duration_min : 30;
+            }
+
+            const notesText = document.querySelector('textarea[name="notes"]');
+            if (notesText) {
+                notesText.value = data.notes || '';
+            }
+
+            const statusPill = document.getElementById('auto-save-status');
+            const badge = document.getElementById('daily-log-badge-status');
+            if (data.adherence_score !== undefined && (data.workout_done || data.breakfast_clean || data.lunch_clean || data.snack_done || data.dinner_clean || (data.notes && data.notes.length > 0))) {
+                statusPill.style.background = '#dcfce7';
+                statusPill.style.color = '#166534';
+                statusPill.innerText = `✓ Salvo (${data.adherence_score}% cumprido)`;
+                if (badge && selectedDailyDate !== todayStr) {
+                    badge.className = data.adherence_score === 100 ? 'daily-status-badge completed' : 'daily-status-badge partial';
+                    badge.innerText = `Histórico · ${data.adherence_score}%`;
+                }
+            } else {
+                statusPill.style.background = '#f1f5f9';
+                statusPill.style.color = '#64748b';
+                statusPill.innerText = 'Sem dados salvos';
+                if (badge && selectedDailyDate !== todayStr) {
+                    badge.className = 'daily-status-badge';
+                    badge.innerText = 'Histórico · Pendente';
+                }
+            }
+        }
+
+        // Renderização do Mapa de Calor (Heatmap estilo GitHub - 53 semanas / 1 ano completo)
+        function renderHeatmapGrid() {
+            const container = document.getElementById('heatmap-grid-container');
+            if (!container) return;
+
+            const today = new Date();
+            // Fim da semana atual (Sábado)
+            const dayOfWeek = today.getDay(); // 0 Dom, 6 Sab
+            const endOfWeek = new Date(today);
+            endOfWeek.setDate(today.getDate() + (6 - dayOfWeek));
+
+            const totalWeeks = 53;
+            const startDate = new Date(endOfWeek);
+            startDate.setDate(endOfWeek.getDate() - (totalWeeks * 7 - 1)); // Domingo de 52 semanas atrás
+
+            const monthNames = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
+
+            let totalActiveDays = 0;
+            let sumAdherence = 0;
+            let perfectDays = 0;
+
+            let curDate = new Date(startDate);
+            const weeksData = [];
+            const monthPositions = [];
+            let lastMonthIndex = -1;
+            let lastMonthCol = -10;
+
+            for (let w = 0; w < totalWeeks; w++) {
+                const daysInWeek = [];
+                // Identifica o mês representativo da semana (Quarta-feira)
+                const wednesdayDate = new Date(curDate);
+                wednesdayDate.setDate(curDate.getDate() + 3);
+                const mIdx = wednesdayDate.getMonth();
+
+                if (mIdx !== lastMonthIndex && (w - lastMonthCol >= 2)) {
+                    monthPositions.push({ colIndex: w, name: monthNames[mIdx] });
+                    lastMonthIndex = mIdx;
+                    lastMonthCol = w;
+                }
+
+                for (let d = 0; d < 7; d++) {
+                    const y = curDate.getFullYear();
+                    const m = String(curDate.getMonth() + 1).padStart(2, '0');
+                    const dayNum = String(curDate.getDate()).padStart(2, '0');
+                    const dateStr = `${y}-${m}-${dayNum}`;
+                    const isFuture = dateStr > todayStr;
+                    const isToday = dateStr === todayStr;
+
+                    const log = dailyLogsMap[dateStr];
+                    let level = 0;
+                    let score = 0;
+
+                    if (log && !isFuture) {
+                        score = log.adherence_score !== undefined ? log.adherence_score : 0;
+                        if (score > 0 || log.workout_done) {
+                            totalActiveDays++;
+                            sumAdherence += score;
+                            if (score >= 100) {
+                                perfectDays++;
+                                level = 4;
+                            } else if (score >= 67) {
+                                level = 3;
+                            } else if (score >= 34) {
+                                level = 2;
+                            } else {
+                                level = 1;
+                            }
+                        }
+                    }
+
+                    daysInWeek.push({
+                        dateStr,
+                        isFuture,
+                        isToday,
+                        level,
+                        score,
+                        log,
+                    });
+
+                    curDate.setDate(curDate.getDate() + 1);
+                }
+
+                weeksData.push(daysInWeek);
+            }
+
+            // Gera o HTML da grade estilo GitHub
+            let html = '<div class="gh-calendar-wrapper">';
+
+            // 1. Linha superior com os meses posicionados nas colunas exatas
+            html += '<div class="gh-months-row">';
+            monthPositions.forEach(mp => {
+                html += `<span class="gh-month-label" style="grid-column-start: ${mp.colIndex + 1};">${mp.name}</span>`;
+            });
+            html += '</div>';
+
+            // 2. Corpo do calendário: dias da semana à esquerda + colunas de semanas
+            html += '<div class="gh-grid-body">';
+
+            // Rótulos dos dias da semana (Seg, Qua, Sex)
+            html += '<div class="gh-weekdays">';
+            html += '<span class="gh-weekday-label"></span>'; // Dom
+            html += '<span class="gh-weekday-label">Seg</span>';
+            html += '<span class="gh-weekday-label"></span>'; // Ter
+            html += '<span class="gh-weekday-label">Qua</span>';
+            html += '<span class="gh-weekday-label"></span>'; // Qui
+            html += '<span class="gh-weekday-label">Sex</span>';
+            html += '<span class="gh-weekday-label"></span>'; // Sáb
+            html += '</div>';
+
+            // Grade com as 53 semanas
+            html += '<div class="gh-weeks-grid">';
+            weeksData.forEach(week => {
+                html += '<div class="gh-week-col">';
+                week.forEach(cd => {
+                    if (cd.isFuture) {
+                        html += '<div class="gh-day-cell future-cell"></div>';
+                    } else {
+                        const isActive = cd.dateStr === selectedDailyDate ? 'active-day' : '';
+                        const isTodayCls = cd.isToday ? 'today-cell' : '';
+                        html += `<div class="gh-day-cell gh-lvl-${cd.level} ${isActive} ${isTodayCls}"
+                            data-date="${cd.dateStr}"
+                            data-score="${cd.score}"
+                            data-level="${cd.level}"
+                            onclick="switchDailyLogDate('${cd.dateStr}')"></div>`;
+                    }
+                });
+                html += '</div>';
+            });
+            html += '</div>'; // fim gh-weeks-grid
+
+            html += '</div>'; // fim gh-grid-body
+            html += '</div>'; // fim gh-calendar-wrapper
+
+            container.innerHTML = html;
+
+            // Atualiza o cabeçalho de estatísticas
+            const statsContainer = document.getElementById('heatmap-summary-stats');
+            if (statsContainer) {
+                const avgAdherence = totalActiveDays > 0 ? Math.round(sumAdherence / totalActiveDays) : 0;
+                statsContainer.innerHTML = `
+                    <div class="heatmap-stat-chip">
+                        <span>🔥</span>
+                        <span>${totalActiveDays} dias ativos</span>
+                    </div>
+                    <div class="heatmap-stat-chip">
+                        <span>📊</span>
+                        <span>${avgAdherence}% média de adesão</span>
+                    </div>
+                    <div class="heatmap-stat-chip">
+                        <span>⭐</span>
+                        <span>${perfectDays} dias perfeitos (100%)</span>
+                    </div>
+                `;
+            }
+
+            // Inicializa tooltips interativos
+            initHeatmapTooltips();
+        }
+
+        // Tooltips flutuantes do Heatmap no estilo GitHub
+        function initHeatmapTooltips() {
+            const tooltip = document.getElementById('heatmap-tooltip');
+            if (!tooltip) return;
+
+            document.querySelectorAll('.gh-day-cell[data-date]').forEach(cell => {
+                cell.addEventListener('mouseenter', (e) => {
+                    const dateStr = cell.getAttribute('data-date');
+                    const score = parseInt(cell.getAttribute('data-score')) || 0;
+                    const log = dailyLogsMap[dateStr];
+                    const dateFormatted = formatPtBrDate(dateStr);
+
+                    let content = `<div style="font-weight: 700; margin-bottom: 0.35rem; color: #f0f6fc;">${dateFormatted}</div>`;
+
+                    if (log && (score > 0 || log.workout_done)) {
+                        let badgeColor = score === 100 ? '#3fb950' : (score >= 67 ? '#56d364' : '#d29922');
+                        content += `<div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.35rem;">
+                            <span style="color: #8b949e;">Adesão aos hábitos:</span>
+                            <strong style="color: ${badgeColor}; font-size: 0.85rem;">${score}%</strong>
+                        </div>`;
+
+                        if (log.workout_done) {
+                            content += `<div style="color: #58a6ff; margin-bottom: 0.2rem;">✓ Treino: ${log.workout_type || 'Realizado'} (${log.workout_duration_min || 30} min)</div>`;
+                        } else {
+                            content += `<div style="color: #8b949e; margin-bottom: 0.2rem;">✗ Sem treino registrado</div>`;
+                        }
+
+                        const mealsClean = [log.breakfast_clean, log.lunch_clean, log.snack_done, log.dinner_clean].filter(Boolean).length;
+                        content += `<div style="color: #7ee787; margin-bottom: 0.35rem;">🥗 Refeições limpas: ${mealsClean}/4</div>`;
+
+                        if (log.notes) {
+                            content += `<div style="font-size: 0.7rem; color: #c9d1d9; font-style: italic; border-top: 1px solid #30363d; padding-top: 0.25rem;">"${log.notes.substring(0, 50)}${log.notes.length > 50 ? '...' : ''}"</div>`;
+                        }
+                    } else {
+                        content += `<div style="color: #8b949e; margin-bottom: 0.25rem;">Nenhum dado lançado neste dia</div>`;
+                    }
+
+                    content += `<div style="font-size: 0.68rem; color: #58a6ff; margin-top: 0.35rem; font-weight: 600;">👆 Clique para abrir / editar este dia</div>`;
+
+                    tooltip.innerHTML = content;
+                    tooltip.style.display = 'block';
+                });
+
+                cell.addEventListener('mousemove', (e) => {
+                    const x = e.clientX + 14;
+                    const y = e.clientY + 14;
+                    const tooltipWidth = 240;
+                    const finalX = (x + tooltipWidth > window.innerWidth) ? (e.clientX - tooltipWidth - 10) : x;
+                    tooltip.style.left = `${finalX}px`;
+                    tooltip.style.top = `${y}px`;
+                });
+
+                cell.addEventListener('mouseleave', () => {
+                    tooltip.style.display = 'none';
+                });
+            });
+        }
 
         // Toast feedback
         function showToast(message) {
@@ -2154,7 +3086,7 @@
             btn.classList.add('active');
         }
 
-        // Zero-Friction Auto-Save with Debounce
+        // Zero-Friction Auto-Save com debounce e suporte a data selecionada
         function triggerAutoSave() {
             const statusPill = document.getElementById('auto-save-status');
             statusPill.style.background = '#fef3c7';
@@ -2167,7 +3099,7 @@
                 const formData = new FormData(form);
 
                 const payload = {
-                    date: '{{ now()->toDateString() }}',
+                    date: selectedDailyDate,
                     workout_done: formData.get('workout_done') === '1',
                     workout_type: formData.get('workout_type'),
                     workout_duration_min: formData.get('workout_duration_min'),
@@ -2175,7 +3107,6 @@
                     lunch_clean: formData.get('lunch_clean') === '1',
                     snack_done: formData.get('snack_done') === '1',
                     dinner_clean: formData.get('dinner_clean') === '1',
-                    water_volume_ml: formData.get('water_volume_ml'),
                     notes: formData.get('notes'),
                 };
 
@@ -2195,10 +3126,29 @@
                         const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
                         statusPill.style.background = '#dcfce7';
                         statusPill.style.color = '#166534';
-                        statusPill.innerText = `✓ Salvo às ${timeStr}`;
-                        document.getElementById('kpi-adherence-val').innerHTML = `${res.adherence_score}% <span style="font-size: 0.8rem; font-weight: 600; color: var(--text-muted);">cumprido</span>`;
+                        statusPill.innerText = `✓ Salvo às ${timeStr} (${res.adherence_score}%)`;
 
-                        if (res.adherence_score === 100 || payload.water_volume_ml >= 3000) {
+                        dailyLogsMap[selectedDailyDate] = {
+                            date: selectedDailyDate,
+                            adherence_score: res.adherence_score,
+                            workout_done: payload.workout_done,
+                            workout_type: payload.workout_type,
+                            workout_duration_min: payload.workout_duration_min,
+                            breakfast_clean: payload.breakfast_clean,
+                            lunch_clean: payload.lunch_clean,
+                            snack_done: payload.snack_done,
+                            dinner_clean: payload.dinner_clean,
+                            notes: payload.notes,
+                        };
+
+                        if (selectedDailyDate === todayStr) {
+                            document.getElementById('kpi-adherence-val').innerHTML = `${res.adherence_score}% <span style="font-size: 0.8rem; font-weight: 600; color: var(--text-muted);">cumprido</span>`;
+                        }
+
+                        // Atualiza o heatmap em tempo real
+                        renderHeatmapGrid();
+
+                        if (res.adherence_score === 100) {
                             launchConfetti();
                         }
                     }
@@ -2211,37 +3161,7 @@
             }, 600);
         }
 
-        // Water Counter logic
-        function addWater(amount) {
-            const input = document.getElementById('water-volume-input');
-            let current = parseInt(input.value) || 0;
-            const previous = current;
-            current += amount;
-            input.value = current;
-            updateWaterDisplay(current);
-
-            if (previous < 3000 && current >= 3000) {
-                launchConfetti();
-                showToast('🎉 Meta de 3.000 ml de água atingida hoje!');
-            }
-
-            triggerAutoSave();
-        }
-
-        function resetWater() {
-            const input = document.getElementById('water-volume-input');
-            input.value = 0;
-            updateWaterDisplay(0);
-            triggerAutoSave();
-        }
-
-        function updateWaterDisplay(val) {
-            document.getElementById('water-display-val').innerText = `${val} / 3000 ml`;
-            const pct = Math.min(100, Math.round((val / 3000) * 100));
-            document.getElementById('water-progress-fill').style.width = `${pct}%`;
-        }
-
-        // Keyboard Shortcuts (1-5, +, -)
+        // Keyboard Shortcuts (1-5)
         window.addEventListener('keydown', (e) => {
             if (['input', 'textarea', 'select'].includes(document.activeElement.tagName.toLowerCase())) {
                 return;
@@ -2266,14 +3186,6 @@
             } else if (e.key === '5') {
                 const el = document.getElementById('hk-workout');
                 el.checked = !el.checked;
-                triggerAutoSave();
-            } else if (e.key === '+' || e.key === '=') {
-                addWater(250);
-            } else if (e.key === '-') {
-                const input = document.getElementById('water-volume-input');
-                let current = Math.max(0, (parseInt(input.value) || 0) - 250);
-                input.value = current;
-                updateWaterDisplay(current);
                 triggerAutoSave();
             }
         });
@@ -3117,11 +4029,348 @@
             }
         }
 
+        // ==========================
+        // COACH IA GEMINI (DIETA & TREINO)
+        // ==========================
+        let currentAiMode = 'meal_deviation';
+        let lastAiResponse = null;
+
+        function openAiCoachModal(mode) {
+            currentAiMode = mode;
+            lastAiResponse = null;
+            const modal = document.getElementById('ai-coach-modal');
+            const inputSection = document.getElementById('ai-modal-input-section');
+            const loadingBox = document.getElementById('ai-coach-loading');
+            const resultBox = document.getElementById('ai-coach-result');
+            const inputEl = document.getElementById('ai-coach-input');
+            const chipsContainer = document.getElementById('ai-chips-container');
+            const iconEl = document.getElementById('ai-modal-icon');
+            const titleEl = document.getElementById('ai-modal-title');
+            const subtitleEl = document.getElementById('ai-modal-subtitle');
+            const labelEl = document.getElementById('ai-input-label');
+            const submitBtnText = document.getElementById('ai-submit-btn-text');
+
+            inputEl.value = '';
+            inputSection.style.display = 'block';
+            loadingBox.style.display = 'none';
+            resultBox.style.display = 'none';
+            resultBox.innerHTML = '';
+
+            if (mode === 'meal_deviation') {
+                iconEl.innerText = '🍕';
+                titleEl.innerText = 'Compensação de Almoço / Refeição Livre';
+                subtitleEl.innerText = 'Calcule o impacto calórico e receba ajustes práticos para o jantar e descanso';
+                labelEl.innerText = 'Descreva o que comeu no almoço ou refeição fora do planejado:';
+                inputEl.placeholder = 'Ex: Almocei 3 fatias de pizza com refrigerante e um pedaço de torta...';
+                submitBtnText.innerText = 'Calcular Compensação Inteligente';
+
+                chipsContainer.innerHTML = `
+                    <span class="ai-chip-example" onclick="selectAiExample('Almocei 3 fatias de pizza de calabresa e refrigerante')">🍕 3 fatias de pizza</span>
+                    <span class="ai-chip-example" onclick="selectAiExample('Almocei feijoada completa com arroz, farofa e sobremesa')">🍲 Feijoada completa</span>
+                    <span class="ai-chip-example" onclick="selectAiExample('Comi hambúrguer artesanal com batata frita')">🍔 Hambúrguer + batata</span>
+                    <span class="ai-chip-example" onclick="selectAiExample('Almocei massa com molho quatro queijos e bebi refrigerante')">🍝 Massa 4 queijos</span>
+                `;
+            } else if (mode === 'extra_workout') {
+                iconEl.innerText = '🏃‍♂️';
+                titleEl.innerText = 'Ajuste de Treino Extra / Volume Atípico';
+                subtitleEl.innerText = 'Calcule queima calórica adicional, reposição de glicogênio e prevenção de lesões';
+                labelEl.innerText = 'Descreva o exercício ou treino adicional realizado:';
+                inputEl.placeholder = 'Ex: Fiz 6 km de corrida na rua além do meu treino de musculação...';
+                submitBtnText.innerText = 'Calcular Gasto & Reposição';
+
+                chipsContainer.innerHTML = `
+                    <span class="ai-chip-example" onclick="selectAiExample('Corri 6 km na rua em ritmo moderado além da musculação')">🏃 6km de corrida extra</span>
+                    <span class="ai-chip-example" onclick="selectAiExample('Joguei 1h30 de futebol com os amigos em alta intensidade')">⚽ 1h30 de futebol</span>
+                    <span class="ai-chip-example" onclick="selectAiExample('Fiz 45 minutos de esteira inclinada e cardio pós-treino')">⚡ 45 min cardio intenso</span>
+                    <span class="ai-chip-example" onclick="selectAiExample('Pedalei 20 km de bicicleta no fim de semana')">🚴 20 km de bike</span>
+                `;
+            }
+
+            modal.classList.add('active');
+        }
+
+        function closeAiCoachModal() {
+            document.getElementById('ai-coach-modal').classList.remove('active');
+        }
+
+        function selectAiExample(text) {
+            document.getElementById('ai-coach-input').value = text;
+        }
+
+        async function submitAiCoach() {
+            const inputVal = document.getElementById('ai-coach-input').value.trim();
+            if (inputVal.length < 3) {
+                showToast('Por favor, descreva detalhadamente a refeição ou o treino.');
+                return;
+            }
+
+            const inputSection = document.getElementById('ai-modal-input-section');
+            const loadingBox = document.getElementById('ai-coach-loading');
+            const resultBox = document.getElementById('ai-coach-result');
+
+            inputSection.style.display = 'none';
+            loadingBox.style.display = 'block';
+            resultBox.style.display = 'none';
+
+            const endpoint = currentAiMode === 'meal_deviation'
+                ? '{{ route("treinos.ai.analyze-meal") }}'
+                : '{{ route("treinos.ai.analyze-workout") }}';
+
+            try {
+                const res = await fetch(endpoint, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken,
+                    },
+                    body: JSON.stringify({
+                        descricao: inputVal,
+                        date: selectedDailyDate,
+                    }),
+                });
+
+                const json = await res.json();
+                loadingBox.style.display = 'none';
+
+                if (json.success && json.data) {
+                    lastAiResponse = json.data;
+                    renderAiResult(json.data);
+                } else {
+                    inputSection.style.display = 'block';
+                    showToast('Não foi possível obter resposta da IA no momento.');
+                }
+            } catch (err) {
+                console.error(err);
+                loadingBox.style.display = 'none';
+                inputSection.style.display = 'block';
+                showToast('Erro ao comunicar com a IA Gemini.');
+            }
+        }
+
+        async function runAiDailyReview() {
+            currentAiMode = 'review';
+            const modal = document.getElementById('ai-coach-modal');
+            const inputSection = document.getElementById('ai-modal-input-section');
+            const loadingBox = document.getElementById('ai-coach-loading');
+            const resultBox = document.getElementById('ai-coach-result');
+            const iconEl = document.getElementById('ai-modal-icon');
+            const titleEl = document.getElementById('ai-modal-title');
+            const subtitleEl = document.getElementById('ai-modal-subtitle');
+
+            iconEl.innerText = '📊';
+            titleEl.innerText = 'Avaliação de Hábitos do Coach IA';
+            subtitleEl.innerText = 'Análise dos hábitos cumpridos na data de ' + formatPtBrDate(selectedDailyDate);
+
+            inputSection.style.display = 'none';
+            loadingBox.style.display = 'block';
+            resultBox.style.display = 'none';
+            resultBox.innerHTML = '';
+            modal.classList.add('active');
+
+            try {
+                const res = await fetch('{{ route("treinos.ai.daily-review") }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken,
+                    },
+                    body: JSON.stringify({
+                        date: selectedDailyDate,
+                    }),
+                });
+
+                const json = await res.json();
+                loadingBox.style.display = 'none';
+
+                if (json.success && json.data) {
+                    lastAiResponse = json.data;
+                    renderAiResult(json.data);
+                } else {
+                    closeAiCoachModal();
+                    showToast('Erro ao avaliar hábitos do dia.');
+                }
+            } catch (err) {
+                console.error(err);
+                loadingBox.style.display = 'none';
+                closeAiCoachModal();
+                showToast('Erro de conexão com o Coach Gemini.');
+            }
+        }
+
+        function renderAiResult(data) {
+            const resultBox = document.getElementById('ai-coach-result');
+            resultBox.style.display = 'block';
+
+            if (currentAiMode === 'meal_deviation') {
+                resultBox.innerHTML = `
+                    <div class="ai-result-box">
+                        <div class="ai-kpi-row">
+                            <div class="ai-kpi-badge" style="border-left: 3px solid #ef4444;">
+                                🔥 ~${data.calorias_estimadas || 750} kcal <span style="font-weight: 500; color: #64748b; font-size: 0.75rem;">ingeridas</span>
+                            </div>
+                        </div>
+
+                        <div class="ai-recommendation-item">
+                            <div class="ai-recommendation-title">🥗 Ajuste Estratégico para o Jantar</div>
+                            <div>${data.ajuste_jantar}</div>
+                        </div>
+
+                        ${data.ajuste_lanche ? `
+                        <div class="ai-recommendation-item" style="border-left-color: #f59e0b;">
+                            <div class="ai-recommendation-title" style="color: #d97706;">🥪 Sugestão para o Lanche</div>
+                            <div>${data.ajuste_lanche}</div>
+                        </div>` : ''}
+
+                        ${data.cardio_compensatorio_sugestao ? `
+                        <div class="ai-recommendation-item" style="border-left-color: #10b981;">
+                            <div class="ai-recommendation-title" style="color: #059669;">🏃 Cardio Opcional de Apoio</div>
+                            <div>${data.cardio_compensatorio_sugestao}</div>
+                        </div>` : ''}
+
+                        <div style="background: #f1f5f9; padding: 0.65rem 0.85rem; border-radius: 0.5rem; font-size: 0.8rem; color: #475569; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+                            <span>💡</span> <em>"${data.dica_mental || 'Consistência vence a perfeição. Retome no jantar!'}"</em>
+                        </div>
+
+                        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.6rem; border-top: 1px solid #e2e8f0; padding-top: 0.85rem;">
+                            <button type="button" class="btn-outline" onclick="openAiCoachModal('meal_deviation')">◀ Consultar Outro Desvio</button>
+                            <button type="button" class="btn-primary" onclick="applyAiSuggestionToDailyLog()" style="background: #10b981; border-color: #10b981;">
+                                ✓ Aplicar Recomendações nas Notas de Hoje
+                            </button>
+                        </div>
+                    </div>
+                `;
+            } else if (currentAiMode === 'extra_workout') {
+                resultBox.innerHTML = `
+                    <div class="ai-result-box">
+                        <div class="ai-kpi-row">
+                            <div class="ai-kpi-badge" style="border-left: 3px solid #10b981;">
+                                ⚡ ~${data.calorias_gastas_estimadas || 450} kcal <span style="font-weight: 500; color: #64748b; font-size: 0.75rem;">queimadas a mais</span>
+                            </div>
+                            <div class="ai-kpi-badge" style="border-left: 3px solid #8b5cf6;">
+                                ⏱️ ${data.tempo_recuperacao_horas || 24}h <span style="font-weight: 500; color: #64748b; font-size: 0.75rem;">recuperação</span>
+                            </div>
+                        </div>
+
+                        <div class="ai-recommendation-item">
+                            <div class="ai-recommendation-title">🥩 Reposição Nutricional & Glicogênio</div>
+                            <div>${data.ajuste_nutricional}</div>
+                        </div>
+
+                        <div class="ai-recommendation-item" style="border-left-color: #f59e0b;">
+                            <div class="ai-recommendation-title" style="color: #d97706;">🛡️ Recomendações para o Dia Seguinte</div>
+                            <div>${data.recomendacao_dia_seguinte}</div>
+                        </div>
+
+                        <div style="background: #f1f5f9; padding: 0.65rem 0.85rem; border-radius: 0.5rem; font-size: 0.8rem; color: #475569; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+                            <span>🏆</span> <em>"${data.dica_performance || 'Ótima sessão! Foque no sono para consolidar a síntese proteica.'}"</em>
+                        </div>
+
+                        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.6rem; border-top: 1px solid #e2e8f0; padding-top: 0.85rem;">
+                            <button type="button" class="btn-outline" onclick="openAiCoachModal('extra_workout')">◀ Consultar Outro Treino</button>
+                            <button type="button" class="btn-primary" onclick="applyAiSuggestionToDailyLog()" style="background: #10b981; border-color: #10b981;">
+                                ✓ Salvar Ajuste nas Notas de Hoje
+                            </button>
+                        </div>
+                    </div>
+                `;
+            } else if (currentAiMode === 'review') {
+                resultBox.innerHTML = `
+                    <div class="ai-result-box">
+                        <div class="ai-kpi-row">
+                            <div class="ai-kpi-badge" style="border-left: 3px solid #6366f1;">
+                                ⭐ Score de Consistência: ${data.score_geral || 80}/100
+                            </div>
+                        </div>
+
+                        <div class="ai-recommendation-item" style="border-left-color: #10b981;">
+                            <div class="ai-recommendation-title" style="color: #059669;">🟢 Destaque Positivo</div>
+                            <div>${data.destaque_positivo}</div>
+                        </div>
+
+                        <div class="ai-recommendation-item" style="border-left-color: #f59e0b;">
+                            <div class="ai-recommendation-title" style="color: #d97706;">⚠️ Ponto de Atenção</div>
+                            <div>${data.ponto_de_atencao}</div>
+                        </div>
+
+                        <div class="ai-recommendation-item">
+                            <div class="ai-recommendation-title">🎯 Próximo Passo Recomendado</div>
+                            <div>${data.proximo_passo}</div>
+                        </div>
+
+                        <div style="background: #eef2ff; padding: 0.65rem 0.85rem; border-radius: 0.5rem; font-size: 0.85rem; color: #4338ca; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+                            <span>💬</span> <strong>"${data.frase_do_dia}"</strong>
+                        </div>
+
+                        <div style="display: flex; justify-content: flex-end; gap: 0.6rem; border-top: 1px solid #e2e8f0; padding-top: 0.85rem;">
+                            <button type="button" class="btn-outline" onclick="closeAiCoachModal()">Fechar</button>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        async function applyAiSuggestionToDailyLog() {
+            if (!lastAiResponse || !lastAiResponse.resumo_para_notas) {
+                showToast('Nenhum resumo da IA disponível para salvar.');
+                return;
+            }
+
+            try {
+                const res = await fetch('{{ route("treinos.ai.apply-suggestion") }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken,
+                    },
+                    body: JSON.stringify({
+                        date: selectedDailyDate,
+                        tipo: currentAiMode,
+                        resumo_para_notas: lastAiResponse.resumo_para_notas,
+                        agua_extra_ml: lastAiResponse.agua_extra_ml || lastAiResponse.agua_adicional_ml || 0,
+                    }),
+                });
+
+                const data = await res.json();
+                if (data.success) {
+                    showToast(data.message || 'Notas e ajustes atualizados!');
+                    closeAiCoachModal();
+
+                    // Atualizar campo de notas na tela sem precisar recarregar
+                    const notesTextarea = document.querySelector('textarea[name="notes"]');
+                    if (notesTextarea && data.data && data.data.notes) {
+                        notesTextarea.value = data.data.notes;
+                    }
+
+                    // Se foi desvio de refeição, desmarca almoço limpo visualmente
+                    if (currentAiMode === 'meal_deviation') {
+                        const lunchCb = document.getElementById('hk-lunch');
+                        if (lunchCb) lunchCb.checked = false;
+                    } else if (currentAiMode === 'extra_workout') {
+                        const workoutCb = document.getElementById('hk-workout');
+                        if (workoutCb) workoutCb.checked = true;
+                    }
+
+                    // Atualizar status de auto-save
+                    const autoSaveStatus = document.getElementById('auto-save-status');
+                    if (autoSaveStatus) {
+                        autoSaveStatus.innerText = '✓ Sincronizado com IA';
+                        autoSaveStatus.classList.add('saved');
+                    }
+                } else {
+                    showToast('Erro ao aplicar resumo nas notas.');
+                }
+            } catch (err) {
+                console.error(err);
+                showToast('Erro ao salvar no diário.');
+            }
+        }
+
         // Initialization
         document.addEventListener('DOMContentLoaded', () => {
             selectMannequinPoint('chest');
             applyHeatmapColors();
             initTimelineSlider();
+            renderHeatmapGrid();
         });
     </script>
 </body>

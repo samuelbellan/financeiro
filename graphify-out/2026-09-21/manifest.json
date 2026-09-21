@@ -810,8 +810,8 @@
     "semantic_hash": ""
   },
   "resources/views/treinos/index.blade.php": {
-    "mtime": 1790001921.888772,
-    "ast_hash": "0f32bcced9bb303e759beadb9f209861",
+    "mtime": 1790001481.5172443,
+    "ast_hash": "f252c2a8c16172c6ab553202315cbf72",
     "semantic_hash": ""
   },
   "tests/Feature/TelegramWebhookTest.php": {
@@ -865,13 +865,13 @@
     "semantic_hash": ""
   },
   "app/Http/Controllers/BodyTrackerController.php": {
-    "mtime": 1790001775.794366,
-    "ast_hash": "72593c899c19e08234941f029e87b511",
+    "mtime": 1789985050.4431386,
+    "ast_hash": "e767809bfb1b175359e633bc6c3c01e9",
     "semantic_hash": ""
   },
   "app/Models/DailyLog.php": {
-    "mtime": 1790001751.904725,
-    "ast_hash": "50c33cf7c7461efe2ba9453f1b1caf4f",
+    "mtime": 1789985041.6290236,
+    "ast_hash": "e029848a072498851a1aa57da4a30ef0",
     "semantic_hash": ""
   },
   "app/Models/Measurement.php": {
@@ -895,13 +895,13 @@
     "semantic_hash": ""
   },
   "tests/Feature/BodyTrackerTest.php": {
-    "mtime": 1790001781.0259402,
-    "ast_hash": "d6e13267fb94dd3be6b06cd664b4b61e",
+    "mtime": 1789985208.0845122,
+    "ast_hash": "cb09e6c62a637c4581aa12b328d1bcb4",
     "semantic_hash": ""
   },
   "app/Services/FitnessAiService.php": {
-    "mtime": 1790001769.4755864,
-    "ast_hash": "d09d655dc9fa069fe756c795c2a0b647",
+    "mtime": 1790001317.1924357,
+    "ast_hash": "e257995861b8ff6b57e04a24a2e1c74e",
     "semantic_hash": ""
   },
   "tests/Feature/FitnessAiModuleTest.php": {

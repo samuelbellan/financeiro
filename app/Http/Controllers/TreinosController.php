@@ -14,16 +14,19 @@ use App\Models\DailyLog;
 use App\Models\Measurement;
 use App\Models\ProgressPhoto;
 use App\Services\BodyTrackerService;
+use App\Services\FitnessAiService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class TreinosController extends Controller
 {
     protected BodyTrackerService $trackerService;
+    protected FitnessAiService $fitnessAi;
 
-    public function __construct(BodyTrackerService $trackerService)
+    public function __construct(BodyTrackerService $trackerService, FitnessAiService $fitnessAi)
     {
         $this->trackerService = $trackerService;
+        $this->fitnessAi = $fitnessAi;
     }
 
     public function index(Request $request)
@@ -96,6 +99,31 @@ class TreinosController extends Controller
         $recentPhotos = $this->trackerService->getPhotos($userId);
         $consistencyStreak = $this->trackerService->getConsistencyStreak($userId);
 
+        // Histórico de diários para o Mapa de Calor / Heatmap (último ano / 52 semanas no estilo GitHub)
+        $startDateHeatmap = now()->subYear()->subDays(7)->toDateString();
+        $dailyLogsHistory = DailyLog::where('user_id', $userId)
+            ->where('date', '>=', $startDateHeatmap)
+            ->orderBy('date', 'asc')
+            ->get();
+
+        $dailyLogsMap = [];
+        foreach ($dailyLogsHistory as $dLog) {
+            $dateKey = is_string($dLog->date) ? substr($dLog->date, 0, 10) : $dLog->date->format('Y-m-d');
+            $dailyLogsMap[$dateKey] = [
+                'date' => $dateKey,
+                'adherence_score' => $dLog->adherence_score,
+                'workout_done' => (bool) $dLog->workout_done,
+                'workout_type' => $dLog->workout_type,
+                'workout_duration_min' => $dLog->workout_duration_min,
+                'water_volume_ml' => $dLog->water_volume_ml,
+                'breakfast_clean' => (bool) $dLog->breakfast_clean,
+                'lunch_clean' => (bool) $dLog->lunch_clean,
+                'snack_done' => (bool) $dLog->snack_done,
+                'dinner_clean' => (bool) $dLog->dinner_clean,
+                'notes' => $dLog->notes,
+            ];
+        }
+
         // Catálogo de Exercícios para os selects nos modais
         $allExercises = Exercise::ativo()->orderBy('nome')->get();
 
@@ -114,7 +142,8 @@ class TreinosController extends Controller
             'trackerSummary',
             'recentPhotos',
             'consistencyStreak',
-            'allExercises'
+            'allExercises',
+            'dailyLogsMap'
         ));
     }
 
@@ -436,5 +465,134 @@ class TreinosController extends Controller
         $session->delete();
 
         return response()->json(['success' => true, 'message' => 'Sessão excluída com sucesso.']);
+    }
+
+    /**
+     * POST /treinos/ai/analyze-meal
+     * Analisa desvios na dieta (ex: almoço fora da dieta / refeição livre) via Gemini.
+     */
+    public function analyzeMeal(Request $request)
+    {
+        $validated = $request->validate([
+            'descricao' => 'required|string|min:3|max:1000',
+            'date' => 'nullable|date',
+        ]);
+
+        $userId = Auth::id();
+        $date = $validated['date'] ?? now()->toDateString();
+        $dailyLog = DailyLog::where('user_id', $userId)->where('date', $date)->first();
+        $latestMeasurement = Measurement::where('user_id', $userId)->orderByDesc('date')->orderByDesc('id')->first();
+
+        $result = $this->fitnessAi->analyzeMealDeviation($validated['descricao'], $dailyLog, $latestMeasurement);
+
+        return response()->json([
+            'success' => true,
+            'data' => $result,
+        ]);
+    }
+
+    /**
+     * POST /treinos/ai/analyze-workout
+     * Analisa treino extra ou sobrecarga física via Gemini.
+     */
+    public function analyzeWorkout(Request $request)
+    {
+        $validated = $request->validate([
+            'descricao' => 'required|string|min:3|max:1000',
+            'date' => 'nullable|date',
+        ]);
+
+        $userId = Auth::id();
+        $date = $validated['date'] ?? now()->toDateString();
+        $dailyLog = DailyLog::where('user_id', $userId)->where('date', $date)->first();
+        $latestMeasurement = Measurement::where('user_id', $userId)->orderByDesc('date')->orderByDesc('id')->first();
+
+        $result = $this->fitnessAi->analyzeExtraWorkout($validated['descricao'], $dailyLog, $latestMeasurement);
+
+        return response()->json([
+            'success' => true,
+            'data' => $result,
+        ]);
+    }
+
+    /**
+     * POST /treinos/ai/daily-review
+     * Avaliação holística do dia selecionado pelo Coach IA.
+     */
+    public function dailyReview(Request $request)
+    {
+        $userId = Auth::id();
+        $date = $request->input('date', now()->toDateString());
+        $dailyLog = DailyLog::firstOrCreate(
+            ['user_id' => $userId, 'date' => $date],
+            [
+                'workout_done' => false,
+                'breakfast_clean' => false,
+                'lunch_clean' => true,
+                'snack_done' => false,
+                'dinner_clean' => true,
+                'water_volume_ml' => 0,
+            ]
+        );
+        $latestMeasurement = Measurement::where('user_id', $userId)->orderByDesc('date')->orderByDesc('id')->first();
+
+        $result = $this->fitnessAi->evaluateDailyProgress($dailyLog, $latestMeasurement);
+
+        return response()->json([
+            'success' => true,
+            'data' => $result,
+        ]);
+    }
+
+    /**
+     * POST /treinos/ai/apply-suggestion
+     * Aplica o resumo da IA diretamente no DailyLog do dia correspondente.
+     */
+    public function applyAiSuggestion(Request $request)
+    {
+        $validated = $request->validate([
+            'date' => 'nullable|date',
+            'resumo_para_notas' => 'required|string|max:1000',
+            'tipo' => 'required|string|in:meal_deviation,extra_workout,review',
+            'agua_extra_ml' => 'nullable|integer|min:0|max:3000',
+        ]);
+
+        $userId = Auth::id();
+        $date = $validated['date'] ?? now()->toDateString();
+
+        $dailyLog = DailyLog::firstOrCreate(
+            ['user_id' => $userId, 'date' => $date],
+            [
+                'workout_done' => false,
+                'breakfast_clean' => false,
+                'lunch_clean' => true,
+                'snack_done' => false,
+                'dinner_clean' => true,
+                'water_volume_ml' => 0,
+            ]
+        );
+
+        // Concatenar notas mantendo histórico prévio se houver
+        $resumo = trim($validated['resumo_para_notas']);
+        if (!empty($dailyLog->notes)) {
+            $dailyLog->notes = $dailyLog->notes . "\n\n[IA Gemini] " . $resumo;
+        } else {
+            $dailyLog->notes = "[IA Gemini] " . $resumo;
+        }
+
+        // Ajustes pontuais conforme o tipo
+        if ($validated['tipo'] === 'meal_deviation') {
+            $dailyLog->lunch_clean = false; // Sinaliza o desvio na refeição
+        } elseif ($validated['tipo'] === 'extra_workout') {
+            $dailyLog->workout_done = true; // Garante que foi registrado treino/atividade
+        }
+
+        $dailyLog->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Orientações da IA aplicadas ao diário de ' . ($dailyLog->date ? $dailyLog->date->format('d/m/Y') : $date) . '!',
+            'data' => $dailyLog,
+        ]);
     }
 }

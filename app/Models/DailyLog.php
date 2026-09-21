@@ -36,6 +36,11 @@ class DailyLog extends Model
         'water_volume_ml' => 'integer',
     ];
 
+    protected $appends = [
+        'adherence_score',
+        'water_progress_percent',
+    ];
+
     public function user()
     {
         return $this->belongsTo(User::class);
@@ -43,7 +48,7 @@ class DailyLog extends Model
 
     /**
      * Percentual de adesão aos hábitos saudáveis do dia (0 a 100%).
-     * Considera: Treino, Café sem açúcar/mel, Almoço equilibrado, Lanche proteico, Jantar leve e Meta de água (3000ml).
+     * Considera: Treino, Café sem açúcar/mel, Almoço equilibrado, Lanche proteico e Jantar leve.
      */
     public function getAdherenceScoreAttribute(): int
     {
@@ -53,7 +58,6 @@ class DailyLog extends Model
             $this->lunch_clean,
             $this->snack_done,
             $this->dinner_clean,
-            ($this->water_volume_ml >= 3000),
         ];
 
         $completed = count(array_filter($habits));

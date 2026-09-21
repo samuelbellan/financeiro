@@ -1,7 +1,7 @@
 # Graph Report - financeiro  (2026-09-21)
 
 ## Corpus Check
-- 173 files · ~295,907 words
+- 173 files · ~296,447 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
@@ -193,7 +193,7 @@ Nodes (3): TelegramWebhookController, WhatsappLog, Carbon
 
 ### Community 44 - "Exercise"
 Cohesion: 0.09
-Nodes (4): Exercise, WorkoutGoal, ExerciseCatalogSeeder, WorkoutModuleTest
+Nodes (4): Exercise, WorkoutPlanItem, ExerciseCatalogSeeder, WorkoutModuleTest
 
 ### Community 47 - "Categoria"
 Cohesion: 0.23

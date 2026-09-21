@@ -73,7 +73,45 @@ class BodyTrackerController extends Controller
                     'dinner_clean' => true,
                     'water_volume_ml' => 0,
                     'notes' => null,
-                    'adherence_score' => 33,
+                    'adherence_score' => 40,
+                    'water_progress_percent' => 0,
+                ],
+            ]);
+        }
+
+        return response()->json([
+            'exists' => true,
+            'data' => $log,
+            'adherence_score' => $log->adherence_score,
+            'water_progress_percent' => $log->water_progress_percent,
+        ]);
+    }
+
+    /**
+     * GET /api/tracker/daily-log/by-date?date=YYYY-MM-DD
+     * Retorna o diário de uma data específica.
+     */
+    public function getDailyLogByDate(Request $request): JsonResponse
+    {
+        $userId = Auth::id();
+        $date = $request->query('date', now()->toDateString());
+        $log = $this->trackerService->getDailyLogForDate($userId, $date);
+
+        if (!$log) {
+            return response()->json([
+                'exists' => false,
+                'data' => [
+                    'date' => $date,
+                    'workout_done' => false,
+                    'workout_type' => 'STRENGTH_CIRCUIT',
+                    'workout_duration_min' => 30,
+                    'breakfast_clean' => false,
+                    'lunch_clean' => false,
+                    'snack_done' => false,
+                    'dinner_clean' => false,
+                    'water_volume_ml' => 0,
+                    'notes' => null,
+                    'adherence_score' => 0,
                     'water_progress_percent' => 0,
                 ],
             ]);
