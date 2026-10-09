@@ -89,17 +89,27 @@ Se preferir usar um banco PostgreSQL externo (como Neon.tech ou Supabase):
 
 ---
 
-## 🤖 Como testar e gerenciar o Bot do Telegram na Nuvem
+## 🤖 Como funciona o Bot do Telegram com Roteamento Inteligente (Local-First + Nuvem Fallback)
 
-Após o deploy, suas mensagens enviadas ao bot no Telegram cairão diretamente no sistema online!
+O bot do Telegram opera com um sistema de alta disponibilidade e sincronização inteligente:
 
-Se precisar redefinir o Webhook manualmente a qualquer momento, basta rodar via console/terminal do seu host:
-```bash
-php artisan telegram:set-webhook https://sua-url-na-nuvem.com/webhook/telegram
-```
+1. **Local-First (Prioridade Máxima)**:
+   - Quando você envia uma nota fiscal ou mensagem de gasto no Telegram, o webhook da Nuvem verifica em tempo real (em menos de 2 segundos) se o seu projeto **Local** está aberto e online (via ngrok/túnel).
+   - Estando **ONLINE**: Os dados, OCR com IA e a foto são salvos diretamente no seu **projeto local** (`SQLite` + storage local) e confirmados com a tag `💻 Ambiente: Projeto Local`!
+2. **Nuvem Fallback de Segurança**:
+   - Se o seu computador estiver desligado, suspenso ou o túnel fechado: a Nuvem assume o comando automaticamente e salva tudo no PostgreSQL da **Neon.tech** + storage da Nuvem, com a tag `☁️ Ambiente: Nuvem (Projeto Local Offline)`.
+   - Você nunca perde nenhuma mensagem ou nota fiscal enviada na rua!
+3. **Sincronização Rápida ao Voltar ao Computador**:
+   - Ao ligar o PC, basta rodar:
+     ```powershell
+     php artisan db:sync --direction=pull
+     ```
+     (ou clicar em **Sincronizar** no painel web). Todos os registros e fotos pendentes criados na Nuvem serão baixados para o seu banco local.
 
-Para verificar o status do webhook:
-Envie qualquer mensagem para o bot no Telegram (ex: `Gastei 50 almoço`).
+4. **Comandos Úteis do Telegram**:
+   - `php artisan telegram:register-local`: Registra/anuncia a URL do seu túnel local para a Nuvem dinamicamente.
+   - `php artisan telegram:set-webhook --info`: Exibe a URL atual e mensagens pendentes no Telegram.
+
 
 ---
 

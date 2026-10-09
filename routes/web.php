@@ -22,9 +22,14 @@ Route::get('/', function () {
     return redirect()->route('login');
 });
 
-// ── Telegram Webhook (rota pública, sem autenticação) ─────────────────────────
+// ── Telegram Webhook (rotas públicas) ───────────────────────────────────────────
 Route::post('/webhook/telegram', [TelegramWebhookController::class, 'receive'])
     ->name('webhook.telegram');
+Route::get('/webhook/telegram/ping', [TelegramWebhookController::class, 'ping'])
+    ->name('webhook.telegram.ping');
+Route::post('/webhook/telegram/register-local', [TelegramWebhookController::class, 'registerLocalUrl'])
+    ->name('webhook.telegram.register-local');
+
 
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
 Route::post('/login', [AuthController::class, 'authenticate'])->name('login.post');

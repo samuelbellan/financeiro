@@ -6,6 +6,9 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Storage;
+
 
 class DatabaseSyncService
 {
@@ -93,12 +96,19 @@ class DatabaseSyncService
      */
     public function pull(): array
     {
-        return $this->transferData(
+        $result = $this->transferData(
             sourceConnection: 'pgsql_cloud',
             destinationConnection: config('database.default'),
             directionName: 'Nuvem ➔ Local (PULL)'
         );
+
+        if ($result['success'] ?? false) {
+            $this->syncMissingReceiptPhotos();
+        }
+
+        return $result;
     }
+
 
     /**
      * Push data from Local to Cloud.
@@ -284,4 +294,29 @@ class DatabaseSyncService
             ];
         }
     }
+
+    /**
+     * Faz download das imagens de notas fiscais salvas na nuvem que não existem no storage local.
+     */
+    protected function syncMissingReceiptPhotos(): void
+    {
+        try {
+            $cloudUrl = env('CLOUD_APP_URL', 'https://financeiro-app-mrik.onrender.com');
+            $notas = \App\Models\NotaFiscal::whereNotNull('foto_path')->get();
+
+            foreach ($notas as $nf) {
+                if (!empty($nf->foto_path) && !Storage::disk('public')->exists($nf->foto_path)) {
+                    $photoUrl = rtrim($cloudUrl, '/') . '/storage/' . ltrim($nf->foto_path, '/');
+                    $res = Http::timeout(5)->get($photoUrl);
+                    if ($res->successful()) {
+                        Storage::disk('public')->put($nf->foto_path, $res->body());
+                        Log::info("[DatabaseSync] Foto da nota baixada da nuvem com sucesso: {$nf->foto_path}");
+                    }
+                }
+            }
+        } catch (\Throwable $e) {
+            Log::warning("[DatabaseSync] Não foi possível sincronizar fotos da nuvem: " . $e->getMessage());
+        }
+    }
 }
+

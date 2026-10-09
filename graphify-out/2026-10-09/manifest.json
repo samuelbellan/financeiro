@@ -80,8 +80,8 @@
     "semantic_hash": ""
   },
   "app/Http/Controllers/TelegramWebhookController.php": {
-    "mtime": 1791549616.7703433,
-    "ast_hash": "7d44550ef36424ff2fbe575f1f18465a",
+    "mtime": 1789562979.8973978,
+    "ast_hash": "282c0dfcfef05db5692863cf3b2dfcc0",
     "semantic_hash": ""
   },
   "app/Models/Cartao.php": {
@@ -260,8 +260,8 @@
     "semantic_hash": ""
   },
   "config/telegram.php": {
-    "mtime": 1791549486.3036644,
-    "ast_hash": "97a10ef83160d809e0e03176ee4d2e4f",
+    "mtime": 1784144175.4256692,
+    "ast_hash": "850ec041c5d7a328828024e0c5be0fae",
     "semantic_hash": ""
   },
   "database/factories/UserFactory.php": {
@@ -490,8 +490,8 @@
     "semantic_hash": ""
   },
   "routes/web.php": {
-    "mtime": 1791549496.406482,
-    "ast_hash": "95af7beba132eea70db26e7976b1c36d",
+    "mtime": 1790001342.4064574,
+    "ast_hash": "beba751c1b26a45bd9363d28aff5cf85",
     "semantic_hash": ""
   },
   "tests/Feature/ExampleTest.php": {
@@ -705,8 +705,8 @@
     "semantic_hash": ""
   },
   "DEPLOY_NUVEM.md": {
-    "mtime": 1791549809.09665,
-    "ast_hash": "6154e12e9cf5c4ee644914bb7dd708a8",
+    "mtime": 1788706090.3680515,
+    "ast_hash": "2530ef9c51747abaa4b6a51417a9d579",
     "semantic_hash": ""
   },
   "docker-compose.prod.yml": {
@@ -715,8 +715,8 @@
     "semantic_hash": ""
   },
   "render.yaml": {
-    "mtime": 1791549708.171976,
-    "ast_hash": "90f3e3b0c29a3cc1f1115132bf319660",
+    "mtime": 1788706090.4383025,
+    "ast_hash": "04de0bdfbd91785010099fb2e770ce9d",
     "semantic_hash": ""
   },
   "tests/Unit/WhatsappMessageParserTest.php": {
@@ -830,8 +830,8 @@
     "semantic_hash": ""
   },
   "app/Services/DatabaseSyncService.php": {
-    "mtime": 1791549675.3189025,
-    "ast_hash": "4eb0b870b1b63a60b555e744c113e46f",
+    "mtime": 1789634986.1550603,
+    "ast_hash": "e63383b37b3bd5b558ed05ee3a96d052",
     "semantic_hash": ""
   },
   "resources/views/components/sync-modal.blade.php": {
@@ -907,16 +907,6 @@
   "tests/Feature/FitnessAiModuleTest.php": {
     "mtime": 1790001498.585772,
     "ast_hash": "58e01c354afa3fd7865b48094cc1de44",
-    "semantic_hash": ""
-  },
-  "app/Console/Commands/TelegramRegisterLocalCommand.php": {
-    "mtime": 1791549625.4447927,
-    "ast_hash": "be3f7a2a196360641b9894e081a7dfe3",
-    "semantic_hash": ""
-  },
-  "tests/Feature/TelegramWebhookRoutingTest.php": {
-    "mtime": 1791549742.9865108,
-    "ast_hash": "462559acf9480f3163ad08dca23c90cf",
     "semantic_hash": ""
   }
 }

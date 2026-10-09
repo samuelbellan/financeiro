@@ -41,3 +41,6 @@ services:
         value: "1"
       - key: GEMINI_API_KEY
         sync: false
+      - key: TELEGRAM_LOCAL_WEBHOOK_URL
+        value: https://unfrosted-surreal-ducky.ngrok-free.dev/webhook/telegram
+

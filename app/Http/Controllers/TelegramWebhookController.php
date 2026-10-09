@@ -22,7 +22,9 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Http;
 use Barryvdh\DomPDF\Facade\Pdf;
+
 
 class TelegramWebhookController extends Controller
 {
@@ -108,7 +110,14 @@ class TelegramWebhookController extends Controller
             return response()->json(['ok' => true, 'skipped' => 'unauthorized chat']);
         }
 
+        // ── 3.1. Roteamento Local-First (Tentar Projeto Local antes da Nuvem) ────
+        $forwardedResponse = $this->attemptForwardToLocal($request);
+        if ($forwardedResponse !== null) {
+            return $forwardedResponse;
+        }
+
         // ── 4. Encontrar usuário dono do sistema ──────────────────────────────
+
         $userId = config('telegram.user_id');
         $user = User::find($userId) ?? User::first();
         if (!$user) {
@@ -815,7 +824,16 @@ class TelegramWebhookController extends Controller
 
         $msg .= "\n✅ Lançamento registrado e " . count($itens) . " itens salvos no seu histórico de mercado!";
 
+        // Identificação de ambiente (Local vs Nuvem Fallback)
+        $isLocal = request()->header('X-Forwarded-From-Cloud') === 'true' || config('app.env') === 'local';
+        if ($isLocal) {
+            $msg .= "\n💻 _Ambiente: Projeto Local_";
+        } else {
+            $msg .= "\n☁️ _Ambiente: Nuvem (Projeto Local Offline)_";
+        }
+
         $this->telegram->sendMessage($chatId, $msg);
+
         return $msg;
     }
 
@@ -867,4 +885,149 @@ class TelegramWebhookController extends Controller
         WhatsappLog::where('numero', 'like', 'tg:%')->delete();
         return response()->json(['success' => true]);
     }
+
+    /**
+     * Endpoint leve de verificação de status (ping) usado pela Nuvem
+     * para verificar em menos de 2.5s se o projeto local está online.
+     * GET /webhook/telegram/ping
+     */
+    public function ping()
+    {
+        return response()->json([
+            'ok'        => true,
+            'status'    => 'online',
+            'env'       => config('app.env'),
+            'app_url'   => config('app.url'),
+            'timestamp' => now()->toIso8601String(),
+        ]);
+    }
+
+    /**
+     * Permite que o projeto local anuncie seu endereço público para a Nuvem dinamicamente.
+     * POST /webhook/telegram/register-local
+     */
+    public function registerLocalUrl(Request $request)
+    {
+        $secret = config('telegram.webhook_secret');
+        $token = $request->header('X-Telegram-Bot-Api-Secret-Token') ?? $request->input('secret');
+
+        if (!empty($secret) && $token !== $secret) {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+
+        $url = trim($request->input('url', ''));
+        if (empty($url) || !filter_var($url, FILTER_VALIDATE_URL)) {
+            return response()->json(['error' => 'URL inválida'], 422);
+        }
+
+        if (!str_contains($url, '/webhook/telegram')) {
+            $url = rtrim($url, '/') . '/webhook/telegram';
+        }
+
+        Cache::put('telegram_dynamic_local_url', $url, now()->addDays(30));
+
+        Log::info('[Telegram Webhook] URL do projeto local registrada dinamicamente na Nuvem.', [
+            'url' => $url,
+            'ip'  => $request->ip(),
+        ]);
+
+        return response()->json([
+            'ok'        => true,
+            'message'   => 'URL do projeto local registrada com sucesso!',
+            'local_url' => $url,
+        ]);
+    }
+
+    /**
+     * Tenta encaminhar a requisição para o projeto local se estiver online (Local-First).
+     * Retorna a resposta JSON se processado com sucesso pelo local, ou null se offline/não aplicável.
+     */
+    protected function attemptForwardToLocal(Request $request): ?\Illuminate\Http\JsonResponse
+    {
+        // 1. Evitar loops: se a requisição já veio encaminhada pela Nuvem, processa aqui no local
+        if ($request->header('X-Forwarded-From-Cloud') === 'true') {
+            return null;
+        }
+
+        // 2. Obter a URL do projeto local (do Cache dinâmico ou do config/env)
+        $localWebhookUrl = Cache::get('telegram_dynamic_local_url') ?: config('telegram.local_webhook_url');
+
+        if (empty($localWebhookUrl)) {
+            return null;
+        }
+
+        // 3. Garantir que a URL termina em /webhook/telegram
+        if (!str_contains($localWebhookUrl, '/webhook/telegram')) {
+            $localWebhookUrl = rtrim($localWebhookUrl, '/') . '/webhook/telegram';
+        }
+
+        // 4. Evitar que a aplicação encaminhe para si mesma
+        $currentHost = parse_url(config('app.url'), PHP_URL_HOST);
+        $targetHost = parse_url($localWebhookUrl, PHP_URL_HOST);
+        if (!empty($currentHost) && !empty($targetHost) && strtolower($currentHost) === strtolower($targetHost)) {
+            return null;
+        }
+
+        // 5. Testar se o projeto local está online com ping rápido (máximo 2.5s)
+        $baseUrl = preg_replace('#/webhook/telegram.*#i', '', $localWebhookUrl);
+        $pingUrl = rtrim($baseUrl, '/') . '/webhook/telegram/ping';
+
+        $isOnline = false;
+        try {
+            $pingResponse = Http::timeout(2.5)
+                ->withHeaders([
+                    'ngrok-skip-browser-warning' => 'true',
+                    'Accept'                     => 'application/json',
+                ])
+                ->get($pingUrl);
+
+            $isOnline = $pingResponse->successful();
+        } catch (\Throwable $e) {
+            $isOnline = false;
+            Log::info('[Telegram Webhook] Projeto local inacessível no ping: ' . $e->getMessage());
+        }
+
+        if (!$isOnline) {
+            Log::warning('[Telegram Webhook] Projeto LOCAL está OFFLINE. Executando processamento no projeto da NUVEM.');
+            return null;
+        }
+
+        // 6. Projeto local está online! Encaminhar o payload completo do Telegram
+        Log::info('[Telegram Webhook] Projeto LOCAL está ONLINE. Encaminhando dados...', [
+            'target' => $localWebhookUrl,
+        ]);
+
+        try {
+            $secret = config('telegram.webhook_secret');
+            $forwardHeaders = [
+                'X-Forwarded-From-Cloud'     => 'true',
+                'ngrok-skip-browser-warning' => 'true',
+                'Accept'                     => 'application/json',
+            ];
+            if (!empty($secret)) {
+                $forwardHeaders['X-Telegram-Bot-Api-Secret-Token'] = $secret;
+            }
+
+            // Timeout de até 60s para OCR/Gemini ser concluído pelo local
+            $forward = Http::timeout(60)
+                ->withHeaders($forwardHeaders)
+                ->post($localWebhookUrl, $request->all());
+
+            if ($forward->successful()) {
+                Log::info('[Telegram Webhook] Requisição processada com sucesso no projeto LOCAL.');
+                return response()->json([
+                    'ok'        => true,
+                    'handled_by'=> 'local',
+                    'response'  => $forward->json(),
+                ]);
+            } else {
+                Log::warning('[Telegram Webhook] Projeto local retornou status ' . $forward->status() . '. Fazendo fallback para a Nuvem.');
+            }
+        } catch (\Throwable $e) {
+            Log::warning('[Telegram Webhook] Falha ao enviar para o projeto local (' . $e->getMessage() . '). Fazendo fallback para a Nuvem.');
+        }
+
+        return null;
+    }
 }
+
