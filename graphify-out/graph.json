@@ -3510,49 +3510,49 @@
     {
       "label": "down()",
       "file_type": "code",
-      "source_file": "database/migrations/0001_01_01_000001_create_cache_table.php",
-      "source_location": "L30",
+      "source_file": "database/migrations/2026_04_24_190322_add_tipo_to_transacao_previsoes_table.php",
+      "source_location": "L22",
       "_callable": true,
       "_origin": "ast",
-      "id": "database_migrations_0001_01_01_000001_create_cache_table_down",
+      "id": "database_migrations_2026_04_24_190322_add_tipo_to_transacao_previsoes_table_down",
       "community": 19,
-      "community_name": "Illuminate\\Database\\Schema\\Blueprint",
+      "community_name": "Illuminate\\Support\\Facades\\Schema",
       "norm_label": "down()"
     },
     {
       "label": "up()",
       "file_type": "code",
-      "source_file": "database/migrations/0001_01_01_000001_create_cache_table.php",
+      "source_file": "database/migrations/2026_04_24_190322_add_tipo_to_transacao_previsoes_table.php",
       "source_location": "L12",
       "_callable": true,
       "_origin": "ast",
-      "id": "database_migrations_0001_01_01_000001_create_cache_table_up",
+      "id": "database_migrations_2026_04_24_190322_add_tipo_to_transacao_previsoes_table_up",
       "community": 19,
-      "community_name": "Illuminate\\Database\\Schema\\Blueprint",
+      "community_name": "Illuminate\\Support\\Facades\\Schema",
       "norm_label": "up()"
     },
     {
       "label": "down()",
       "file_type": "code",
-      "source_file": "database/migrations/2026_05_02_133147_alter_valor_total_to_decimal_in_cartao_compras_table.php",
-      "source_location": "L22",
+      "source_file": "database/migrations/2026_08_25_000001_create_fiscal_concursos_table.php",
+      "source_location": "L72",
       "_callable": true,
       "_origin": "ast",
-      "id": "database_migrations_2026_05_02_133147_alter_valor_total_to_decimal_in_cartao_compras_table_down",
+      "id": "database_migrations_2026_08_25_000001_create_fiscal_concursos_table_down",
       "community": 19,
-      "community_name": "Illuminate\\Database\\Schema\\Blueprint",
+      "community_name": "Illuminate\\Support\\Facades\\Schema",
       "norm_label": "down()"
     },
     {
       "label": "up()",
       "file_type": "code",
-      "source_file": "database/migrations/2026_05_02_133147_alter_valor_total_to_decimal_in_cartao_compras_table.php",
+      "source_file": "database/migrations/2026_08_25_000001_create_fiscal_concursos_table.php",
       "source_location": "L12",
       "_callable": true,
       "_origin": "ast",
-      "id": "database_migrations_2026_05_02_133147_alter_valor_total_to_decimal_in_cartao_compras_table_up",
+      "id": "database_migrations_2026_08_25_000001_create_fiscal_concursos_table_up",
       "community": 19,
-      "community_name": "Illuminate\\Database\\Schema\\Blueprint",
+      "community_name": "Illuminate\\Support\\Facades\\Schema",
       "norm_label": "up()"
     },
     {
@@ -3564,7 +3564,7 @@
       "_origin": "ast",
       "id": "database_migrations_2026_08_26_000001_add_vigencia_fields_to_fiscal_concursos_table_down",
       "community": 19,
-      "community_name": "Illuminate\\Database\\Schema\\Blueprint",
+      "community_name": "Illuminate\\Support\\Facades\\Schema",
       "norm_label": "down()"
     },
     {
@@ -3576,7 +3576,7 @@
       "_origin": "ast",
       "id": "database_migrations_2026_08_26_000001_add_vigencia_fields_to_fiscal_concursos_table_up",
       "community": 19,
-      "community_name": "Illuminate\\Database\\Schema\\Blueprint",
+      "community_name": "Illuminate\\Support\\Facades\\Schema",
       "norm_label": "up()"
     },
     {
@@ -4362,25 +4362,25 @@
     {
       "label": "down()",
       "file_type": "code",
-      "source_file": "database/migrations/2026_04_24_183542_create_transacaos_table.php",
+      "source_file": "database/migrations/2026_04_24_184000_create_cartaos_table.php",
       "source_location": "L29",
       "_callable": true,
       "_origin": "ast",
-      "id": "database_migrations_2026_04_24_183542_create_transacaos_table_down",
+      "id": "database_migrations_2026_04_24_184000_create_cartaos_table_down",
       "community": 33,
-      "community_name": "2026_04_24_183542_create_transacaos_table.php",
+      "community_name": "2026_04_24_184000_create_cartaos_table.php",
       "norm_label": "down()"
     },
     {
       "label": "up()",
       "file_type": "code",
-      "source_file": "database/migrations/2026_04_24_183542_create_transacaos_table.php",
+      "source_file": "database/migrations/2026_04_24_184000_create_cartaos_table.php",
       "source_location": "L12",
       "_callable": true,
       "_origin": "ast",
-      "id": "database_migrations_2026_04_24_183542_create_transacaos_table_up",
+      "id": "database_migrations_2026_04_24_184000_create_cartaos_table_up",
       "community": 33,
-      "community_name": "2026_04_24_183542_create_transacaos_table.php",
+      "community_name": "2026_04_24_184000_create_cartaos_table.php",
       "norm_label": "up()"
     },
     {
@@ -6750,13 +6750,37 @@
     {
       "label": "down()",
       "file_type": "code",
+      "source_file": "database/migrations/0001_01_01_000001_create_cache_table.php",
+      "source_location": "L30",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "database_migrations_0001_01_01_000001_create_cache_table_down",
+      "community": 83,
+      "community_name": "Illuminate\\Database\\Schema\\Blueprint",
+      "norm_label": "down()"
+    },
+    {
+      "label": "up()",
+      "file_type": "code",
+      "source_file": "database/migrations/0001_01_01_000001_create_cache_table.php",
+      "source_location": "L12",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "database_migrations_0001_01_01_000001_create_cache_table_up",
+      "community": 83,
+      "community_name": "Illuminate\\Database\\Schema\\Blueprint",
+      "norm_label": "up()"
+    },
+    {
+      "label": "down()",
+      "file_type": "code",
       "source_file": "database/migrations/2026_04_24_184001_create_cartao_compras_table.php",
       "source_location": "L30",
       "_callable": true,
       "_origin": "ast",
       "id": "database_migrations_2026_04_24_184001_create_cartao_compras_table_down",
       "community": 83,
-      "community_name": "Illuminate\\Support\\Facades\\Schema",
+      "community_name": "Illuminate\\Database\\Schema\\Blueprint",
       "norm_label": "down()"
     },
     {
@@ -6768,7 +6792,7 @@
       "_origin": "ast",
       "id": "database_migrations_2026_04_24_184001_create_cartao_compras_table_up",
       "community": 83,
-      "community_name": "Illuminate\\Support\\Facades\\Schema",
+      "community_name": "Illuminate\\Database\\Schema\\Blueprint",
       "norm_label": "up()"
     },
     {
@@ -6780,7 +6804,7 @@
       "_origin": "ast",
       "id": "database_migrations_2026_04_24_184002_create_cartao_parcelas_table_down",
       "community": 83,
-      "community_name": "Illuminate\\Support\\Facades\\Schema",
+      "community_name": "Illuminate\\Database\\Schema\\Blueprint",
       "norm_label": "down()"
     },
     {
@@ -6792,31 +6816,7 @@
       "_origin": "ast",
       "id": "database_migrations_2026_04_24_184002_create_cartao_parcelas_table_up",
       "community": 83,
-      "community_name": "Illuminate\\Support\\Facades\\Schema",
-      "norm_label": "up()"
-    },
-    {
-      "label": "down()",
-      "file_type": "code",
-      "source_file": "database/migrations/2026_04_24_190322_add_tipo_to_transacao_previsoes_table.php",
-      "source_location": "L22",
-      "_callable": true,
-      "_origin": "ast",
-      "id": "database_migrations_2026_04_24_190322_add_tipo_to_transacao_previsoes_table_down",
-      "community": 83,
-      "community_name": "Illuminate\\Support\\Facades\\Schema",
-      "norm_label": "down()"
-    },
-    {
-      "label": "up()",
-      "file_type": "code",
-      "source_file": "database/migrations/2026_04_24_190322_add_tipo_to_transacao_previsoes_table.php",
-      "source_location": "L12",
-      "_callable": true,
-      "_origin": "ast",
-      "id": "database_migrations_2026_04_24_190322_add_tipo_to_transacao_previsoes_table_up",
-      "community": 83,
-      "community_name": "Illuminate\\Support\\Facades\\Schema",
+      "community_name": "Illuminate\\Database\\Schema\\Blueprint",
       "norm_label": "up()"
     },
     {
@@ -6846,11 +6846,11 @@
     {
       "label": "down()",
       "file_type": "code",
-      "source_file": "database/migrations/2026_04_24_184000_create_cartaos_table.php",
+      "source_file": "database/migrations/2026_04_24_183542_create_transacaos_table.php",
       "source_location": "L29",
       "_callable": true,
       "_origin": "ast",
-      "id": "database_migrations_2026_04_24_184000_create_cartaos_table_down",
+      "id": "database_migrations_2026_04_24_183542_create_transacaos_table_down",
       "community": 85,
       "community_name": "Illuminate\\Database\\Migrations\\Migration",
       "norm_label": "down()"
@@ -6858,11 +6858,35 @@
     {
       "label": "up()",
       "file_type": "code",
-      "source_file": "database/migrations/2026_04_24_184000_create_cartaos_table.php",
+      "source_file": "database/migrations/2026_04_24_183542_create_transacaos_table.php",
       "source_location": "L12",
       "_callable": true,
       "_origin": "ast",
-      "id": "database_migrations_2026_04_24_184000_create_cartaos_table_up",
+      "id": "database_migrations_2026_04_24_183542_create_transacaos_table_up",
+      "community": 85,
+      "community_name": "Illuminate\\Database\\Migrations\\Migration",
+      "norm_label": "up()"
+    },
+    {
+      "label": "down()",
+      "file_type": "code",
+      "source_file": "database/migrations/2026_05_02_133147_alter_valor_total_to_decimal_in_cartao_compras_table.php",
+      "source_location": "L22",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "database_migrations_2026_05_02_133147_alter_valor_total_to_decimal_in_cartao_compras_table_down",
+      "community": 85,
+      "community_name": "Illuminate\\Database\\Migrations\\Migration",
+      "norm_label": "down()"
+    },
+    {
+      "label": "up()",
+      "file_type": "code",
+      "source_file": "database/migrations/2026_05_02_133147_alter_valor_total_to_decimal_in_cartao_compras_table.php",
+      "source_location": "L12",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "database_migrations_2026_05_02_133147_alter_valor_total_to_decimal_in_cartao_compras_table_up",
       "community": 85,
       "community_name": "Illuminate\\Database\\Migrations\\Migration",
       "norm_label": "up()"
@@ -6887,30 +6911,6 @@
       "_callable": true,
       "_origin": "ast",
       "id": "database_migrations_2026_08_08_000000_make_study_goals_and_logs_flexible_up",
-      "community": 85,
-      "community_name": "Illuminate\\Database\\Migrations\\Migration",
-      "norm_label": "up()"
-    },
-    {
-      "label": "down()",
-      "file_type": "code",
-      "source_file": "database/migrations/2026_08_25_000001_create_fiscal_concursos_table.php",
-      "source_location": "L72",
-      "_callable": true,
-      "_origin": "ast",
-      "id": "database_migrations_2026_08_25_000001_create_fiscal_concursos_table_down",
-      "community": 85,
-      "community_name": "Illuminate\\Database\\Migrations\\Migration",
-      "norm_label": "down()"
-    },
-    {
-      "label": "up()",
-      "file_type": "code",
-      "source_file": "database/migrations/2026_08_25_000001_create_fiscal_concursos_table.php",
-      "source_location": "L12",
-      "_callable": true,
-      "_origin": "ast",
-      "id": "database_migrations_2026_08_25_000001_create_fiscal_concursos_table_up",
       "community": 85,
       "community_name": "Illuminate\\Database\\Migrations\\Migration",
       "norm_label": "up()"
@@ -7063,7 +7063,7 @@
       "label": ".parseReceiptImage()",
       "file_type": "code",
       "source_file": "app/Services/GeminiService.php",
-      "source_location": "L159",
+      "source_location": "L160",
       "_callable": true,
       "_origin": "ast",
       "id": "app_services_geminiservice_geminiservice_parsereceiptimage",
@@ -7075,7 +7075,7 @@
       "label": ".parseVisionWithGeminiApi()",
       "file_type": "code",
       "source_file": "app/Services/GeminiService.php",
-      "source_location": "L229",
+      "source_location": "L230",
       "_callable": true,
       "_origin": "ast",
       "id": "app_services_geminiservice_geminiservice_parsevisionwithgeminiapi",
@@ -8158,26 +8158,26 @@
       "norm_label": "security vulnerabilities"
     },
     {
-      "label": "0001_01_01_000001_create_cache_table.php",
+      "label": "2026_04_24_190322_add_tipo_to_transacao_previsoes_table.php",
       "file_type": "code",
-      "source_file": "database/migrations/0001_01_01_000001_create_cache_table.php",
+      "source_file": "database/migrations/2026_04_24_190322_add_tipo_to_transacao_previsoes_table.php",
       "source_location": "L1",
       "_origin": "ast",
-      "id": "database_migrations_0001_01_01_000001_create_cache_table",
+      "id": "database_migrations_2026_04_24_190322_add_tipo_to_transacao_previsoes_table",
       "community": 19,
-      "community_name": "Illuminate\\Database\\Schema\\Blueprint",
-      "norm_label": "0001_01_01_000001_create_cache_table.php"
+      "community_name": "Illuminate\\Support\\Facades\\Schema",
+      "norm_label": "2026_04_24_190322_add_tipo_to_transacao_previsoes_table.php"
     },
     {
-      "label": "2026_05_02_133147_alter_valor_total_to_decimal_in_cartao_compras_table.php",
+      "label": "2026_08_25_000001_create_fiscal_concursos_table.php",
       "file_type": "code",
-      "source_file": "database/migrations/2026_05_02_133147_alter_valor_total_to_decimal_in_cartao_compras_table.php",
+      "source_file": "database/migrations/2026_08_25_000001_create_fiscal_concursos_table.php",
       "source_location": "L1",
       "_origin": "ast",
-      "id": "database_migrations_2026_05_02_133147_alter_valor_total_to_decimal_in_cartao_compras_table",
+      "id": "database_migrations_2026_08_25_000001_create_fiscal_concursos_table",
       "community": 19,
-      "community_name": "Illuminate\\Database\\Schema\\Blueprint",
-      "norm_label": "2026_05_02_133147_alter_valor_total_to_decimal_in_cartao_compras_table.php"
+      "community_name": "Illuminate\\Support\\Facades\\Schema",
+      "norm_label": "2026_08_25_000001_create_fiscal_concursos_table.php"
     },
     {
       "label": "2026_08_26_000001_add_vigencia_fields_to_fiscal_concursos_table.php",
@@ -8187,19 +8187,19 @@
       "_origin": "ast",
       "id": "database_migrations_2026_08_26_000001_add_vigencia_fields_to_fiscal_concursos_table",
       "community": 19,
-      "community_name": "Illuminate\\Database\\Schema\\Blueprint",
+      "community_name": "Illuminate\\Support\\Facades\\Schema",
       "norm_label": "2026_08_26_000001_add_vigencia_fields_to_fiscal_concursos_table.php"
     },
     {
-      "label": "Illuminate\\Database\\Schema\\Blueprint",
+      "label": "Illuminate\\Support\\Facades\\Schema",
       "file_type": "code",
       "source_file": "",
       "source_location": "",
       "_origin": "ast",
-      "id": "illuminate_database_schema_blueprint",
+      "id": "illuminate_support_facades_schema",
       "community": 19,
-      "community_name": "Illuminate\\Database\\Schema\\Blueprint",
-      "norm_label": "illuminate\\database\\schema\\blueprint"
+      "community_name": "Illuminate\\Support\\Facades\\Schema",
+      "norm_label": "illuminate\\support\\facades\\schema"
     },
     {
       "label": "ConsignadoDTO.php",
@@ -9247,15 +9247,15 @@
       "norm_label": "illuminate\\database\\eloquent\\relations\\belongsto"
     },
     {
-      "label": "2026_04_24_183542_create_transacaos_table.php",
+      "label": "2026_04_24_184000_create_cartaos_table.php",
       "file_type": "code",
-      "source_file": "database/migrations/2026_04_24_183542_create_transacaos_table.php",
+      "source_file": "database/migrations/2026_04_24_184000_create_cartaos_table.php",
       "source_location": "L1",
       "_origin": "ast",
-      "id": "database_migrations_2026_04_24_183542_create_transacaos_table",
+      "id": "database_migrations_2026_04_24_184000_create_cartaos_table",
       "community": 33,
-      "community_name": "2026_04_24_183542_create_transacaos_table.php",
-      "norm_label": "2026_04_24_183542_create_transacaos_table.php"
+      "community_name": "2026_04_24_184000_create_cartaos_table.php",
+      "norm_label": "2026_04_24_184000_create_cartaos_table.php"
     },
     {
       "label": "treinos/index.blade.php",
@@ -11125,6 +11125,17 @@
       "norm_label": "vite.config.js"
     },
     {
+      "label": "0001_01_01_000001_create_cache_table.php",
+      "file_type": "code",
+      "source_file": "database/migrations/0001_01_01_000001_create_cache_table.php",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "database_migrations_0001_01_01_000001_create_cache_table",
+      "community": 83,
+      "community_name": "Illuminate\\Database\\Schema\\Blueprint",
+      "norm_label": "0001_01_01_000001_create_cache_table.php"
+    },
+    {
       "label": "2026_04_24_184001_create_cartao_compras_table.php",
       "file_type": "code",
       "source_file": "database/migrations/2026_04_24_184001_create_cartao_compras_table.php",
@@ -11132,7 +11143,7 @@
       "_origin": "ast",
       "id": "database_migrations_2026_04_24_184001_create_cartao_compras_table",
       "community": 83,
-      "community_name": "Illuminate\\Support\\Facades\\Schema",
+      "community_name": "Illuminate\\Database\\Schema\\Blueprint",
       "norm_label": "2026_04_24_184001_create_cartao_compras_table.php"
     },
     {
@@ -11143,30 +11154,19 @@
       "_origin": "ast",
       "id": "database_migrations_2026_04_24_184002_create_cartao_parcelas_table",
       "community": 83,
-      "community_name": "Illuminate\\Support\\Facades\\Schema",
+      "community_name": "Illuminate\\Database\\Schema\\Blueprint",
       "norm_label": "2026_04_24_184002_create_cartao_parcelas_table.php"
     },
     {
-      "label": "2026_04_24_190322_add_tipo_to_transacao_previsoes_table.php",
-      "file_type": "code",
-      "source_file": "database/migrations/2026_04_24_190322_add_tipo_to_transacao_previsoes_table.php",
-      "source_location": "L1",
-      "_origin": "ast",
-      "id": "database_migrations_2026_04_24_190322_add_tipo_to_transacao_previsoes_table",
-      "community": 83,
-      "community_name": "Illuminate\\Support\\Facades\\Schema",
-      "norm_label": "2026_04_24_190322_add_tipo_to_transacao_previsoes_table.php"
-    },
-    {
-      "label": "Illuminate\\Support\\Facades\\Schema",
+      "label": "Illuminate\\Database\\Schema\\Blueprint",
       "file_type": "code",
       "source_file": "",
       "source_location": "",
       "_origin": "ast",
-      "id": "illuminate_support_facades_schema",
+      "id": "illuminate_database_schema_blueprint",
       "community": 83,
-      "community_name": "Illuminate\\Support\\Facades\\Schema",
-      "norm_label": "illuminate\\support\\facades\\schema"
+      "community_name": "Illuminate\\Database\\Schema\\Blueprint",
+      "norm_label": "illuminate\\database\\schema\\blueprint"
     },
     {
       "label": "2026_09_04_060000_create_workout_and_fitness_tables.php",
@@ -11180,15 +11180,26 @@
       "norm_label": "2026_09_04_060000_create_workout_and_fitness_tables.php"
     },
     {
-      "label": "2026_04_24_184000_create_cartaos_table.php",
+      "label": "2026_04_24_183542_create_transacaos_table.php",
       "file_type": "code",
-      "source_file": "database/migrations/2026_04_24_184000_create_cartaos_table.php",
+      "source_file": "database/migrations/2026_04_24_183542_create_transacaos_table.php",
       "source_location": "L1",
       "_origin": "ast",
-      "id": "database_migrations_2026_04_24_184000_create_cartaos_table",
+      "id": "database_migrations_2026_04_24_183542_create_transacaos_table",
       "community": 85,
       "community_name": "Illuminate\\Database\\Migrations\\Migration",
-      "norm_label": "2026_04_24_184000_create_cartaos_table.php"
+      "norm_label": "2026_04_24_183542_create_transacaos_table.php"
+    },
+    {
+      "label": "2026_05_02_133147_alter_valor_total_to_decimal_in_cartao_compras_table.php",
+      "file_type": "code",
+      "source_file": "database/migrations/2026_05_02_133147_alter_valor_total_to_decimal_in_cartao_compras_table.php",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "database_migrations_2026_05_02_133147_alter_valor_total_to_decimal_in_cartao_compras_table",
+      "community": 85,
+      "community_name": "Illuminate\\Database\\Migrations\\Migration",
+      "norm_label": "2026_05_02_133147_alter_valor_total_to_decimal_in_cartao_compras_table.php"
     },
     {
       "label": "2026_08_08_000000_make_study_goals_and_logs_flexible.php",
@@ -11200,17 +11211,6 @@
       "community": 85,
       "community_name": "Illuminate\\Database\\Migrations\\Migration",
       "norm_label": "2026_08_08_000000_make_study_goals_and_logs_flexible.php"
-    },
-    {
-      "label": "2026_08_25_000001_create_fiscal_concursos_table.php",
-      "file_type": "code",
-      "source_file": "database/migrations/2026_08_25_000001_create_fiscal_concursos_table.php",
-      "source_location": "L1",
-      "_origin": "ast",
-      "id": "database_migrations_2026_08_25_000001_create_fiscal_concursos_table",
-      "community": 85,
-      "community_name": "Illuminate\\Database\\Migrations\\Migration",
-      "norm_label": "2026_08_25_000001_create_fiscal_concursos_table.php"
     },
     {
       "label": "Illuminate\\Database\\Migrations\\Migration",
@@ -13676,7 +13676,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "app/Services/GeminiService.php",
-      "source_location": "L161",
+      "source_location": "L162",
       "weight": 1.0,
       "_origin": "ast",
       "source": "app_services_geminiservice_geminiservice_parsereceiptimage",
@@ -13687,7 +13687,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "app/Services/GeminiService.php",
-      "source_location": "L219",
+      "source_location": "L220",
       "weight": 1.0,
       "_origin": "ast",
       "source": "app_services_geminiservice_geminiservice_parsereceiptimage",
@@ -31211,7 +31211,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "app/Services/GeminiService.php",
-      "source_location": "L159",
+      "source_location": "L160",
       "weight": 1.0,
       "_origin": "ast",
       "source": "app_services_geminiservice_geminiservice",
@@ -31222,7 +31222,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "app/Services/GeminiService.php",
-      "source_location": "L229",
+      "source_location": "L230",
       "weight": 1.0,
       "_origin": "ast",
       "source": "app_services_geminiservice_geminiservice",
@@ -33350,7 +33350,7 @@
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "app/Services/GeminiService.php",
-      "source_location": "L236",
+      "source_location": "L238",
       "weight": 1.0,
       "_origin": "ast",
       "source": "app_services_geminiservice_geminiservice_parsevisionwithgeminiapi",
@@ -33362,7 +33362,7 @@
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "app/Services/GeminiService.php",
-      "source_location": "L109",
+      "source_location": "L110",
       "weight": 1.0,
       "_origin": "ast",
       "source": "app_services_geminiservice_geminiservice_parsewithgeminiapi",
@@ -33442,5 +33442,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "d859a880a745909f8d58396c946d937dd8cd5493"
+  "built_at_commit": "2fd2206552298ad0334f257a70d72b1e240d9e8c"
 }

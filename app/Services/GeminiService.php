@@ -101,7 +101,8 @@ Esquema do JSON esperado:
 
     private function parseWithGeminiApi(string $mensagem, string $systemInstruction): ?array
     {
-        $models = ['gemini-2.0-flash', 'gemini-1.5-flash', 'gemini-2.5-flash'];
+        $models = ['gemini-3.5-flash', 'gemini-3.5-flash-lite', 'gemini-3.6-flash', 'gemini-3.8-flash'];
+
 
         foreach ($models as $model) {
             try {
@@ -228,7 +229,8 @@ Esquema JSON esperado:
 
     private function parseVisionWithGeminiApi(string $base64Image, string $mimeType, string $systemInstruction): ?array
     {
-        $visionModels = ['gemini-3.5-flash', 'gemini-3.5-flash-lite', 'gemini-3.6-flash'];
+        $visionModels = ['gemini-3.5-flash', 'gemini-3.5-flash-lite', 'gemini-3.6-flash', 'gemini-3.8-flash'];
+
 
         foreach ($visionModels as $model) {
             try {

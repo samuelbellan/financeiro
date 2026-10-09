@@ -1,7 +1,7 @@
 # Graph Report - financeiro  (2026-10-09)
 
 ## Corpus Check
-- 175 files · ~297,470 words
+- 175 files · ~297,472 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
@@ -10,7 +10,7 @@
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `d859a880`
+- Built from commit: `2fd22065`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -34,7 +34,7 @@
 - DailyLog
 - DatabaseSyncTest
 - README.md
-- Illuminate\Database\Schema\Blueprint
+- Illuminate\Support\Facades\Schema
 - 🚀 Guia de Deploy em Nuvem - Sistema Financeiro & Concursos
 - AppServiceProvider
 - sidebar.js
@@ -65,7 +65,7 @@
 - RunningLog
 - FitnessAiModuleTest
 - transaction-autocomplete.js
-- Illuminate\Support\Facades\Schema
+- Illuminate\Database\Schema\Blueprint
 - Illuminate\Database\Migrations\Migration
 - Cartao
 - FiscalNoticia
