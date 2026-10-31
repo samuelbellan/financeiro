@@ -206,7 +206,7 @@
                             </svg>
                         </div>
                         <h3>Horas de Estudo</h3>
-                        <p>Simulador e calculadora interativa de metas e registros de horas de estudo.</p>
+                        <p>Cronômetro por matéria estilo YPT, funciona offline e sincroniza entre aparelhos.</p>
                         <a href="{{ route('estudos.index') }}" class="card-link">Acessar →</a>
                     </div>
 
