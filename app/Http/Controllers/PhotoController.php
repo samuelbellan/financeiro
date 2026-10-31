@@ -2619,7 +2619,9 @@ class PhotoController extends Controller
         }
 
         try {
-            if (PHP_OS_FAMILY === 'Windows') {
+            if (app()->environment('testing')) {
+                // Nos testes não abre o Explorador de verdade (a pasta temporária é apagada em seguida).
+            } elseif (PHP_OS_FAMILY === 'Windows') {
                 pclose(popen('explorer.exe ' . escapeshellarg($albumPath), 'r'));
             } elseif (PHP_OS_FAMILY === 'Darwin') {
                 @exec('open ' . escapeshellarg($albumPath));
