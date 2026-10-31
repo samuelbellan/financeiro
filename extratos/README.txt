@@ -8,7 +8,8 @@ PASTA DE IMPORTAÇÃO DE EXTRATOS BANCÁRIOS (.OFX)
 3. Para importar e atualizar as contas no sistema:
    - Dê dois cliques em: importar-extratos.bat
    - OU envie o arquivo .ofx diretamente para o Bot do Telegram!
-   - OU acesse no navegador: http://localhost:8000/importar_ofx.php
+   - OU pelo navegador, no módulo Finanças > Importar Extrato (exige login)
+   - OU pelo terminal: php importar_ofx.php extratos --user=1
 
 4. Os arquivos processados com sucesso serão movidos automaticamente para a subpasta:
    processados/
