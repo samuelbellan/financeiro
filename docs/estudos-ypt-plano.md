@@ -37,6 +37,13 @@ Decisões tomadas na sabatina de 31/10/2026, já implementadas.
 - **Cronômetro aberto em dois aparelhos** só gera aviso de sobreposição (v2: encerrar o mais antigo automaticamente).
 - **Backup do módulo antigo na nuvem**: a migration grava o JSON em `storage/app/backups/` do container, que é efêmero no Render. Exporte as tabelas antigas da nuvem antes do deploy se quiser guardar.
 
+## Backup no PC
+
+`php artisan estudos:backup` baixa da nuvem (só leitura) as tabelas `study_*` para
+`storage/app/backups/estudos/estudos_AAAAMMDD_HHMMSS.json` e mantém os 30 mais recentes (`--keep=N`).
+O `iniciar.bat` roda esse comando em segundo plano a cada inicialização; o resultado fica em
+`storage/logs/estudos-backup.log`.
+
 ## Roteiro de teste manual (modo avião)
 
 1. Abrir `https://<nuvem>/estudos` no celular, fazer login e instalar ("Adicionar à tela inicial").

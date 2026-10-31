@@ -51,6 +51,10 @@ if errorlevel 1 (
 echo [2/4] Configurando webhook do Telegram...
 php artisan telegram:set-webhook https://unfrosted-surreal-ducky.ngrok-free.dev/webhook/telegram >nul 2>&1
 
+:: Backup dos dados de estudo da nuvem para o PC (em segundo plano, nao atrasa a inicializacao)
+echo [+] Fazendo backup dos estudos da nuvem em segundo plano...
+start /min "Backup Estudos" cmd /c "php artisan estudos:backup >> storage\logs\estudos-backup.log 2>&1"
+
 :: 3. Abrindo navegador com breve delay para dar tempo ao PHP iniciar
 echo [3/4] Abrindo o sistema no navegador...
 start /min cmd /c "timeout /t 2 /nobreak >nul && start http://127.0.0.1:%PORT%/home"
