@@ -39,6 +39,13 @@ Decisões tomadas na sabatina de 31/10/2026, já implementadas.
 
 ## Backup no PC
 
+**Exportar backup (principal):** em Ajustes → Backup, o app baixa um JSON com tudo o que está no
+aparelho (matérias, sessões, D-Days, preferências, inclusive excluídos). Funciona offline e não
+precisa de credenciais. A data do último export aparece na mesma tela.
+
+**Backup automático (opcional):** só funciona se o `.env` do PC tiver `CLOUD_DATABASE_URL` (string de conexão do Neon).
+Atenção: essa variável também ativa o modo nuvem do sync do financeiro. Sem ela, o comando sai sem erro.
+
 `php artisan estudos:backup` baixa da nuvem (só leitura) as tabelas `study_*` para
 `storage/app/backups/estudos/estudos_AAAAMMDD_HHMMSS.json` e mantém os 30 mais recentes (`--keep=N`).
 O `iniciar.bat` roda esse comando em segundo plano a cada inicialização; o resultado fica em

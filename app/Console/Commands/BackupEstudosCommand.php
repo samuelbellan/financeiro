@@ -24,6 +24,13 @@ class BackupEstudosCommand extends Command
     {
         $connection = $this->option('connection');
 
+        // Sem conexão com a nuvem configurada no .env, não há de onde copiar: sai sem erro
+        // (o iniciar.bat chama este comando a cada inicialização).
+        if ($connection === 'pgsql_cloud' && empty(config('database.connections.pgsql_cloud.url'))) {
+            $this->warn('CLOUD_DATABASE_URL não configurada no .env: backup automático ignorado. Use "Exportar backup" no app de estudos.');
+            return self::SUCCESS;
+        }
+
         try {
             $db = DB::connection($connection);
             $data = [];

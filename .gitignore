@@ -30,3 +30,4 @@ Thumbs.db
 /.gemini/
 /.obsidian/
 check_db*.php
+/.claude/settings.local.json

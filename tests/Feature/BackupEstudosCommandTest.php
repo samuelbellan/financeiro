@@ -69,4 +69,13 @@ class BackupEstudosCommandTest extends TestCase
     {
         $this->artisan('estudos:backup', ['--connection' => 'conexao_inexistente', '--dir' => $this->dir])->assertFailed();
     }
+
+    public function test_backup_is_skipped_when_cloud_url_is_not_configured(): void
+    {
+        config(['database.connections.pgsql_cloud.url' => null]);
+
+        $this->artisan('estudos:backup', ['--dir' => $this->dir])->assertSuccessful();
+
+        $this->assertSame([], glob($this->dir . '/estudos_*.json') ?: []);
+    }
 }

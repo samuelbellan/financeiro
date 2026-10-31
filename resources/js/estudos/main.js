@@ -29,6 +29,7 @@ const state = {
     statsMode: 'week',
     statsAnchor: null,
     sync: { state: 'idle', pending: 0 },
+    lastExportAt: null,
 };
 
 let charts = [];
@@ -428,6 +429,11 @@ function renderSettings() {
             ${st.pending ? ` · ${st.pending} alteração(ões) pendente(s)` : ''}</p>
         ${(st.rejected ?? []).length ? `<p class="warn">${st.rejected.length} item(ns) recusado(s) pelo servidor: ${esc(st.rejected.map((r) => r.motivo).join('; '))}</p>` : ''}
         <button type="button" class="btn ghost" data-action="sync-now">Sincronizar agora</button>
+
+        <h3>Backup</h3>
+        <p class="muted">Baixa um arquivo JSON com todas as matérias, sessões, D-Days e preferências deste aparelho.
+            ${state.lastExportAt ? `Último backup: ${new Date(state.lastExportAt).toLocaleString('pt-BR')}.` : 'Nenhum backup feito neste aparelho.'}</p>
+        <button type="button" class="btn ghost" data-action="export-backup">⤓ Exportar backup</button>
         <a class="btn ghost" href="${esc(config.homeUrl)}">← Voltar ao sistema</a>`;
 }
 
@@ -598,6 +604,34 @@ async function openSuspiciousDialog(session) {
     });
 }
 
+// ── Backup ───────────────────────────────────────────────────────────────────
+
+// Exporta tudo o que está no aparelho (inclusive excluídos, para permitir restauração fiel).
+async function exportBackup() {
+    const at = nowMs();
+    const backup = {
+        app: 'estudos',
+        versao: 1,
+        gerado_em: iso(at),
+        pendentes_de_sincronizar: state.sync.pending ?? 0,
+        settings: state.settings,
+        subjects: state.subjects,
+        sessions: state.sessions,
+        ddays: state.ddays,
+    };
+    const stamp = msToLocalInput(at, state.settings.timezone).replace('T', '_').replace(':', '');
+    const url = URL.createObjectURL(new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' }));
+    const link = Object.assign(document.createElement('a'), { href: url, download: `estudos_backup_${stamp}.json` });
+    document.body.append(link);
+    link.click();
+    link.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 10_000);
+
+    state.lastExportAt = at;
+    await setMeta('last_export_at', at);
+    render();
+}
+
 // ── Eventos ──────────────────────────────────────────────────────────────────
 
 function shiftStats(direction) {
@@ -646,6 +680,7 @@ root.addEventListener('click', async (event) => {
             if (confirm(`Excluir "${dday.titulo}"?`)) { await persist('ddays', { ...dday, deleted_at: iso(nowMs()) }); render(); }
         },
         'sync-now': () => sync.syncNow(),
+        'export-backup': () => exportBackup(),
     };
     await handlers[action]?.();
 });
@@ -694,6 +729,7 @@ async function reload() {
 async function boot() {
     await ensureUser(Number(config.userId));
     await reload();
+    state.lastExportAt = await getMeta('last_export_at');
 
     sync = createSync({
         syncUrl: config.syncUrl,
