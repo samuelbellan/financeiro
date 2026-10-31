@@ -10,7 +10,7 @@ Decisões tomadas na sabatina de 31/10/2026, já implementadas.
 | 2 | Histórico antigo (`study_goals`/`study_logs`) descartado, com backup JSON antes do drop | Recomeço limpo; o backup permite rollback |
 | 3 | MVP: matérias com cronômetro, total + meta diária, linha do tempo de 10 min, estatísticas dia/semana/mês + heatmap + sequência, D-Day | Núcleo do YPT. Tarefas, pausas e modo foco ficam para a v2; ranking fica fora |
 | 4 | Métricas: total, máximo de foco, início, término, distribuição por matéria, dias estudados, média diária | Métricas individuais do YPT + média do módulo antigo |
-| 5 | O dia vira às 3h (configurável); o corte é calculado na leitura | Estudo de madrugada não quebra a sequência; mudar a virada recalcula o histórico |
+| 5 | O dia vira à 1h (configurável; era 3h, mudou após a análise do histórico do YPT); o corte é calculado na leitura | O estudo se concentra entre 3h e 7h e nunca entre 22h e 2h: a virada à 1h não corta sessões reais |
 | 6 | Sessão = início/fim, uma matéria por vez, sem tolerância; o tempo vem do timestamp | Regra do YPT; sobrevive a tela bloqueada e app fechado |
 | 7 | Sessão aberta há mais de 3h (configurável) fica `suspeita` e pede confirmação ao reabrir | Protege os números sem cortar sessões longas reais |
 | 8 | Entrada manual permitida (`origem = manual`): conta no total, não no máximo de foco nem no início/término | A vida real cabe, e a métrica de foco continua honesta |
@@ -22,6 +22,8 @@ Decisões tomadas na sabatina de 31/10/2026, já implementadas.
 | 14 | Testes: Vitest no motor de métricas (`npm test`), PHPUnit no sync, roteiro manual de modo avião | Os bugs prováveis estão no corte do dia e no fuso |
 | 15 | A nuvem é a única fonte da verdade para estudos: as tabelas `study_*` ficam fora do `DatabaseSyncService` e do export; fora da nuvem, `/estudos` redireciona para `CLOUD_APP_URL` | Evita dois mecanismos de sync (o atual faz upsert cego e usa `setval`, que não funciona com UUID) |
 | 16 | Fuso padrão = fuso do aparelho (editável em Ajustes) | O PC está em America/Cuiaba, não em São Paulo |
+| 17 | Origem `importado` para o histórico do YPT: conta em total, matérias, calendário, sequência e médias; fica fora de máximo de foco, início/término, linha do tempo, estudo × outros e sobreposição | O YPT só fornece totais por dia/matéria, sem horários reais |
+| 18 | Métricas P1 do YPT: comparação com o período anterior até o mesmo ponto, estudo × outros, intervalos na linha do tempo, calendário com horas e faixas 0/4/7/10/12 h, grades de semanas e meses, aba Tendência com filtro por matéria, média por dia da semana, estudo por hora do dia | Lista priorizada a partir dos prints do YPT; P2 fica para depois |
 
 ## Onde está o código
 
@@ -61,5 +63,8 @@ O `iniciar.bat` roda esse comando em segundo plano a cada inicialização; o res
 6. Abrir no PC e conferir a sessão e as estatísticas.
 
 ## v2
+
+Métricas P2: período personalizado, acumulado por matéria, início/fim ao longo do período, consistência com medianas, linha do tempo de vários dias.
+
 
 Lista de tarefas, tempo de pausa, modo foco em tela cheia, resolução automática de cronômetro duplo.

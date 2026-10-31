@@ -14,6 +14,8 @@
     --heat-2: #8DB3F9;
     --heat-3: #4F86F7;
     --heat-4: #1E4FC2;
+    --heat-5: #10307A;
+    --compare-prev: rgba(125, 133, 151, .28);
     color-scheme: light;
 }
 
@@ -130,6 +132,7 @@ li.empty { justify-content: center; color: var(--muted); }
 .btn.ghost { background: var(--card); color: var(--text); border: 1px solid var(--border); }
 .btn.danger { background: var(--danger); }
 main > .btn { width: 100%; margin-top: 6px; }
+.file-btn { cursor: pointer; }
 
 /* Linha do tempo */
 .day-nav { display: flex; align-items: center; justify-content: space-between; margin: 6px 0; }
@@ -147,6 +150,8 @@ main > .btn { width: 100%; margin-top: 6px; }
 .segmented { display: grid; grid-template-columns: repeat(3, 1fr); background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 3px; }
 .segmented button { border: 0; background: none; padding: 7px; border-radius: 8px; color: var(--muted); }
 .segmented button.active { background: var(--primary); color: #fff; font-weight: 600; }
+.segmented.four { grid-template-columns: repeat(4, 1fr); }
+.segmented.four button { padding: 7px 2px; font-size: .85rem; }
 .cards { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 .card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 12px; }
 .card small { display: block; color: var(--muted); font-size: .75rem; }
@@ -155,17 +160,62 @@ main > .btn { width: 100%; margin-top: 6px; }
 .chart-box.small { height: 180px; }
 .subject-share li span:nth-last-child(2) { font-variant-numeric: tabular-nums; }
 
-.calendar { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; margin-top: 12px; text-align: center; }
-.calendar b { font-size: .7rem; color: var(--muted); font-weight: 500; }
-.calendar i { font-style: normal; font-size: .75rem; aspect-ratio: 1; display: grid; place-items: center; border-radius: 6px; }
+.calendar { display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; margin-top: 12px; text-align: center; }
+.calendar span { font-size: .7rem; color: var(--muted); }
+.calendar i { font-style: normal; min-height: 46px; display: grid; align-content: center; gap: 2px; border-radius: 6px; padding: 4px 0; }
+.calendar i b { font-size: .72rem; font-weight: 500; opacity: .8; }
+.calendar i small { font-size: .78rem; font-variant-numeric: tabular-nums; font-weight: 600; }
+.calendar i.today { outline: 2px solid var(--text); outline-offset: -2px; }
+.heat-legend { display: flex; gap: 2px; justify-content: flex-end; margin: 6px 0 0; }
+.heat-legend i { font-style: normal; font-size: .68rem; padding: 1px 6px; border-radius: 3px; }
 .heatmap { display: grid; grid-template-columns: repeat(15, 1fr); gap: 3px; }
 .heatmap div { display: grid; gap: 3px; }
 .heatmap i { aspect-ratio: 1; border-radius: 3px; }
 .lv0 { background: var(--heat-0); }
-.lv1 { background: var(--heat-1); }
-.lv2 { background: var(--heat-2); }
+.lv1 { background: var(--heat-1); color: #10213F; }
+.lv2 { background: var(--heat-2); color: #10213F; }
 .lv3 { background: var(--heat-3); color: #fff; }
 .lv4 { background: var(--heat-4); color: #fff; }
+.lv5 { background: var(--heat-5); color: #fff; }
+
+/* Grades de semanas do trimestre e meses do ano */
+.period-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; margin: 12px 0 4px; }
+.period-grid.months { grid-template-columns: repeat(4, 1fr); }
+.period-grid button { border: 0; border-radius: 8px; padding: 8px 2px; display: grid; gap: 2px; color: inherit; }
+.period-grid button:disabled { background: transparent; opacity: .45; }
+.period-grid button.selected { outline: 2px solid var(--text); outline-offset: -2px; }
+.period-grid small { font-size: .72rem; opacity: .8; text-transform: capitalize; }
+.period-grid b { font-size: .8rem; font-variant-numeric: tabular-nums; }
+
+/* Comparação com o período anterior */
+.compare { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr); gap: 10px; align-items: center; margin-top: 10px;
+    background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 12px; }
+.compare small { display: block; color: var(--muted); font-size: .75rem; }
+.compare > div > b { display: block; font-size: 1.35rem; font-variant-numeric: tabular-nums; margin: 2px 0 6px; }
+.compare b.neg { color: var(--danger); }
+.compare b.pos { color: #1E8E5A; }
+.compare .legend i { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin: 0 4px 0 6px; vertical-align: -1px; }
+.compare .legend i.now { background: var(--primary); margin-left: 0; }
+.compare .legend i.prev { background: var(--compare-prev); }
+.chart-box.mini { height: 110px; margin: 0; padding: 4px; border: 0; min-width: 0; }
+
+/* Estudo × outros */
+.ratio { margin-top: 10px; background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 12px; display: grid; gap: 6px; }
+.ratio small { color: var(--muted); font-size: .78rem; }
+.ratio small b { color: var(--text); }
+.ratio-bar { height: 8px; background: var(--border); border-radius: 99px; overflow: hidden; }
+.ratio-bar span { display: block; height: 100%; background: var(--primary); }
+
+/* Filtro por matéria (Tendência) */
+.chips { display: flex; gap: 6px; overflow-x: auto; padding: 12px 0 4px; scrollbar-width: none; }
+.chips button { flex: none; border: 1px solid var(--border); background: var(--card); border-radius: 99px; padding: 6px 12px; font-size: .82rem; }
+.chips button[style] { border-left: 4px solid var(--c); }
+.chips button.active { background: var(--primary); border-color: var(--primary); color: #fff; }
+
+/* Intervalos na linha do tempo */
+.session-list li.gap { background: transparent; border-style: dashed; padding: 6px 12px; }
+.session-list li.gap .range { flex: 1; }
+.session-list li.gap button { font-size: 1.1rem; color: var(--primary); }
 i.blank { background: transparent; }
 
 /* Formulários e diálogos */

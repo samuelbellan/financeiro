@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Validator;
  * - updated_at é carimbado pelo servidor no recebimento: vence quem sincronizar por último.
  * - Exclusão é lógica e definitiva: uma alteração recebida para um registro já excluído é ignorada.
  * - O cursor é o relógio do servidor, com margem para cobrir requisições concorrentes.
+ * - Sessões com origem 'importado' (histórico de outro app) não entram na checagem de sobreposição.
  */
 class StudySyncService
 {
@@ -110,7 +111,7 @@ class StudySyncService
             'subject_id' => 'required|uuid',
             'inicio' => 'required|date',
             'fim' => 'nullable|date|after_or_equal:inicio',
-            'origem' => 'required|in:timer,manual',
+            'origem' => 'required|in:timer,manual,importado',
             'status' => 'required|in:ok,suspeita',
             'device_id' => 'nullable|uuid',
             'deleted_at' => 'nullable|date',
@@ -262,13 +263,15 @@ class StudySyncService
 
         foreach (array_unique($sessionIds) as $id) {
             $session = DB::table('study_sessions')->where('id', $id)->first();
-            if (!$session) {
+            // Sessões importadas têm horários fictícios: não geram conflito.
+            if (!$session || $session->origem === 'importado') {
                 continue;
             }
             $end = $session->fim ?? $now;
             $others = DB::table('study_sessions')
                 ->where('user_id', $this->userId)
                 ->where('id', '!=', $id)
+                ->where('origem', '!=', 'importado')
                 ->whereNull('deleted_at')
                 ->where('inicio', '<', $end)
                 ->where(fn ($q) => $q->whereNull('fim')->orWhere('fim', '>', $session->inicio))

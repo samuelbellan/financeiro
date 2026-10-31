@@ -6,6 +6,9 @@ import { applyServerChanges, dropFromQueue, getMeta, pendingQueue, setMeta } fro
 const BACKOFF_MS = [10_000, 30_000, 120_000, 300_000];
 const PERIODIC_MS = 5 * 60_000;
 const DEBOUNCE_MS = 5_000;
+// Itens por envio (o servidor aceita até 1000 por tipo). Matérias vão primeiro: o servidor valida subject_id.
+const BATCH_SIZE = 400;
+const TYPE_ORDER = { subjects: 0, settings: 1, ddays: 2, sessions: 3 };
 
 export function createSync({ syncUrl, tokenUrl, initialToken, onStatus, onApplied }) {
     let csrfToken = initialToken;
@@ -39,11 +42,13 @@ export function createSync({ syncUrl, tokenUrl, initialToken, onStatus, onApplie
     }
 
     async function runOnce() {
-        const queue = await pendingQueue();
-        emit({ state: 'syncing', pending: queue.length });
+        const pending = await pendingQueue();
+        emit({ state: 'syncing', pending: pending.length });
 
+        const queue = pending
+            .sort((a, b) => TYPE_ORDER[a.type] - TYPE_ORDER[b.type])
+            .slice(0, BATCH_SIZE);
         const changes = { subjects: [], sessions: [], ddays: [], settings: null };
-        // Matérias antes das sessões: o servidor valida subject_id.
         for (const entry of queue) {
             if (entry.type === 'settings') changes.settings = entry.record;
             else changes[entry.type].push(entry.record);
@@ -81,7 +86,7 @@ export function createSync({ syncUrl, tokenUrl, initialToken, onStatus, onApplie
             message: '',
         });
         onApplied(result);
-        return remaining;
+        return { remaining, sent: queue.length };
     }
 
     async function syncNow() {
@@ -95,7 +100,9 @@ export function createSync({ syncUrl, tokenUrl, initialToken, onStatus, onApplie
         try {
             do {
                 again = false;
-                await runOnce();
+                const { remaining, sent } = await runOnce();
+                // Fila grande (ex.: importação): continua enviando em lotes enquanto houver progresso.
+                if (remaining > 0 && sent > 0) again = true;
             } while (again);
             failures = 0;
         } catch (error) {

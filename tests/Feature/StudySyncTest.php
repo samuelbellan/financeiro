@@ -239,4 +239,18 @@ class StudySyncTest extends TestCase
             ->assertJsonPath('user_id', $this->user->id)
             ->assertJsonStructure(['token']);
     }
+
+    public function test_imported_sessions_are_accepted_and_never_conflict(): void
+    {
+        $subject = $this->makeSubject();
+        $real = $this->makeSession($subject['id']);
+        $imported = $this->makeSession($subject['id'], ['origem' => 'importado']);
+
+        $this->sync(['subjects' => [$subject], 'sessions' => [$real, $imported]])
+            ->assertOk()
+            ->assertJsonPath('rejected', [])
+            ->assertJsonPath('conflicts', []);
+
+        $this->assertSame('importado', DB::table('study_sessions')->where('id', $imported['id'])->value('origem'));
+    }
 }

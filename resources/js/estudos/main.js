@@ -2,17 +2,23 @@
 // Toda a lógica roda no aparelho; o servidor só guarda e sincroniza (ver sync.js).
 
 import {
-    ArcElement, BarController, BarElement, CategoryScale, Chart, DoughnutController, Legend, LinearScale, Tooltip,
+    ArcElement, BarController, BarElement, CategoryScale, Chart, DoughnutController, Filler, Legend, LinearScale,
+    LineController, LineElement, PointElement, Tooltip,
 } from 'chart.js';
 import { ensureUser, getMeta, loadAll, saveLocal, setMeta, uuid } from './db.js';
+import { planImport } from './importer.js';
 import { createSync } from './sync.js';
 import {
-    addDays, buildDaily, dayBounds, dayStats, daysUntil, findOverlaps, formatClock, formatDuration, heatLevel,
-    isSuspicious, localInputToMs, monthRange, msToLocalInput, rangeStats, streak, studyDayOf, timelineSlots,
-    toMs, weekRange,
+    addDays, buildDaily, compareWithPrevious, comparisonSeries, dayBounds, dayGaps, dayStats, daysUntil, findOverlaps,
+    formatClock, formatDuration, heatLevel, hourProfile, isSuspicious, localInputToMs, monthRange, msToLocalInput,
+    quarterWeeks, rangeStats, streak, studyDayOf, studyVsOther, timelineSlots, toMs, trendBuckets, weekdayAverages,
+    weekRange, yearMonths,
 } from './metrics.js';
 
-Chart.register(ArcElement, BarController, BarElement, CategoryScale, DoughnutController, Legend, LinearScale, Tooltip);
+Chart.register(
+    ArcElement, BarController, BarElement, CategoryScale, DoughnutController, Filler, Legend, LinearScale,
+    LineController, LineElement, PointElement, Tooltip,
+);
 
 const PALETTE = ['#4F86F7', '#F25F5C', '#43AA8B', '#F9A03F', '#9B5DE5', '#00BBF9', '#F15BB5', '#7D8597', '#90BE6D', '#E07A5F'];
 const MAX_SESSION_MS = 24 * 3_600_000;
@@ -28,6 +34,7 @@ const state = {
     timelineDay: null,
     statsMode: 'week',
     statsAnchor: null,
+    trendSubject: null,
     sync: { state: 'idle', pending: 0 },
     lastExportAt: null,
 };
@@ -227,21 +234,33 @@ function renderTimeline() {
         .filter((s) => toMs(s.inicio) < dayEnd && (s.fim ? toMs(s.fim) : nowMs()) > dayStart)
         .sort((a, b) => toMs(a.inicio) - toMs(b.inicio));
 
-    const list = sessions.map((s) => {
+    const gapRows = dayGaps(stats).map((g) => ({
+        at: g.start,
+        html: `<li class="gap">
+            <span class="range">${formatClock(g.start, day, state.settings)} – ${formatClock(g.end, day, state.settings)}</span>
+            <span class="dur">${formatDuration(g.end - g.start)}</span>
+            <button type="button" data-action="gap-session" data-start="${g.start}" data-end="${g.end}" aria-label="Registrar sessão neste intervalo">+</button>
+        </li>`,
+    }));
+
+    const sessionRows = sessions.map((s) => {
         const subject = subjectById(s.subject_id);
         const end = s.fim ? toMs(s.fim) : nowMs();
         const overlap = findOverlaps(s, liveSessions(), nowMs()).length > 0;
-        return `<li style="--c:${esc(subject?.cor ?? '#888')}">
+        const html = `<li style="--c:${esc(subject?.cor ?? '#888')}">
             <span class="dot"></span>
             <span class="name">${esc(subject?.nome ?? 'Matéria removida')}
                 ${s.origem === 'manual' ? '<em>manual</em>' : ''}
+                ${s.origem === 'importado' ? '<em>importado</em>' : ''}
                 ${s.status === 'suspeita' ? '<em class="warn">a confirmar</em>' : ''}
                 ${overlap ? '<em class="warn">sobreposta</em>' : ''}</span>
             <span class="range">${formatClock(toMs(s.inicio), day, state.settings)} – ${s.fim ? formatClock(end, day, state.settings) : 'agora'}</span>
             <span class="dur">${formatDuration(end - toMs(s.inicio))}</span>
             ${s.fim ? `<button type="button" data-action="edit-session" data-id="${s.id}" aria-label="Editar">✎</button>` : ''}
         </li>`;
-    }).join('');
+        return { at: toMs(s.inicio) + 0.5, html };
+    });
+    const list = [...sessionRows, ...gapRows].sort((a, b) => a.at - b.at).map((row) => row.html).join('');
 
     return `
         <nav class="day-nav">
@@ -256,6 +275,9 @@ function renderTimeline() {
         <button type="button" class="btn ghost" data-action="new-session" data-day="${day}">+ Sessão manual</button>`;
 }
 
+const STATS_MODES = { day: 'Dia', week: 'Semana', month: 'Mês', trend: 'Tendência' };
+const WEEKDAYS = ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom'];
+
 function statsRange() {
     const anchor = state.statsAnchor ?? today();
     if (state.statsMode === 'day') return [anchor, anchor];
@@ -263,60 +285,173 @@ function statsRange() {
     return monthRange(anchor);
 }
 
+/** "3:29" (horas:minutos), como no calendário do YPT. */
+function formatHM(ms) {
+    const minutes = Math.floor(ms / 60_000);
+    return `${Math.floor(minutes / 60)}:${String(minutes % 60).padStart(2, '0')}`;
+}
+
+function formatSigned(ms) {
+    return `${ms < 0 ? '−' : '+'}${formatDuration(Math.abs(ms), { seconds: true })}`;
+}
+
+function cards(items) {
+    return `<div class="cards">${items.map(([label, value]) => `<div class="card"><small>${label}</small><b>${value}</b></div>`).join('')}</div>`;
+}
+
+function segmentedModes() {
+    return `<div class="segmented four">
+        ${Object.entries(STATS_MODES).map(([m, label]) => `<button type="button" data-action="stats-mode" data-mode="${m}" class="${m === state.statsMode ? 'active' : ''}">${label}</button>`).join('')}
+    </div>`;
+}
+
 function renderStats() {
+    if (state.statsMode === 'trend') return segmentedModes() + renderTrend();
+
     const d = daily();
     const t = today();
     const [from, to] = statsRange();
     const range = rangeStats(d, from, to, t);
     const mode = state.statsMode;
+    const isCurrent = from <= t && t <= to;
     const single = mode === 'day' ? dayStats(d, from) : null;
     const title = mode === 'day'
         ? formatDay(from, { weekday: 'long', day: '2-digit', month: '2-digit' })
         : mode === 'week' ? `${formatDay(from, { day: '2-digit', month: '2-digit' })} – ${formatDay(to, { day: '2-digit', month: '2-digit' })}`
             : formatDay(from, { month: 'long', year: 'numeric' });
 
-    const cards = [
-        ['Total', formatDuration(range.totalMs)],
-        mode === 'day' ? ['Máx. foco', formatDuration(single.maxFocusMs)] : ['Média diária', formatDuration(range.avgPerDayMs)],
-        mode === 'day'
-            ? ['Início / término', single.startMs ? `${formatClock(single.startMs, from, state.settings)} – ${formatClock(single.endMs, from, state.settings)}` : '--']
-            : ['Dias estudados', `${range.daysStudied} / ${range.days.length}`],
-        mode === 'day' ? ['Sequência', `${streak(d, t)} dias`] : ['Máx. foco', formatDuration(range.maxFocusMs)],
-    ].map(([label, value]) => `<div class="card"><small>${label}</small><b>${value}</b></div>`).join('');
-
-    const subjects = Object.entries(range.bySubject).sort((a, b) => b[1] - a[1]);
-    const subjectRows = subjects.map(([id, ms]) => {
-        const s = subjectById(id);
-        const pct = range.totalMs ? Math.round((ms / range.totalMs) * 100) : 0;
-        return `<li style="--c:${esc(s?.cor ?? '#888')}"><span class="dot"></span><span class="name">${esc(s?.nome ?? 'Removida')}</span>
-            <span>${formatDuration(ms)}</span><span class="muted">${pct}%</span></li>`;
-    }).join('');
+    const summary = mode === 'day'
+        ? cards([
+            ['Total', formatDuration(range.totalMs)],
+            ['Máx. foco', formatDuration(single.maxFocusMs)],
+            ['Início / término', single.startMs ? `${formatClock(single.startMs, from, state.settings)} – ${formatClock(single.endMs, from, state.settings)}` : '--'],
+            ['Sequência', `${streak(d, t)} dias`],
+        ])
+        : cards([
+            ['Total', formatDuration(range.totalMs)],
+            ['Média diária', formatDuration(range.avgPerDayMs)],
+            ['Dias estudados', `${range.daysStudied} / ${range.days.length}`],
+            ['Máx. foco', formatDuration(range.maxFocusMs)],
+        ]);
 
     return `
-        <div class="segmented">
-            ${['day', 'week', 'month'].map((m) => `<button type="button" data-action="stats-mode" data-mode="${m}" class="${m === mode ? 'active' : ''}">${{ day: 'Dia', week: 'Semana', month: 'Mês' }[m]}</button>`).join('')}
-        </div>
+        ${segmentedModes()}
+        ${mode === 'week' ? renderQuarterGrid(d, from) : ''}
+        ${mode === 'month' ? renderYearGrid(d, from) : ''}
         <nav class="day-nav">
             <button type="button" data-action="stats-prev" aria-label="Anterior">‹</button>
             <b>${title}</b>
             <button type="button" data-action="stats-next" aria-label="Próximo" ${to >= t ? 'disabled' : ''}>›</button>
         </nav>
-        <div class="cards">${cards}</div>
+        ${summary}
+        ${isCurrent ? renderComparison(d, mode, t) : ''}
+        ${renderStudyVsOther(d, from, to)}
         ${mode !== 'day' ? '<div class="chart-box"><canvas data-chart="bars"></canvas></div>' : ''}
         ${mode === 'month' ? renderMonthCalendar(range, from) : ''}
-        <h3>Por matéria</h3>
-        ${subjects.length ? `<div class="chart-box small"><canvas data-chart="donut"></canvas></div>` : ''}
-        <ul class="subject-share">${subjectRows || '<li class="empty">Sem estudo no período.</li>'}</ul>
-        <h3>Últimas 15 semanas</h3>
-        ${renderHeatmap(d, t)}
-        <p class="center muted">Sequência atual: <b>${streak(d, t)} dias</b></p>`;
+        ${mode === 'month' ? renderWeekdayAndHours(d, from, to, t) : ''}
+        ${renderSubjectShare(range.bySubject, range.totalMs)}`;
+}
+
+function renderComparison(d, mode, t) {
+    const { diffMs } = compareWithPrevious(d, mode, t, state.settings, nowMs());
+    const weekdayName = formatDay(t, { weekday: 'long' }).toLowerCase();
+    const label = mode === 'day' ? 'Vs ontem, mesmo horário'
+        : mode === 'week' ? `Até ${weekdayName}, vs semana passada`
+            : `Até o dia ${Number(t.slice(8))}, vs mês passado`;
+    const previousLabel = { day: 'Ontem', week: 'Semana passada', month: 'Mês passado' }[mode];
+    return `<div class="compare">
+        <div><small>${label}</small><b class="${diffMs < 0 ? 'neg' : 'pos'}">${formatSigned(diffMs)}</b>
+            <small class="legend"><i class="now"></i>Agora <i class="prev"></i>${previousLabel}</small></div>
+        <div class="chart-box mini"><canvas data-chart="compare"></canvas></div>
+    </div>`;
+}
+
+function renderStudyVsOther(d, from, to) {
+    const { studyMs, otherMs, ratio } = studyVsOther(d, from, to);
+    if (!studyMs && !otherMs) return '';
+    return `<div class="ratio">
+        <small>Estudo × outros, entre o início e o término de cada dia (só cronômetro)</small>
+        <div class="ratio-bar"><span style="width:${(ratio * 100).toFixed(1)}%"></span></div>
+        <small><b>Estudo ${formatHM(studyMs)} · ${Math.round(ratio * 100)}%</b> &nbsp; Outros ${formatHM(otherMs)} · ${100 - Math.round(ratio * 100)}%</small>
+    </div>`;
+}
+
+function renderQuarterGrid(d, from) {
+    const weeks = quarterWeeks(d, from);
+    const t = today();
+    return `<div class="period-grid">${weeks.map((w) => `<button type="button" data-action="stats-goto" data-day="${w.from}"
+        class="lv${heatLevel(w.totalMs / 7)} ${w.from === from ? 'selected' : ''}" ${w.from > t ? 'disabled' : ''}>
+        <small>${formatDay(w.from, { day: '2-digit', month: '2-digit' })}</small><b>${w.totalMs ? formatHM(w.totalMs) : '—'}</b></button>`).join('')}</div>`;
+}
+
+function renderYearGrid(d, from) {
+    const months = yearMonths(d, from);
+    const t = today();
+    return `<div class="period-grid months">${months.map((m) => `<button type="button" data-action="stats-goto" data-day="${m.from}"
+        class="lv${heatLevel(m.totalMs / 30)} ${m.from === from ? 'selected' : ''}" ${m.from > t ? 'disabled' : ''}>
+        <small>${formatDay(m.from, { month: 'short' }).replace('.', '')}</small><b>${m.totalMs ? formatHM(m.totalMs) : '—'}</b></button>`).join('')}</div>`;
 }
 
 function renderMonthCalendar(range, from) {
     const offset = (new Date(from + 'T00:00:00Z').getUTCDay() + 6) % 7;
     const blanks = '<i class="blank"></i>'.repeat(offset);
-    const cells = range.days.map((s) => `<i class="lv${heatLevel(s.totalMs)}" title="${formatDay(s.day)}: ${formatDuration(s.totalMs)}">${Number(s.day.slice(8))}</i>`).join('');
-    return `<div class="calendar"><b>S</b><b>T</b><b>Q</b><b>Q</b><b>S</b><b>S</b><b>D</b>${blanks}${cells}</div>`;
+    const t = today();
+    const cells = range.days.map((s) => `<i class="lv${heatLevel(s.totalMs)} ${s.day === t ? 'today' : ''}">
+        <b>${Number(s.day.slice(8))}</b><small>${s.totalMs ? formatHM(s.totalMs) : ''}</small></i>`).join('');
+    return `<div class="calendar">${WEEKDAYS.map((w) => `<span>${w}</span>`).join('')}${blanks}${cells}</div>
+        <p class="heat-legend"><i class="lv1">0+</i><i class="lv2">4+</i><i class="lv3">7+</i><i class="lv4">10+</i><i class="lv5">12+</i></p>`;
+}
+
+function renderWeekdayAndHours(d, from, to, t) {
+    return `<h3>Média por dia da semana</h3>
+        <div class="chart-box small"><canvas data-chart="weekday" data-from="${from}" data-to="${to}"></canvas></div>
+        <h3>Estudo por hora do dia (média, só cronômetro)</h3>
+        <div class="chart-box small"><canvas data-chart="hours" data-from="${from}" data-to="${to}"></canvas></div>`;
+}
+
+function renderSubjectShare(bySubject, totalMs) {
+    const subjects = Object.entries(bySubject).sort((a, b) => b[1] - a[1]);
+    const rows = subjects.map(([id, ms]) => {
+        const s = subjectById(id);
+        const pct = totalMs ? Math.round((ms / totalMs) * 100) : 0;
+        return `<li style="--c:${esc(s?.cor ?? '#888')}"><span class="dot"></span><span class="name">${esc(s?.nome ?? 'Removida')}</span>
+            <span>${formatDuration(ms)}</span><span class="muted">${pct}%</span></li>`;
+    }).join('');
+    return `<h3>Por matéria</h3>
+        ${subjects.length ? '<div class="chart-box small"><canvas data-chart="donut"></canvas></div>' : ''}
+        <ul class="subject-share">${rows || '<li class="empty">Sem estudo no período.</li>'}</ul>`;
+}
+
+function trendSessions() {
+    return state.trendSubject ? state.sessions.filter((s) => s.subject_id === state.trendSubject) : state.sessions;
+}
+
+function renderTrend() {
+    const d = buildDaily(trendSessions(), state.settings, nowMs());
+    const t = today();
+    const withSessions = new Set(liveSessions().map((s) => s.subject_id));
+    const chips = state.subjects
+        .filter((s) => !s.deleted_at && withSessions.has(s.id))
+        .sort((a, b) => a.ordem - b.ordem)
+        .map((s) => `<button type="button" data-action="trend-subject" data-id="${s.id}" style="--c:${esc(s.cor)}"
+            class="${state.trendSubject === s.id ? 'active' : ''}">${esc(s.nome)}</button>`).join('');
+    const maxOf = (unit, count) => formatDuration(Math.max(0, ...trendBuckets(d, unit, count, t).map((b) => b.totalMs)));
+    const weeksFrom = addDays(weekRange(t)[0], -11 * 7);
+    return `
+        <div class="chips"><button type="button" data-action="trend-subject" data-id="" class="${state.trendSubject ? '' : 'active'}">Todos</button>${chips}</div>
+        <h3>Por dia · máximo ${maxOf('day', 14)}</h3>
+        <div class="chart-box"><canvas data-chart="trend-day"></canvas></div>
+        <h3>Por semana · máximo ${maxOf('week', 12)}</h3>
+        <div class="chart-box"><canvas data-chart="trend-week"></canvas></div>
+        <h3>Por mês · máximo ${maxOf('month', 12)}</h3>
+        <div class="chart-box"><canvas data-chart="trend-month"></canvas></div>
+        <h3>Média por dia da semana (12 semanas)</h3>
+        <div class="chart-box small"><canvas data-chart="weekday" data-from="${weeksFrom}" data-to="${t}"></canvas></div>
+        <h3>Estudo por hora do dia (28 dias, só cronômetro)</h3>
+        <div class="chart-box small"><canvas data-chart="hours" data-from="${addDays(t, -27)}" data-to="${t}"></canvas></div>
+        <h3>Últimas 15 semanas</h3>
+        ${renderHeatmap(d, t)}
+        <p class="center muted">Sequência atual: <b>${streak(d, t)} dias</b></p>`;
 }
 
 function renderHeatmap(d, t) {
@@ -335,46 +470,120 @@ function renderHeatmap(d, t) {
     return `<div class="heatmap">${cols}</div>`;
 }
 
-function mountStatsCharts() {
-    const [from, to] = statsRange();
-    const range = rangeStats(daily(), from, to, today());
-    const subjectIds = Object.keys(range.bySubject);
-    const color = (id) => subjectById(id)?.cor ?? '#888';
-    const name = (id) => subjectById(id)?.nome ?? 'Removida';
-    const hours = (ms) => +(ms / 3_600_000).toFixed(2);
-    const tooltip = { callbacks: { label: (ctx) => `${ctx.dataset.label ?? ctx.label}: ${formatDuration(ctx.raw * 3_600_000)}` } };
+// ── Gráficos ─────────────────────────────────────────────────────────────────
 
-    const bars = root.querySelector('[data-chart="bars"]');
-    if (bars) {
-        charts.push(new Chart(bars, {
+const hoursOf = (ms) => +(ms / 3_600_000).toFixed(2);
+const chartTooltip = { callbacks: { label: (ctx) => `${ctx.dataset.label ?? ctx.label}: ${formatDuration(ctx.raw * 3_600_000)}` } };
+const colorOf = (id) => subjectById(id)?.cor ?? '#888';
+const nameOf = (id) => subjectById(id)?.nome ?? 'Removida';
+
+function cssVar(name) {
+    return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+}
+
+function stackedBars(canvas, labels, buckets) {
+    const subjectIds = [...new Set(buckets.flatMap((b) => Object.keys(b.bySubject)))];
+    charts.push(new Chart(canvas, {
+        type: 'bar',
+        data: {
+            labels,
+            datasets: subjectIds.map((id) => ({
+                label: nameOf(id),
+                data: buckets.map((b) => hoursOf(b.bySubject[id] ?? 0)),
+                backgroundColor: colorOf(id),
+                borderRadius: 3,
+            })),
+        },
+        options: {
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false }, tooltip: chartTooltip },
+            scales: { x: { stacked: true, grid: { display: false } }, y: { stacked: true, ticks: { callback: (v) => `${v}h` } } },
+        },
+    }));
+}
+
+function simpleBars(canvas, labels, values, tooltipLabel) {
+    charts.push(new Chart(canvas, {
+        type: 'bar',
+        data: { labels, datasets: [{ label: tooltipLabel, data: values, backgroundColor: cssVar('--primary'), borderRadius: 3 }] },
+        options: {
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: { x: { grid: { display: false } }, y: { beginAtZero: true } },
+        },
+    }));
+}
+
+function mountStatsCharts() {
+    const t = today();
+    const mode = state.statsMode;
+    const d = mode === 'trend' ? buildDaily(trendSessions(), state.settings, nowMs()) : daily();
+
+    if (mode !== 'trend') {
+        const [from, to] = statsRange();
+        const range = rangeStats(d, from, to, t);
+        const bars = root.querySelector('[data-chart="bars"]');
+        if (bars) {
+            const labels = range.days.map((s) => (mode === 'week' ? formatDay(s.day, { weekday: 'short' }) : Number(s.day.slice(8))));
+            stackedBars(bars, labels, range.days.map((s) => ({ bySubject: s.bySubject })));
+        }
+        const donut = root.querySelector('[data-chart="donut"]');
+        if (donut) {
+            const ids = Object.keys(range.bySubject);
+            charts.push(new Chart(donut, {
+                type: 'doughnut',
+                data: { labels: ids.map(nameOf), datasets: [{ data: ids.map((id) => hoursOf(range.bySubject[id])), backgroundColor: ids.map(colorOf), borderWidth: 0 }] },
+                options: { maintainAspectRatio: false, cutout: '65%', plugins: { legend: { display: false }, tooltip: chartTooltip } },
+            }));
+        }
+        const compare = root.querySelector('[data-chart="compare"]');
+        if (compare) {
+            const series = comparisonSeries(d, mode, t, state.settings, nowMs());
+            const labels = mode === 'day' ? series.labels : series.labels.map((l) => (l ? Number(l.slice(8)) : ''));
+            charts.push(new Chart(compare, {
+                type: 'line',
+                data: {
+                    labels,
+                    datasets: [
+                        { label: 'Agora', data: series.current.map(hoursOf), borderColor: cssVar('--primary'), borderWidth: 2, pointRadius: 0, stepped: true },
+                        { label: 'Anterior', data: series.previous.map(hoursOf), borderColor: 'transparent', backgroundColor: cssVar('--compare-prev'), fill: 'origin', pointRadius: 0, stepped: true },
+                    ],
+                },
+                options: {
+                    maintainAspectRatio: false,
+                    animation: false,
+                    plugins: { legend: { display: false }, tooltip: chartTooltip },
+                    scales: { x: { grid: { display: false }, ticks: { maxTicksLimit: 5 } }, y: { display: false, beginAtZero: true } },
+                },
+            }));
+        }
+    } else {
+        const dayBuckets = trendBuckets(d, 'day', 14, t);
+        stackedBars(root.querySelector('[data-chart="trend-day"]'), dayBuckets.map((b) => formatDay(b.from, { day: '2-digit', month: '2-digit' })), dayBuckets);
+        const weekBuckets = trendBuckets(d, 'week', 12, t);
+        stackedBars(root.querySelector('[data-chart="trend-week"]'), weekBuckets.map((b) => formatDay(b.from, { day: '2-digit', month: '2-digit' })), weekBuckets);
+        const monthBuckets = trendBuckets(d, 'month', 12, t);
+        stackedBars(root.querySelector('[data-chart="trend-month"]'), monthBuckets.map((b) => formatDay(b.from, { month: 'short' }).replace('.', '')), monthBuckets);
+    }
+
+    const weekday = root.querySelector('[data-chart="weekday"]');
+    if (weekday) {
+        const averages = weekdayAverages(d, weekday.dataset.from, weekday.dataset.to, t);
+        charts.push(new Chart(weekday, {
             type: 'bar',
-            data: {
-                labels: range.days.map((s) => (state.statsMode === 'week' ? formatDay(s.day, { weekday: 'short' }) : Number(s.day.slice(8)))),
-                datasets: subjectIds.map((id) => ({
-                    label: name(id),
-                    data: range.days.map((s) => hours(s.bySubject[id] ?? 0)),
-                    backgroundColor: color(id),
-                    borderRadius: 3,
-                })),
-            },
+            data: { labels: WEEKDAYS, datasets: [{ label: 'Média', data: averages.map(hoursOf), backgroundColor: cssVar('--primary'), borderRadius: 3 }] },
             options: {
                 maintainAspectRatio: false,
-                plugins: { legend: { display: false }, tooltip },
-                scales: { x: { stacked: true, grid: { display: false } }, y: { stacked: true, ticks: { callback: (v) => `${v}h` } } },
+                plugins: { legend: { display: false }, tooltip: chartTooltip },
+                scales: { x: { grid: { display: false } }, y: { beginAtZero: true, ticks: { callback: (v) => `${v}h` } } },
             },
         }));
     }
-
-    const donut = root.querySelector('[data-chart="donut"]');
-    if (donut) {
-        charts.push(new Chart(donut, {
-            type: 'doughnut',
-            data: {
-                labels: subjectIds.map(name),
-                datasets: [{ data: subjectIds.map((id) => hours(range.bySubject[id])), backgroundColor: subjectIds.map(color), borderWidth: 0 }],
-            },
-            options: { maintainAspectRatio: false, cutout: '65%', plugins: { legend: { display: false }, tooltip } },
-        }));
+    const hoursChart = root.querySelector('[data-chart="hours"]');
+    if (hoursChart) {
+        const profile = hourProfile(d, hoursChart.dataset.from, hoursChart.dataset.to, t, state.settings);
+        const order = Array.from({ length: 24 }, (_, i) => (state.settings.virada_hora + i) % 24);
+        simpleBars(hoursChart, order.map((h) => String(h).padStart(2, '0')), order.map((h) => +profile[h].toFixed(1)), 'Minutos por dia');
     }
 }
 
@@ -434,6 +643,8 @@ function renderSettings() {
         <p class="muted">Baixa um arquivo JSON com todas as matérias, sessões, D-Days e preferências deste aparelho.
             ${state.lastExportAt ? `Último backup: ${new Date(state.lastExportAt).toLocaleString('pt-BR')}.` : 'Nenhum backup feito neste aparelho.'}</p>
         <button type="button" class="btn ghost" data-action="export-backup">⤓ Exportar backup</button>
+        <label class="btn ghost file-btn">⤒ Importar arquivo (backup ou histórico)
+            <input type="file" accept="application/json,.json" data-import hidden></label>
         <a class="btn ghost" href="${esc(config.homeUrl)}">← Voltar ao sistema</a>`;
 }
 
@@ -523,13 +734,13 @@ function openSubjectDialog(subject = null) {
     });
 }
 
-function openSessionDialog(session = null, day = today()) {
+function openSessionDialog(session = null, day = today(), gap = null) {
     const tz = state.settings.timezone;
     const subjects = state.subjects.filter((s) => !s.deleted_at && (!s.arquivada_em || s.id === session?.subject_id));
     if (!subjects.length) return alert('Crie uma matéria primeiro.');
     const [dayStart] = dayBounds(day, state.settings);
-    const defaultStart = session ? toMs(session.inicio) : Math.min(dayStart + 6 * 3_600_000, nowMs() - 3_600_000);
-    const defaultEnd = session?.fim ? toMs(session.fim) : defaultStart + 3_600_000;
+    const defaultStart = session ? toMs(session.inicio) : gap?.start ?? Math.min(dayStart + 6 * 3_600_000, nowMs() - 3_600_000);
+    const defaultEnd = session?.fim ? toMs(session.fim) : gap?.end ?? defaultStart + 3_600_000;
 
     openDialog(`
         <h3>${session ? 'Editar sessão' : 'Sessão manual'}</h3>
@@ -632,6 +843,27 @@ async function exportBackup() {
     render();
 }
 
+async function importBackup(file) {
+    let plan;
+    try {
+        plan = planImport(JSON.parse(await file.text()), state);
+    } catch (error) {
+        return alert(error instanceof SyntaxError ? 'O arquivo não é um JSON válido.' : error.message);
+    }
+    const total = plan.subjects.length + plan.sessions.length + plan.ddays.length;
+    const details = `${plan.subjects.length} matéria(s), ${plan.sessions.length} sessão(ões), ${plan.ddays.length} D-Day(s)`
+        + (plan.skipped ? `\n${plan.skipped} já existiam e serão ignoradas.` : '')
+        + (plan.invalid ? `\n${plan.invalid} registro(s) inválido(s) serão descartados.` : '');
+    if (!total) return alert(`Nada novo para importar.\n${details}`);
+    if (!confirm(`Importar ${details}?`)) return;
+
+    for (const subject of plan.subjects) await persist('subjects', subject);
+    for (const dday of plan.ddays) await persist('ddays', dday);
+    for (const session of plan.sessions) await persist('sessions', session);
+    render();
+    alert(`Importado: ${details}.\nO envio para o servidor acontece em segundo plano.`);
+}
+
 // ── Eventos ──────────────────────────────────────────────────────────────────
 
 function shiftStats(direction) {
@@ -674,6 +906,9 @@ root.addEventListener('click', async (event) => {
         'goto-day': () => { state.tab = 'timeline'; state.timelineDay = button.dataset.day; render(); },
         'stats-mode': () => { state.statsMode = button.dataset.mode; render(); },
         'stats-prev': () => { shiftStats(-1); render(); },
+        'stats-goto': () => { state.statsAnchor = button.dataset.day; render(); },
+        'trend-subject': () => { state.trendSubject = id || null; render(); },
+        'gap-session': () => openSessionDialog(null, state.timelineDay ?? today(), { start: Number(button.dataset.start), end: Number(button.dataset.end) }),
         'stats-next': () => { shiftStats(1); render(); },
         'delete-dday': async () => {
             const dday = state.ddays.find((d) => d.id === id);
@@ -683,6 +918,13 @@ root.addEventListener('click', async (event) => {
         'export-backup': () => exportBackup(),
     };
     await handlers[action]?.();
+});
+
+root.addEventListener('change', async (event) => {
+    const input = event.target.closest('[data-import]');
+    if (!input?.files?.length) return;
+    await importBackup(input.files[0]);
+    input.value = '';
 });
 
 root.addEventListener('submit', async (event) => {

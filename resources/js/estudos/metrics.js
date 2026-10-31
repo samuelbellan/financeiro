@@ -6,13 +6,15 @@
 // - Só contam sessões não excluídas e com status 'ok'. Sessão em andamento conta até "agora".
 // - Sessões manuais contam no total, matérias, heatmap e dias estudados,
 //   mas não no máximo de foco nem nos horários de início/término.
+// - Sessões importadas (histórico do YPT, horários fictícios) contam como as manuais e também
+//   ficam fora da linha do tempo e da checagem de sobreposição.
 
 const MIN = 60_000;
 const HOUR = 60 * MIN;
 const DAY = 24 * HOUR;
 
 export const DEFAULT_SETTINGS = Object.freeze({
-    virada_hora: 3,
+    virada_hora: 1,
     limite_suspeita_min: 180,
     meta_diaria_min: null,
     timezone: 'America/Sao_Paulo',
@@ -119,7 +121,7 @@ export function splitSession(session, settings, nowMs) {
 }
 
 function emptyDay(day) {
-    return { day, totalMs: 0, maxFocusMs: 0, startMs: null, endMs: null, bySubject: {}, pieces: [] };
+    return { day, totalMs: 0, timerMs: 0, maxFocusMs: 0, startMs: null, endMs: null, bySubject: {}, pieces: [] };
 }
 
 /** Estatísticas por dia de estudo. Retorna Map<day, stats>. */
@@ -134,6 +136,7 @@ export function buildDaily(sessions, settings, nowMs) {
             stats.bySubject[session.subject_id] = (stats.bySubject[session.subject_id] ?? 0) + duration;
             stats.pieces.push(piece);
             if (session.origem === 'timer') {
+                stats.timerMs += duration;
                 stats.maxFocusMs = Math.max(stats.maxFocusMs, duration);
                 stats.startMs = stats.startMs === null ? piece.start : Math.min(stats.startMs, piece.start);
                 stats.endMs = stats.endMs === null ? piece.end : Math.max(stats.endMs, piece.end);
@@ -205,6 +208,7 @@ export function timelineSlots(stats, settings, slotMinutes = 10) {
     const count = Math.round((dayEnd - dayStart) / slotMs);
     const occupancy = Array.from({ length: count }, () => new Map());
     for (const piece of stats.pieces) {
+        if (piece.session.origem === 'importado') continue;
         const first = Math.max(0, Math.floor((piece.start - dayStart) / slotMs));
         const last = Math.min(count - 1, Math.floor((piece.end - 1 - dayStart) / slotMs));
         for (let i = first; i <= last; i++) {
@@ -231,21 +235,24 @@ export function timelineSlots(stats, settings, slotMinutes = 10) {
 export function findOverlaps(candidate, sessions, nowMs) {
     const start = toMs(candidate.inicio);
     const end = sessionEnd(candidate, nowMs);
+    if (candidate.origem === 'importado') return [];
     return sessions.filter((other) =>
         other.id !== candidate.id
         && !other.deleted_at
+        && other.origem !== 'importado'
         && toMs(other.inicio) < end
         && sessionEnd(other, nowMs) > start
     );
 }
 
-/** Nível de cor do heatmap (0–4). */
+/** Nível de cor do calendário (0–5), nas faixas do YPT: 0+, 4+, 7+, 10+, 12+ horas. */
 export function heatLevel(totalMs) {
     if (totalMs <= 0) return 0;
-    if (totalMs < 2 * HOUR) return 1;
-    if (totalMs < 4 * HOUR) return 2;
-    if (totalMs < 6 * HOUR) return 3;
-    return 4;
+    if (totalMs < 4 * HOUR) return 1;
+    if (totalMs < 7 * HOUR) return 2;
+    if (totalMs < 10 * HOUR) return 3;
+    if (totalMs < 12 * HOUR) return 4;
+    return 5;
 }
 
 export function daysUntil(targetDay, today) {
@@ -268,4 +275,205 @@ export function formatClock(ms, day, settings) {
     const mm = String(wall.getUTCMinutes()).padStart(2, '0');
     const nextDay = wall.toISOString().slice(0, 10) > day;
     return `${hh}:${mm}${nextDay ? ' (+1)' : ''}`;
+}
+
+// ── Métricas de comparação e tendência ────────────────────────────────────────
+
+function daysOf(fromDay, toDay) {
+    const days = [];
+    for (let day = fromDay; day <= toDay; day = addDays(day, 1)) days.push(day);
+    return days;
+}
+
+/** Tempo estudado entre dois instantes, somando os pedaços dos dias envolvidos. */
+export function amountBetween(daily, fromMs, toMs, settings) {
+    if (toMs <= fromMs) return 0;
+    let total = 0;
+    const lastDay = studyDayOf(toMs - 1, settings);
+    for (let day = studyDayOf(fromMs, settings); day <= lastDay; day = addDays(day, 1)) {
+        for (const piece of daily.get(day)?.pieces ?? []) {
+            total += Math.max(0, Math.min(piece.end, toMs) - Math.max(piece.start, fromMs));
+        }
+    }
+    return total;
+}
+
+function comparisonRanges(mode, today) {
+    if (mode === 'day') return { curFrom: today, curTo: today, prevFrom: addDays(today, -1), prevTo: addDays(today, -1) };
+    if (mode === 'week') {
+        const [from, to] = weekRange(today);
+        return { curFrom: from, curTo: to, prevFrom: addDays(from, -7), prevTo: addDays(from, -1) };
+    }
+    const [from, to] = monthRange(today);
+    const [prevFrom, prevTo] = monthRange(addDays(from, -1));
+    return { curFrom: from, curTo: to, prevFrom, prevTo };
+}
+
+/**
+ * Período atual × anterior até o ponto equivalente ("Vs ontem", "Até sábado", "Vs dia 31").
+ * mode: 'day' | 'week' | 'month'. Retorna { currentMs, previousMs, diffMs }.
+ */
+export function compareWithPrevious(daily, mode, today, settings, nowMs) {
+    const { curFrom, prevFrom, prevTo } = comparisonRanges(mode, today);
+    const curStart = dayBounds(curFrom, settings)[0];
+    const prevStart = dayBounds(prevFrom, settings)[0];
+    const prevEnd = dayBounds(prevTo, settings)[1];
+    const currentMs = amountBetween(daily, curStart, nowMs, settings);
+    const previousMs = amountBetween(daily, prevStart, Math.min(prevStart + (nowMs - curStart), prevEnd), settings);
+    return { currentMs, previousMs, diffMs: currentMs - previousMs };
+}
+
+/**
+ * Curvas acumuladas do período atual e do anterior, para o gráfico da comparação.
+ * Dia: um ponto por hora a partir da virada; semana e mês: um ponto no fim de cada dia.
+ * A curva atual para em "agora".
+ */
+export function comparisonSeries(daily, mode, today, settings, nowMs) {
+    const { curFrom, curTo, prevFrom, prevTo } = comparisonRanges(mode, today);
+    const marksFor = (fromDay, toDay) => {
+        const start = dayBounds(fromDay, settings)[0];
+        if (mode === 'day') return Array.from({ length: 25 }, (_, i) => start + i * HOUR);
+        return [start, ...daysOf(fromDay, toDay).map((d) => dayBounds(d, settings)[1])];
+    };
+    const build = (fromDay, toDay, stopMs) => {
+        const start = dayBounds(fromDay, settings)[0];
+        const points = [];
+        for (const mark of marksFor(fromDay, toDay)) {
+            if (stopMs !== null && mark > stopMs) {
+                points.push(amountBetween(daily, start, stopMs, settings));
+                break;
+            }
+            points.push(amountBetween(daily, start, mark, settings));
+        }
+        return points;
+    };
+    const labels = mode === 'day'
+        ? Array.from({ length: 25 }, (_, i) => String((settings.virada_hora + i) % 24).padStart(2, '0'))
+        : ['', ...daysOf(curFrom, curTo)];
+    return { labels, current: build(curFrom, curTo, nowMs), previous: build(prevFrom, prevTo, null) };
+}
+
+/**
+ * Estudo × Outros: tempo cronometrado ÷ janela entre o início e o término de cada dia.
+ * Sessões manuais e importadas ficam de fora porque não têm horários confiáveis.
+ */
+export function studyVsOther(daily, fromDay, toDay) {
+    let studyMs = 0;
+    let windowMs = 0;
+    for (const day of daysOf(fromDay, toDay)) {
+        const stats = daily.get(day);
+        if (!stats || stats.startMs === null) continue;
+        studyMs += stats.timerMs;
+        windowMs += stats.endMs - stats.startMs;
+    }
+    return { studyMs, otherMs: Math.max(0, windowMs - studyMs), ratio: windowMs > 0 ? studyMs / windowMs : 0 };
+}
+
+/** Intervalos entre sessões consecutivas do dia (para a linha do tempo). */
+export function dayGaps(stats, minMs = MIN) {
+    const pieces = stats.pieces
+        .filter((p) => p.session.origem !== 'importado')
+        .sort((a, b) => a.start - b.start);
+    const gaps = [];
+    let lastEnd = null;
+    for (const piece of pieces) {
+        if (lastEnd !== null && piece.start - lastEnd >= minMs) {
+            gaps.push({ start: lastEnd, end: piece.start });
+        }
+        lastEnd = lastEnd === null ? piece.end : Math.max(lastEnd, piece.end);
+    }
+    return gaps;
+}
+
+/** Média por dia da semana (seg = 0 … dom = 6), considerando só os dias já decorridos do intervalo. */
+export function weekdayAverages(daily, fromDay, toDay, today) {
+    const totals = Array(7).fill(0);
+    const counts = Array(7).fill(0);
+    for (const day of daysOf(fromDay, toDay < today ? toDay : today)) {
+        const weekday = (new Date(day + 'T00:00:00Z').getUTCDay() + 6) % 7;
+        totals[weekday] += daily.get(day)?.totalMs ?? 0;
+        counts[weekday]++;
+    }
+    return totals.map((total, i) => (counts[i] ? total / counts[i] : 0));
+}
+
+/**
+ * Perfil por hora do relógio (0–23): minutos médios cronometrados em cada hora,
+ * considerando os dias já decorridos do intervalo.
+ */
+export function hourProfile(daily, fromDay, toDay, today, settings) {
+    const minutes = Array(24).fill(0);
+    const days = daysOf(fromDay, toDay < today ? toDay : today);
+    for (const day of days) {
+        for (const piece of daily.get(day)?.pieces ?? []) {
+            if (piece.session.origem !== 'timer') continue;
+            let cursor = piece.start;
+            while (cursor < piece.end) {
+                const wall = wallClock(cursor, settings.timezone);
+                const hour = new Date(wall).getUTCHours();
+                const nextHour = cursor + (HOUR - (((wall % HOUR) + HOUR) % HOUR));
+                const sliceEnd = Math.min(piece.end, nextHour);
+                minutes[hour] += (sliceEnd - cursor) / MIN;
+                cursor = sliceEnd;
+            }
+        }
+    }
+    return minutes.map((m) => (days.length ? m / days.length : 0));
+}
+
+/** Semanas (segunda a domingo) que tocam o trimestre do dia: [{ from, to, totalMs }]. */
+export function quarterWeeks(daily, day) {
+    const [y, m] = day.split('-').map(Number);
+    const firstMonth = Math.floor((m - 1) / 3) * 3 + 1;
+    const qFrom = `${y}-${String(firstMonth).padStart(2, '0')}-01`;
+    const qTo = monthRange(`${y}-${String(firstMonth + 2).padStart(2, '0')}-01`)[1];
+    const weeks = [];
+    for (let from = weekRange(qFrom)[0]; from <= qTo; from = addDays(from, 7)) {
+        const to = addDays(from, 6);
+        weeks.push({ from, to, totalMs: sumDays(daily, from, to) });
+    }
+    return weeks;
+}
+
+/** Os 12 meses do ano do dia: [{ month: 'YYYY-MM', from, to, totalMs }]. */
+export function yearMonths(daily, day) {
+    const year = day.slice(0, 4);
+    return Array.from({ length: 12 }, (_, i) => {
+        const [from, to] = monthRange(`${year}-${String(i + 1).padStart(2, '0')}-01`);
+        return { month: from.slice(0, 7), from, to, totalMs: sumDays(daily, from, to) };
+    });
+}
+
+function sumDays(daily, fromDay, toDay) {
+    return daysOf(fromDay, toDay).reduce((sum, d) => sum + (daily.get(d)?.totalMs ?? 0), 0);
+}
+
+/**
+ * Tendência: os últimos `count` dias, semanas ou meses até hoje (do mais antigo ao mais recente),
+ * com total e divisão por matéria. unit: 'day' | 'week' | 'month'.
+ */
+export function trendBuckets(daily, unit, count, today) {
+    const buckets = [];
+    let [from, to] = unit === 'day' ? [today, today] : unit === 'week' ? weekRange(today) : monthRange(today);
+    for (let i = 0; i < count; i++) {
+        const bucket = { from, to, totalMs: 0, bySubject: {} };
+        for (const d of daysOf(from, to)) {
+            const stats = daily.get(d);
+            if (!stats) continue;
+            bucket.totalMs += stats.totalMs;
+            for (const [subjectId, ms] of Object.entries(stats.bySubject)) {
+                bucket.bySubject[subjectId] = (bucket.bySubject[subjectId] ?? 0) + ms;
+            }
+        }
+        buckets.unshift(bucket);
+        if (unit === 'day') {
+            from = to = addDays(from, -1);
+        } else if (unit === 'week') {
+            from = addDays(from, -7);
+            to = addDays(from, 6);
+        } else {
+            [from, to] = monthRange(addDays(from, -1));
+        }
+    }
+    return buckets;
 }

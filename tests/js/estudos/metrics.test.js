@@ -5,7 +5,7 @@ import {
 } from '../../../resources/js/estudos/metrics.js';
 
 const H = 3_600_000;
-const settings = { ...DEFAULT_SETTINGS }; // virada às 3h, America/Sao_Paulo (UTC-3)
+const settings = { ...DEFAULT_SETTINGS, virada_hora: 3, timezone: 'America/Sao_Paulo' }; // UTC-3
 
 let seq = 0;
 function session(inicioLocal, fimLocal, extra = {}) {
