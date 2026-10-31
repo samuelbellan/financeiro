@@ -10,6 +10,7 @@ use App\Models\CartaoParcela;
 use App\Services\Ofx\OfxParserService;
 use Carbon\Carbon;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
@@ -20,6 +21,12 @@ class CreditCardReconciliationService
     /** Diferença máxima aceita entre fatura e sistema: o maior entre R$ 0,20 e 0,5% do valor. */
     public const TOLERANCIA_MINIMA = 0.20;
     public const TOLERANCIA_PERCENTUAL = 0.005;
+
+    /** O lite respondeu mais rápido e, com o texto do PDF, completo; a validação pelo total cobre os demais. */
+    protected const GEMINI_MODELOS = ['gemini-3.5-flash-lite', 'gemini-3.5-flash', 'gemini-3.6-flash', 'gemini-3.8-flash'];
+
+    /** Incrementar ao mudar prompt/formato dos itens, para invalidar extrações em cache. */
+    protected const CACHE_EXTRACAO_VERSAO = 'v1';
 
     protected OfxParserService $ofxParser;
     protected StatementImportService $statementImporter;
@@ -514,16 +521,17 @@ class CreditCardReconciliationService
      */
     protected function extractFromPdf(string $filePath): array
     {
+        $text = $this->extractPdfText($filePath);
+
         $apiKey = env('GEMINI_API_KEY', '');
         if (!empty($apiKey)) {
-            $geminiItems = $this->extractWithGemini($filePath, 'application/pdf');
+            $geminiItems = $this->extractWithGemini($filePath, 'application/pdf', $text);
             if (!empty($geminiItems)) {
                 return $geminiItems;
             }
         }
 
         // Fallback local: Extração nativa de texto do PDF via streams FlateDecode
-        $text = $this->extractPdfText($filePath);
         if (!empty($text) && strlen($text) > 80) {
             $parsed = $this->parsePdfText($text);
             if (count($parsed) >= 2) {
@@ -601,7 +609,7 @@ class CreditCardReconciliationService
     /**
      * Extração com IA Gemini para interpretar PDFs e planilhas de fatura com visão multimodal.
      */
-    protected function extractWithGemini(string $filePath, string $mimeType): array
+    protected function extractWithGemini(string $filePath, string $mimeType, ?string $pdfText = null): array
     {
         $apiKey = env('GEMINI_API_KEY', '');
         if (empty($apiKey)) {
@@ -609,10 +617,16 @@ class CreditCardReconciliationService
             return [];
         }
 
+        // Reenviar a mesma fatura (outro cartão/mês) reaproveita a extração anterior
+        $cacheKey = 'fatura_extracao:' . self::CACHE_EXTRACAO_VERSAO . ':' . hash_file('sha256', $filePath);
+        $cached = Cache::get($cacheKey);
+        if (is_array($cached) && !empty($cached)) {
+            Log::info('Extração da fatura reaproveitada do cache (' . count($cached) . ' itens).');
+            return $cached;
+        }
+
         // Faturas longas levam mais que os 30s padrão do PHP para o Gemini responder
         @set_time_limit(420);
-
-        $base64 = base64_encode(file_get_contents($filePath));
 
         $prompt = "Você é um especialista em faturas de cartão de crédito brasileiras (Nubank, Santander, Inter, Itaú, Vuon, Bradesco, C6, etc.).
 Analise o documento da fatura em anexo e extraia a lista completa de TODOS os lançamentos de compras, despesas, tarifas, anuidade, estornos e pagamentos.
@@ -636,37 +650,47 @@ Retorne APENAS um JSON estrito (sem formatação markdown, sem comentários) com
     ]
 }";
 
-        $models = ['gemini-3.5-flash', 'gemini-3.6-flash', 'gemini-3.8-flash', 'gemini-3.5-flash-lite'];
+        // O texto extraído localmente é menor que o PDF e rendeu extração mais completa; o arquivo fica como fallback
+        $entradas = [];
+        $textoLimpo = $pdfText !== null ? $this->prepararTextoPdf($pdfText) : '';
+        if ($this->textoPdfUtilizavel($textoLimpo)) {
+            $entradas['texto'] = [['text' => $prompt . "\n\nTexto extraído do PDF da fatura:\n" . $textoLimpo]];
+        }
+        $entradas['arquivo'] = [
+            ['inlineData' => ['mimeType' => $mimeType, 'data' => base64_encode(file_get_contents($filePath))]],
+            ['text' => $prompt],
+        ];
+
         $rows = [];
         $melhorDiferenca = INF;
 
-        foreach ($models as $model) {
-            try {
-                $response = Http::withoutVerifying()
-                    ->timeout(90)
-                    ->post("https://generativelanguage.googleapis.com/v1beta/models/{$model}:generateContent?key={$apiKey}", [
-                        'contents' => [
-                            [
-                                'parts' => [
-                                    [
-                                        'inlineData' => [
-                                            'mimeType' => $mimeType,
-                                            'data'     => $base64,
-                                        ],
-                                    ],
-                                    ['text' => $prompt],
-                                ],
+        foreach ($entradas as $entrada => $parts) {
+            foreach (self::GEMINI_MODELOS as $model) {
+                if (Cache::has("gemini_indisponivel:{$model}")) {
+                    continue;
+                }
+
+                try {
+                    $response = Http::withoutVerifying()
+                        ->connectTimeout(10)
+                        ->timeout(90)
+                        ->post("https://generativelanguage.googleapis.com/v1beta/models/{$model}:generateContent?key={$apiKey}", [
+                            'contents' => [['parts' => $parts]],
+                            'generationConfig' => [
+                                'temperature'      => 0.1,
+                                'maxOutputTokens'  => 65536,
+                                'responseMimeType' => 'application/json',
                             ],
-                        ],
-                        'generationConfig' => [
-                            'temperature'      => 0.1,
-                            'maxOutputTokens'  => 65536,
-                            'responseMimeType' => 'application/json',
-                        ],
-                    ]);
+                        ]);
+                } catch (Throwable $e) {
+                    Log::warning("Gemini ({$model}) exceção na conciliação de fatura: " . $e->getMessage());
+                    $this->marcarModeloIndisponivel($model, 0);
+                    continue;
+                }
 
                 if (!$response->successful()) {
                     Log::warning("Gemini ({$model}) falhou na conciliação de fatura: status {$response->status()} " . substr($response->body(), 0, 200));
+                    $this->marcarModeloIndisponivel($model, $response->status());
                     continue;
                 }
 
@@ -681,7 +705,7 @@ Retorne APENAS um JSON estrito (sem formatação markdown, sem comentários) com
                 $candidatos = $data['itens'] ?? $data['transacoes'] ?? $data['compras'] ?? (is_array($data) && isset($data[0]) ? $data : []);
 
                 if (empty($candidatos)) {
-                    Log::warning("Gemini ({$model}) não retornou itens na conciliação de fatura.");
+                    Log::warning("Gemini ({$model}/{$entrada}) não retornou itens na conciliação de fatura.");
                     continue;
                 }
 
@@ -695,12 +719,10 @@ Retorne APENAS um JSON estrito (sem formatação markdown, sem comentários) com
                 }
 
                 if ($diferenca <= 1.00) {
-                    Log::info("Gemini ({$model}) extraiu " . count($candidatos) . ' itens da fatura (total confere).');
-                    break;
+                    Log::info("Gemini ({$model}/{$entrada}) extraiu " . count($candidatos) . ' itens da fatura (total confere).');
+                    break 2;
                 }
-                Log::warning("Gemini ({$model}) extraiu " . count($candidatos) . " itens, mas a soma difere do total da fatura (R$ {$totalFatura}) em R$ " . round($diferenca, 2) . '.');
-            } catch (Throwable $e) {
-                Log::warning("Gemini ({$model}) exceção na conciliação de fatura: " . $e->getMessage());
+                Log::warning("Gemini ({$model}/{$entrada}) extraiu " . count($candidatos) . " itens, mas a soma difere do total da fatura (R$ {$totalFatura}) em R$ " . round($diferenca, 2) . '.');
             }
         }
 
@@ -726,11 +748,56 @@ Retorne APENAS um JSON estrito (sem formatação markdown, sem comentários) com
                 ];
             }
 
+            // Só guarda extrações que bateram com o total, para não perpetuar uma leitura incompleta
+            if ($melhorDiferenca <= 1.00 && !empty($items)) {
+                Cache::put($cacheKey, $items, now()->addDays(30));
+            }
+
             return $items;
         } catch (Throwable $e) {
             Log::error('Falha Gemini na conciliação: ' . $e->getMessage());
             return [];
         }
+    }
+
+    /**
+     * Evita esperar por modelos sobrecarregados (503), sem cota (429) ou removidos (404) nas próximas chamadas.
+     */
+    protected function marcarModeloIndisponivel(string $model, int $status): void
+    {
+        $minutos = match (true) {
+            $status === 404                 => 24 * 60,
+            $status === 429                 => 2,
+            $status === 0, $status >= 500   => 5,
+            default                         => 0,
+        };
+
+        if ($minutos > 0) {
+            Cache::put("gemini_indisponivel:{$model}", $status, now()->addMinutes($minutos));
+        }
+    }
+
+    /**
+     * Converte o texto cru dos operadores Tj/TJ (escapes octais WinAnsi, parênteses escapados) em UTF-8 legível.
+     */
+    protected function prepararTextoPdf(string $text): string
+    {
+        $text = preg_replace_callback('/\\\\([0-7]{1,3})/', fn($m) => chr(octdec($m[1]) & 0xFF), $text);
+        $text = str_replace(['\\(', '\\)', '\\\\'], ['(', ')', '\\'], $text);
+
+        if (!mb_check_encoding($text, 'UTF-8')) {
+            $text = mb_convert_encoding($text, 'UTF-8', 'Windows-1252');
+        }
+
+        return trim(preg_replace('/[ \t]+/', ' ', $text));
+    }
+
+    /**
+     * O texto só é útil se tiver volume e vários valores monetários (PDFs escaneados não têm camada de texto).
+     */
+    protected function textoPdfUtilizavel(string $text): bool
+    {
+        return strlen($text) >= 500 && preg_match_all('/\d,\d{2}\b/', $text) >= 5;
     }
 
     /**

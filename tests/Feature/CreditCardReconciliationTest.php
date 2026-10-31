@@ -12,6 +12,8 @@ use App\Services\CreditCardReconciliationService;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Str;
 use Tests\TestCase;
 
 class CreditCardReconciliationTest extends TestCase
@@ -213,6 +215,64 @@ class CreditCardReconciliationTest extends TestCase
 
         $this->assertEquals(0, $resultado['contadores']['conciliados']);
         $this->assertStringContainsString('VISA SX', $resultado['aviso']);
+    }
+
+    public function test_same_invoice_file_reuses_cached_extraction(): void
+    {
+        $this->fakeGemini();
+        $service = new CreditCardReconciliationService();
+        $pdf = $this->fakePdf('Fatura A');
+
+        $primeira = $service->extractItemsFromFile($pdf);
+        $segunda = $service->extractItemsFromFile($pdf);
+
+        $this->assertCount(2, $primeira);
+        $this->assertEquals($primeira, $segunda);
+        Http::assertSentCount(1);
+    }
+
+    public function test_overloaded_gemini_model_is_skipped_on_next_extraction(): void
+    {
+        $this->fakeGemini(['gemini-3.5-flash-lite' => 503]);
+        $service = new CreditCardReconciliationService();
+
+        $this->assertCount(2, $service->extractItemsFromFile($this->fakePdf('Fatura A')));
+        $this->assertCount(2, $service->extractItemsFromFile($this->fakePdf('Fatura B')));
+
+        // 1ª extração: lite (503) + 3.5-flash; 2ª: direto no 3.5-flash, sem esperar o lite de novo
+        $modelos = collect(Http::recorded())->map(fn($r) => Str::between($r[0]->url(), 'models/', ':generateContent'))->all();
+        $this->assertEquals(['gemini-3.5-flash-lite', 'gemini-3.5-flash', 'gemini-3.5-flash'], $modelos);
+    }
+
+    /** @param array<string, int> $falhas modelo => status HTTP de erro */
+    protected function fakeGemini(array $falhas = []): void
+    {
+        config(['cache.default' => 'array']);
+        $_ENV['GEMINI_API_KEY'] = $_SERVER['GEMINI_API_KEY'] = 'chave-teste';
+        putenv('GEMINI_API_KEY=chave-teste');
+
+        $json = json_encode([
+            'total_fatura' => 150.40,
+            'itens' => [
+                ['data' => '2026-09-10', 'descricao' => 'FIP - BASICA MODA INT', 'valor' => 49.90, 'tipo' => 'despesa', 'parcela' => '02/02'],
+                ['data' => '2026-10-01', 'descricao' => 'FORT ATACADISTA 180', 'valor' => 100.50, 'tipo' => 'despesa'],
+            ],
+        ]);
+
+        $fakes = [];
+        foreach ($falhas as $modelo => $status) {
+            $fakes["generativelanguage.googleapis.com/v1beta/models/{$modelo}:*"] = Http::response(['error' => 'indisponível'], $status);
+        }
+        $fakes['generativelanguage.googleapis.com/*'] = Http::response(['candidates' => [['content' => ['parts' => [['text' => $json]]]]]]);
+
+        Http::fake($fakes);
+    }
+
+    protected function fakePdf(string $conteudo): string
+    {
+        $path = tempnam(sys_get_temp_dir(), 'fatura') . '.pdf';
+        file_put_contents($path, "%PDF-1.4\n% {$conteudo}\n%%EOF");
+        return $path;
     }
 
     protected function criarCompraParcelada(string $descricao, string $dataCompra, int $numeroParcelas, float $valorParcela, int $parcelaNoMes, string $vencimento, string $tipo = 'parcelada'): void
