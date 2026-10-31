@@ -32,8 +32,6 @@ class DatabaseSyncService
         'cartao_compras',
         'cartao_parcelas',
         'cartao_previsoes',
-        'study_goals',
-        'study_logs',
         'salary_profiles',
         'fiscal_concursos',
         'fiscal_noticias',

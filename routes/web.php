@@ -8,7 +8,6 @@ use App\Http\Controllers\CartoesController;
 use App\Http\Controllers\CategoriasController;
 use App\Http\Controllers\ExportController;
 use App\Http\Controllers\TelegramWebhookController;
-use App\Http\Controllers\EstudosController;
 use App\Http\Controllers\PhotoController;
 use App\Http\Controllers\SalaryController;
 use App\Http\Controllers\FiscalConcursosController;
@@ -111,14 +110,8 @@ Route::middleware('auth')->group(function () {
     Route::delete('/financas/telegram-logs', [TelegramWebhookController::class, 'clearLogs'])->name('telegram.logs.clear');
     Route::delete('/financas/telegram-logs/{log}', [TelegramWebhookController::class, 'destroyLog'])->name('telegram.logs.destroy');
     
-    // Sistema 2 - Calculadora de Estudos
-    Route::get('/estudos', [EstudosController::class, 'index'])->name('estudos.index');
-    Route::post('/estudos/goals', [EstudosController::class, 'storeGoal'])->name('estudos.goals.store');
-    Route::post('/estudos/goals/{goal}/activate', [EstudosController::class, 'activateGoal'])->name('estudos.goals.activate');
-    Route::delete('/estudos/goals/{goal}', [EstudosController::class, 'destroyGoal'])->name('estudos.goals.destroy');
-    Route::post('/estudos/logs', [EstudosController::class, 'storeLog'])->name('estudos.logs.store');
-    Route::put('/estudos/logs/{log}', [EstudosController::class, 'updateLog'])->name('estudos.logs.update');
-    Route::delete('/estudos/logs/{log}', [EstudosController::class, 'destroyLog'])->name('estudos.logs.destroy');
+    // Sistema 2 - Horas de Estudo (em reconstrução)
+    Route::get('/estudos', fn () => response('Módulo de estudos em reconstrução.', 503))->name('estudos.index');
 
 
 
