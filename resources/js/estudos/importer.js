@@ -6,6 +6,8 @@
 //   e as sessões importadas passam a apontar para a matéria local.
 // - Registros cujo id já existe no aparelho são ignorados (reimportar o mesmo arquivo não duplica nada).
 // - Registros excluídos no arquivo não são importados. Preferências do arquivo não são aplicadas.
+// - Sessão excluída no arquivo cujo id existe (ativo) no aparelho é excluída também: assim um arquivo de
+//   correção consegue trocar sessões importadas antes (ex.: estimadas) pelas reais.
 
 const MAX_SESSION_MS = 24 * 3_600_000;
 
@@ -47,7 +49,8 @@ export function planImport(backup, local) {
     );
     let nextOrder = Math.max(-1, ...local.subjects.map((s) => s.ordem ?? 0)) + 1;
 
-    const plan = { subjects: [], sessions: [], ddays: [], skipped: 0, invalid: 0 };
+    const plan = { subjects: [], sessions: [], ddays: [], removals: [], skipped: 0, invalid: 0 };
+    const localSessions = new Map(local.sessions.map((s) => [s.id, s]));
     const subjectMap = new Map();
 
     for (const subject of backup.subjects) {
@@ -77,8 +80,13 @@ export function planImport(backup, local) {
     }
 
     for (const session of backup.sessions) {
-        if (!session?.id || session.deleted_at) continue;
+        if (!session?.id) continue;
         const id = toUuid(session.id);
+        if (session.deleted_at) {
+            const existing = localSessions.get(id);
+            if (existing && !existing.deleted_at) plan.removals.push(existing);
+            continue;
+        }
         if (localIds.sessions.has(id)) {
             plan.skipped++;
             continue;

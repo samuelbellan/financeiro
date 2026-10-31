@@ -57,6 +57,20 @@ describe('planImport', () => {
         expect(plan.invalid).toBe(2);
     });
 
+    it('sessão excluída no arquivo exclui a sessão local de mesmo id', () => {
+        const first = planImport(backup(), empty);
+        const local = { subjects: first.subjects, sessions: first.sessions, ddays: [] };
+        const plan = planImport(backup({
+            sessions: [
+                { id: 'x1', subject_id: 's-cont', inicio: '2026-10-01T04:00:00Z', fim: '2026-10-01T06:00:00Z', deleted_at: '2026-10-02T00:00:00Z' },
+                { id: 'nao-existe', subject_id: 's-cont', inicio: '2026-10-01T04:00:00Z', fim: '2026-10-01T05:00:00Z', deleted_at: '2026-10-02T00:00:00Z' },
+                { id: 'x3', subject_id: 's-cont', inicio: '2026-10-01T08:00:00Z', fim: '2026-10-01T09:00:00Z' },
+            ],
+        }), local);
+        expect(plan.removals.map((s) => s.id)).toEqual([toUuid('x1')]);
+        expect(plan.sessions.map((s) => s.id)).toEqual([toUuid('x3')]);
+    });
+
     it('recusa arquivo que não é backup de estudos', () => {
         expect(() => planImport({ app: 'outro' }, empty)).toThrow('Arquivo inválido');
     });

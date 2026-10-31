@@ -1020,8 +1020,10 @@ async function importBackup(file) {
     } catch (error) {
         return alert(error instanceof SyntaxError ? 'O arquivo não é um JSON válido.' : error.message);
     }
-    const total = plan.subjects.length + plan.sessions.length + plan.ddays.length;
+    const total = plan.subjects.length + plan.sessions.length + plan.ddays.length + plan.removals.length;
     const details = `${plan.subjects.length} matéria(s), ${plan.sessions.length} sessão(ões), ${plan.ddays.length} D-Day(s)`
+        + (plan.removals.length ? `
+${plan.removals.length} sessão(ões) serão excluídas.` : '')
         + (plan.skipped ? `\n${plan.skipped} já existiam e serão ignoradas.` : '')
         + (plan.invalid ? `\n${plan.invalid} registro(s) inválido(s) serão descartados.` : '');
     if (!total) return alert(`Nada novo para importar.\n${details}`);
@@ -1029,6 +1031,7 @@ async function importBackup(file) {
 
     for (const subject of plan.subjects) await persist('subjects', subject);
     for (const dday of plan.ddays) await persist('ddays', dday);
+    for (const session of plan.removals) await persist('sessions', { ...session, deleted_at: iso(nowMs()) });
     for (const session of plan.sessions) await persist('sessions', session);
     render();
     alert(`Importado: ${details}.\nO envio para o servidor acontece em segundo plano.`);
