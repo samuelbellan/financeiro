@@ -114,6 +114,7 @@ Route::middleware('auth')->group(function () {
     // Sistema 2 - Horas de Estudo (PWA offline estilo YPT)
     Route::get('/estudos', [EstudosController::class, 'index'])->name('estudos.index');
     Route::post('/estudos/sync', [EstudosController::class, 'sync'])->name('estudos.sync');
+    Route::get('/estudos/token', [EstudosController::class, 'token'])->name('estudos.token');
 
 
 

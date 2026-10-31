@@ -22,6 +22,14 @@ class EstudosController extends Controller
         return view('estudos.app');
     }
 
+    /**
+     * Token CSRF atual: a casca em cache da PWA pode carregar um token vencido.
+     */
+    public function token(): JsonResponse
+    {
+        return response()->json(['token' => csrf_token(), 'user_id' => Auth::id()]);
+    }
+
     public function sync(Request $request, StudySyncService $service): JsonResponse
     {
         if ($this->cloudRedirect()) {

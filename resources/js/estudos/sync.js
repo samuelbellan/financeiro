@@ -1,0 +1,132 @@
+// Sincronização com o servidor: fila local → POST /estudos/sync → aplica mudanças do servidor.
+// Gatilhos: abrir o app, voltar a conexão, 5 s após uma alteração e a cada 5 min.
+
+import { applyServerChanges, dropFromQueue, getMeta, pendingQueue, setMeta } from './db.js';
+
+const BACKOFF_MS = [10_000, 30_000, 120_000, 300_000];
+const PERIODIC_MS = 5 * 60_000;
+const DEBOUNCE_MS = 5_000;
+
+export function createSync({ syncUrl, tokenUrl, initialToken, onStatus, onApplied }) {
+    let csrfToken = initialToken;
+    let running = false;
+    let again = false;
+    let failures = 0;
+    let retryTimer = null;
+    let debounceTimer = null;
+
+    const status = { state: 'idle', pending: 0, lastSyncAt: null, rejected: [], conflicts: [], message: '' };
+
+    function emit(patch) {
+        Object.assign(status, patch);
+        onStatus({ ...status });
+    }
+
+    async function refreshToken() {
+        const response = await fetch(tokenUrl, { credentials: 'same-origin', headers: { Accept: 'application/json' } });
+        if (response.status === 401) throw Object.assign(new Error('login'), { status: 401 });
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        csrfToken = (await response.json()).token;
+    }
+
+    async function post(body) {
+        return fetch(syncUrl, {
+            method: 'POST',
+            credentials: 'same-origin',
+            headers: { 'Content-Type': 'application/json', Accept: 'application/json', 'X-CSRF-TOKEN': csrfToken },
+            body: JSON.stringify(body),
+        });
+    }
+
+    async function runOnce() {
+        const queue = await pendingQueue();
+        emit({ state: 'syncing', pending: queue.length });
+
+        const changes = { subjects: [], sessions: [], ddays: [], settings: null };
+        // Matérias antes das sessões: o servidor valida subject_id.
+        for (const entry of queue) {
+            if (entry.type === 'settings') changes.settings = entry.record;
+            else changes[entry.type].push(entry.record);
+        }
+
+        const body = {
+            device_id: await getMeta('device_id'),
+            cursor: await getMeta('cursor'),
+            changes,
+        };
+
+        let response = await post(body);
+        if (response.status === 419) {
+            await refreshToken();
+            response = await post(body);
+        }
+        if (response.status === 401) throw Object.assign(new Error('login'), { status: 401 });
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+        const result = await response.json();
+        await applyServerChanges(queue, result.changes);
+        await setMeta('cursor', result.cursor);
+
+        const rejectedKeys = (result.rejected ?? [])
+            .map((r) => (r.type === 'settings' ? 'settings' : `${r.type}:${r.id}`));
+        if (rejectedKeys.length) await dropFromQueue(rejectedKeys);
+
+        const remaining = (await pendingQueue()).length;
+        emit({
+            state: 'ok',
+            pending: remaining,
+            lastSyncAt: Date.now(),
+            rejected: result.rejected ?? [],
+            conflicts: result.conflicts ?? [],
+            message: '',
+        });
+        onApplied(result);
+        return remaining;
+    }
+
+    async function syncNow() {
+        if (running) { again = true; return; }
+        if (!navigator.onLine) {
+            emit({ state: 'offline', pending: (await pendingQueue()).length });
+            return;
+        }
+        running = true;
+        clearTimeout(retryTimer);
+        try {
+            do {
+                again = false;
+                await runOnce();
+            } while (again);
+            failures = 0;
+        } catch (error) {
+            if (error.status === 401) {
+                emit({ state: 'login', message: 'Entre novamente para sincronizar.' });
+            } else {
+                const wait = BACKOFF_MS[Math.min(failures, BACKOFF_MS.length - 1)];
+                failures++;
+                emit({ state: 'error', message: `Falha ao sincronizar. Nova tentativa em ${Math.round(wait / 1000)} s.` });
+                retryTimer = setTimeout(syncNow, wait);
+            }
+        } finally {
+            running = false;
+        }
+    }
+
+    function schedule() {
+        clearTimeout(debounceTimer);
+        pendingQueue().then((q) => emit({ pending: q.length, state: status.state === 'ok' ? 'pending' : status.state }));
+        debounceTimer = setTimeout(syncNow, DEBOUNCE_MS);
+    }
+
+    function start() {
+        window.addEventListener('online', syncNow);
+        window.addEventListener('offline', () => emit({ state: 'offline' }));
+        document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'visible') syncNow();
+        });
+        setInterval(() => document.visibilityState === 'visible' && syncNow(), PERIODIC_MS);
+        syncNow();
+    }
+
+    return { start, syncNow, schedule, status: () => ({ ...status }) };
+}

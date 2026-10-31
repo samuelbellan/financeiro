@@ -50,6 +50,19 @@ function wallToInstant(wallMs, timezone) {
     return guess;
 }
 
+/** "YYYY-MM-DDTHH:MM" (relógio do fuso) → ms UTC. Usado pelos campos datetime-local. */
+export function localInputToMs(value, timezone) {
+    const [date, time] = value.split('T');
+    const [y, m, d] = date.split('-').map(Number);
+    const [hh, mm] = time.split(':').map(Number);
+    return wallToInstant(Date.UTC(y, m - 1, d, hh, mm), timezone);
+}
+
+/** ms UTC → "YYYY-MM-DDTHH:MM" no relógio do fuso. */
+export function msToLocalInput(ms, timezone) {
+    return new Date(wallClock(ms, timezone)).toISOString().slice(0, 16);
+}
+
 export function toMs(value) {
     return typeof value === 'number' ? value : Date.parse(value);
 }

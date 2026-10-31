@@ -229,4 +229,14 @@ class StudySyncTest extends TestCase
 
         $this->sync(['ddays' => [$dday]])->assertOk()->assertJsonPath('changes.ddays.0.data', '2027-03-14');
     }
+
+    public function test_token_endpoint_returns_fresh_csrf_token(): void
+    {
+        $this->getJson(route('estudos.token'))->assertStatus(401);
+
+        $this->actingAs($this->user)->getJson(route('estudos.token'))
+            ->assertOk()
+            ->assertJsonPath('user_id', $this->user->id)
+            ->assertJsonStructure(['token']);
+    }
 }
