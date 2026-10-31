@@ -16,6 +16,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'webhook/whatsapp',
             'webhook/telegram',
             'api/tracker/*',
+            'api/tv/*',
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

@@ -16,7 +16,7 @@ class GeminiService
     {
         $this->apiKey = env('GEMINI_API_KEY', '');
         // Usar gemini-3.6-flash (versão ativa na API v1beta)
-        $this->baseUrl = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent';
+        $this->baseUrl = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent';
     }
 
     /**

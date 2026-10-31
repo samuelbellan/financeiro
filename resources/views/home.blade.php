@@ -70,7 +70,16 @@
                         <span>Horas de Estudo</span>
                     </a>
 
-                    <a href="{{ route('salary.index') }}" class="nav-item">
+                                        <a href="{{ route('photos.index') }}" class="nav-item">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                            <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                            <polyline points="21 15 16 10 5 21"></polyline>
+                        </svg>
+                        <span>Galeria Fotos</span>
+                    </a>
+
+<a href="{{ route('salary.index') }}" class="nav-item">
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
                             <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
@@ -84,10 +93,28 @@
                         </svg>
                         <span>Treinos & Exercícios</span>
                     </a>
+
+                    <a href="{{ route('celular') }}" class="nav-item" style="color: #34d399;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="5" y="2" width="14" height="20" rx="2" ry="2"/>
+                            <line x1="12" y1="18" x2="12.01" y2="18"/>
+                        </svg>
+                        <span>Acessar no Celular</span>
+                    </a>
                 </div>
             </nav>
 
             <div class="sidebar-footer">
+                <button type="button" class="btn-celular-sidebar" onclick="openCelularModal()" title="Acessar pelo Celular (Mesmo Wi-Fi)" style="display: flex; align-items: center; justify-content: space-between; width: 100%; padding: 0.65rem 0.85rem; background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.25); border-radius: 8px; color: #34d399; font-size: 0.85rem; font-weight: 600; cursor: pointer; margin-bottom: 0.5rem; transition: all 0.2s ease;">
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="5" y="2" width="14" height="20" rx="2" ry="2"/>
+                            <line x1="12" y1="18" x2="12.01" y2="18"/>
+                        </svg>
+                        <span>Acessar no Celular</span>
+                    </div>
+                    <span style="font-size: 0.65rem; background: rgba(16, 185, 129, 0.2); padding: 0.15rem 0.4rem; border-radius: 4px; font-weight: 700;">WI-FI</span>
+                </button>
                 <button type="button" class="btn-sync-sidebar" onclick="openSyncModal()" title="Sincronizar dados com a nuvem Neon">
                     <div style="display: flex; align-items: center; gap: 0.5rem;">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -121,7 +148,7 @@
 
         <!-- Main Content -->
         <main class="main-content">
-            <header class="content-header" style="display: flex; align-items: center; gap: 1rem;">
+            <header class="content-header" style="display: flex; align-items: center; justify-content: space-between; gap: 1rem;">
                 <button type="button" class="btn-toggle-sidebar js-toggle-sidebar" title="Alternar barra lateral (Ctrl + \)">
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <line x1="3" y1="12" x2="21" y2="12"></line>
@@ -132,6 +159,15 @@
                 <div>
                     <h1>Bem-vindo, {{ Auth::user()->name }}!</h1>
                     <p>Selecione um sistema no menu lateral para começar</p>
+                </div>
+                <div>
+                    <button type="button" onclick="openCelularModal()" class="btn-conectar-celular" style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.55rem 0.95rem; background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: #fff; border: none; border-radius: 8px; font-weight: 600; font-size: 0.85rem; cursor: pointer; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25); transition: all 0.2s ease;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="5" y="2" width="14" height="20" rx="2" ry="2"/>
+                            <line x1="12" y1="18" x2="12.01" y2="18"/>
+                        </svg>
+                        <span>📱 Acessar no Celular</span>
+                    </button>
                 </div>
             </header>
 
@@ -178,7 +214,20 @@
 
 
 
-                    <div class="info-card">
+                                        <div class="info-card">
+                        <div class="card-icon card-icon-purple" style="background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                                <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                                <polyline points="21 15 16 10 5 21"></polyline>
+                            </svg>
+                        </div>
+                        <h3>Galeria de Fotos</h3>
+                        <p>Mapeamento inteligente de fotos divididos por produtores, modelos, datas e álbuns.</p>
+                        <a href="{{ route('photos.index') }}" class="card-link">Acessar →</a>
+                    </div>
+
+<div class="info-card">
                         <div class="card-icon card-icon-green" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);">
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
@@ -219,5 +268,6 @@
     </div>
 
     @include('components.sync-modal')
+    @include('components.celular-modal')
 </body>
 </html>

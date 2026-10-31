@@ -40,8 +40,8 @@
     "semantic_hash": ""
   },
   "app/Http/Controllers/CartoesController.php": {
-    "mtime": 1789568718.314073,
-    "ast_hash": "53e6c94dded725a86818b36c376adebf",
+    "mtime": 1793448517.0659032,
+    "ast_hash": "007a2f702de909b5c6fb9d8fca3d2baf",
     "semantic_hash": ""
   },
   "app/Http/Controllers/CategoriasController.php": {
@@ -60,13 +60,13 @@
     "semantic_hash": ""
   },
   "app/Http/Controllers/ExportController.php": {
-    "mtime": 1784148663.3086252,
-    "ast_hash": "fc0195081d499e5c30c973b4d7ba150f",
+    "mtime": 1791715467.0413501,
+    "ast_hash": "27dd79f718e905819384b50e9bdc2fd7",
     "semantic_hash": ""
   },
   "app/Http/Controllers/FinancasController.php": {
-    "mtime": 1789568704.8307996,
-    "ast_hash": "1245bb24dd951383133cfb4745ea4eb7",
+    "mtime": 1793107013.9782636,
+    "ast_hash": "c24c7df1925ee462ce2a15445e0405bf",
     "semantic_hash": ""
   },
   "app/Http/Controllers/HomeController.php": {
@@ -80,8 +80,8 @@
     "semantic_hash": ""
   },
   "app/Http/Controllers/TelegramWebhookController.php": {
-    "mtime": 1791549616.7703433,
-    "ast_hash": "7d44550ef36424ff2fbe575f1f18465a",
+    "mtime": 1792889432.8050964,
+    "ast_hash": "d5d64ad879dab8fbc3910471222ba157",
     "semantic_hash": ""
   },
   "app/Models/Cartao.php": {
@@ -135,8 +135,8 @@
     "semantic_hash": ""
   },
   "app/Models/Transacao.php": {
-    "mtime": 1777122485.467127,
-    "ast_hash": "2194fd6b4514ea22ba38757e306111a8",
+    "mtime": 1792889097.9068372,
+    "ast_hash": "5acfb65cc1b69b5b85cc03d28f915567",
     "semantic_hash": ""
   },
   "app/Models/TransacaoPrevisao.php": {
@@ -170,8 +170,8 @@
     "semantic_hash": ""
   },
   "app/Services/GeminiService.php": {
-    "mtime": 1791550613.3200147,
-    "ast_hash": "b2d3c207d9386bfbba97311642c32928",
+    "mtime": 1793456138.911492,
+    "ast_hash": "71ab36e45d34f36f036cfd06bbd31b01",
     "semantic_hash": ""
   },
   "app/Services/SalaryCalculatorService.php": {
@@ -195,8 +195,8 @@
     "semantic_hash": ""
   },
   "bootstrap/app.php": {
-    "mtime": 1789934707.6423733,
-    "ast_hash": "6a385acfbec54de9f07713f988ec441c",
+    "mtime": 1792966806.8568423,
+    "ast_hash": "5a4a5d3500c0a73ed2970c9ee805796b",
     "semantic_hash": ""
   },
   "bootstrap/providers.php": {
@@ -225,8 +225,8 @@
     "semantic_hash": ""
   },
   "config/database.php": {
-    "mtime": 1789634968.424579,
-    "ast_hash": "45d7e44a19b575163ad7c89330fadfef",
+    "mtime": 1791556831.5115921,
+    "ast_hash": "f8fc3c34166024c6fa9963eecca6977c",
     "semantic_hash": ""
   },
   "config/filesystems.php": {
@@ -250,8 +250,8 @@
     "semantic_hash": ""
   },
   "config/services.php": {
-    "mtime": 1777122485.475243,
-    "ast_hash": "534a1b7af7009c373ea4ebfa18823d57",
+    "mtime": 1792890644.9311564,
+    "ast_hash": "dd0ca67f7a1818c8a23791d9bde99b71",
     "semantic_hash": ""
   },
   "config/session.php": {
@@ -425,8 +425,8 @@
     "semantic_hash": ""
   },
   "public/js/sidebar.js": {
-    "mtime": 1789564202.92398,
-    "ast_hash": "6bd9b0220a038264d7f196012822d474",
+    "mtime": 1791556810.1642282,
+    "ast_hash": "353b4e5d8e4fc14bd136e6253880f13e",
     "semantic_hash": ""
   },
   "resources/js/app.js": {
@@ -440,8 +440,8 @@
     "semantic_hash": ""
   },
   "resources/views/estudos/index.blade.php": {
-    "mtime": 1788706090.4399023,
-    "ast_hash": "6d8bc9cb5f8d570cb8b2c868dacecc54",
+    "mtime": 1792889223.5744371,
+    "ast_hash": "1665f86bf473326e52e395e51bcecda7",
     "semantic_hash": ""
   },
   "resources/views/exports/fatura_pdf.blade.php": {
@@ -455,28 +455,28 @@
     "semantic_hash": ""
   },
   "resources/views/financas/cartoes.blade.php": {
-    "mtime": 1789570684.9219148,
-    "ast_hash": "b70f97ff5a077b94f84577fe2e53ef0b",
+    "mtime": 1793449032.0572562,
+    "ast_hash": "a7ff0e50f50bb1bc3f9d0198dd9d1867",
     "semantic_hash": ""
   },
   "resources/views/financas/categorias.blade.php": {
-    "mtime": 1788706090.4425664,
-    "ast_hash": "759596cddafef310edeede4430474bcd",
+    "mtime": 1792889223.5162547,
+    "ast_hash": "c792369fcddb688e6315a45ceb2546b0",
     "semantic_hash": ""
   },
   "resources/views/financas/index.blade.php": {
-    "mtime": 1789570409.0554495,
-    "ast_hash": "79db8ee7d0272ada280ab8fb7099cf17",
+    "mtime": 1793107124.9147418,
+    "ast_hash": "85640b1dd3b94f5e8cbfd86ec19037c1",
     "semantic_hash": ""
   },
   "resources/views/home.blade.php": {
-    "mtime": 1789564148.5477986,
-    "ast_hash": "ed5aa3ed71dcefdbeaaceeb70a3799e2",
+    "mtime": 1793062190.8644948,
+    "ast_hash": "e1f29771aec4fb8329fa81c3b6f79d28",
     "semantic_hash": ""
   },
   "resources/views/salary/index.blade.php": {
-    "mtime": 1788706090.4506626,
-    "ast_hash": "6da648228682b3d957be0732f95db8b4",
+    "mtime": 1792889223.6141255,
+    "ast_hash": "002141654ef97eee00666417ca6b39f0",
     "semantic_hash": ""
   },
   "resources/views/welcome.blade.php": {
@@ -490,8 +490,8 @@
     "semantic_hash": ""
   },
   "routes/web.php": {
-    "mtime": 1791549496.406482,
-    "ast_hash": "95af7beba132eea70db26e7976b1c36d",
+    "mtime": 1793448562.2456975,
+    "ast_hash": "a635bf28cd75d477b77c3653d3ad4642",
     "semantic_hash": ""
   },
   "tests/Feature/ExampleTest.php": {
@@ -515,8 +515,8 @@
     "semantic_hash": ""
   },
   "vite.config.js": {
-    "mtime": 1777122485.5041049,
-    "ast_hash": "60c40741a9c5b915a5e5542cfb23bc25",
+    "mtime": 1792716358.0706418,
+    "ast_hash": "01114231766012aad0690c564e01e924",
     "semantic_hash": ""
   },
   ".agents/rules/graphify.md": {
@@ -640,8 +640,8 @@
     "semantic_hash": ""
   },
   "resources/views/fiscal/index.blade.php": {
-    "mtime": 1789562967.3876884,
-    "ast_hash": "aa7450031296f7db719afa73c70fb14b",
+    "mtime": 1792889223.643645,
+    "ast_hash": "f320134c30f64026c92faf6a4fe905cb",
     "semantic_hash": ""
   },
   "tests/Feature/FiscalModuleTest.php": {
@@ -665,8 +665,8 @@
     "semantic_hash": ""
   },
   "app/Http/Controllers/MercadoController.php": {
-    "mtime": 1788095418.201226,
-    "ast_hash": "d523fe975aa13544d45f0e3462153b60",
+    "mtime": 1791554467.2567732,
+    "ast_hash": "b2625adf8e41c57043b947747ebc5b53",
     "semantic_hash": ""
   },
   "app/Models/NotaFiscal.php": {
@@ -680,8 +680,8 @@
     "semantic_hash": ""
   },
   "resources/views/financas/mercado.blade.php": {
-    "mtime": 1788706090.4457726,
-    "ast_hash": "f78f7a8b8eb7e6a8fc2f11a20f9b3020",
+    "mtime": 1792889223.541777,
+    "ast_hash": "2f7862f454f8a74f79247c5bd249bf6f",
     "semantic_hash": ""
   },
   "tests/Feature/MercadoModuleTest.php": {
@@ -810,13 +810,13 @@
     "semantic_hash": ""
   },
   "resources/views/treinos/index.blade.php": {
-    "mtime": 1790001921.888772,
-    "ast_hash": "0f32bcced9bb303e759beadb9f209861",
+    "mtime": 1792889223.6845255,
+    "ast_hash": "d934f07c975c4e11fd73118dd083f839",
     "semantic_hash": ""
   },
   "tests/Feature/TelegramWebhookTest.php": {
-    "mtime": 1788706090.252112,
-    "ast_hash": "b44c5d532c9fc8e05d2ebde9465ad20d",
+    "mtime": 1791554511.337271,
+    "ast_hash": "e0188247162ae2adb6d19f31215d5d5f",
     "semantic_hash": ""
   },
   "app/Console/Commands/SyncDatabaseCommand.php": {
@@ -830,8 +830,8 @@
     "semantic_hash": ""
   },
   "app/Services/DatabaseSyncService.php": {
-    "mtime": 1791549675.3189025,
-    "ast_hash": "4eb0b870b1b63a60b555e744c113e46f",
+    "mtime": 1791556775.29353,
+    "ast_hash": "8c88eefaf7f735a6c0c7b4bfc50a6dfe",
     "semantic_hash": ""
   },
   "resources/views/components/sync-modal.blade.php": {
@@ -917,6 +917,231 @@
   "tests/Feature/TelegramWebhookRoutingTest.php": {
     "mtime": 1791549742.9865108,
     "ast_hash": "462559acf9480f3163ad08dca23c90cf",
+    "semantic_hash": ""
+  },
+  "app/Services/FinancialSummaryService.php": {
+    "mtime": 1791715619.332439,
+    "ast_hash": "50f371b345eb380e204b6c6087a9d50d",
+    "semantic_hash": ""
+  },
+  "tests/Feature/FinancialSummaryAndCardLimitsTest.php": {
+    "mtime": 1791715710.2106006,
+    "ast_hash": "0a2aeef8e337dc8ceaef34b90351f886",
+    "semantic_hash": ""
+  },
+  "resources/views/exports/resumo_financeiro_pdf.blade.php": {
+    "mtime": 1791715421.048413,
+    "ast_hash": "08093941e52b1fb7eef31602371bc2e8",
+    "semantic_hash": ""
+  },
+  "fix_gemini_chrome.ps1": {
+    "mtime": 1792571966.5529144,
+    "ast_hash": "628372a1bf654aecda794f9567239847",
+    "semantic_hash": ""
+  },
+  "app/Console/Commands/PregeneratePhotoCacheCommand.php": {
+    "mtime": 1793092032.6513784,
+    "ast_hash": "54a1fbecc5b6dae33940c0d1e8b99cd3",
+    "semantic_hash": ""
+  },
+  "app/Http/Controllers/PhotoController.php": {
+    "mtime": 1793094307.4042394,
+    "ast_hash": "58fb531c285633ea173c5c47a45cb588",
+    "semantic_hash": ""
+  },
+  "app/Http/Middleware/PhotoAuth.php": {
+    "mtime": 1792889161.1013105,
+    "ast_hash": "72c13bd539a7e76b056db2f8191b628d",
+    "semantic_hash": ""
+  },
+  "app/Models/Conta.php": {
+    "mtime": 1792889089.056676,
+    "ast_hash": "7a5e730c979d4fe557b711d047b04434",
+    "semantic_hash": ""
+  },
+  "app/Services/Ofx/DTO/OfxAccountDTO.php": {
+    "mtime": 1792889000.8248,
+    "ast_hash": "1f4bf92c8057a8761a835cd10ad95a1e",
+    "semantic_hash": ""
+  },
+  "app/Services/Ofx/DTO/OfxImportResultDTO.php": {
+    "mtime": 1792889017.7974875,
+    "ast_hash": "923407d6e978ff98233f16aad3aee4b0",
+    "semantic_hash": ""
+  },
+  "app/Services/Ofx/DTO/OfxStatementDTO.php": {
+    "mtime": 1792889010.5173197,
+    "ast_hash": "d082a58257245392febb8fc3ecb85758",
+    "semantic_hash": ""
+  },
+  "app/Services/Ofx/DTO/OfxTransactionDTO.php": {
+    "mtime": 1792888991.502385,
+    "ast_hash": "5c07feacc08047696bb1b3acb6b18269",
+    "semantic_hash": ""
+  },
+  "app/Services/Ofx/OfxImportService.php": {
+    "mtime": 1792889701.4311032,
+    "ast_hash": "f1fbbe36fc6a866641f2f4a3a4de886c",
+    "semantic_hash": ""
+  },
+  "app/Services/Ofx/OfxParserService.php": {
+    "mtime": 1792889054.1318998,
+    "ast_hash": "97ddf65fe20399fb8be41788bc7d5cc2",
+    "semantic_hash": ""
+  },
+  "config/photos.php": {
+    "mtime": 1792889681.0866506,
+    "ast_hash": "9b93d78ba4aafa7e9e3251b70e0b90bc",
+    "semantic_hash": ""
+  },
+  "database/migrations/2026_10_24_200000_create_contas_and_update_transacoes_for_ofx.php": {
+    "mtime": 1792889082.0407317,
+    "ast_hash": "1b05d046efabcf2bf615d2759a6cf37b",
+    "semantic_hash": ""
+  },
+  "importar_ofx.php": {
+    "mtime": 1792889158.634776,
+    "ast_hash": "2a984776b4cc8906318c84a18596f2f2",
+    "semantic_hash": ""
+  },
+  "public/importar_ofx.php": {
+    "mtime": 1793106138.089942,
+    "ast_hash": "1c10605bfc8b7395230f5643aeaba4f4",
+    "semantic_hash": ""
+  },
+  "resources/views/photos/album.blade.php": {
+    "mtime": 1793093719.734877,
+    "ast_hash": "0bfa6c176ebd8fa21a4f3bd7a5d7cef1",
+    "semantic_hash": ""
+  },
+  "resources/views/photos/index.blade.php": {
+    "mtime": 1793094391.0826035,
+    "ast_hash": "fe1f71aaf223ae736072f9426c78c713",
+    "semantic_hash": ""
+  },
+  "resources/views/photos/login.blade.php": {
+    "mtime": 1792889161.1066236,
+    "ast_hash": "d4521626d0960d7d58e99b53890fe8de",
+    "semantic_hash": ""
+  },
+  "tests/Feature/PhotoModuleTest.php": {
+    "mtime": 1793094427.2810538,
+    "ast_hash": "4dd6d36aa0cec9bfab4d2a46551ef736",
+    "semantic_hash": ""
+  },
+  "tests/Feature/OfxImportServiceTest.php": {
+    "mtime": 1792889494.5756822,
+    "ast_hash": "59156502840febf1b108fd0c63e04218",
+    "semantic_hash": ""
+  },
+  "tests/Feature/TelegramOfxDocumentTest.php": {
+    "mtime": 1792889709.3101692,
+    "ast_hash": "9b281c486cc6c4c00ea627c463b46da5",
+    "semantic_hash": ""
+  },
+  "tests/Unit/OfxParserServiceTest.php": {
+    "mtime": 1792889471.4187777,
+    "ast_hash": "de361420c6f50594ff2618bcf9542a8d",
+    "semantic_hash": ""
+  },
+  "app/Http/Controllers/Api/TvWidgetController.php": {
+    "mtime": 1792966766.07788,
+    "ast_hash": "68c88ecaea95166d6078b0edaf4dfebf",
+    "semantic_hash": ""
+  },
+  "tests/Feature/TvWidgetEndpointTest.php": {
+    "mtime": 1792966943.931082,
+    "ast_hash": "a55e353b543123680ffed4a3f6cd2594",
+    "semantic_hash": ""
+  },
+  "app/Console/Commands/ScanPhotoModelsCommand.php": {
+    "mtime": 1793093248.3575313,
+    "ast_hash": "e517ed5ea6efe50b26cacf1d762af990",
+    "semantic_hash": ""
+  },
+  "resources/views/tv_control.blade.php": {
+    "mtime": 1792966742.579205,
+    "ast_hash": "f0282eaadd0d0833cc982632464efb6d",
+    "semantic_hash": ""
+  },
+  "app/Services/NetworkService.php": {
+    "mtime": 1793061959.641966,
+    "ast_hash": "2b8c21bc9a282841be72d4098dc5a5c2",
+    "semantic_hash": ""
+  },
+  "public/js/qrcode.min.js": {
+    "mtime": 1793061935.7799642,
+    "ast_hash": "517b55d3688ce9ef1085a3d9632bcb97",
+    "semantic_hash": ""
+  },
+  "resources/views/celular.blade.php": {
+    "mtime": 1793062036.5494287,
+    "ast_hash": "2384a7e1068e5c19d6581e65791bc131",
+    "semantic_hash": ""
+  },
+  "resources/views/components/celular-modal.blade.php": {
+    "mtime": 1793370727.2423098,
+    "ast_hash": "086c95e26ba7bcbf9089151a54cc7b95",
+    "semantic_hash": ""
+  },
+  "tests/Feature/CelularAccessTest.php": {
+    "mtime": 1793062248.1155598,
+    "ast_hash": "3b9c316293dcc0f23fc8d58966e0d89a",
+    "semantic_hash": ""
+  },
+  "iniciar-cloudflare.ps1": {
+    "mtime": 1793370722.6063018,
+    "ast_hash": "b18b44bf9f8b8216c831cae212524089",
+    "semantic_hash": ""
+  },
+  "app/Console/Commands/ImportOfxCommand.php": {
+    "mtime": 1793106116.7001486,
+    "ast_hash": "3a056fb9c87879cf5b16a48599ef2431",
+    "semantic_hash": ""
+  },
+  "tests/Feature/ImportOfxCommandTest.php": {
+    "mtime": 1793106168.161292,
+    "ast_hash": "180877defd45b88673ff2ee6b1292bad",
+    "semantic_hash": ""
+  },
+  "extratos/README.txt": {
+    "mtime": 1793106100.7361524,
+    "ast_hash": "f9a3b6c4f6d096e880e63012c771fd2d",
+    "semantic_hash": ""
+  },
+  "app/Services/StatementImportService.php": {
+    "mtime": 1793456115.6336317,
+    "ast_hash": "807c3c5a80aa4cc365da416f59bac5cd",
+    "semantic_hash": ""
+  },
+  "resources/views/components/import-extrato-modal.blade.php": {
+    "mtime": 1793107069.3168128,
+    "ast_hash": "9814f3ca71e998dc804aee315f5723f5",
+    "semantic_hash": ""
+  },
+  "tests/Feature/StatementImportTest.php": {
+    "mtime": 1793107143.1887555,
+    "ast_hash": "1d8721a13c9cfe864f29d5709ebba4e4",
+    "semantic_hash": ""
+  },
+  "app/Services/CreditCardReconciliationService.php": {
+    "mtime": 1793456089.1998487,
+    "ast_hash": "8ca92bcfd70bda0b9eefff8e5d302b4c",
+    "semantic_hash": ""
+  },
+  "resources/views/components/conciliacao-fatura-modal.blade.php": {
+    "mtime": 1793456169.3917558,
+    "ast_hash": "b89fd8b47131523d663ce6aa61567584",
+    "semantic_hash": ""
+  },
+  "resources/views/exports/conciliacao_fatura_pdf.blade.php": {
+    "mtime": 1793448455.0166192,
+    "ast_hash": "225b17ebbe968d904e06d1aaeac4251f",
+    "semantic_hash": ""
+  },
+  "tests/Feature/CreditCardReconciliationTest.php": {
+    "mtime": 1793456194.4226108,
+    "ast_hash": "a84c011f5c3ac618e3ec24f0081c5364",
     "semantic_hash": ""
   }
 }

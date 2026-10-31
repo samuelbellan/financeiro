@@ -63,6 +63,14 @@ class DatabaseSyncService
      */
     public function testCloudConnection(): array
     {
+        $cloudUrl = env('CLOUD_DATABASE_URL', env('DATABASE_URL'));
+        if (empty($cloudUrl)) {
+            return [
+                'online' => false,
+                'error'  => 'Modo Nuvem desativado (sistema operando exclusivamente com banco local).',
+            ];
+        }
+
         try {
             DB::connection('pgsql_cloud')->select('SELECT 1');
             return ['online' => true, 'error' => null];

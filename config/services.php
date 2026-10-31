@@ -35,4 +35,8 @@ return [
         ],
     ],
 
+    'tv_widget' => [
+        'token' => env('TV_WIDGET_TOKEN', 'philco_glass_tv_secure_token'),
+    ],
+
 ];

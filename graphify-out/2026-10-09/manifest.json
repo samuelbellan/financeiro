@@ -80,8 +80,8 @@
     "semantic_hash": ""
   },
   "app/Http/Controllers/TelegramWebhookController.php": {
-    "mtime": 1791549616.7703433,
-    "ast_hash": "7d44550ef36424ff2fbe575f1f18465a",
+    "mtime": 1791554582.788696,
+    "ast_hash": "26d4a174a5a204b8698377800fc1e59a",
     "semantic_hash": ""
   },
   "app/Models/Cartao.php": {
@@ -170,8 +170,8 @@
     "semantic_hash": ""
   },
   "app/Services/GeminiService.php": {
-    "mtime": 1789562918.1226678,
-    "ast_hash": "216cf8fbd37d9fc26ab67e7e87d589fc",
+    "mtime": 1791550613.3200147,
+    "ast_hash": "b2d3c207d9386bfbba97311642c32928",
     "semantic_hash": ""
   },
   "app/Services/SalaryCalculatorService.php": {
@@ -665,8 +665,8 @@
     "semantic_hash": ""
   },
   "app/Http/Controllers/MercadoController.php": {
-    "mtime": 1788095418.201226,
-    "ast_hash": "d523fe975aa13544d45f0e3462153b60",
+    "mtime": 1791554467.2567732,
+    "ast_hash": "b2625adf8e41c57043b947747ebc5b53",
     "semantic_hash": ""
   },
   "app/Models/NotaFiscal.php": {
@@ -815,8 +815,8 @@
     "semantic_hash": ""
   },
   "tests/Feature/TelegramWebhookTest.php": {
-    "mtime": 1788706090.252112,
-    "ast_hash": "b44c5d532c9fc8e05d2ebde9465ad20d",
+    "mtime": 1791554511.337271,
+    "ast_hash": "e0188247162ae2adb6d19f31215d5d5f",
     "semantic_hash": ""
   },
   "app/Console/Commands/SyncDatabaseCommand.php": {

@@ -9,11 +9,13 @@ use App\Http\Controllers\CategoriasController;
 use App\Http\Controllers\ExportController;
 use App\Http\Controllers\TelegramWebhookController;
 use App\Http\Controllers\EstudosController;
+use App\Http\Controllers\PhotoController;
 use App\Http\Controllers\SalaryController;
 use App\Http\Controllers\FiscalConcursosController;
 use App\Http\Controllers\MercadoController;
 use App\Http\Controllers\TreinosController;
 use App\Http\Controllers\DatabaseSyncController;
+use App\Http\Controllers\Api\TvWidgetController;
 
 Route::get('/', function () {
     if (auth()->check()) {
@@ -30,6 +32,14 @@ Route::get('/webhook/telegram/ping', [TelegramWebhookController::class, 'ping'])
 Route::post('/webhook/telegram/register-local', [TelegramWebhookController::class, 'registerLocalUrl'])
     ->name('webhook.telegram.register-local');
 
+
+// ── TV Launcher Widget & Controle Remoto (Rede Local) ─────────────────
+Route::get('/api/tv/widget-resumo', [TvWidgetController::class, 'resumo'])->name('api.tv.widget-resumo');
+Route::get('/tv', [TvWidgetController::class, 'controlUi'])->name('tv.control');
+Route::post('/api/tv/action', [TvWidgetController::class, 'action'])->name('api.tv.action');
+
+Route::get('/financas/relatorio/pdf', [ExportController::class, 'exportResumoFinanceiroPdf'])->name('financas.relatorio.pdf');
+Route::get('/celular', function () { return view('celular'); })->name('celular');
 
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
 Route::post('/login', [AuthController::class, 'authenticate'])->name('login.post');
@@ -49,6 +59,7 @@ Route::middleware('auth')->group(function () {
     Route::delete('/financas/mercado/notas/{notaFiscal}', [MercadoController::class, 'destroy'])->name('financas.mercado.notas.destroy');
     Route::delete('/financas/mercado/itens/{item}', [MercadoController::class, 'destroyItem'])->name('financas.mercado.itens.destroy');
     Route::get('/financas/sugestoes-descricao', [FinancasController::class, 'sugestoesDescricao'])->name('financas.sugestoes-descricao');
+    Route::post('/financas/importar-extrato', [FinancasController::class, 'importarExtrato'])->name('financas.importar-extrato');
     Route::post('/financas', [FinancasController::class, 'store'])->name('financas.store');
     Route::post('/financas/previsoes', [FinancasController::class, 'storePrevisao'])->name('financas.previsoes.store');
     Route::put('/financas/previsoes/{previsao}', [FinancasController::class, 'updatePrevisao'])->name('financas.previsoes.update');
@@ -77,7 +88,12 @@ Route::middleware('auth')->group(function () {
     Route::patch('/financas/cartoes/{cartao}/toggle-status', [CartoesController::class, 'toggleStatus'])->name('cartoes.toggle-status');
     Route::post('/financas/cartoes/{cartao}/recalcular', [CartoesController::class, 'recalcular'])->name('cartoes.recalcular');
     Route::put('/financas/cartoes/parcelas/{parcela}', [CartoesController::class, 'updateParcela'])->name('cartoes.parcelas.update');
+    Route::post('/financas/cartoes/conciliar-fatura', [CartoesController::class, 'conciliarFatura'])->name('cartoes.conciliar.fatura');
+    Route::get('/financas/cartoes/conciliar-fatura/pdf', [CartoesController::class, 'exportarRelatorioConciliacaoPdf'])->name('cartoes.conciliar.pdf');
     
+    // WhatsApp Resumo
+    Route::get('/financas/whatsapp/resumo', [FinancasController::class, 'whatsappResumo'])->name('financas.whatsapp.resumo');
+
     // Exportações
     Route::get('/financas/export/fatura/{cartao}/{format}', [ExportController::class, 'exportFatura'])->name('export.fatura');
     Route::get('/financas/export/orcamento/{format}', [ExportController::class, 'exportOrcamento'])->name('export.orcamento');
@@ -100,6 +116,27 @@ Route::middleware('auth')->group(function () {
     Route::get('/dashboard', function () {
         return redirect()->route('home');
     })->name('dashboard');
+
+    // Sistema 7 - Galeria & Mapeador de Fotos Inteligente
+    Route::get('/photos/login', [PhotoController::class, 'showLogin'])->name('photos.login');
+    Route::post('/photos/login', [PhotoController::class, 'login'])->name('photos.login.post');
+    Route::post('/photos/logout', [PhotoController::class, 'logout'])->name('photos.logout');
+
+    Route::middleware(\App\Http\Middleware\PhotoAuth::class)->group(function () {
+        Route::get('/photos', [PhotoController::class, 'index'])->name('photos.index');
+        Route::get('/photos/album/{id}', [PhotoController::class, 'showAlbum'])->name('photos.album');
+        Route::get('/photos/file', [PhotoController::class, 'servePhoto'])->name('photos.serve');
+        Route::post('/photos/sync', [PhotoController::class, 'sync'])->name('photos.sync');
+        Route::post('/photos/locations/add', [PhotoController::class, 'addLocation'])->name('photos.locations.add');
+        Route::post('/photos/locations/remove', [PhotoController::class, 'removeLocation'])->name('photos.locations.remove');
+        Route::post('/photos/pregenerate-thumbs', [PhotoController::class, 'pregenerateThumbs'])->name('photos.pregenerate');
+        Route::post('/photos/album/{id}/rate', [PhotoController::class, 'rateAlbum'])->name('photos.album.rate');
+        Route::post('/photos/album/{id}/favorite', [PhotoController::class, 'favoriteAlbum'])->name('photos.album.favorite');
+        Route::post('/photos/album/{id}/tags', [PhotoController::class, 'updateTags'])->name('photos.album.tags');
+        Route::post('/photos/album/{id}/delete', [PhotoController::class, 'deleteAlbum'])->name('photos.album.delete');
+        Route::post('/photos/album/{id}/open-folder', [PhotoController::class, 'openFolder'])->name('photos.album.open-folder');
+        Route::post('/photos/rescan-models', [PhotoController::class, 'rescanModels'])->name('photos.rescan-models');
+    });
 
     // Sistema 7 - Simulador & Projetor Salarial (TJMS)
     Route::get('/salario', [SalaryController::class, 'index'])->name('salary.index');

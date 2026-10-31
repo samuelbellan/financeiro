@@ -23,6 +23,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
+use App\Services\Ofx\OfxImportService;
+use Illuminate\Support\Facades\DB;
 use Barryvdh\DomPDF\Facade\Pdf;
 
 
@@ -77,15 +79,17 @@ class TelegramWebhookController extends Controller
         $chatId = $message['chat']['id'] ?? null;
         $texto  = $message['text'] ?? $message['caption'] ?? null;
         $photos = $message['photo'] ?? null;
+        $document = $message['document'] ?? null;
 
-        if (!$chatId || (!$texto && !$photos)) {
+        if (!$chatId || (!$texto && !$photos && !$document)) {
             return response()->json(['ok' => true, 'skipped' => 'no chat_id, text, or photo']);
         }
 
         Log::info('[Telegram Webhook] Mensagem recebida.', [
             'chat_id'  => $chatId,
             'texto'    => $texto,
-            'has_photo' => !empty($photos),
+            'has_photo'    => !empty($photos),
+            'has_document' => !empty($document),
         ]);
 
         // ── 3. Validar chat autorizado ────────────────────────────────────────
@@ -161,6 +165,17 @@ class TelegramWebhookController extends Controller
                         }
                     }
                 }
+            }
+        }
+
+        // ── 5.1. Processar Arquivo OFX de Extrato Bancário / Fatura ─────────
+        if ($document && is_array($document)) {
+            $fileName = $document['file_name'] ?? '';
+            $ext = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
+            $mime = $document['mime_type'] ?? '';
+
+            if ($ext === 'ofx' || str_ends_with(strtolower($fileName), '.ofx') || $mime === 'application/x-ofx') {
+                return $this->handleOfxDocument($user, $chatId, $document);
             }
         }
 
@@ -1029,5 +1044,87 @@ class TelegramWebhookController extends Controller
 
         return null;
     }
-}
 
+
+    /**
+     * Processa documento OFX enviado pelo usuário no Telegram e salva no banco.
+     */
+    protected function handleOfxDocument(User $user, int|string $chatId, array $document)
+    {
+        @set_time_limit(180);
+        $fileName = $document['file_name'] ?? 'extrato.ofx';
+        $fileId   = $document['file_id'] ?? null;
+
+        if (!$fileId) {
+            $this->telegram->sendMessage($chatId, "⚠️ Não foi possível identificar o identificador do arquivo.");
+            return response()->json(['ok' => false, 'error' => 'no file_id']);
+        }
+
+        $this->telegram->sendMessage($chatId, "📄 *Arquivo OFX recebido: `{$fileName}`*\n\n⏳ _Processando extrato bancário e verificando duplicidades..._");
+
+        $fileInfo = $this->telegram->getFile($fileId);
+        if (!$fileInfo || !isset($fileInfo['file_path'])) {
+            $this->telegram->sendMessage($chatId, "❌ Não foi possível obter o arquivo OFX dos servidores do Telegram.");
+            return response()->json(['ok' => false, 'error' => 'failed to get file info']);
+        }
+
+        $fileContent = $this->telegram->downloadFile($fileInfo['file_path']);
+        if (!$fileContent) {
+            $this->telegram->sendMessage($chatId, "❌ Falha no download do arquivo OFX.");
+            return response()->json(['ok' => false, 'error' => 'download failed']);
+        }
+
+        try {
+            $service = new OfxImportService(DB::connection()->getPdo());
+            $result = $service->import($fileContent, $user->id);
+
+            if ($result->sucesso) {
+                $tipoStr = $result->tipoConta === 'cartao_credito' ? '💳 Fatura de Cartão' : '🏦 Conta Bancária';
+                $periodo = ($result->periodoInicio && $result->periodoFim)
+                    ? "📅 *Período:* " . substr($result->periodoInicio, 0, 10) . " a " . substr($result->periodoFim, 0, 10) . "\n"
+                    : "";
+
+                $resposta = "✅ *Extrato OFX Importado com Sucesso!*\n\n"
+                    . "🏦 *Conta:* {$result->contaNome}\n"
+                    . "📑 *Tipo:* {$tipoStr}\n"
+                    . $periodo
+                    . "\n📊 *Resumo dos Lançamentos:*\n"
+                    . "• Total no arquivo: *{$result->totalEncontrados}*\n"
+                    . "• Novos inseridos: *{$result->inseridos}*\n"
+                    . "• Duplicados ignorados: *{$result->duplicadosIgnorados}*\n"
+                    . "• Entradas (+): *R$ " . number_format($result->totalCreditos, 2, ',', '.') . "*\n"
+                    . "• Saídas (-): *R$ " . number_format($result->totalDebitos, 2, ',', '.') . "*\n";
+
+                if ($result->saldoFinal !== null) {
+                    $resposta .= "• Saldo Consolidado: *R$ " . number_format($result->saldoFinal, 2, ',', '.') . "*\n";
+                }
+
+                if (!empty($result->erros)) {
+                    $resposta .= "\n⚠️ *Avisos:* " . count($result->erros) . " lançamento(s) com ressalvas.";
+                }
+            } else {
+                $resposta = "❌ *Falha ao processar extrato OFX*\n\n" . $result->mensagem;
+            }
+
+            $this->telegram->sendMessage($chatId, $resposta);
+
+            WhatsappLog::create([
+                'numero'            => "tg:{$chatId}",
+                'mensagem_original' => "OFX: {$fileName}",
+                'status'            => $result->sucesso ? 'ok' : 'erro',
+                'resposta'          => $resposta,
+            ]);
+
+            return response()->json([
+                'ok'        => true,
+                'processed' => 'ofx_import',
+                'result'    => $result->toArray(),
+            ]);
+        } catch (\Throwable $e) {
+            Log::error('[Telegram Webhook] Erro ao processar OFX: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            $msgErro = "❌ *Erro interno:* " . $e->getMessage();
+            $this->telegram->sendMessage($chatId, $msgErro);
+            return response()->json(['ok' => false, 'error' => $e->getMessage()], 500);
+        }
+    }
+}

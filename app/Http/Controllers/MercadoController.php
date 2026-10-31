@@ -329,84 +329,167 @@ class MercadoController extends Controller
         $transacaoObj = null;
         $cartaoCompraObj = null;
         $cartao = null;
+        $substituiuCompra = false;
+        $detalhesSubstituicao = null;
 
-        if ($transacaoDestino === 'cartao') {
-            if ($cartaoId) {
-                $cartao = Cartao::where('user_id', $user->id)->find($cartaoId);
-            } else {
-                $cartao = Cartao::where('user_id', $user->id)->where('ativo', true)->first();
+        \Illuminate\Support\Facades\DB::transaction(function () use (
+            $user, $estabelecimento, $valorTotal, &$transacaoDestino, &$cartaoId,
+            $itens, $dataCompra, $fotoPath, &$transacaoObj, &$cartaoCompraObj, &$cartao,
+            &$notaFiscal, &$substituiuCompra, &$detalhesSubstituicao
+        ) {
+            // ── 1. Verificação de duplicata: data da compra e valor exato ──
+            $dataCompraStr = $dataCompra->format('Y-m-d');
+            $valMin = round($valorTotal, 2) - 0.009;
+            $valMax = round($valorTotal, 2) + 0.009;
+
+            $existingNf = NotaFiscal::where('user_id', $user->id)
+                ->whereDate('data_compra', $dataCompraStr)
+                ->whereBetween('valor_total', [$valMin, $valMax])
+                ->latest('id')
+                ->first();
+
+            $existingCartaoCompra = CartaoCompra::whereHas('cartao', function ($q) use ($user) {
+                    $q->where('user_id', $user->id);
+                })
+                ->whereDate('data_compra', $dataCompraStr)
+                ->whereBetween('valor_total', [$valMin, $valMax])
+                ->latest('id')
+                ->first();
+
+            $existingTransacao = Transacao::where('user_id', $user->id)
+                ->where('tipo', 'despesa')
+                ->whereDate('data', $dataCompraStr)
+                ->whereBetween('valor', [$valMin, $valMax])
+                ->latest('id')
+                ->first();
+
+            if ($existingNf) {
+                if (!$existingCartaoCompra && $existingNf->cartao_compra_id) {
+                    $existingCartaoCompra = $existingNf->cartaoCompra;
+                }
+                if (!$existingTransacao && $existingNf->transacao_id) {
+                    $existingTransacao = $existingNf->transacao;
+                }
             }
 
-            if ($cartao) {
-                $cartaoCompraObj = CartaoCompra::create([
-                    'cartao_id'       => $cartao->id,
-                    'descricao'       => "Compra em {$estabelecimento} (Nota Fiscal)",
-                    'valor_total'     => $valorTotal,
-                    'tipo'            => 'avista',
-                    'numero_parcelas' => 1,
-                    'categoria'       => 'Alimentação',
-                    'data_compra'     => $dataCompra,
-                ]);
+            if ($existingNf || $existingCartaoCompra || $existingTransacao) {
+                $substituiuCompra = true;
+                if ($existingNf) {
+                    $detalhesSubstituicao = "Nota Fiscal anterior ({$existingNf->estabelecimento})";
+                } elseif ($existingCartaoCompra) {
+                    $detalhesSubstituicao = "Compra no Cartão " . ($existingCartaoCompra->cartao?->nome ?? '') . " ({$existingCartaoCompra->descricao})";
+                } else {
+                    $detalhesSubstituicao = "Lançamento em Contas ({$existingTransacao->descricao})";
+                }
 
-                $vencimento = \App\Services\CreditCardService::calcularVencimentoParcela($cartao, $dataCompra, 1);
-                CartaoParcela::create([
-                    'cartao_compra_id' => $cartaoCompraObj->id,
-                    'numero_parcela'   => 1,
-                    'valor_parcela'    => $valorTotal,
-                    'data_vencimento'  => $vencimento,
-                    'status'           => 'aberta',
+                if ($existingCartaoCompra && !$cartaoId) {
+                    $cartaoId = $existingCartaoCompra->cartao_id;
+                    $transacaoDestino = 'cartao';
+                }
+
+                if ($existingCartaoCompra) {
+                    $existingCartaoCompra->parcelas()->delete();
+                    $existingCartaoCompra->delete();
+                }
+
+                if ($existingTransacao) {
+                    $existingTransacao->delete();
+                }
+
+                if ($existingNf) {
+                    $existingNf->itens()->delete();
+                    if ($existingNf->foto_path && $existingNf->foto_path !== $fotoPath && Storage::disk('public')->exists($existingNf->foto_path)) {
+                        Storage::disk('public')->delete($existingNf->foto_path);
+                    }
+                    $existingNf->delete();
+                }
+            }
+
+            if ($transacaoDestino === 'cartao') {
+                if ($cartaoId) {
+                    $cartao = Cartao::where('user_id', $user->id)->find($cartaoId);
+                } else {
+                    $cartao = Cartao::where('user_id', $user->id)->where('ativo', true)->first();
+                }
+
+                if ($cartao) {
+                    $cartaoCompraObj = CartaoCompra::create([
+                        'cartao_id'       => $cartao->id,
+                        'descricao'       => "Compra em {$estabelecimento} (Nota Fiscal)",
+                        'valor_total'     => $valorTotal,
+                        'tipo'            => 'avista',
+                        'numero_parcelas' => 1,
+                        'categoria'       => 'Alimentação',
+                        'data_compra'     => $dataCompra,
+                    ]);
+
+                    $vencimento = \App\Services\CreditCardService::calcularVencimentoParcela($cartao, $dataCompra, 1);
+                    CartaoParcela::create([
+                        'cartao_compra_id' => $cartaoCompraObj->id,
+                        'numero_parcela'   => 1,
+                        'valor_parcela'    => $valorTotal,
+                        'data_vencimento'  => $vencimento,
+                        'status'           => 'aberta',
+                    ]);
+                }
+            }
+
+            if (!$cartaoCompraObj) {
+                $transacaoObj = Transacao::create([
+                    'user_id'      => $user->id,
+                    'descricao'    => "Mercado em {$estabelecimento} (Nota Fiscal)",
+                    'valor'        => $valorTotal,
+                    'tipo'         => 'despesa',
+                    'categoria'    => 'Alimentação',
+                    'subcategoria' => 'Mercado',
+                    'data'         => $dataCompra,
                 ]);
             }
-        }
 
-        if (!$cartaoCompraObj) {
-            $transacaoObj = Transacao::create([
-                'user_id'      => $user->id,
-                'descricao'    => "Mercado em {$estabelecimento} (Nota Fiscal)",
-                'valor'        => $valorTotal,
-                'tipo'         => 'despesa',
-                'categoria'    => 'Alimentação',
-                'subcategoria' => 'Mercado',
-                'data'         => $dataCompra,
-            ]);
-        }
-
-        $notaFiscal = NotaFiscal::create([
-            'user_id'          => $user->id,
-            'transacao_id'     => $transacaoObj?->id,
-            'cartao_compra_id' => $cartaoCompraObj?->id,
-            'estabelecimento'  => $estabelecimento,
-            'data_compra'      => $dataCompra,
-            'valor_total'      => $valorTotal,
-            'foto_path'        => $fotoPath,
-            'forma_pagamento'  => $cartaoCompraObj ? 'cartao' : 'casa',
-            'cartao_nome'      => $cartao?->nome,
-            'observacoes'      => 'Upload manual via painel web',
-        ]);
-
-        foreach ($itens as $item) {
-            $nomeItem = $item['nome'] ?? 'Produto';
-            $catItem = $item['categoria_item'] ?? 'Outros';
-            $qtd = (float)($item['quantidade'] ?? 1);
-            $vUnit = (float)($item['valor_unitario'] ?? $item['valor_total'] ?? 0);
-            $vTotal = (float)($item['valor_total'] ?? ($qtd * $vUnit));
-
-            NotaFiscalItem::create([
+            $notaFiscal = NotaFiscal::create([
                 'user_id'          => $user->id,
-                'nota_fiscal_id'   => $notaFiscal->id,
                 'transacao_id'     => $transacaoObj?->id,
                 'cartao_compra_id' => $cartaoCompraObj?->id,
                 'estabelecimento'  => $estabelecimento,
                 'data_compra'      => $dataCompra,
-                'nome_item'        => $nomeItem,
-                'categoria_item'   => $catItem,
-                'quantidade'       => $qtd,
-                'valor_unitario'   => $vUnit,
-                'valor_total'      => $vTotal,
+                'valor_total'      => $valorTotal,
+                'foto_path'        => $fotoPath,
+                'forma_pagamento'  => $cartaoCompraObj ? 'cartao' : 'casa',
+                'cartao_nome'      => $cartao?->nome,
+                'observacoes'      => $substituiuCompra 
+                    ? "Substituiu compra prévia para evitar duplicidade ({$detalhesSubstituicao})" 
+                    : 'Upload manual via painel web',
             ]);
+
+            foreach ($itens as $item) {
+                $nomeItem = $item['nome'] ?? 'Produto';
+                $catItem = $item['categoria_item'] ?? 'Outros';
+                $qtd = (float)($item['quantidade'] ?? 1);
+                $vUnit = (float)($item['valor_unitario'] ?? $item['valor_total'] ?? 0);
+                $vTotal = (float)($item['valor_total'] ?? ($qtd * $vUnit));
+
+                NotaFiscalItem::create([
+                    'user_id'          => $user->id,
+                    'nota_fiscal_id'   => $notaFiscal->id,
+                    'transacao_id'     => $transacaoObj?->id,
+                    'cartao_compra_id' => $cartaoCompraObj?->id,
+                    'estabelecimento'  => $estabelecimento,
+                    'data_compra'      => $dataCompra,
+                    'nome_item'        => $nomeItem,
+                    'categoria_item'   => $catItem,
+                    'quantidade'       => $qtd,
+                    'valor_unitario'   => $vUnit,
+                    'valor_total'      => $vTotal,
+                ]);
+            }
+        });
+
+        $msgSuccess = "Nota Fiscal de {$estabelecimento} (R$ " . number_format($valorTotal, 2, ',', '.') . ") processada com " . count($itens) . " itens!";
+        if ($substituiuCompra) {
+            $msgSuccess .= " Substituiu lançamento prévio ({$detalhesSubstituicao}) para evitar duplicidade.";
         }
 
-        return redirect()->route('financas.mercado.index')->with('success', "Nota Fiscal de {$estabelecimento} (R$ " . number_format($valorTotal, 2, ',', '.') . ") processada com " . count($itens) . " itens!");
+        return redirect()->route('financas.mercado.index')->with('success', $msgSuccess);
     }
 
     /**

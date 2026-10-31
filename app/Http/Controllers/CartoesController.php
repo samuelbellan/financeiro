@@ -8,8 +8,10 @@ use App\Models\CartaoParcela;
 use App\Models\CartaoPrevisao;
 use App\Models\Categoria;
 use App\Services\CategorySanitizer;
+use App\Services\CreditCardReconciliationService;
 use App\Services\CreditCardService;
 use App\Services\TransactionSuggestionService;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
@@ -54,19 +56,13 @@ class CartoesController extends Controller
             ->with('cartao')
             ->get();
 
-        // Buscar todas as compras do mês dos cartões ativos para bater com as previsões (sanitizado)
-        $comprasMes = CartaoCompra::whereHas('cartao', function($q) use ($user) {
-                $q->where('user_id', $user->id)->where('ativo', true);
-            })
-            ->whereMonth('data_compra', $currentMonth)
-            ->whereYear('data_compra', $currentYear)
-            ->get();
-
-        // Calcular consumo real para cada previsão
+        // Calcular consumo real para cada previsão a partir das faturas/parcelas do mês
         foreach ($previsoes as $p) {
-            $consumoReal = $comprasMes->filter(function($compra) use ($p) {
-                return $compra->cartao_id == $p->cartao_id && CategorySanitizer::isMatch($compra->categoria, $p->categoria);
-            })->sum('valor_total');
+            $consumoReal = (float) $faturas->filter(function($fatura) use ($p) {
+                return $fatura->compra 
+                    && $fatura->compra->cartao_id == $p->cartao_id 
+                    && CategorySanitizer::isMatch($fatura->compra->categoria, $p->categoria);
+            })->sum('valor_parcela');
             
             $p->consumo_real = $consumoReal;
             $p->restante = max(0, $p->valor_previsto - $consumoReal);
@@ -137,31 +133,45 @@ class CartoesController extends Controller
 
     public function storePrevisao(Request $request)
     {
+        if ($request->has('valor_previsto')) {
+            $valorPrevisto = $this->parseCurrencyValue($request->input('valor_previsto'));
+            $request->merge(['valor_previsto' => $valorPrevisto]);
+        }
+
         $validated = $request->validate([
             'cartao_id' => 'required|exists:cartoes,id',
             'categoria' => 'required|string|max:255',
             'valor_previsto' => 'required|numeric|min:0',
+            'mes' => 'nullable|integer|min:1|max:12',
+            'ano' => 'nullable|integer|min:2000|max:2100',
         ]);
 
-        $validated['mes'] = now()->month;
-        $validated['ano'] = now()->year;
+        $cartao = Cartao::where('user_id', Auth::id())->findOrFail($validated['cartao_id']);
+
+        $mes = $validated['mes'] ?? now()->month;
+        $ano = $validated['ano'] ?? now()->year;
 
         CartaoPrevisao::updateOrCreate(
             [
-                'cartao_id' => $validated['cartao_id'],
+                'cartao_id' => $cartao->id,
                 'categoria' => $validated['categoria'],
-                'mes' => $validated['mes'],
-                'ano' => $validated['ano'],
+                'mes' => $mes,
+                'ano' => $ano,
             ],
             ['valor_previsto' => $validated['valor_previsto']]
         );
 
-        return redirect()->back()->with('success', 'Previsão atualizada com sucesso!');
+        return redirect()->back()->with('success', 'Previsão de gastos do cartão atualizada com sucesso!');
     }
 
     public function updatePrevisao(Request $request, CartaoPrevisao $previsao)
     {
         if ($previsao->cartao->user_id !== Auth::id()) abort(403);
+
+        if ($request->has('valor_previsto')) {
+            $valorPrevisto = $this->parseCurrencyValue($request->input('valor_previsto'));
+            $request->merge(['valor_previsto' => $valorPrevisto]);
+        }
 
         $validated = $request->validate([
             'categoria' => 'required|string|max:255',
@@ -434,5 +444,57 @@ class CartoesController extends Controller
         }
 
         return (float)$val;
+    }
+
+    /**
+     * Processa o upload da fatura fechada e gera o relatório comparativo de conciliação.
+     */
+    public function conciliarFatura(Request $request, CreditCardReconciliationService $service)
+    {
+        $request->validate([
+            'arquivo'   => 'required|file|max:30720', // até 30MB
+            'cartao_id' => 'required|exists:cartoes,id',
+            'mes'       => 'required|integer|between:1,12',
+            'ano'       => 'required|integer|min:2020|max:2050',
+        ]);
+
+        $cartao = Cartao::where('user_id', Auth::id())->findOrFail($request->cartao_id);
+        $file = $request->file('arquivo');
+
+        $resultado = $service->reconcile(
+            file: $file,
+            cartao: $cartao,
+            mes: (int) $request->mes,
+            ano: (int) $request->ano
+        );
+
+        if (!$resultado['sucesso']) {
+            return response()->json($resultado, 422);
+        }
+
+        // Salvar na sessão para permitir download imediato do PDF
+        session(['ultima_conciliacao_fatura' => $resultado]);
+
+        return response()->json($resultado);
+    }
+
+    /**
+     * Exporta o relatório comparativo de conciliação em PDF.
+     */
+    public function exportarRelatorioConciliacaoPdf(Request $request)
+    {
+        $dados = session('ultima_conciliacao_fatura');
+
+        if (!$dados) {
+            return redirect()->route('cartoes.index')->with('error', 'Nenhum relatório de conciliação recente para download.');
+        }
+
+        $pdf = Pdf::loadView('exports.conciliacao_fatura_pdf', $dados);
+        $cartaoNome = \Illuminate\Support\Str::slug($dados['cartao']['nome'] ?? 'cartao');
+        $mes = $dados['periodo']['mes'] ?? now()->month;
+        $ano = $dados['periodo']['ano'] ?? now()->year;
+        $filename = "relatorio_conciliacao_{$cartaoNome}_{$mes}_{$ano}.pdf";
+
+        return $pdf->download($filename);
     }
 }

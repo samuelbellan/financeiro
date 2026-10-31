@@ -379,9 +379,6 @@ window.TAB_ID = window.TAB_ID || (Math.random().toString(36).substring(2) + Date
                 });
             });
         }
-
-        // Checagem de status inicial silenciosa
-        fetchSyncStatusGlobal();
     }
 
     function openSyncModalGlobal() {

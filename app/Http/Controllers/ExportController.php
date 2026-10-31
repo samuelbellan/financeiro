@@ -4,10 +4,15 @@ namespace App\Http\Controllers;
 
 use App\Models\Cartao;
 use App\Models\CartaoParcela;
+use App\Models\CartaoPrevisao;
 use App\Models\Transacao;
 use App\Models\TransacaoPrevisao;
+use App\Models\User;
+use App\Services\CategorySanitizer;
+use App\Services\FinancialSummaryService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\URL;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 
@@ -166,5 +171,96 @@ class ExportController extends Controller
         }
 
         return abort(404);
+    }
+
+    /**
+     * Exporta o relatório completo e consolidado de Conta Corrente + Cartões em PDF.
+     */
+    public function exportResumoFinanceiroPdf(Request $request)
+    {
+        $user = Auth::user();
+        if (!$user && $request->has('user_id')) {
+            if ($request->hasValidSignature()) {
+                $user = User::find($request->get('user_id'));
+            }
+        }
+
+        if (!$user) {
+            abort(403, 'Acesso não autorizado.');
+        }
+
+        $mes = (int) $request->get('mes', now()->month);
+        $ano = (int) $request->get('ano', now()->year);
+
+        // Resumo financeiro consolidado
+        $summary = FinancialSummaryService::generateSummary($user, $mes, $ano);
+
+        // Transações realizadas na conta corrente
+        $transacoes = Transacao::where('user_id', $user->id)
+            ->whereMonth('data', $mes)
+            ->whereYear('data', $ano)
+            ->orderBy('data', 'asc')
+            ->get();
+
+        // Previsões de metas da conta corrente
+        $previsoesCC = TransacaoPrevisao::where('user_id', $user->id)
+            ->where('mes', $mes)
+            ->where('ano', $ano)
+            ->get();
+
+        foreach ($previsoesCC as $p) {
+            $consumoReal = $transacoes->filter(function($t) use ($p) {
+                if ($p->tipo !== $t->tipo) return false;
+                if (!CategorySanitizer::isMatch($p->categoria, $t->categoria)) return false;
+                if ($p->subcategoria) {
+                    return CategorySanitizer::isMatch($p->subcategoria, $t->subcategoria);
+                }
+                return empty($t->subcategoria);
+            })->sum('valor');
+            $p->consumo_real = $consumoReal;
+        }
+
+        // Cartões ativos
+        $cartoes = Cartao::where('user_id', $user->id)->where('ativo', true)->get();
+
+        // Parcelas da fatura do mês dos cartões ativos
+        $faturasParcelas = CartaoParcela::whereHas('compra.cartao', function($q) use ($user) {
+                $q->where('user_id', $user->id)->where('ativo', true);
+            })
+            ->whereMonth('data_vencimento', $mes)
+            ->whereYear('data_vencimento', $ano)
+            ->with(['compra.cartao'])
+            ->orderBy('data_vencimento', 'asc')
+            ->get();
+
+        // Previsões de cartões do mês
+        $cartaoPrevisoes = CartaoPrevisao::whereIn('cartao_id', $cartoes->pluck('id'))
+            ->where('mes', $mes)
+            ->where('ano', $ano)
+            ->with('cartao')
+            ->get();
+
+        foreach ($cartaoPrevisoes as $cp) {
+            $consumo = (float) $faturasParcelas->filter(function($fatura) use ($cp) {
+                return $fatura->compra 
+                    && $fatura->compra->cartao_id == $cp->cartao_id 
+                    && CategorySanitizer::isMatch($fatura->compra->categoria, $cp->categoria);
+            })->sum('valor_parcela');
+            $cp->consumo_real = $consumo;
+            $cp->restante = max(0, $cp->valor_previsto - $consumo);
+        }
+
+        $filename = "relatorio_financeiro_{$mes}_{$ano}.pdf";
+
+        $pdf = Pdf::loadView('exports.resumo_financeiro_pdf', compact(
+            'user', 'mes', 'ano', 'summary', 'transacoes', 'previsoesCC', 
+            'cartoes', 'faturasParcelas', 'cartaoPrevisoes'
+        ))->setPaper('a4', 'portrait');
+
+        if ($request->has('download')) {
+            return $pdf->download($filename);
+        }
+
+        return $pdf->stream($filename);
     }
 }

@@ -35,6 +35,22 @@
         .action-btn-small { background: none; border: none; padding: 4px; border-radius: 4px; cursor: pointer; opacity: 0.6; transition: opacity 0.2s; }
         .action-btn-small:hover { opacity: 1; background: #f1f5f9; }
 
+        .predictions-section { background: white; border-radius: 1rem; border: 1px solid #e2e8f0; margin-bottom: 2rem; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .predictions-header { padding: 1.25rem 1.5rem; background: #f8fafc; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; }
+        .prediction-row { padding: 1rem 1.5rem; border-bottom: 1px solid #e2e8f0; display: grid; grid-template-columns: 2fr 1.2fr 2fr 1fr auto; align-items: center; gap: 1rem; }
+        .prediction-row:last-child { border-bottom: none; }
+        .progress-mini-container { height: 6px; background: #f1f5f9; border-radius: 999px; overflow: hidden; margin-top: 4px; }
+        .progress-mini-bar { height: 100%; background: #6366f1; transition: width 0.3s ease; }
+        .progress-mini-bar.warning { background: #f59e0b; }
+        .progress-mini-bar.danger { background: #ef4444; }
+
+        .dropdown-whatsapp { position: relative; display: inline-block; }
+        .dropdown-whatsapp-menu { display: none; position: absolute; right: 0; top: 100%; margin-top: 0.35rem; background: white; border-radius: 0.75rem; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.2), 0 8px 10px -6px rgba(0,0,0,0.1); border: 1px solid #e2e8f0; min-width: 220px; z-index: 1050; overflow: hidden; }
+        .dropdown-whatsapp:hover .dropdown-whatsapp-menu, .dropdown-whatsapp:focus-within .dropdown-whatsapp-menu { display: block; animation: slideUp 0.15s ease-out; }
+        .dropdown-whatsapp-item { display: flex; align-items: center; gap: 0.6rem; padding: 0.65rem 1rem; color: #1e293b; text-decoration: none; font-size: 0.8rem; font-weight: 600; transition: background 0.15s; }
+        .dropdown-whatsapp-item:hover { background: #f0fdf4; color: #166534; }
+        .dropdown-whatsapp-item:not(:last-child) { border-bottom: 1px solid #f1f5f9; }
+
         .period-nav {
             display: flex;
             align-items: center;
@@ -184,7 +200,15 @@
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
                         <span>Meus Cartões</span>
                     </a>
-                    <a href="{{ route('treinos.index') }}" class="nav-item">
+                                        <a href="{{ route('photos.index') }}" class="nav-item">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                            <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                            <polyline points="21 15 16 10 5 21"></polyline>
+                        </svg>
+                        <span>Galeria Fotos</span>
+                    </a>
+<a href="{{ route('treinos.index') }}" class="nav-item">
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M6 5v14M18 5v14M2 9v6M22 9v6M6 12h12"></path>
                         </svg>
@@ -195,17 +219,60 @@
         </aside>
 
         <main class="main-content">
-            <header class="content-header" style="display: flex; align-items: center; gap: 1rem;">
-                <button type="button" class="btn-toggle-sidebar js-toggle-sidebar" title="Alternar barra lateral (Ctrl + \)">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <line x1="3" y1="12" x2="21" y2="12"></line>
-                        <line x1="3" y1="6" x2="21" y2="6"></line>
-                        <line x1="3" y1="18" x2="21" y2="18"></line>
-                    </svg>
-                </button>
-                <div>
-                    <h1>Cartões de Crédito</h1>
-                    <p>Gerencie seus gastos e faturas de forma independente</p>
+            <header class="content-header" style="display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem;">
+                <div style="display: flex; align-items: center; gap: 1rem;">
+                    <button type="button" class="btn-toggle-sidebar js-toggle-sidebar" title="Alternar barra lateral (Ctrl + \)">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="3" y1="12" x2="21" y2="12"></line>
+                            <line x1="3" y1="6" x2="21" y2="6"></line>
+                            <line x1="3" y1="18" x2="21" y2="18"></line>
+                        </svg>
+                    </button>
+                    <div>
+                        <h1>Cartões de Crédito</h1>
+                        <p>Gerencie seus gastos e faturas de forma independente</p>
+                    </div>
+                </div>
+                <div style="display: flex; gap: 0.6rem; align-items: center;">
+                    <button type="button" onclick="openConciliacaoModal()" class="btn-action" style="background: #4f46e5; font-size: 0.8rem; box-shadow: 0 2px 4px rgba(79,70,229,0.3);">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
+                            <line x1="1" y1="10" x2="23" y2="10"></line>
+                            <path d="M16 14h.01"></path>
+                        </svg>
+                        Conciliar Fatura
+                    </button>
+                <div class="dropdown-whatsapp">
+                    <button type="button" class="btn-action" style="background: #25d366; font-size: 0.8rem; box-shadow: 0 2px 4px rgba(37,211,102,0.3);">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.182-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766.001-3.187-2.575-5.77-5.764-5.771zm3.392 8.244c-.144.405-.837.774-1.17.824-.299.045-.677.063-1.092-.069-.252-.08-.575-.187-.988-.365-1.739-.751-2.874-2.502-2.961-2.617-.087-.116-.708-.94-.708-1.793s.448-1.273.607-1.446c.159-.173.346-.217.462-.217l.332.006c.106.005.249-.04.39.298.144.347.491 1.2.534 1.287.043.087.072.188.014.304-.058.116-.087.188-.173.289l-.26.304c-.087.086-.177.18-.076.354.101.174.449.741.964 1.201.662.591 1.221.774 1.394.861.174.086.275.073.376-.044.101-.116.433-.506.549-.68.116-.173.231-.145.39-.087s1.011.477 1.184.564.289.13.332.202c.045.072.045.419-.099.824zm-3.423-14.416c-6.627 0-12 5.373-12 12 0 2.159.57 4.184 1.564 5.939l-1.664 6.083 6.241-1.637c1.7 1.01 3.682 1.615 5.859 1.615 6.627 0 12-5.373 12-12s-5.373-12-12-12z"/>
+                        </svg>
+                        Enviar Resumo WhatsApp ▾
+                    </button>
+                    <div class="dropdown-whatsapp-menu">
+                        <a href="{{ route('financas.whatsapp.resumo', ['mes' => $currentMonth, 'ano' => $currentYear, 'phone' => '5567984376473']) }}" target="_blank" class="dropdown-whatsapp-item">
+                            <span>📱</span>
+                            <div>
+                                <div>Samuel</div>
+                                <div style="font-size:0.7rem; color:#64748b; font-weight:normal;">+55 67 98437-6473</div>
+                            </div>
+                        </a>
+                        <a href="{{ route('financas.whatsapp.resumo', ['mes' => $currentMonth, 'ano' => $currentYear, 'phone' => '5567984456378']) }}" target="_blank" class="dropdown-whatsapp-item">
+                            <span>📱</span>
+                            <div>
+                                <div>Contato 2</div>
+                                <div style="font-size:0.7rem; color:#64748b; font-weight:normal;">+55 67 98445-6378</div>
+                            </div>
+                        </a>
+                        <a href="{{ route('financas.relatorio.pdf', ['mes' => $currentMonth, 'ano' => $currentYear, 'download' => 1]) }}" target="_blank" class="dropdown-whatsapp-item" style="border-top: 1px solid #e2e8f0; background: #f8fafc;">
+                            <span>📄</span>
+                            <div>
+                                <div style="color: #4338ca;">Baixar Relatório (PDF)</div>
+                                <div style="font-size:0.7rem; color:#64748b; font-weight:normal;">Extrato Completo & Cartões</div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
                 </div>
             </header>
 
@@ -311,6 +378,65 @@
                     @endif
                 </div>
 
+                <!-- Limites e Previsão de Gastos por Categoria -->
+                <div class="predictions-section">
+                    <div class="predictions-header">
+                        <div style="display: flex; align-items: center; gap: 1rem;">
+                            <h2 style="font-size: 1.1rem; margin: 0; color: #1e293b; font-weight: 700;">Limites e Previsão de Gastos ({{ \Carbon\Carbon::create(null, $currentMonth)->translatedFormat('F') }})</h2>
+                            <button onclick="toggleSection('cartaoPlanningContent')" class="btn-action" id="btn-cartaoPlanningContent" style="background: #e2e8f0; color: #475569; font-size: 0.75rem; padding: 0.25rem 0.65rem;">Recolher</button>
+                        </div>
+                        <button onclick="openCardPrevisaoModal()" class="btn-action" style="background: #10b981; font-size: 0.8rem;">+ Adicionar Limite / Previsão</button>
+                    </div>
+                    <div id="cartaoPlanningContent">
+                        @forelse($previsoes as $p)
+                            <div class="prediction-row">
+                                <div>
+                                    <span style="font-weight: 700; color: #1e293b;">{{ $p->categoria }}</span>
+                                    <span style="font-size: 0.75rem; color: #64748b;"> • {{ $p->cartao->nome }}</span>
+                                </div>
+                                <div>
+                                    @if($p->consumo_real > $p->valor_previsto)
+                                        <span style="background: #fee2e2; color: #991b1b; padding: 0.2rem 0.5rem; border-radius: 4px; font-size: 0.75rem; font-weight: 700;">Estourou</span>
+                                    @elseif($p->porcentagem >= 80)
+                                        <span style="background: #fef3c7; color: #92400e; padding: 0.2rem 0.5rem; border-radius: 4px; font-size: 0.75rem; font-weight: 700;">Alerta</span>
+                                    @else
+                                        <span style="background: #dcfce7; color: #166534; padding: 0.2rem 0.5rem; border-radius: 4px; font-size: 0.75rem; font-weight: 700;">Dentro da Meta</span>
+                                    @endif
+                                </div>
+                                <div>
+                                    <div style="display: flex; justify-content: space-between; font-size: 0.75rem; margin-bottom: 2px;">
+                                        <span>Gasto: R$ {{ number_format($p->consumo_real, 2, ',', '.') }}</span>
+                                        <span style="font-weight: 600;">Limite: R$ {{ number_format($p->valor_previsto, 2, ',', '.') }}</span>
+                                    </div>
+                                    <div class="progress-mini-container">
+                                        <div class="progress-mini-bar {{ $p->consumo_real > $p->valor_previsto ? 'danger' : ($p->porcentagem >= 80 ? 'warning' : '') }}" style="width: {{ min(100, $p->porcentagem) }}%"></div>
+                                    </div>
+                                </div>
+                                <div style="text-align: right; font-weight: 700;">
+                                    @if($p->consumo_real > $p->valor_previsto)
+                                        <span style="color: #ef4444; font-size: 0.85rem;" title="Valor excedido">+ R$ {{ number_format($p->consumo_real - $p->valor_previsto, 2, ',', '.') }}</span>
+                                    @else
+                                        <span style="color: #10b981; font-size: 0.85rem;" title="Resta para atingir o limite">Resta R$ {{ number_format($p->restante, 2, ',', '.') }}</span>
+                                    @endif
+                                </div>
+                                <div style="text-align: right; display: flex; gap: 5px; justify-content: flex-end;">
+                                    <button onclick="editCardPrevisao({{ json_encode($p) }})" class="action-btn-small" title="Editar Limite">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4L18.5 2.5z"></path></svg>
+                                    </button>
+                                    <form action="{{ route('cartoes.previsoes.destroy', $p->id) }}" method="POST" style="display:inline;" onsubmit="return confirm('Excluir este limite/previsão?')">
+                                        @csrf @method('DELETE')
+                                        <button type="submit" class="action-btn-small" title="Excluir Limite">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        @empty
+                            <p style="text-align: center; color: #94a3b8; font-size: 0.875rem; padding: 2rem; margin: 0;">Nenhum limite ou previsão cadastrada para este mês. Clique em "+ Adicionar Limite / Previsão" para estipular metas por categoria.</p>
+                        @endforelse
+                    </div>
+                </div>
+
                 <div class="section-header">
                     <h2>Meus Cartões</h2>
                     <button onclick="openCardModal()" class="btn-action">+ Novo Cartão</button>
@@ -377,6 +503,9 @@
                                             {{ $cartao->ativo ? 'Desabilitar' : 'Habilitar' }}
                                         </button>
                                     </form>
+                                    <button type="button" onclick="openConciliacaoModal({{ $cartao->id }})" class="btn-action" style="background:#4f46e5; padding:0.3rem 0.6rem; font-size:0.7rem;" title="Conciliar fatura fechada deste cartão">
+                                        Conciliar
+                                    </button>
                                     <a href="{{ route('export.fatura', ['cartao' => $cartao->id, 'format' => 'pdf', 'mes' => $currentMonth, 'ano' => $currentYear]) }}" class="btn-action" style="background:#ef4444; padding:0.3rem 0.6rem; font-size:0.7rem;">PDF</a>
                                     <a href="{{ route('export.fatura', ['cartao' => $cartao->id, 'format' => 'csv', 'mes' => $currentMonth, 'ano' => $currentYear]) }}" class="btn-action" style="background:#10b981; padding:0.3rem 0.6rem; font-size:0.7rem;">CSV</a>
                                 </div>
@@ -601,6 +730,44 @@
         </div>
     </div>
 
+    <!-- Modal Limite / Previsão de Cartão -->
+    <div id="modalCardPrevisao" class="modal-overlay">
+        <div class="modal">
+            <h3 id="cardPrevisaoModalTitle" style="font-weight:700; color:#1e293b;">Novo Limite / Previsão</h3><br>
+            <form id="cardPrevisaoForm" action="{{ route('cartoes.previsoes.store') }}" method="POST">
+                @csrf
+                <div id="cardPrevisaoMethodField"></div>
+                <input type="hidden" name="mes" value="{{ $currentMonth }}">
+                <input type="hidden" name="ano" value="{{ $currentYear }}">
+
+                <div class="form-group" id="cardPrevisaoCartaoGroup">
+                    <label style="font-size:0.8rem; font-weight:600; color:#475569;">Cartão de Crédito</label>
+                    <select name="cartao_id" id="cardPrevisaoCartaoId" class="form-input" required>
+                        @foreach($cartoes->where('ativo', true) as $c)
+                            <option value="{{ $c->id }}">{{ $c->nome }}</option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label style="font-size:0.8rem; font-weight:600; color:#475569;">Categoria</label>
+                    <input type="text" name="categoria" id="cardPrevisaoCat" class="form-input" required list="cardCategoriesList" placeholder="Ex: Alimentação, Lazer, etc.">
+                </div>
+
+                <div class="form-group">
+                    <label style="font-size:0.8rem; font-weight:600; color:#475569;">Limite / Valor Previsto (R$)</label>
+                    <input type="text" id="cardPrevisaoValorDisplay" class="form-input" required placeholder="0,00" inputmode="numeric">
+                    <input type="hidden" name="valor_previsto" id="cardPrevisaoValor">
+                </div>
+
+                <div style="display: flex; justify-content: flex-end; gap: 0.5rem; margin-top: 1.5rem;">
+                    <button type="button" onclick="document.getElementById('modalCardPrevisao').style.display='none'" class="btn-action" style="background: #94a3b8;">Cancelar</button>
+                    <button type="submit" class="btn-action" style="background: #10b981;">Salvar Limite</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <script src="{{ asset('js/transaction-autocomplete.js') }}"></script>
     <script>
         const sugestoesIniciaisCartao = @json($sugestoesDescricao ?? []);
@@ -633,8 +800,42 @@
             }
         }
         function openCardModal() { document.getElementById('cardModalTitle').innerText = 'Novo Cartão'; document.getElementById('cardForm').action = "{{ route('cartoes.store') }}"; document.getElementById('cardMethod').innerHTML = ''; document.getElementById('modalCard').style.display = 'flex'; }
-        function editCard(card) { document.getElementById('cardModalTitle').innerText = 'Editar Cartão'; document.getElementById('cardForm').action = `/financas/cartoes/${card.id}`; document.getElementById('cardMethod').innerHTML = '@method("PUT")'; document.getElementById('cardName').value = card.nome; document.getElementById('cardColor').value = card.cor || '#6366f1'; document.getElementById('cardBrand').value = card.bandeira || ''; document.getElementById('cardLimit').value = card.limite; document.getElementById('cardClose').value = card.dia_fechamento; document.getElementById('cardDue').value = card.dia_vencimento; document.getElementById('modalCard').style.display = 'flex'; }
-        
+        function openCardPrevisaoModal() {
+            document.getElementById('cardPrevisaoModalTitle').innerText = 'Novo Limite / Previsão';
+            document.getElementById('cardPrevisaoForm').action = "{{ route('cartoes.previsoes.store') }}";
+            document.getElementById('cardPrevisaoMethodField').innerHTML = '';
+            document.getElementById('cardPrevisaoCartaoGroup').style.display = 'block';
+            document.getElementById('cardPrevisaoCat').value = '';
+            document.getElementById('cardPrevisaoValor').value = '';
+            document.getElementById('cardPrevisaoValorDisplay').value = '';
+            document.getElementById('modalCardPrevisao').style.display = 'flex';
+        }
+
+        function editCardPrevisao(p) {
+            document.getElementById('cardPrevisaoModalTitle').innerText = 'Editar Limite / Previsão (' + (p.cartao ? p.cartao.nome : '') + ')';
+            document.getElementById('cardPrevisaoForm').action = `/financas/cartoes/previsoes/${p.id}`;
+            document.getElementById('cardPrevisaoMethodField').innerHTML = '@method("PUT")';
+            document.getElementById('cardPrevisaoCartaoGroup').style.display = 'none';
+            document.getElementById('cardPrevisaoCat').value = p.categoria;
+            document.getElementById('cardPrevisaoValor').value = p.valor_previsto;
+            const val = parseFloat(p.valor_previsto) || 0;
+            document.getElementById('cardPrevisaoValorDisplay').value = val.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            document.getElementById('modalCardPrevisao').style.display = 'flex';
+        }
+
+        function toggleSection(sectionId) {
+            const el = document.getElementById(sectionId);
+            const btn = document.getElementById('btn-' + sectionId);
+            if (!el) return;
+            if (el.style.display === 'none') {
+                el.style.display = '';
+                if (btn) btn.innerText = 'Recolher';
+            } else {
+                el.style.display = 'none';
+                if (btn) btn.innerText = 'Expandir';
+            }
+        }
+
         let currentModoCalculo = 'total';
 
         function setModoCalculo(modo) {
@@ -912,6 +1113,7 @@
             applyCurrencyMask('purchaseInstallmentValDisplay', 'purchaseInstallmentVal', function() {
                 if (currentModoCalculo === 'parcela') recalcInstallments();
             });
+            applyCurrencyMask('cardPrevisaoValorDisplay', 'cardPrevisaoValor');
             
             // Initialize Purchases Doughnut Charts
             const chartAVistaCtx = document.getElementById('chartAVista');
@@ -1632,5 +1834,8 @@
             </button>
         </div>
     </div>
+    <!-- Modal de Conciliação de Fatura Fechada -->
+    @include('components.conciliacao-fatura-modal')
+
 </body>
 </html>

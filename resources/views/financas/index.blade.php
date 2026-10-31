@@ -152,6 +152,13 @@
         }
         .btn-add:hover { background: var(--primary-hover); }
 
+        .dropdown-whatsapp { position: relative; display: inline-block; }
+        .dropdown-whatsapp-menu { display: none; position: absolute; right: 0; top: 100%; margin-top: 0.35rem; background: white; border-radius: 0.75rem; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.2), 0 8px 10px -6px rgba(0,0,0,0.1); border: 1px solid var(--border); min-width: 220px; z-index: 1050; overflow: hidden; }
+        .dropdown-whatsapp:hover .dropdown-whatsapp-menu, .dropdown-whatsapp:focus-within .dropdown-whatsapp-menu { display: block; animation: slideUpFooter 0.15s ease-out; }
+        .dropdown-whatsapp-item { display: flex; align-items: center; gap: 0.6rem; padding: 0.65rem 1rem; color: var(--text-main); text-decoration: none; font-size: 0.8rem; font-weight: 600; transition: background 0.15s; }
+        .dropdown-whatsapp-item:hover { background: #f0fdf4; color: #166534; }
+        .dropdown-whatsapp-item:not(:last-child) { border-bottom: 1px solid #f1f5f9; }
+
         .table-container { background: white; border-radius: 1rem; border: 1px solid var(--border); overflow: hidden; }
         table { width: 100%; border-collapse: collapse; }
         th { text-align: left; padding: 0.75rem 1.5rem; background: #f9fafb; font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; }
@@ -312,11 +319,26 @@
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
                         <span>Meus Cartões</span>
                     </a>
-                    <a href="{{ route('treinos.index') }}" class="nav-item">
+                                        <a href="{{ route('photos.index') }}" class="nav-item">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                            <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                            <polyline points="21 15 16 10 5 21"></polyline>
+                        </svg>
+                        <span>Galeria Fotos</span>
+                    </a>
+<a href="{{ route('treinos.index') }}" class="nav-item">
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M6 5v14M18 5v14M2 9v6M22 9v6M6 12h12"></path>
                         </svg>
                         <span>Treinos & Exercícios</span>
+                    </a>
+                    <a href="{{ route('celular') }}" class="nav-item" style="color: #34d399;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="5" y="2" width="14" height="20" rx="2" ry="2"/>
+                            <line x1="12" y1="18" x2="12.01" y2="18"/>
+                        </svg>
+                        <span>Acessar no Celular</span>
                     </a>
                 </div>
             </nav>
@@ -337,7 +359,46 @@
                         <p>Planejamento de {{ \Carbon\Carbon::create(null, $mes)->translatedFormat('F') }} / {{ $ano }}</p>
                     </div>
                 </div>
-                <div style="display: flex; gap: 0.5rem;">
+                <div style="display: flex; gap: 0.5rem; align-items: center;">
+                    <div class="dropdown-whatsapp">
+                        <button type="button" class="btn-add" style="background: #25d366; font-size: 0.75rem; color: white; display: inline-flex; align-items: center; gap: 0.35rem; box-shadow: 0 2px 4px rgba(37,211,102,0.3);">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.182-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766.001-3.187-2.575-5.77-5.764-5.771zm3.392 8.244c-.144.405-.837.774-1.17.824-.299.045-.677.063-1.092-.069-.252-.08-.575-.187-.988-.365-1.739-.751-2.874-2.502-2.961-2.617-.087-.116-.708-.94-.708-1.793s.448-1.273.607-1.446c.159-.173.346-.217.462-.217l.332.006c.106.005.249-.04.39.298.144.347.491 1.2.534 1.287.043.087.072.188.014.304-.058.116-.087.188-.173.289l-.26.304c-.087.086-.177.18-.076.354.101.174.449.741.964 1.201.662.591 1.221.774 1.394.861.174.086.275.073.376-.044.101-.116.433-.506.549-.68.116-.173.231-.145.39-.087s1.011.477 1.184.564.289.13.332.202c.045.072.045.419-.099.824zm-3.423-14.416c-6.627 0-12 5.373-12 12 0 2.159.57 4.184 1.564 5.939l-1.664 6.083 6.241-1.637c1.7 1.01 3.682 1.615 5.859 1.615 6.627 0 12-5.373 12-12s-5.373-12-12-12z"/>
+                            </svg>
+                            WhatsApp ▾
+                        </button>
+                        <div class="dropdown-whatsapp-menu">
+                            <a href="{{ route('financas.whatsapp.resumo', ['mes' => $mes, 'ano' => $ano, 'phone' => '5567984376473']) }}" target="_blank" class="dropdown-whatsapp-item">
+                                <span>📱</span>
+                                <div>
+                                    <div>Samuel</div>
+                                    <div style="font-size:0.7rem; color:var(--text-muted); font-weight:normal;">+55 67 98437-6473</div>
+                                </div>
+                            </a>
+                            <a href="{{ route('financas.whatsapp.resumo', ['mes' => $mes, 'ano' => $ano, 'phone' => '5567984456378']) }}" target="_blank" class="dropdown-whatsapp-item">
+                                <span>📱</span>
+                                <div>
+                                    <div>Contato 2</div>
+                                    <div style="font-size:0.7rem; color:var(--text-muted); font-weight:normal;">+55 67 98445-6378</div>
+                                </div>
+                            </a>
+                            <a href="{{ route('financas.relatorio.pdf', ['mes' => $mes, 'ano' => $ano, 'download' => 1]) }}" target="_blank" class="dropdown-whatsapp-item" style="border-top: 1px solid #e2e8f0; background: #f8fafc;">
+                                <span>📄</span>
+                                <div>
+                                    <div style="color: #4338ca;">Baixar Relatório (PDF)</div>
+                                    <div style="font-size:0.7rem; color:var(--text-muted); font-weight:normal;">Extrato Completo & Cartões</div>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                    <button type="button" onclick="openImportExtratoModal()" class="btn-add" style="background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%); font-size: 0.75rem; border: none; cursor: pointer; color: white; display: inline-flex; align-items: center; gap: 0.35rem; font-weight: 600; box-shadow: 0 2px 4px rgba(99, 102, 241, 0.3);" title="Importar extrato bancário nos formatos PDF, Excel, CSV ou OFX">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                            <polyline points="17 8 12 3 7 8"/>
+                            <line x1="12" y1="3" x2="12" y2="15"/>
+                        </svg>
+                        <span>📥 Importar Extrato</span>
+                    </button>
                     <button onclick="downloadPdf()" class="btn-add" style="background: #ef4444; font-size: 0.75rem; border: none; cursor: pointer; color: white;">PDF</button>
                     <a href="{{ route('export.orcamento', ['format' => 'csv', 'mes' => $mes, 'ano' => $ano, 'data_inicio' => $dataInicio, 'data_fim' => $dataFim]) }}" class="btn-add" style="background: #10b981; font-size: 0.75rem;">CSV</a>
                     <a href="{{ route('export.orcamento', ['format' => 'sql', 'mes' => $mes, 'ano' => $ano, 'data_inicio' => $dataInicio, 'data_fim' => $dataFim]) }}" class="btn-add" style="background: #3b82f6; font-size: 0.75rem;">DB (SQL)</a>
@@ -409,16 +470,7 @@
                         <span class="stat-value">R$ {{ number_format($totalPrevistoReceita - $totalPrevistoDespesa, 2, ',', '.') }}</span>
                         <span class="stat-sub">Receita - Despesa Prevista</span>
                     </div>
-                    <div class="stat-card consolidado" onclick="openConsolidadoModal()" style="cursor: pointer;" title="Clique para ver detalhes">
-                        <span class="stat-label">Consolidado + Previsão</span>
-                        <span class="stat-value" style="color: {{ $consolidadoMaisPrevisao >= 0 ? 'var(--success)' : 'var(--danger)' }}">R$ {{ number_format($consolidadoMaisPrevisao, 2, ',', '.') }}</span>
-                        <span class="stat-sub">Projeção fim do mês (Ver Detalhes)</span>
-                    </div>
-                    <div class="stat-card" onclick="openConsolidadoAnoModal()" style="cursor: pointer; border-left-color: #0ea5e9;" title="Clique para ver todos os meses">
-                        <span class="stat-label">Consolidado Ano ({{ $ano }})</span>
-                        <span class="stat-value" style="color: {{ $totalConsolidadoAno >= 0 ? 'var(--success)' : 'var(--danger)' }}">R$ {{ number_format($totalConsolidadoAno, 2, ',', '.') }}</span>
-                        <span class="stat-sub">Soma de todos os meses (Ver Detalhes)</span>
-                    </div>
+
                     <div class="stat-card income">
                         <span class="stat-label">Receitas</span>
                         <span class="stat-value" style="color: var(--success)">+ R$ {{ number_format($receitasMes, 2, ',', '.') }}</span>
@@ -500,41 +552,87 @@
                             </div>
                         </div>
                     @empty
-                        @if($faturasPorCartao->isEmpty())
+                        @if(empty($cardsPlanejamento) && $faturasPorCartao->isEmpty())
                             <div style="padding: 2rem; text-align: center; color: var(--text-muted);">Nenhum planejamento para este período.</div>
                         @endif
                     @endforelse
 
-                    @foreach($faturasPorCartao as $cartaoId => $parcelas)
-                        @php
-                            $cartao = $parcelas->first()->compra->cartao;
-                            $valorFatura = $parcelas->sum('valor_parcela');
-                        @endphp
-                        <div class="prediction-row" style="background: #fdf2f2;">
-                            <div>
-                                <span style="font-weight: 700; color: #b91c1c;">Fatura: {{ $cartao->nome }}</span>
-                                <span style="font-size: 0.75rem; color: var(--text-muted);"> • Cartão de Crédito</span>
-                            </div>
-                            <div><span class="tag tag-despesa">Cartão</span></div>
-                            <div>
-                                <div style="display: flex; justify-content: space-between; font-size: 0.75rem; margin-bottom: 2px;">
-                                    <span>Vencimento dia {{ $cartao->dia_vencimento }}</span>
-                                    <span style="font-weight: 600;">Total: R$ {{ number_format($valorFatura, 2, ',', '.') }}</span>
+                    @if(!empty($cardsPlanejamento))
+                        @foreach($cardsPlanejamento as $cpCard)
+                            @php
+                                $cartao = $cpCard->cartao;
+                                $valorFatura = $cpCard->fatura_valor;
+                                $totalPrevisto = $cpCard->total_previsto;
+                                $temPrevisao = $cpCard->limite_previsto > 0;
+                            @endphp
+                            <div class="prediction-row" style="background: #fdf2f2;">
+                                <div>
+                                    <span style="font-weight: 700; color: #b91c1c;">Fatura: {{ $cartao->nome }}</span>
+                                    <span style="font-size: 0.75rem; color: var(--text-muted);"> • Cartão de Crédito</span>
                                 </div>
-                                <div class="progress-mini-container">
-                                    <div class="progress-mini-bar danger" style="width: 100%"></div>
+                                <div><span class="tag tag-despesa">Cartão</span></div>
+                                <div>
+                                    <div style="display: flex; justify-content: space-between; font-size: 0.75rem; margin-bottom: 2px;">
+                                        <span>Vencimento dia {{ $cartao->dia_vencimento }}</span>
+                                        @if($temPrevisao)
+                                            <span style="font-weight: 600;" title="Fatura atual: R$ {{ number_format($valorFatura, 2, ',', '.') }} | Margem prevista restante: R$ {{ number_format($cpCard->margem_restante, 2, ',', '.') }}">
+                                                Fatura: R$ {{ number_format($valorFatura, 2, ',', '.') }} @if($cpCard->margem_restante > 0)<span style="color: #64748b; font-weight: normal;">(+R$ {{ number_format($cpCard->margem_restante, 2, ',', '.') }} margem)</span>@endif
+                                            </span>
+                                        @else
+                                            <span style="font-weight: 600;">Total: R$ {{ number_format($valorFatura, 2, ',', '.') }}</span>
+                                        @endif
+                                    </div>
+                                    <div class="progress-mini-container">
+                                        <div class="progress-mini-bar {{ $cpCard->porcentagem > 100 ? 'danger' : '' }}" style="width: {{ min(100, $cpCard->porcentagem) }}%"></div>
+                                    </div>
+                                </div>
+                                <div style="text-align: right; font-weight: 700;">
+                                    <span style="color: var(--danger)">R$ {{ number_format($totalPrevisto, 2, ',', '.') }}</span>
+                                    @if($temPrevisao && $cpCard->margem_restante > 0)
+                                        <div style="font-size: 0.7rem; color: var(--text-muted); font-weight: normal;">
+                                            Meta: R$ {{ number_format($cpCard->limite_previsto, 2, ',', '.') }}
+                                        </div>
+                                    @endif
+                                </div>
+                                <div style="text-align: right;">
+                                    <a href="{{ route('cartoes.index') }}" class="action-btn-small" style="text-decoration: none; display: inline-flex; align-items: center; justify-content: center;" title="Ver Detalhes do Cartão">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+                                    </a>
                                 </div>
                             </div>
-                            <div style="text-align: right; font-weight: 700;">
-                                <span style="color: var(--danger)">R$ {{ number_format($valorFatura, 2, ',', '.') }}</span>
+                        @endforeach
+                    @else
+                        @foreach($faturasPorCartao as $cartaoId => $parcelas)
+                            @php
+                                $cartao = $parcelas->first()->compra->cartao;
+                                $valorFatura = $parcelas->sum('valor_parcela');
+                            @endphp
+                            <div class="prediction-row" style="background: #fdf2f2;">
+                                <div>
+                                    <span style="font-weight: 700; color: #b91c1c;">Fatura: {{ $cartao->nome }}</span>
+                                    <span style="font-size: 0.75rem; color: var(--text-muted);"> • Cartão de Crédito</span>
+                                </div>
+                                <div><span class="tag tag-despesa">Cartão</span></div>
+                                <div>
+                                    <div style="display: flex; justify-content: space-between; font-size: 0.75rem; margin-bottom: 2px;">
+                                        <span>Vencimento dia {{ $cartao->dia_vencimento }}</span>
+                                        <span style="font-weight: 600;">Total: R$ {{ number_format($valorFatura, 2, ',', '.') }}</span>
+                                    </div>
+                                    <div class="progress-mini-container">
+                                        <div class="progress-mini-bar danger" style="width: 100%"></div>
+                                    </div>
+                                </div>
+                                <div style="text-align: right; font-weight: 700;">
+                                    <span style="color: var(--danger)">R$ {{ number_format($valorFatura, 2, ',', '.') }}</span>
+                                </div>
+                                <div style="text-align: right;">
+                                    <a href="{{ route('cartoes.index') }}" class="action-btn-small" style="text-decoration: none; display: inline-flex; align-items: center; justify-content: center;" title="Ver Detalhes">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+                                    </a>
+                                </div>
                             </div>
-                            <div style="text-align: right;">
-                                <a href="{{ route('cartoes.index') }}" class="action-btn-small" style="text-decoration: none; display: inline-flex; align-items: center; justify-content: center;" title="Ver Detalhes">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
-                                </a>
-                            </div>
-                        </div>
-                    @endforeach
+                        @endforeach
+                    @endif
                     </div>
                 </div>
 
@@ -2029,5 +2127,6 @@
             </button>
         </div>
     </div>
+    @include('components.import-extrato-modal')
 </body>
 </html>

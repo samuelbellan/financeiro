@@ -8,7 +8,10 @@ use App\Models\Cartao;
 use App\Models\TransacaoPrevisao;
 use App\Models\Categoria;
 use App\Models\CartaoParcela;
+use App\Models\CartaoPrevisao;
+use App\Models\CartaoCompra;
 use App\Services\CategorySanitizer;
+use App\Services\FinancialSummaryService;
 use App\Services\TransactionSuggestionService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -45,6 +48,7 @@ class FinancasController extends Controller
         }
 
         $cartoes = Cartao::where('user_id', $user->id)->where('ativo', true)->get();
+        $contas = \App\Models\Conta::where('user_id', $user->id)->where('ativo', true)->get();
         
         $categorias = Categoria::where('user_id', $user->id)
             ->with('subcategorias')
@@ -105,8 +109,58 @@ class FinancasController extends Controller
 
         $totalFaturas = $faturas->sum('valor_parcela');
         $faturasPorCartao = $faturas->groupBy('compra.cartao_id');
+
+        // Cartões ativos do usuário
+        $cartoesAtivos = Cartao::where('user_id', $user->id)->where('ativo', true)->get();
+
+        // Previsões de categorias cadastradas nos cartões ativos para o mês
+        $cartaoPrevisoes = CartaoPrevisao::whereIn('cartao_id', $cartoesAtivos->pluck('id'))
+            ->where('mes', $mes)
+            ->where('ano', $ano)
+            ->with('cartao')
+            ->get();
+
+        $totalCartaoPrevisoesRestante = 0.0;
+        foreach ($cartaoPrevisoes as $cp) {
+            $consumoReal = (float) $faturas->filter(function($fatura) use ($cp) {
+                return $fatura->compra 
+                    && $fatura->compra->cartao_id == $cp->cartao_id 
+                    && CategorySanitizer::isMatch($fatura->compra->categoria, $cp->categoria);
+            })->sum('valor_parcela');
+
+            $cp->consumo_real = $consumoReal;
+            $cp->restante = max(0, $cp->valor_previsto - $consumoReal);
+            $cp->porcentagem = $cp->valor_previsto > 0 ? min(100, ($consumoReal / $cp->valor_previsto) * 100) : 0;
+            $totalCartaoPrevisoesRestante += $cp->restante;
+        }
+
+        // Planejamento consolidado de cartões para a visualização na tabela do mês
+        $cardsPlanejamento = [];
+        foreach ($cartoesAtivos as $cartao) {
+            $parcelasCartao = $faturasPorCartao->get($cartao->id, collect());
+            $faturaValor = (float) $parcelasCartao->sum('valor_parcela');
+            $previsoesDoCartao = $cartaoPrevisoes->where('cartao_id', $cartao->id);
+            $limitePrevistoTotal = (float) $previsoesDoCartao->sum('valor_previsto');
+            $margemRestante = (float) $previsoesDoCartao->sum('restante');
+
+            if ($faturaValor > 0 || $limitePrevistoTotal > 0) {
+                $totalPrevistoCartao = $faturaValor + $margemRestante;
+                $consumoTotal = (float) $previsoesDoCartao->sum('consumo_real');
+                $pct = $limitePrevistoTotal > 0 ? min(100, ($consumoTotal / $limitePrevistoTotal) * 100) : 100;
+
+                $cardsPlanejamento[] = (object)[
+                    'cartao' => $cartao,
+                    'fatura_valor' => $faturaValor,
+                    'limite_previsto' => $limitePrevistoTotal,
+                    'margem_restante' => $margemRestante,
+                    'total_previsto' => $totalPrevistoCartao,
+                    'porcentagem' => $pct,
+                    'previsoes' => $previsoesDoCartao,
+                ];
+            }
+        }
         
-        $totalPrevistoDespesa += $totalFaturas;
+        $totalPrevistoDespesa += $totalFaturas + $totalCartaoPrevisoesRestante;
 
         $baseConsolidado = $totalPrevistoReceita - $totalPrevistoDespesa;
         $imprevistos = 0;
@@ -170,6 +224,9 @@ class FinancasController extends Controller
         $todasFaturasAno = CartaoParcela::whereHas('compra.cartao', function($query) use ($user) {
                 $query->where('user_id', $user->id)->where('ativo', true);
             })->whereYear('data_vencimento', $ano)->get();
+        $todasCartaoPrevisoesAno = CartaoPrevisao::whereHas('cartao', function($query) use ($user) {
+                $query->where('user_id', $user->id)->where('ativo', true);
+            })->where('ano', $ano)->get();
 
         $consolidadoAnoMeses = [];
         $totalConsolidadoAno = 0;
@@ -201,7 +258,19 @@ class FinancasController extends Controller
             }
 
             $tFaturas = $faturasMes->sum('valor_parcela');
-            $tPrevDespesa += $tFaturas;
+            
+            $cpMes = $todasCartaoPrevisoesAno->where('mes', $m);
+            $restanteCartaoMes = 0;
+            foreach ($cpMes as $cp) {
+                $cReal = (float) $faturasMes->filter(function($fatura) use ($cp) {
+                    return $fatura->compra 
+                        && $fatura->compra->cartao_id == $cp->cartao_id 
+                        && CategorySanitizer::isMatch($fatura->compra->categoria, $cp->categoria);
+                })->sum('valor_parcela');
+                $restanteCartaoMes += max(0, $cp->valor_previsto - $cReal);
+            }
+
+            $tPrevDespesa += $tFaturas + $restanteCartaoMes;
 
             $bConsolidado = $tPrevReceita - $tPrevDespesa;
             $imprev = 0;
@@ -297,7 +366,7 @@ class FinancasController extends Controller
             'consolidadoMaisPrevisao', 'listaImprevistos', 'listaExcessos',
             'consolidadoAnoMeses', 'totalConsolidadoAno', 'dataInicio', 'dataFim',
             'labelsDiarios', 'despesasDiariasValues', 'datesMap', 'despesasDetalhado', 'mediaDiariaDespesa',
-            'sugestoesDescricao'
+            'sugestoesDescricao', 'cardsPlanejamento', 'totalCartaoPrevisoesRestante', 'contas'
         ));
     }
 
@@ -460,5 +529,51 @@ class FinancasController extends Controller
         $transacao->delete();
 
         return redirect()->route('financas.index')->with('success', 'Transação excluída com sucesso!');
+    }
+
+    /**
+     * Retorna o resumo financeiro formatado para envio via WhatsApp ou redireciona diretamente para o WhatsApp.
+     */
+    public function whatsappResumo(Request $request)
+    {
+        $user = Auth::user();
+        $mes = (int) $request->get('mes', now()->month);
+        $ano = (int) $request->get('ano', now()->year);
+        $phone = $request->get('phone');
+
+        $summary = FinancialSummaryService::generateSummary($user, $mes, $ano, $phone);
+
+        if ($request->wantsJson()) {
+            return response()->json($summary);
+        }
+
+        return redirect()->away($summary['whatsapp_url']);
+    }
+
+    /**
+     * Importa extrato bancário em formato PDF, Excel (.xlsx), CSV ou OFX.
+     */
+    public function importarExtrato(Request $request, \App\Services\StatementImportService $service)
+    {
+        $request->validate([
+            'extrato'  => 'required|file|max:25600', // até 25MB
+            'conta_id' => 'nullable|exists:contas,id',
+        ]);
+
+        $user = Auth::user();
+        $file = $request->file('extrato');
+        $forcedContaId = $request->input('conta_id') ? (int)$request->input('conta_id') : null;
+
+        $result = $service->import($file, $user->id, $forcedContaId);
+
+        if ($request->expectsJson() || $request->ajax()) {
+            return response()->json($result, $result['sucesso'] ? 200 : 422);
+        }
+
+        if ($result['sucesso']) {
+            return redirect()->back()->with('success', $result['mensagem']);
+        }
+
+        return redirect()->back()->with('error', $result['mensagem']);
     }
 }
