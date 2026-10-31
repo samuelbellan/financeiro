@@ -253,4 +253,13 @@ class StudySyncTest extends TestCase
 
         $this->assertSame('importado', DB::table('study_sessions')->where('id', $imported['id'])->value('origem'));
     }
+
+    public function test_settings_store_avatar_and_reject_invalid_ids(): void
+    {
+        $base = ['virada_hora' => 1, 'limite_suspeita_min' => 180, 'timezone' => 'America/Cuiaba'];
+
+        $this->sync(['settings' => $base])->assertOk()->assertJsonPath('changes.settings.avatar', 'bichinho');
+        $this->sync(['settings' => $base + ['avatar' => 'planta']])->assertOk()->assertJsonPath('changes.settings.avatar', 'planta');
+        $this->sync(['settings' => $base + ['avatar' => '<script>']])->assertOk()->assertJsonPath('rejected.0.type', 'settings');
+    }
 }

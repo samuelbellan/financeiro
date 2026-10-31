@@ -39,6 +39,16 @@ Decisões tomadas na sabatina de 31/10/2026, já implementadas.
 - **Cronômetro aberto em dois aparelhos** só gera aviso de sobreposição (v2: encerrar o mais antigo automaticamente).
 - **Backup do módulo antigo na nuvem**: a migration grava o JSON em `storage/app/backups/` do container, que é efêmero no Render. Exporte as tabelas antigas da nuvem antes do deploy se quiser guardar.
 
+## Avatares
+
+O avatar evolui com o total estudado no dia (estágios em 0 · 30 min · 1h · 2h · 3h · 4h · 5h) e recomeça
+na virada do dia. Aparece no Cronômetro e no modo foco, com animação ao subir de estágio; a escolha fica em
+Ajustes → Avatar e sincroniza entre aparelhos (`study_settings.avatar`).
+
+Para criar um avatar novo, adicione uma entrada em `AVATARS` (`resources/js/estudos/avatars.js`): id em
+minúsculas/números/hífen, nome e 7 desenhos SVG no viewBox `0 0 120 120`. O teste
+`tests/js/estudos/avatars.test.js` confere que todo avatar tem os 7 estágios.
+
 ## Backup no PC
 
 **Exportar backup (principal):** em Ajustes → Backup, o app baixa um JSON com tudo o que está no

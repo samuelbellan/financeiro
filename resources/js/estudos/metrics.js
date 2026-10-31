@@ -18,6 +18,7 @@ export const DEFAULT_SETTINGS = Object.freeze({
     limite_suspeita_min: 180,
     meta_diaria_min: null,
     timezone: 'America/Sao_Paulo',
+    avatar: 'bichinho',
 });
 
 const partsFormatters = new Map();

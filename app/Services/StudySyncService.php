@@ -175,6 +175,7 @@ class StudySyncService
             'limite_suspeita_min' => 'required|integer|min:30|max:1440',
             'meta_diaria_min' => 'nullable|integer|min:0|max:1440',
             'timezone' => 'required|timezone:all',
+            'avatar' => ['nullable', 'string', 'max:40', 'regex:/^[a-z0-9-]+$/'],
         ]);
         if (!$data) {
             return;
@@ -187,6 +188,7 @@ class StudySyncService
                 'limite_suspeita_min' => $data['limite_suspeita_min'],
                 'meta_diaria_min' => $data['meta_diaria_min'] ?? null,
                 'timezone' => $data['timezone'],
+                'avatar' => $data['avatar'] ?? 'bichinho',
                 'updated_at' => $this->stamp(),
             ]
         );

@@ -5,6 +5,7 @@ import {
     ArcElement, BarController, BarElement, CategoryScale, Chart, DoughnutController, Filler, Legend, LinearScale,
     LineController, LineElement, PointElement, Tooltip,
 } from 'chart.js';
+import { AVATARS, AVATAR_LIMITES_MIN, avatarStage, avatarSvg } from './avatars.js';
 import { ensureUser, getMeta, loadAll, saveLocal, setMeta, uuid } from './db.js';
 import { planImport } from './importer.js';
 import { createSync } from './sync.js';
@@ -36,6 +37,7 @@ const state = {
     statsAnchor: null,
     trendSubject: null,
     focusOpen: false,
+    avatarStage: null,
     sync: { state: 'idle', pending: 0 },
     lastExportAt: null,
 };
@@ -165,6 +167,34 @@ function closeFocus() {
 
 const restInfo = () => lastStopped(state.sessions, nowMs());
 
+function nextStageText(nextInMs) {
+    return nextInMs === null ? 'Estágio máximo do dia!' : `Próximo estágio em ${formatDuration(nextInMs)}`;
+}
+
+function avatarBlock(totalMs, size, withHint = true) {
+    const { stage, nextInMs } = avatarStage(totalMs);
+    state.avatarStage = stage;
+    return `<div class="avatar" data-avatar data-size="${size}">${avatarSvg(state.settings.avatar, stage, { size })}</div>`
+        + (withHint ? `<small class="avatar-hint" data-live="avatar-next">${nextStageText(nextInMs)}</small>` : '');
+}
+
+// Atualiza os avatares visíveis; ao subir de estágio, toca a animação.
+function updateAvatars(totalMs) {
+    const { stage, nextInMs } = avatarStage(totalMs);
+    root.querySelectorAll('[data-live="avatar-next"]').forEach((el) => { el.textContent = nextStageText(nextInMs); });
+    if (stage === state.avatarStage) return;
+    const leveledUp = state.avatarStage !== null && stage > state.avatarStage;
+    state.avatarStage = stage;
+    root.querySelectorAll('[data-avatar]').forEach((el) => {
+        el.innerHTML = avatarSvg(state.settings.avatar, stage, { size: Number(el.dataset.size) });
+        if (leveledUp) {
+            el.classList.remove('level-up');
+            void el.offsetWidth;
+            el.classList.add('level-up');
+        }
+    });
+}
+
 function todayTotals() {
     return dayStats(buildDaily(recentSessions(), state.settings, nowMs()), today());
 }
@@ -203,6 +233,7 @@ function renderFocus() {
     panel.style.setProperty('--c', subject?.cor ?? '#888');
     panel.innerHTML = running ? `
         <button type="button" class="focus-close" data-action="focus-close" aria-label="Sair do modo foco">✕</button>
+        ${avatarBlock(todayTotals().totalMs, 150, false)}
         <p class="focus-label">Focando</p>
         <p class="focus-time" data-live="session">--</p>
         <div class="focus-sub">
@@ -212,6 +243,7 @@ function renderFocus() {
         <button type="button" class="focus-btn" data-action="toggle" data-id="${running.subject_id}" aria-label="Pausar">❚❚</button>`
         : `
         <button type="button" class="focus-close" data-action="focus-close" aria-label="Sair do modo foco">✕</button>
+        ${avatarBlock(todayTotals().totalMs, 150, false)}
         <p class="focus-label">Descanso</p>
         <p class="focus-time rest" data-live="rest">--</p>
         <div class="focus-sub">
@@ -289,6 +321,7 @@ function renderTimer() {
     return `
         <section class="today">
             <div class="ddays">${ddayChips()}</div>
+            ${avatarBlock(stats.totalMs, 96)}
             <p class="day-label">${formatDay(day, { weekday: 'long', day: '2-digit', month: 'long' })}</p>
             <p class="total" data-live="total">${formatDuration(stats.totalMs, { seconds: true })}</p>
             ${metaBar(stats)}
@@ -713,6 +746,12 @@ function renderSettings() {
         <ul class="manage">${subjectRows || '<li class="empty">Nenhuma matéria.</li>'}</ul>
         <button type="button" class="btn ghost" data-action="new-subject">+ Matéria</button>
 
+        <h3>Avatar</h3>
+        <div class="avatar-picker">${Object.entries(AVATARS).map(([id, a]) => `<button type="button" data-action="pick-avatar" data-id="${id}"
+            class="${(s.avatar ?? 'bichinho') === id ? 'selected' : ''}" aria-pressed="${(s.avatar ?? 'bichinho') === id}">
+            ${avatarSvg(id, AVATAR_LIMITES_MIN.length - 1, { size: 64 })}<span>${esc(a.nome)}</span></button>`).join('')}</div>
+        <p class="muted small">Evolui com o total estudado no dia: 0 · 30 min · 1h · 2h · 3h · 4h · 5h. Recomeça na virada do dia.</p>
+
         <h3>Preferências</h3>
         <form class="form" data-form="settings">
             <label>Virada do dia (hora)
@@ -759,6 +798,7 @@ function tick() {
     const day = today();
     const stats = todayTotals();
     const set = (sel, text) => root.querySelectorAll(sel).forEach((el) => { el.textContent = text; });
+    updateAvatars(stats.totalMs);
     const current = running ?? restInfo()?.session;
     if (current) set('[data-live="current-subject"]', formatDuration(stats.bySubject[current.subject_id] ?? 0, { seconds: true }));
     const rest = running ? null : restInfo();
@@ -1000,6 +1040,7 @@ root.addEventListener('click', async (event) => {
     const handlers = {
         toggle: () => toggleSubject(id),
         'focus-open': () => openFocus(),
+        'pick-avatar': async () => { await persist('settings', { ...state.settings, avatar: id }); render(); },
         'focus-close': () => closeFocus(),
         'new-subject': () => openSubjectDialog(),
         'edit-subject': () => openSubjectDialog(subjectById(id)),
