@@ -19,6 +19,7 @@ export const DEFAULT_SETTINGS = Object.freeze({
     meta_diaria_min: null,
     timezone: 'America/Sao_Paulo',
     avatar: 'bichinho',
+    retro_sound: false,
 });
 
 const partsFormatters = new Map();

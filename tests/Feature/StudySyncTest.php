@@ -213,10 +213,11 @@ class StudySyncTest extends TestCase
 
     public function test_settings_are_saved_and_validated(): void
     {
-        $this->sync(['settings' => ['virada_hora' => 3, 'limite_suspeita_min' => 180, 'meta_diaria_min' => 360, 'timezone' => 'America/Sao_Paulo']])
+        $this->sync(['settings' => ['virada_hora' => 3, 'limite_suspeita_min' => 180, 'meta_diaria_min' => 360, 'timezone' => 'America/Sao_Paulo', 'retro_sound' => true]])
             ->assertOk()
             ->assertJsonPath('changes.settings.virada_hora', 3)
-            ->assertJsonPath('changes.settings.meta_diaria_min', 360);
+            ->assertJsonPath('changes.settings.meta_diaria_min', 360)
+            ->assertJsonPath('changes.settings.retro_sound', true);
 
         $this->sync(['settings' => ['virada_hora' => 20, 'limite_suspeita_min' => 180, 'timezone' => 'America/Sao_Paulo']])
             ->assertOk()

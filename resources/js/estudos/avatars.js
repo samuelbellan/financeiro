@@ -1,8 +1,9 @@
-// Avatares que evoluem com o total estudado no dia (voltam ao estágio 0 na virada do dia).
+// Avatares pixel art (48x48) que evoluem com o total estudado no dia (voltam ao estágio 0 na virada do dia).
+// Estilo Cozy Indie (Stardew Valley / Celeste) com itens temáticos de mesa de estudo e animações em passos.
 //
 // Para criar um avatar novo: adicione uma entrada em AVATARS com um id (letras minúsculas, números e
-// hífen), um nome e exatamente 7 desenhos SVG em `estagios` (um por limite de AVATAR_LIMITES_MIN),
-// todos no viewBox "0 0 120 120". Ele aparece sozinho no seletor de Ajustes.
+// hífen), um nome e exatamente 7 desenhos em `estagios` (um por limite de AVATAR_LIMITES_MIN),
+// todos no viewBox "0 0 48 48". Ele aparece sozinho no seletor de Ajustes.
 
 /** Minutos estudados no dia para alcançar cada estágio (0 a 6). */
 export const AVATAR_LIMITES_MIN = [0, 30, 60, 120, 180, 240, 300];
@@ -17,71 +18,319 @@ export function avatarStage(totalMs) {
     return { stage, nextInMs: next === undefined ? null : Math.ceil((next - minutes) * 60_000) };
 }
 
-// ── Peças de desenho ──────────────────────────────────────────────────────────
+// ── Utilitário Pixel Art SVG ──────────────────────────────────────────────────
+// Gera um único elemento <path> contendo múltiplos retângulos pixelados por cor.
+const P = (color, rects) => `<path fill="${color}" d="${rects.map(([x, y, w = 1, h = 1]) => `M${x} ${y}h${w}v${h}h-${w}z`).join(' ')}"/>`;
 
-const INK = '#3B3B3B';
-const shadow = (rx = 34) => `<ellipse cx="60" cy="110" rx="${rx}" ry="6" fill="#000" opacity=".12"/>`;
-const eyes = (y, gap = 9, r = 3.2) => `<circle cx="${60 - gap}" cy="${y}" r="${r}" fill="${INK}"/><circle cx="${60 + gap}" cy="${y}" r="${r}" fill="${INK}"/>`
-    + `<circle cx="${60 - gap + 1}" cy="${y - 1}" r="1" fill="#fff"/><circle cx="${60 + gap + 1}" cy="${y - 1}" r="1" fill="#fff"/>`;
-const smile = (y, w = 6) => `<path d="M${60 - w} ${y} Q60 ${y + w} ${60 + w} ${y}" fill="none" stroke="${INK}" stroke-width="2.5" stroke-linecap="round"/>`;
-const blush = (y, gap = 17) => `<ellipse cx="${60 - gap}" cy="${y}" rx="4.5" ry="2.6" fill="#F49AA7" opacity=".8"/><ellipse cx="${60 + gap}" cy="${y}" rx="4.5" ry="2.6" fill="#F49AA7" opacity=".8"/>`;
+const INK = '#2B2327';
+const SHADOW = (cx = 24, w = 22) => P('rgba(43, 35, 39, 0.16)', [
+    [cx - Math.floor(w / 2), 42, w, 2],
+    [cx - Math.floor(w / 2) + 2, 41, w - 4, 3]
+]);
 
-// Bichinho "Pipo": ovo de bolinhas laranja que vira uma criaturinha verde estudiosa.
-const SHELL = '#FFF3DC';
-const SPOT = '#F7A65A';
-const BODY = '#7FD1AE';
+// ── Itens Cozy de Mesa de Estudos ─────────────────────────────────────────────
+const zzz = `<g class="zzz-pixel">${P('#8B8797', [
+    [33, 15, 3, 1], [35, 16, 1, 1], [33, 17, 3, 1],
+    [38, 9, 4, 1], [40, 10, 2, 1], [38, 11, 4, 1]
+])}</g>`;
+
+const postIt = `<g class="desk-postit">${P('#FFE26A', [[5, 36, 6, 5]])}${P('#E5C541', [[9, 39, 2, 2]])}${P('#3A86FF', [[12, 33, 1, 6], [13, 32, 1, 2]])}${P(INK, [[11, 39, 1, 1]])}</g>`;
+
+const coffeeCup = `<g class="desk-coffee">${P('#F7EBE1', [
+    [37, 35, 6, 6], [43, 36, 2, 3]
+])}${P('#C05C46', [
+    [37, 37, 6, 2]
+])}${P('#3A2318', [
+    [38, 35, 4, 1]
+])}<g class="steam-pixel">${P('#B8C5D0', [
+    [39, 32, 1, 2], [41, 30, 1, 2], [40, 27, 1, 2]
+])}</g></g>`;
+
+const bookStack = `<g class="desk-books">${P('#2A4365', [
+    [4, 38, 10, 3]
+])}${P('#F7FAFC', [
+    [6, 39, 7, 1]
+])}${P('#7B1E30', [
+    [5, 34, 9, 3]
+])}${P('#F7FAFC', [
+    [7, 35, 6, 1]
+])}${P('#22543D', [
+    [6, 30, 8, 3]
+])}${P('#F7FAFC', [
+    [7, 31, 6, 1]
+])}</g>`;
+
+const deskLamp = `<g class="desk-lamp">${P('#4A5568', [
+    [39, 40, 5, 2]
+])}${P('#718096', [
+    [41, 24, 2, 16], [38, 22, 4, 2]
+])}${P('#E85D04', [
+    [34, 23, 6, 4]
+])}${P('#FAA307', [
+    [33, 27, 8, 2]
+])}<g class="lamp-glow">${P('rgba(255, 230, 109, 0.22)', [
+    [25, 29, 14, 3], [22, 32, 18, 4], [20, 36, 22, 5]
+])}</g></g>`;
+
+const stars = `<g class="star-pixel">${P('#FFD166', [
+    [7, 14, 3, 1], [8, 13, 1, 3],
+    [39, 9, 3, 1], [40, 8, 1, 3],
+    [42, 22, 3, 1], [43, 21, 1, 3]
+])}${P('#FFFBEB', [
+    [8, 14, 1, 1], [40, 9, 1, 1], [43, 22, 1, 1]
+])}</g>`;
+
+// ── BICHINHO (Pipo) ────────────────────────────────────────────────────────────
+const SHELL_MAIN = '#FFF0D4';
+const SHELL_SHADOW = '#E4D0B5';
+const SPOT = '#E68A35';
+const BODY_MINT = '#74D6A7';
 const BODY_DARK = '#4FA984';
-const egg = `<path d="M60 16 C83 16 95 50 95 72 C95 95 80 107 60 107 C40 107 25 95 25 72 C25 50 37 16 60 16Z" fill="${SHELL}" stroke="${INK}" stroke-width="3"/>`;
-const spots = `<circle cx="44" cy="52" r="6" fill="${SPOT}"/><circle cx="72" cy="40" r="5" fill="${SPOT}"/><circle cx="76" cy="78" r="7" fill="${SPOT}"/><circle cx="46" cy="88" r="5" fill="${SPOT}"/><circle cx="60" cy="66" r="3.5" fill="${SPOT}"/>`;
-const halfShell = `<path d="M25 70 L33 62 L41 70 L49 62 L57 70 L65 62 L73 70 L81 62 L89 70 L95 74 C95 96 80 107 60 107 C40 107 25 96 25 74 Z" fill="${SHELL}" stroke="${INK}" stroke-width="3" stroke-linejoin="round"/>`
-    + `<circle cx="46" cy="90" r="5" fill="${SPOT}"/><circle cx="76" cy="86" r="6" fill="${SPOT}"/>`;
-const feet = (y, gap = 14) => `<ellipse cx="${60 - gap}" cy="${y}" rx="9" ry="5" fill="${BODY_DARK}" stroke="${INK}" stroke-width="2.5"/><ellipse cx="${60 + gap}" cy="${y}" rx="9" ry="5" fill="${BODY_DARK}" stroke="${INK}" stroke-width="2.5"/>`;
-const ears = `<path d="M34 52 L30 28 L50 42 Z" fill="${BODY}" stroke="${INK}" stroke-width="3" stroke-linejoin="round"/><path d="M86 52 L90 28 L70 42 Z" fill="${BODY}" stroke="${INK}" stroke-width="3" stroke-linejoin="round"/>`;
-const bigBody = `<ellipse cx="60" cy="72" rx="36" ry="34" fill="${BODY}" stroke="${INK}" stroke-width="3"/><ellipse cx="60" cy="82" rx="20" ry="16" fill="#BDEBD6"/>`;
-const glasses = `<circle cx="51" cy="62" r="8" fill="none" stroke="${INK}" stroke-width="2.5"/><circle cx="69" cy="62" r="8" fill="none" stroke="${INK}" stroke-width="2.5"/><path d="M59 62 L61 62" stroke="${INK}" stroke-width="2.5"/>`;
-const book = `<path d="M38 86 L60 90 L82 86 L82 104 L60 108 L38 104 Z" fill="#4F86F7" stroke="${INK}" stroke-width="2.5" stroke-linejoin="round"/><path d="M60 90 L60 108" stroke="${INK}" stroke-width="2.5"/><path d="M44 92 L54 94 M44 97 L54 99 M66 94 L76 92 M66 99 L76 97" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/>`;
-const cap = `<path d="M60 14 L94 26 L60 38 L26 26 Z" fill="${INK}"/><path d="M44 32 L44 42 Q60 50 76 42 L76 32" fill="${INK}"/><path d="M94 26 L94 42" stroke="#F6C343" stroke-width="2.5"/><circle cx="94" cy="44" r="3" fill="#F6C343"/>`;
-const star = (x, y, s = 1) => `<path transform="translate(${x} ${y}) scale(${s})" d="M0 -7 L2 -2 L7 -2 L3 1.5 L4.5 7 L0 3.8 L-4.5 7 L-3 1.5 L-7 -2 L-2 -2 Z" fill="#F6C343"/>`;
+const BELLY = '#BCEBCE';
+const BLUSH = '#F28E9B';
+
+const eggBody = P(SHELL_MAIN, [
+    [20, 18, 8, 2], [18, 20, 12, 3], [16, 23, 16, 5],
+    [15, 28, 18, 7], [16, 35, 16, 4], [18, 39, 12, 2]
+]) + P(SHELL_SHADOW, [
+    [15, 32, 2, 4], [16, 36, 2, 3], [18, 39, 12, 2],
+    [27, 36, 5, 3], [31, 32, 2, 4]
+]) + P(INK, [
+    [20, 17, 8, 1], [18, 18, 2, 2], [16, 20, 2, 3], [15, 23, 1, 5],
+    [14, 28, 1, 7], [15, 35, 1, 3], [16, 38, 2, 2], [18, 40, 12, 1],
+    [30, 38, 2, 2], [32, 35, 1, 3], [33, 28, 1, 7], [32, 23, 1, 5],
+    [30, 20, 2, 3], [28, 18, 2, 2]
+]) + P(SPOT, [
+    [18, 25, 3, 3], [28, 22, 3, 3], [19, 33, 2, 3], [27, 31, 3, 2], [23, 28, 2, 2]
+]);
+
+const eggSleepFace = `<g class="avatar-face">${P(INK, [[19, 29, 3, 1], [26, 29, 3, 1]])}${P(BLUSH, [[18, 31, 3, 2], [27, 31, 3, 2]])}</g>`;
+
+const eggCrack = P(INK, [
+    [17, 27, 3, 1], [19, 26, 1, 2], [20, 28, 2, 1],
+    [22, 26, 2, 1], [24, 27, 2, 2], [26, 25, 3, 1], [29, 27, 2, 1]
+]);
+
+const eggPeekingEyes = `<g class="avatar-eyes">${P(INK, [[20, 29, 3, 3], [26, 29, 3, 3]])}${P('#FFFFFF', [[20, 29, 1, 1], [26, 29, 1, 1]])}${P(BLUSH, [[18, 33, 3, 2], [27, 33, 3, 2]])}</g>`;
+
+const halfShell = P(SHELL_MAIN, [
+    [15, 30, 18, 7], [17, 37, 14, 3], [19, 40, 10, 1]
+]) + P(SHELL_SHADOW, [
+    [15, 34, 2, 3], [17, 37, 2, 2], [19, 40, 10, 1], [27, 37, 4, 2]
+]) + P(INK, [
+    [15, 30, 2, 1], [17, 32, 2, 1], [19, 30, 2, 1], [21, 32, 2, 1],
+    [23, 30, 2, 1], [25, 32, 2, 1], [27, 30, 2, 1], [29, 32, 2, 1], [31, 30, 2, 1],
+    [14, 31, 1, 6], [15, 37, 2, 2], [17, 39, 2, 1], [19, 41, 10, 1],
+    [29, 39, 2, 1], [31, 37, 2, 2], [33, 31, 1, 6]
+]) + P(SPOT, [[19, 34, 3, 3], [27, 33, 3, 2]]);
+
+const babyHead = P(BODY_MINT, [
+    [19, 20, 10, 2], [17, 22, 14, 3], [16, 25, 16, 6]
+]) + P(INK, [
+    [19, 19, 10, 1], [17, 20, 2, 2], [16, 22, 1, 3],
+    [31, 20, 2, 2], [32, 22, 1, 3]
+]);
+
+const fullBody = `<g class="avatar-body">` + P(BODY_MINT, [
+    [19, 19, 10, 2], [17, 21, 14, 3], [16, 24, 16, 12],
+    [18, 36, 12, 3]
+]) + P(BELLY, [
+    [21, 28, 6, 7], [22, 27, 4, 9]
+]) + P(BODY_DARK, [
+    [16, 32, 2, 4], [18, 36, 3, 2], [27, 36, 3, 2], [30, 32, 2, 4]
+]) + P(INK, [
+    [19, 18, 10, 1], [17, 19, 2, 2], [16, 21, 1, 3], [15, 24, 1, 12],
+    [16, 36, 2, 2], [18, 38, 2, 2], [28, 38, 2, 2], [30, 36, 2, 2],
+    [32, 24, 1, 12], [31, 21, 1, 3], [29, 19, 2, 2],
+    [17, 40, 4, 1], [27, 40, 4, 1]
+]) + P(BODY_DARK, [
+    [18, 39, 3, 2], [27, 39, 3, 2]
+]);
+
+const happyFace = (y = 25) => `<g class="avatar-eyes">${P(INK, [[19, y, 2, 3], [27, y, 2, 3]])}${P('#FFFFFF', [[19, y, 1, 1], [27, y, 1, 1]])}${P(BLUSH, [[17, y + 3, 3, 2], [28, y + 3, 3, 2]])}${P(INK, [[22, y + 4, 4, 1], [23, y + 5, 2, 1]])}</g>`;
+
+const shellHat = P(SHELL_MAIN, [
+    [19, 16, 10, 3], [18, 19, 12, 2]
+]) + P(INK, [
+    [19, 15, 10, 1], [18, 16, 1, 3], [29, 16, 1, 3],
+    [18, 20, 2, 1], [21, 19, 2, 1], [24, 20, 2, 1], [27, 19, 2, 1]
+]) + P(SPOT, [[22, 16, 2, 2]]);
+
+const headphones = `<g class="headphone-pulse">${P('#4361EE', [
+    [18, 16, 12, 2], [14, 22, 3, 6], [31, 22, 3, 6]
+])}${P('#3A0CA3', [
+    [15, 23, 1, 4], [32, 23, 1, 4]
+])}${P(INK, [
+    [18, 15, 12, 1], [13, 22, 1, 6], [34, 22, 1, 6],
+    [14, 28, 3, 1], [31, 28, 3, 1]
+])}</g>`;
+
+const ears = P(BODY_MINT, [
+    [14, 15, 3, 5], [13, 17, 2, 4],
+    [31, 15, 3, 5], [33, 17, 2, 4]
+]) + P(BLUSH, [
+    [15, 17, 1, 3], [32, 17, 1, 3]
+]) + P(INK, [
+    [14, 14, 3, 1], [13, 15, 1, 3], [12, 18, 1, 3],
+    [31, 14, 3, 1], [34, 15, 1, 3], [35, 18, 1, 3]
+]);
+
+const glasses = `<g class="avatar-glasses">${P('#F3C053', [
+    [18, 24, 5, 1], [18, 28, 5, 1], [18, 25, 1, 3], [22, 25, 1, 3],
+    [25, 24, 5, 1], [25, 28, 5, 1], [25, 25, 1, 3], [29, 25, 1, 3],
+    [23, 26, 2, 1]
+])}</g>`;
+
+const openBook = `<g class="held-book">${P('#2A4365', [
+    [17, 33, 14, 6]
+])}${P('#F7FAFC', [
+    [18, 33, 5, 5], [25, 33, 5, 5]
+])}${P('#718096', [
+    [19, 34, 3, 1], [19, 36, 3, 1],
+    [26, 34, 3, 1], [26, 36, 3, 1]
+])}${P(INK, [
+    [23, 33, 2, 6],
+    [16, 34, 2, 2], [30, 34, 2, 2]
+])}</g>`;
+
+const cap = `<g class="grad-cap">${P(INK, [
+    [23, 11, 2, 1], [19, 12, 10, 2], [15, 14, 18, 2], [19, 16, 10, 1],
+    [20, 17, 8, 2]
+])}${P('#FFD166', [
+    [24, 12, 1, 1], [27, 14, 1, 4], [27, 18, 2, 2]
+])}</g>`;
 
 const BICHINHO = [
-    // 0 — ovo dormindo
-    `${shadow(30)}${egg}${spots}<text x="86" y="24" font-size="13" font-weight="700" fill="${INK}" opacity=".55">z</text><text x="96" y="14" font-size="9" font-weight="700" fill="${INK}" opacity=".4">z</text>`,
-    // 1 — ovo rachado, espiando
-    `${shadow(30)}${egg}${spots}<path d="M36 50 L45 43 L51 51 L60 43 L68 51 L75 43 L84 50" fill="none" stroke="${INK}" stroke-width="2.5" stroke-linejoin="round"/>${eyes(60, 9, 3)}`,
-    // 2 — filhote saindo da casca
-    `${shadow(32)}<circle cx="60" cy="54" r="28" fill="${BODY}" stroke="${INK}" stroke-width="3"/>${eyes(50)}${blush(58, 15)}${smile(57, 5)}${halfShell}`,
-    // 3 — filhote inteiro, com chapeuzinho de casca
-    `${shadow(32)}${feet(102, 13)}<ellipse cx="60" cy="74" rx="30" ry="28" fill="${BODY}" stroke="${INK}" stroke-width="3"/>`
-        + `<path d="M42 52 L48 44 L54 50 L60 42 L66 50 L72 44 L78 52 Q60 40 42 52Z" fill="${SHELL}" stroke="${INK}" stroke-width="2.5" stroke-linejoin="round"/>${eyes(70)}${blush(78, 16)}${smile(78, 5)}`,
-    // 4 — cresceu: orelhas e bracinhos
-    `${shadow()}${feet(104, 16)}${ears}${bigBody}<path d="M26 76 Q16 70 20 62" fill="none" stroke="${INK}" stroke-width="3" stroke-linecap="round"/><path d="M94 76 Q104 70 100 62" fill="none" stroke="${INK}" stroke-width="3" stroke-linecap="round"/>${eyes(62)}${blush(72, 20)}${smile(72, 6)}`,
-    // 5 — estudioso: óculos e livro
-    `${shadow()}${feet(104, 16)}${ears}${bigBody}${eyes(62, 9, 2.6)}${glasses}${blush(73, 22)}${smile(74, 5)}${book}`,
-    // 6 — formado: capelo e estrelas
-    `${shadow()}${feet(104, 16)}${ears}${bigBody}${eyes(62, 9, 2.6)}${glasses}${blush(73, 22)}${smile(74, 5)}${book}${cap}${star(14, 40)}${star(106, 60, .8)}${star(18, 86, .7)}`,
+    // 0: Ovo dormindo
+    `${SHADOW(24, 20)}<g class="avatar-body">${eggBody}${eggSleepFace}</g>${zzz}`,
+    // 1: Ovo rachado espiando + post-it
+    `${SHADOW(24, 20)}<g class="avatar-body">${eggBody}${eggCrack}${eggPeekingEyes}</g>${postIt}`,
+    // 2: Bebê saindo da casca + café + post-it
+    `${SHADOW(24, 22)}<g class="avatar-body">${babyHead}${happyFace(23)}${halfShell}</g>${postIt}${coffeeCup}`,
+    // 3: Filhote com fone de ouvido + casca de chapéu + café + post-it
+    `${SHADOW(24, 22)}${fullBody}${shellHat}${happyFace(25)}${headphones}</g>${postIt}${coffeeCup}`,
+    // 4: Cresceu com orelhas + pilha de livros + fones + café
+    `${SHADOW(24, 22)}${fullBody}${ears}${happyFace(25)}${headphones}</g>${bookStack}${coffeeCup}`,
+    // 5: Estudioso com óculos + livro aberto + abajur + livros + café
+    `${SHADOW(24, 22)}${fullBody}${ears}${happyFace(25)}${glasses}${openBook}</g>${bookStack}${deskLamp}${coffeeCup}`,
+    // 6: Mestre formado com capelo + estrelas douradas + abajur + livros + café
+    `${SHADOW(24, 22)}${fullBody}${ears}${happyFace(25)}${glasses}${openBook}${cap}</g>${bookStack}${deskLamp}${coffeeCup}${stars}`
 ];
 
-// Planta: semente no vaso até florescer.
-const LEAF = '#6DBE6D';
-const LEAF_EDGE = '#2F6B3A';
-const pot = `<path d="M38 86 L82 86 L76 108 L44 108 Z" fill="#C9774A" stroke="${INK}" stroke-width="3" stroke-linejoin="round"/><rect x="33" y="78" width="54" height="10" rx="3" fill="#D98A5B" stroke="${INK}" stroke-width="3"/>`;
-const soil = '<ellipse cx="60" cy="79" rx="23" ry="3.5" fill="#5B3A29"/>';
-const stem = (top) => `<path d="M60 79 L60 ${top}" stroke="${LEAF_EDGE}" stroke-width="3.5" stroke-linecap="round"/>`;
-const leaf = (x, y, rx, ry, angle) => `<ellipse cx="${x}" cy="${y}" rx="${rx}" ry="${ry}" transform="rotate(${angle} ${x} ${y})" fill="${LEAF}" stroke="${LEAF_EDGE}" stroke-width="2"/>`;
-const flower = (x, y, color) => [0, 72, 144, 216, 288].map((a) => {
-    const rad = (a * Math.PI) / 180;
-    return `<circle cx="${(x + Math.cos(rad) * 5).toFixed(1)}" cy="${(y + Math.sin(rad) * 5).toFixed(1)}" r="4.2" fill="${color}" stroke="${INK}" stroke-width="1.2"/>`;
-}).join('') + `<circle cx="${x}" cy="${y}" r="3.2" fill="#F6C343" stroke="${INK}" stroke-width="1.2"/>`;
-const bush = `${stem(36)}${leaf(46, 64, 12, 6, -30)}${leaf(74, 64, 12, 6, 30)}${leaf(44, 50, 13, 6.5, -25)}${leaf(76, 50, 13, 6.5, 25)}${leaf(48, 36, 12, 6, -35)}${leaf(72, 36, 12, 6, 35)}${leaf(60, 26, 7, 11, 0)}`;
+// ── PLANTA (Flora) ─────────────────────────────────────────────────────────────
+const POT_MAIN = '#B85D31';
+const POT_RIM = '#D17748';
+const POT_SHADOW = '#8A3E1B';
+const SOIL = '#4B2D1D';
+const LEAF_BRIGHT = '#89DF7C';
+const LEAF_MID = '#4EBA5C';
+const LEAF_DARK = '#287538';
+
+const pot = P(POT_RIM, [
+    [16, 33, 16, 3]
+]) + P(POT_MAIN, [
+    [17, 36, 14, 4], [18, 40, 12, 2]
+]) + P(POT_SHADOW, [
+    [17, 37, 2, 3], [18, 40, 2, 2], [26, 37, 5, 3]
+]) + P(SOIL, [
+    [18, 33, 12, 2]
+]) + P(INK, [
+    [16, 32, 16, 1], [15, 33, 1, 3], [32, 33, 1, 3],
+    [16, 36, 1, 4], [17, 40, 1, 2], [18, 42, 12, 1],
+    [30, 40, 1, 2], [31, 36, 1, 4]
+]);
+
+const seedSleep = `<g class="avatar-face">${P('#E8C07D', [
+    [22, 31, 4, 3]
+])}${P('#937138', [
+    [22, 33, 4, 1]
+])}${P(INK, [
+    [23, 32, 2, 1]
+])}</g>`;
+
+const sprout = P(LEAF_MID, [
+    [23, 29, 2, 4]
+]) + P(LEAF_BRIGHT, [
+    [20, 27, 3, 2], [25, 27, 3, 2]
+]) + P(LEAF_DARK, [
+    [20, 29, 3, 1], [25, 29, 3, 1]
+]) + P(INK, [
+    [20, 26, 3, 1], [25, 26, 3, 1]
+]);
+
+const plantStem2 = P(LEAF_DARK, [
+    [23, 23, 2, 10]
+]) + P(LEAF_BRIGHT, [
+    [16, 24, 7, 3], [25, 23, 7, 3]
+]) + P(LEAF_MID, [
+    [15, 27, 8, 2], [25, 26, 8, 2]
+]) + P(LEAF_DARK, [
+    [16, 29, 6, 1], [26, 28, 6, 1]
+]);
+
+const bigBush = P(LEAF_DARK, [
+    [23, 16, 2, 17],
+    [14, 27, 9, 3], [25, 26, 9, 3]
+]) + P(LEAF_MID, [
+    [13, 23, 10, 4], [25, 22, 10, 4],
+    [16, 18, 8, 4], [24, 17, 8, 4]
+]) + P(LEAF_BRIGHT, [
+    [15, 22, 8, 2], [25, 21, 8, 2],
+    [18, 16, 6, 2], [24, 15, 6, 2],
+    [22, 13, 4, 3]
+]) + P(INK, [
+    [13, 22, 10, 1], [25, 21, 10, 1],
+    [16, 17, 8, 1], [24, 16, 8, 1]
+]);
+
+const buds = `<g class="flower-buds">${P('#F48C9E', [
+    [15, 20, 3, 3]
+])}${P('#A888DB', [
+    [30, 19, 3, 3]
+])}${P('#FFD166', [
+    [22, 12, 4, 3]
+])}</g>`;
+
+const fullFlowers = `<g class="blooming-flowers">${P('#F48C9E', [
+    [13, 19, 5, 5]
+])}${P('#FFFFFF', [
+    [14, 20, 3, 3]
+])}${P('#FFD166', [
+    [15, 21, 1, 1]
+])}
+${P('#A888DB', [
+    [29, 18, 5, 5]
+])}${P('#FFFFFF', [
+    [30, 19, 3, 3]
+])}${P('#FFD166', [
+    [31, 20, 1, 1]
+])}
+${P('#FFD166', [
+    [21, 10, 6, 6]
+])}${P('#FFFFFF', [
+    [22, 11, 4, 4]
+])}${P('#F77F00', [
+    [23, 12, 2, 2]
+])}
+${P('#FFB703', [
+    [12, 27, 4, 4], [32, 26, 4, 4]
+])}</g>`;
 
 const PLANTA = [
-    `${shadow(26)}${pot}${soil}<ellipse cx="60" cy="77" rx="4" ry="2.6" fill="#E8C07D" stroke="${INK}" stroke-width="1.5"/>`,
-    `${shadow(26)}${pot}${soil}${stem(68)}${leaf(55, 68, 5, 2.6, -30)}${leaf(65, 68, 5, 2.6, 30)}`,
-    `${shadow(26)}${pot}${soil}${stem(58)}${leaf(51, 60, 9, 4.5, -30)}${leaf(69, 60, 9, 4.5, 30)}`,
-    `${shadow(26)}${pot}${soil}${stem(46)}${leaf(49, 66, 10, 5, -30)}${leaf(71, 66, 10, 5, 30)}${leaf(50, 50, 10, 5, -35)}${leaf(70, 50, 10, 5, 35)}`,
-    `${shadow(28)}${pot}${soil}${stem(36)}${leaf(46, 66, 12, 6, -30)}${leaf(74, 66, 12, 6, 30)}${leaf(47, 52, 12, 6, -30)}${leaf(73, 52, 12, 6, 30)}${leaf(50, 38, 11, 5.5, -35)}${leaf(70, 38, 11, 5.5, 35)}`,
-    `${shadow(30)}${pot}${soil}${bush}<circle cx="38" cy="44" r="3.5" fill="#F49AA7" stroke="${INK}" stroke-width="1.2"/><circle cx="84" cy="40" r="3.5" fill="#F49AA7" stroke="${INK}" stroke-width="1.2"/><circle cx="60" cy="16" r="3.5" fill="#F49AA7" stroke="${INK}" stroke-width="1.2"/>`,
-    `${shadow(30)}${pot}${soil}${bush}${flower(36, 42, '#F49AA7')}${flower(86, 38, '#B39DDB')}${flower(60, 14, '#FFFFFF')}${flower(30, 62, '#F7A65A')}${flower(90, 62, '#F49AA7')}`,
+    // 0: Semente dormindo
+    `${SHADOW(24, 20)}<g class="avatar-body">${pot}${seedSleep}</g>${zzz}`,
+    // 1: Broto + post-it
+    `${SHADOW(24, 20)}<g class="avatar-body">${pot}${sprout}</g>${postIt}`,
+    // 2: Caule e folhas + café + post-it
+    `${SHADOW(24, 20)}<g class="avatar-body">${pot}${plantStem2}</g>${postIt}${coffeeCup}`,
+    // 3: Planta com fone de ouvido + café + post-it
+    `${SHADOW(24, 20)}<g class="avatar-body">${pot}${plantStem2}${headphones}</g>${postIt}${coffeeCup}`,
+    // 4: Arbusto rico + livros + fones + café
+    `${SHADOW(24, 20)}<g class="avatar-body">${pot}${bigBush}${headphones}</g>${bookStack}${coffeeCup}`,
+    // 5: Botões florais + abajur + livros + café
+    `${SHADOW(24, 20)}<g class="avatar-body">${pot}${bigBush}${buds}</g>${bookStack}${deskLamp}${coffeeCup}`,
+    // 6: Floração mágica + abajur + livros + estrelas + café
+    `${SHADOW(24, 20)}<g class="avatar-body">${pot}${bigBush}${fullFlowers}</g>${bookStack}${deskLamp}${coffeeCup}${stars}`
 ];
 
 export const AVATARS = {
@@ -89,9 +338,9 @@ export const AVATARS = {
     planta: { nome: 'Planta', estagios: PLANTA },
 };
 
-/** SVG completo do avatar (cai no padrão se o id não existir, ex.: escolhido em outro aparelho mais novo). */
+/** SVG completo do avatar em pixel art 48x48 */
 export function avatarSvg(id, stage, { size = 120, label = '' } = {}) {
     const avatar = AVATARS[id] ?? AVATARS[AVATAR_PADRAO];
     const art = avatar.estagios[Math.max(0, Math.min(stage, avatar.estagios.length - 1))];
-    return `<svg viewBox="0 0 120 120" width="${size}" height="${size}" role="img" aria-label="${label || `${avatar.nome}, estágio ${stage + 1} de 7`}">${art}</svg>`;
+    return `<svg viewBox="0 0 48 48" width="${size}" height="${size}" role="img" aria-label="${label || `${avatar.nome}, estágio ${stage + 1} de 7`}">${art}</svg>`;
 }

@@ -289,18 +289,114 @@ body.focus-on { overflow: hidden; }
 .focus-btn { width: 76px; height: 76px; border-radius: 50%; border: 0; background: var(--c); color: #fff; font-size: 1.6rem; }
 .focus-hint { margin: 0; color: var(--muted); font-size: .8rem; }
 
-/* Avatar */
+/* Avatar Pixel Art */
 .avatar { display: flex; justify-content: center; margin: 4px auto 0; }
-.avatar svg { display: block; overflow: visible; }
-.avatar-hint { display: block; color: var(--muted); font-size: .75rem; margin-top: 2px; }
-.avatar.level-up svg { animation: avatar-level-up .9s ease-out; }
-@keyframes avatar-level-up {
-    0% { transform: scale(1); }
-    30% { transform: scale(1.18) rotate(-4deg); }
-    55% { transform: scale(.95) rotate(3deg); }
-    100% { transform: scale(1); }
+.avatar svg {
+    display: block;
+    overflow: visible;
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+    shape-rendering: crispEdges;
 }
-@media (prefers-reduced-motion: reduce) { .avatar.level-up svg { animation: none; } }
+.avatar-hint { display: block; color: var(--muted); font-size: .75rem; margin-top: 2px; }
+
+/* Animações de Repouso (Idle) */
+.avatar:not(.is-running) .avatar-body {
+    animation: pixel-breathe 2.6s steps(2) infinite;
+    transform-origin: 24px 40px;
+}
+@keyframes pixel-breathe {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-1px); }
+}
+
+.avatar .avatar-eyes {
+    animation: pixel-blink 4s steps(1) infinite;
+    transform-origin: 24px 25px;
+}
+@keyframes pixel-blink {
+    0%, 94%, 100% { transform: scaleY(1); }
+    95%, 98% { transform: scaleY(0.1); }
+}
+
+.avatar .steam-pixel {
+    animation: pixel-steam 2.2s steps(4) infinite;
+}
+@keyframes pixel-steam {
+    0% { opacity: 0; transform: translateY(0); }
+    30% { opacity: 0.9; transform: translateY(-1px); }
+    70% { opacity: 0.9; transform: translateY(-2px); }
+    100% { opacity: 0; transform: translateY(-3px); }
+}
+
+.avatar .zzz-pixel {
+    animation: pixel-zzz 2.4s steps(3) infinite;
+}
+@keyframes pixel-zzz {
+    0% { opacity: 0; transform: translate(0, 0); }
+    40% { opacity: 0.8; transform: translate(1px, -2px); }
+    80% { opacity: 0.8; transform: translate(2px, -4px); }
+    100% { opacity: 0; transform: translate(3px, -5px); }
+}
+
+/* Animações de Foco Ativo (Cronômetro Rodando) */
+.avatar.is-running .avatar-body {
+    animation: pixel-focus 0.9s steps(2) infinite;
+    transform-origin: 24px 40px;
+}
+@keyframes pixel-focus {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(1px); }
+}
+
+.avatar.is-running .headphone-pulse {
+    animation: pixel-headphones 0.9s steps(2) infinite;
+    transform-origin: 24px 20px;
+}
+@keyframes pixel-headphones {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.06); }
+}
+
+.avatar.is-running .lamp-glow {
+    animation: pixel-lamp 2s steps(2) infinite;
+}
+@keyframes pixel-lamp {
+    0%, 100% { opacity: 0.6; }
+    50% { opacity: 1; }
+}
+
+.avatar.is-running .star-pixel {
+    animation: pixel-star 1.2s steps(2) infinite;
+}
+@keyframes pixel-star {
+    0%, 100% { opacity: 0.7; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.1); }
+}
+
+/* Level Up em passos pixelados */
+.avatar.level-up svg {
+    animation: avatar-level-up .9s steps(4);
+}
+@keyframes avatar-level-up {
+    0% { transform: translateY(0) scale(1); }
+    30% { transform: translateY(-6px) scale(1.12); }
+    60% { transform: translateY(-1px) scale(0.98); }
+    100% { transform: translateY(0) scale(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .avatar .avatar-body,
+    .avatar .avatar-eyes,
+    .avatar .steam-pixel,
+    .avatar .zzz-pixel,
+    .avatar .headphone-pulse,
+    .avatar .lamp-glow,
+    .avatar .star-pixel,
+    .avatar.level-up svg {
+        animation: none !important;
+    }
+}
 .focus .avatar { margin-bottom: 4px; }
 .avatar-picker { display: flex; flex-wrap: wrap; gap: 8px; }
 .avatar-picker button { display: grid; justify-items: center; gap: 4px; border: 1px solid var(--border); background: var(--card); border-radius: 12px; padding: 8px 12px; font-size: .82rem; }

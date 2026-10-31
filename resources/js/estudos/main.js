@@ -5,6 +5,7 @@ import {
     ArcElement, BarController, BarElement, CategoryScale, Chart, DoughnutController, Filler, Legend, LinearScale,
     LineController, LineElement, PointElement, Tooltip,
 } from 'chart.js';
+import { playFocusEndSound, playLevelUpSound } from './audio.js';
 import { AVATARS, AVATAR_LIMITES_MIN, avatarStage, avatarSvg } from './avatars.js';
 import { ensureUser, getMeta, loadAll, saveLocal, setMeta, uuid } from './db.js';
 import { planImport } from './importer.js';
@@ -86,6 +87,9 @@ async function markSeen() {
 
 async function stopSession(session, atMs) {
     await persist('sessions', { ...session, fim: iso(Math.max(atMs, toMs(session.inicio))) });
+    if (state.settings?.retro_sound) {
+        playFocusEndSound();
+    }
 }
 
 async function toggleSubject(subjectId) {
@@ -174,14 +178,20 @@ function nextStageText(nextInMs) {
 function avatarBlock(totalMs, size, withHint = true) {
     const { stage, nextInMs } = avatarStage(totalMs);
     state.avatarStage = stage;
-    return `<div class="avatar" data-avatar data-size="${size}">${avatarSvg(state.settings.avatar, stage, { size })}</div>`
+    const isRunning = Boolean(runningSession());
+    return `<div class="avatar ${isRunning ? 'is-running' : 'is-idle'}" data-avatar data-size="${size}">${avatarSvg(state.settings.avatar, stage, { size })}</div>`
         + (withHint ? `<small class="avatar-hint" data-live="avatar-next">${nextStageText(nextInMs)}</small>` : '');
 }
 
-// Atualiza os avatares visíveis; ao subir de estágio, toca a animação.
+// Atualiza os avatares visíveis; ao subir de estágio, toca a animação e o som.
 function updateAvatars(totalMs) {
     const { stage, nextInMs } = avatarStage(totalMs);
+    const isRunning = Boolean(runningSession());
     root.querySelectorAll('[data-live="avatar-next"]').forEach((el) => { el.textContent = nextStageText(nextInMs); });
+    root.querySelectorAll('[data-avatar]').forEach((el) => {
+        el.classList.toggle('is-running', isRunning);
+        el.classList.toggle('is-idle', !isRunning);
+    });
     if (stage === state.avatarStage) return;
     const leveledUp = state.avatarStage !== null && stage > state.avatarStage;
     state.avatarStage = stage;
@@ -193,6 +203,9 @@ function updateAvatars(totalMs) {
             el.classList.add('level-up');
         }
     });
+    if (leveledUp && state.settings?.retro_sound) {
+        playLevelUpSound();
+    }
 }
 
 function todayTotals() {
@@ -766,6 +779,10 @@ function renderSettings() {
                 <datalist id="estudos-timezones">${['America/Sao_Paulo', 'America/Cuiaba', 'America/Manaus', 'America/Belem', 'America/Fortaleza', 'America/Recife', 'America/Rio_Branco', 'America/Noronha']
                     .map((tz) => `<option value="${tz}">`).join('')}</datalist>
                 <small>Este aparelho: ${esc(Intl.DateTimeFormat().resolvedOptions().timeZone)}</small></label>
+            <label class="checkbox">
+                <input type="checkbox" name="retro_sound" ${s.retro_sound ? 'checked' : ''}>
+                Sons retrô 8-bit (ao subir de nível e pausar foco)
+            </label>
             <button class="btn" type="submit">Salvar preferências</button>
         </form>
 
@@ -1102,6 +1119,7 @@ root.addEventListener('submit', async (event) => {
             virada_hora: Number(data.get('virada_hora')),
             limite_suspeita_min: Number(data.get('limite_suspeita_min')),
             meta_diaria_min: meta === '' ? null : Number(meta),
+            retro_sound: data.get('retro_sound') === 'on',
         });
     } else if (form.dataset.form === 'dday') {
         await persist('ddays', { id: uuid(), titulo: String(data.get('titulo')).trim(), data: String(data.get('data')), deleted_at: null, created_at: iso(nowMs()) });

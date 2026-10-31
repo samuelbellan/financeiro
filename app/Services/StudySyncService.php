@@ -176,6 +176,7 @@ class StudySyncService
             'meta_diaria_min' => 'nullable|integer|min:0|max:1440',
             'timezone' => 'required|timezone:all',
             'avatar' => ['nullable', 'string', 'max:40', 'regex:/^[a-z0-9-]+$/'],
+            'retro_sound' => 'nullable|boolean',
         ]);
         if (!$data) {
             return;
@@ -189,6 +190,7 @@ class StudySyncService
                 'meta_diaria_min' => $data['meta_diaria_min'] ?? null,
                 'timezone' => $data['timezone'],
                 'avatar' => $data['avatar'] ?? 'bichinho',
+                'retro_sound' => (bool) ($data['retro_sound'] ?? false),
                 'updated_at' => $this->stamp(),
             ]
         );
@@ -325,6 +327,9 @@ class StudySyncService
             if (isset($row[$col])) {
                 $row[$col] = (int) $row[$col];
             }
+        }
+        if (isset($row['retro_sound'])) {
+            $row['retro_sound'] = (bool) $row['retro_sound'];
         }
         if ($type === 'ddays' && isset($row['data'])) {
             $row['data'] = substr((string) $row['data'], 0, 10);
