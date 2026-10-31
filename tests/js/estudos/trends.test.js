@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
     DEFAULT_SETTINGS, buildDaily, compareWithPrevious, comparisonSeries, dayGaps, dayStats, findOverlaps, heatLevel,
-    hourProfile, quarterWeeks, studyVsOther, timelineSlots, trendBuckets, weekdayAverages, yearMonths,
+    hourProfile, lastStopped, quarterWeeks, studyVsOther, timelineSlots, trendBuckets, weekdayAverages, yearMonths,
 } from '../../../resources/js/estudos/metrics.js';
 
 const H = 3_600_000;
@@ -149,5 +149,26 @@ describe('agregados', () => {
 
     it('faixas de cor do YPT', () => {
         expect([0, 3.9, 4, 7, 10, 12].map((h) => heatLevel(h * H))).toEqual([0, 1, 2, 3, 4, 5]);
+    });
+});
+
+describe('descanso', () => {
+    const now = at('2026-10-31T16:30');
+
+    it('mede o tempo desde a última sessão cronometrada', () => {
+        const result = lastStopped([
+            session('2026-10-31T14:00', '2026-10-31T15:00', { subject_id: 'aud' }),
+            session('2026-10-31T15:10', '2026-10-31T16:25'),
+            session('2026-10-31T06:00', '2026-10-31T09:00', { origem: 'manual' }),
+        ], now);
+        expect(result.session.subject_id).toBe('dir');
+        expect(result.sinceMs).toBe(5 * M);
+    });
+
+    it('não há descanso com sessão rodando, sem sessões ou após o limite', () => {
+        expect(lastStopped([session('2026-10-31T16:00', null)], now)).toBeNull();
+        expect(lastStopped([], now)).toBeNull();
+        expect(lastStopped([session('2026-10-31T06:00', '2026-10-31T07:00')], now)).toBeNull();
+        expect(lastStopped([session('2026-10-31T16:00', '2026-10-31T16:20', { deleted_at: '2026-10-31T16:21:00Z' })], now)).toBeNull();
     });
 });

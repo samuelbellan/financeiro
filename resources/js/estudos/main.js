@@ -10,7 +10,7 @@ import { planImport } from './importer.js';
 import { createSync } from './sync.js';
 import {
     addDays, buildDaily, compareWithPrevious, comparisonSeries, dayBounds, dayGaps, dayStats, daysUntil, findOverlaps,
-    formatClock, formatDuration, heatLevel, hourProfile, isSuspicious, localInputToMs, monthRange, msToLocalInput,
+    formatClock, formatDuration, heatLevel, hourProfile, isSuspicious, lastStopped, localInputToMs, monthRange, msToLocalInput,
     quarterWeeks, rangeStats, streak, studyDayOf, studyVsOther, timelineSlots, toMs, trendBuckets, weekdayAverages,
     weekRange, yearMonths,
 } from './metrics.js';
@@ -35,6 +35,7 @@ const state = {
     statsMode: 'week',
     statsAnchor: null,
     trendSubject: null,
+    focusOpen: false,
     sync: { state: 'idle', pending: 0 },
     lastExportAt: null,
 };
@@ -103,7 +104,7 @@ async function toggleSubject(subjectId) {
         deleted_at: null,
         created_at: iso(at),
     });
-    render();
+    openFocus();
 }
 
 async function checkSuspicious() {
@@ -124,8 +125,101 @@ function render() {
     root.querySelector('[data-view]').innerHTML = views[state.tab]();
     root.querySelectorAll('[data-tab]').forEach((b) => b.classList.toggle('active', b.dataset.tab === state.tab));
     renderSyncBadge();
+    renderCurrent();
+    renderFocus();
     if (state.tab === 'stats') mountStatsCharts();
     tick();
+}
+
+// ── Modo foco, descanso e matéria atual ─────────────────────────────────────
+
+let wakeLock = null;
+
+async function keepScreenOn(on) {
+    try {
+        if (on && !wakeLock && 'wakeLock' in navigator && document.visibilityState === 'visible') {
+            wakeLock = await navigator.wakeLock.request('screen');
+            wakeLock.addEventListener('release', () => { wakeLock = null; });
+        } else if (!on && wakeLock) {
+            await wakeLock.release();
+            wakeLock = null;
+        }
+    } catch {
+        wakeLock = null; // sem suporte ou bateria fraca: segue sem manter a tela acesa
+    }
+}
+
+function openFocus() {
+    state.focusOpen = true;
+    if (!document.fullscreenElement) document.documentElement.requestFullscreen?.().catch(() => {});
+    keepScreenOn(true);
+    render();
+}
+
+function closeFocus() {
+    state.focusOpen = false;
+    if (document.fullscreenElement) document.exitFullscreen?.().catch(() => {});
+    keepScreenOn(false);
+    render();
+}
+
+const restInfo = () => lastStopped(state.sessions, nowMs());
+
+function todayTotals() {
+    return dayStats(buildDaily(recentSessions(), state.settings, nowMs()), today());
+}
+
+// Só as sessões que podem tocar o dia de hoje (o tick roda a cada segundo).
+function recentSessions() {
+    const [dayStart] = dayBounds(today(), state.settings);
+    return state.sessions.filter((s) => !s.fim || toMs(s.fim) > dayStart);
+}
+
+function renderCurrent() {
+    const chip = root.querySelector('[data-current]');
+    const running = runningSession();
+    const rest = running ? null : restInfo();
+    chip.hidden = !running && !rest;
+    if (running) {
+        const subject = subjectById(running.subject_id);
+        chip.style.setProperty('--c', subject?.cor ?? '#888');
+        chip.innerHTML = `<span class="dot"></span><span class="name">${esc(subject?.nome ?? 'Matéria')}</span> <b data-live="current-subject">--</b>`;
+    } else if (rest) {
+        chip.style.setProperty('--c', 'var(--muted)');
+        chip.innerHTML = `<span class="name">Descanso</span> <b data-live="rest">--</b>`;
+    }
+}
+
+function renderFocus() {
+    const panel = root.querySelector('[data-focus]');
+    const running = runningSession();
+    const rest = running ? null : restInfo();
+    if (state.focusOpen && !running && !rest) state.focusOpen = false;
+    panel.hidden = !state.focusOpen;
+    document.body.classList.toggle('focus-on', state.focusOpen);
+    if (!state.focusOpen) return;
+
+    const subject = subjectById((running ?? rest.session).subject_id);
+    panel.style.setProperty('--c', subject?.cor ?? '#888');
+    panel.innerHTML = running ? `
+        <button type="button" class="focus-close" data-action="focus-close" aria-label="Sair do modo foco">✕</button>
+        <p class="focus-label">Focando</p>
+        <p class="focus-time" data-live="session">--</p>
+        <div class="focus-sub">
+            <div><small><span class="dot"></span>${esc(subject?.nome ?? 'Matéria')}</small><b data-live="current-subject">--</b></div>
+            <div><small>Hoje</small><b data-live="total">--</b></div>
+        </div>
+        <button type="button" class="focus-btn" data-action="toggle" data-id="${running.subject_id}" aria-label="Pausar">❚❚</button>`
+        : `
+        <button type="button" class="focus-close" data-action="focus-close" aria-label="Sair do modo foco">✕</button>
+        <p class="focus-label">Descanso</p>
+        <p class="focus-time rest" data-live="rest">--</p>
+        <div class="focus-sub">
+            <div><small><span class="dot"></span>${esc(subject?.nome ?? 'Matéria')}</small><b data-live="current-subject">--</b></div>
+            <div><small>Hoje</small><b data-live="total">--</b></div>
+        </div>
+        <button type="button" class="focus-btn" data-action="toggle" data-id="${rest.session.subject_id}" aria-label="Retomar ${esc(subject?.nome ?? '')}">▶</button>
+        <p class="focus-hint">Toque em ▶ para retomar ${esc(subject?.nome ?? 'a matéria')}</p>`;
 }
 
 function renderSyncBadge() {
@@ -207,10 +301,21 @@ function renderTimer() {
         ${running ? `<section class="now-running" style="--c:${esc(subjectById(running.subject_id)?.cor ?? '#888')}">
             <span>${esc(subjectById(running.subject_id)?.nome ?? 'Matéria')}</span>
             <b data-live="session">${formatDuration(nowMs() - toMs(running.inicio), { seconds: true })}</b>
+            <button type="button" data-action="focus-open" aria-label="Abrir modo foco">⛶</button>
             <button type="button" data-action="toggle" data-id="${running.subject_id}">Parar</button>
-        </section>` : ''}
+        </section>` : renderRestBanner()}
         <ul class="subjects">${rows || '<li class="empty">Crie sua primeira matéria para começar.</li>'}</ul>
         <button type="button" class="btn ghost" data-action="new-subject">+ Matéria</button>`;
+}
+
+function renderRestBanner() {
+    const rest = restInfo();
+    if (!rest) return '';
+    const subject = subjectById(rest.session.subject_id);
+    return `<section class="rest-banner" style="--c:${esc(subject?.cor ?? '#888')}">
+        <span>Descanso <b data-live="rest">${formatDuration(rest.sinceMs, { seconds: true })}</b></span>
+        <button type="button" data-action="toggle" data-id="${rest.session.subject_id}">▶ Retomar ${esc(subject?.nome ?? '')}</button>
+    </section>`;
 }
 
 function renderTimeline() {
@@ -651,10 +756,18 @@ function renderSettings() {
 // Atualiza apenas os números vivos (evita re-renderizar a tela toda a cada segundo).
 function tick() {
     const running = runningSession();
-    if (state.tab !== 'timer') return;
     const day = today();
-    const stats = dayStats(daily(), day);
+    const stats = todayTotals();
     const set = (sel, text) => root.querySelectorAll(sel).forEach((el) => { el.textContent = text; });
+    const current = running ?? restInfo()?.session;
+    if (current) set('[data-live="current-subject"]', formatDuration(stats.bySubject[current.subject_id] ?? 0, { seconds: true }));
+    const rest = running ? null : restInfo();
+    if (rest) set('[data-live="rest"]', formatDuration(rest.sinceMs, { seconds: true }));
+    // Descanso passou do limite (6h) ou outra aba/aparelho mudou o estado: atualiza cabeçalho e foco.
+    if (!running && !rest && (state.focusOpen || !root.querySelector('[data-current]').hidden)) {
+        renderCurrent();
+        renderFocus();
+    }
     set('[data-live="total"]', formatDuration(stats.totalMs, { seconds: true }));
     set('[data-live="maxfocus"]', formatDuration(stats.maxFocusMs));
     if (stats.endMs) set('[data-live="end"]', formatClock(stats.endMs, day, state.settings));
@@ -886,6 +999,8 @@ root.addEventListener('click', async (event) => {
     const { action, id } = button.dataset;
     const handlers = {
         toggle: () => toggleSubject(id),
+        'focus-open': () => openFocus(),
+        'focus-close': () => closeFocus(),
         'new-subject': () => openSubjectDialog(),
         'edit-subject': () => openSubjectDialog(subjectById(id)),
         'move-subject': async () => {
@@ -959,6 +1074,7 @@ document.addEventListener('visibilitychange', async () => {
     } else {
         render();
         checkSuspicious();
+        if (state.focusOpen) keepScreenOn(true);
     }
 });
 

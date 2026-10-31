@@ -477,3 +477,19 @@ export function trendBuckets(daily, unit, count, today) {
     }
     return buckets;
 }
+
+/**
+ * Descanso: última sessão cronometrada encerrada (sem nenhuma em andamento), se terminou há menos de maxGapMs.
+ * Retorna { session, sinceMs } ou null.
+ */
+export function lastStopped(sessions, nowMs, maxGapMs = 6 * HOUR) {
+    let last = null;
+    for (const s of sessions) {
+        if (s.deleted_at || s.origem !== 'timer') continue;
+        if (!s.fim) return null;
+        if (!last || toMs(s.fim) > toMs(last.fim)) last = s;
+    }
+    if (!last) return null;
+    const sinceMs = nowMs - toMs(last.fim);
+    return sinceMs >= 0 && sinceMs <= maxGapMs ? { session: last, sinceMs } : null;
+}

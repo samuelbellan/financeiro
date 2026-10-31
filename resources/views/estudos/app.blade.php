@@ -31,10 +31,12 @@
          data-sw-scope="/estudos">
         <header class="topbar">
             <a href="{{ route('home', [], false) }}" class="brand" aria-label="Voltar ao sistema">Estudos</a>
+            <button type="button" class="current-chip" data-current data-action="focus-open" hidden></button>
             <span class="sync-badge" data-sync-badge></span>
         </header>
         <div class="conflicts" data-conflicts hidden></div>
         <main data-view></main>
+        <section class="focus" data-focus hidden aria-live="polite"></section>
         <nav class="tabbar">
             <button type="button" data-tab="timer"><span>⏱</span>Cronômetro</button>
             <button type="button" data-tab="timeline"><span>▦</span>Linha do tempo</button>

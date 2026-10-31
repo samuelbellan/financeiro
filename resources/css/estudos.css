@@ -249,3 +249,42 @@ dialog p { margin: 0; }
 @media (max-width: 380px) {
     .form.inline { grid-template-columns: 1fr; }
 }
+
+/* Matéria atual no cabeçalho */
+.topbar { gap: 8px; }
+.current-chip {
+    margin-left: auto; display: flex; align-items: center; gap: 6px; min-width: 0; max-width: 55%;
+    border: 1px solid var(--border); background: var(--card); border-radius: 99px; padding: 4px 10px; font-size: .8rem;
+}
+.current-chip .name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.current-chip b { font-variant-numeric: tabular-nums; }
+.current-chip + .sync-badge { margin-left: 0; }
+.current-chip[hidden] { display: none; }
+
+/* Descanso na aba Cronômetro */
+.rest-banner {
+    margin: 14px 0 0; padding: 10px 12px; border-radius: 14px; display: flex; align-items: center; gap: 10px;
+    background: var(--card); border: 1px dashed var(--c);
+}
+.rest-banner span { flex: 1; color: var(--muted); }
+.rest-banner b { color: var(--text); font-variant-numeric: tabular-nums; }
+.rest-banner button { border: 0; border-radius: 99px; padding: 6px 12px; background: var(--c); color: #fff; font-weight: 600; max-width: 60%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.now-running button[data-action="focus-open"] { padding: 6px 10px; }
+
+/* Modo foco (tela cheia) */
+body.focus-on { overflow: hidden; }
+.focus {
+    position: fixed; inset: 0; z-index: 50; background: var(--bg); color: var(--text);
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px;
+    padding: calc(24px + env(safe-area-inset-top)) 16px calc(24px + env(safe-area-inset-bottom));
+}
+.focus[hidden] { display: none; }
+.focus-close { position: absolute; top: calc(12px + env(safe-area-inset-top)); left: 16px; border: 0; background: none; color: var(--muted); font-size: 1.3rem; padding: 8px; }
+.focus-label { margin: 0; font-size: 1.1rem; color: var(--muted); }
+.focus-time { margin: 0; font-size: clamp(3.4rem, 20vw, 6rem); font-weight: 700; font-variant-numeric: tabular-nums; letter-spacing: -.02em; }
+.focus-time.rest { color: var(--muted); }
+.focus-sub { display: flex; gap: 32px; text-align: center; margin-bottom: 28px; }
+.focus-sub small { display: flex; align-items: center; justify-content: center; gap: 6px; color: var(--muted); font-size: .85rem; }
+.focus-sub b { font-size: 1.25rem; font-variant-numeric: tabular-nums; color: var(--muted); }
+.focus-btn { width: 76px; height: 76px; border-radius: 50%; border: 0; background: var(--c); color: #fff; font-size: 1.6rem; }
+.focus-hint { margin: 0; color: var(--muted); font-size: .8rem; }
