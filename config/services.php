@@ -39,4 +39,9 @@ return [
         'token' => env('TV_WIDGET_TOKEN', 'philco_glass_tv_secure_token'),
     ],
 
+    // Módulo de estudos (PWA): a nuvem é a fonte única da verdade; fora dela, /estudos redireciona para cá.
+    'estudos' => [
+        'cloud_url' => env('CLOUD_APP_URL', 'https://financeiro-app-mrik.onrender.com'),
+    ],
+
 ];

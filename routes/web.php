@@ -8,6 +8,7 @@ use App\Http\Controllers\CartoesController;
 use App\Http\Controllers\CategoriasController;
 use App\Http\Controllers\ExportController;
 use App\Http\Controllers\TelegramWebhookController;
+use App\Http\Controllers\EstudosController;
 use App\Http\Controllers\PhotoController;
 use App\Http\Controllers\SalaryController;
 use App\Http\Controllers\FiscalConcursosController;
@@ -110,8 +111,9 @@ Route::middleware('auth')->group(function () {
     Route::delete('/financas/telegram-logs', [TelegramWebhookController::class, 'clearLogs'])->name('telegram.logs.clear');
     Route::delete('/financas/telegram-logs/{log}', [TelegramWebhookController::class, 'destroyLog'])->name('telegram.logs.destroy');
     
-    // Sistema 2 - Horas de Estudo (em reconstrução)
-    Route::get('/estudos', fn () => response('Módulo de estudos em reconstrução.', 503))->name('estudos.index');
+    // Sistema 2 - Horas de Estudo (PWA offline estilo YPT)
+    Route::get('/estudos', [EstudosController::class, 'index'])->name('estudos.index');
+    Route::post('/estudos/sync', [EstudosController::class, 'sync'])->name('estudos.sync');
 
 
 
