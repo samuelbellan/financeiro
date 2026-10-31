@@ -11,7 +11,9 @@ use App\Models\CartaoParcela;
 use App\Models\CartaoPrevisao;
 use App\Models\CartaoCompra;
 use App\Services\CategorySanitizer;
+use App\Services\CreditCardService;
 use App\Services\FinancialSummaryService;
+use App\Services\TransactionDeduplicationService;
 use App\Services\TransactionSuggestionService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -128,8 +130,13 @@ class FinancasController extends Controller
                     && CategorySanitizer::isMatch($fatura->compra->categoria, $cp->categoria);
             })->sum('valor_parcela');
 
+            $cartaoDaPrevisao = $cartoesAtivos->firstWhere('id', $cp->cartao_id);
+            $isCartaoFechado = $cartaoDaPrevisao ? CreditCardService::isFaturaFechada($cartaoDaPrevisao, (int)$mes, (int)$ano) : false;
+
             $cp->consumo_real = $consumoReal;
-            $cp->restante = max(0, $cp->valor_previsto - $consumoReal);
+            $cp->is_fechada = $isCartaoFechado;
+            // Se a fatura está fechada, nenhuma compra a mais pode entrar nela: margem restante é zero
+            $cp->restante = $isCartaoFechado ? 0.0 : max(0, $cp->valor_previsto - $consumoReal);
             $cp->porcentagem = $cp->valor_previsto > 0 ? min(100, ($consumoReal / $cp->valor_previsto) * 100) : 0;
             $totalCartaoPrevisoesRestante += $cp->restante;
         }
@@ -141,7 +148,12 @@ class FinancasController extends Controller
             $faturaValor = (float) $parcelasCartao->sum('valor_parcela');
             $previsoesDoCartao = $cartaoPrevisoes->where('cartao_id', $cartao->id);
             $limitePrevistoTotal = (float) $previsoesDoCartao->sum('valor_previsto');
-            $margemRestante = (float) $previsoesDoCartao->sum('restante');
+
+            $isFechada = CreditCardService::isFaturaFechada($cartao, (int)$mes, (int)$ano);
+            $dataFechamento = CreditCardService::getDataFechamentoFatura($cartao, (int)$mes, (int)$ano);
+
+            // Se a fatura está fechada, não há mais margem de gastos a ser adicionada a este mês!
+            $margemRestante = $isFechada ? 0.0 : (float) $previsoesDoCartao->sum('restante');
 
             if ($faturaValor > 0 || $limitePrevistoTotal > 0) {
                 $totalPrevistoCartao = $faturaValor + $margemRestante;
@@ -156,6 +168,8 @@ class FinancasController extends Controller
                     'total_previsto' => $totalPrevistoCartao,
                     'porcentagem' => $pct,
                     'previsoes' => $previsoesDoCartao,
+                    'is_fechada' => $isFechada,
+                    'data_fechamento' => $dataFechamento,
                 ];
             }
         }
@@ -359,6 +373,10 @@ class FinancasController extends Controller
 
         $sugestoesDescricao = TransactionSuggestionService::getSuggestions($user->id, limit: 150);
 
+        // Detecção de duplicidades nos lançamentos da Conta Corrente (extrato x manuais)
+        $duplicidades = TransactionDeduplicationService::detectDuplicates($user->id, (int)$mes, (int)$ano, $dataInicio, $dataFim);
+        $duplicateTransactionIds = collect($duplicidades)->flatMap(fn($d) => [$d['t1']['id'], $d['t2']['id']])->unique()->values()->toArray();
+
         return view('financas.index', compact(
             'transacoes', 'saldo', 'receitasMes', 'despesasMes', 'cartoes', 
             'previsoes', 'mes', 'ano', 'categorias', 'totalPrevistoReceita', 
@@ -366,7 +384,8 @@ class FinancasController extends Controller
             'consolidadoMaisPrevisao', 'listaImprevistos', 'listaExcessos',
             'consolidadoAnoMeses', 'totalConsolidadoAno', 'dataInicio', 'dataFim',
             'labelsDiarios', 'despesasDiariasValues', 'datesMap', 'despesasDetalhado', 'mediaDiariaDespesa',
-            'sugestoesDescricao', 'cardsPlanejamento', 'totalCartaoPrevisoesRestante', 'contas'
+            'sugestoesDescricao', 'cardsPlanejamento', 'totalCartaoPrevisoesRestante', 'contas',
+            'duplicidades', 'duplicateTransactionIds'
         ));
     }
 
@@ -575,5 +594,102 @@ class FinancasController extends Controller
         }
 
         return redirect()->back()->with('error', $result['mensagem']);
+    }
+
+    /**
+     * Retorna a lista de transações potencialmente duplicadas no período.
+     */
+    public function listarDuplicidades(Request $request)
+    {
+        $user = Auth::user();
+        $mes = $request->filled('mes') ? (int)$request->get('mes') : null;
+        $ano = $request->filled('ano') ? (int)$request->get('ano') : null;
+        $dataInicio = $request->get('data_inicio');
+        $dataFim = $request->get('data_fim');
+
+        $duplicidades = TransactionDeduplicationService::detectDuplicates($user->id, $mes, $ano, $dataInicio, $dataFim);
+
+        return response()->json([
+            'sucesso' => true,
+            'total'   => count($duplicidades),
+            'itens'   => $duplicidades,
+        ]);
+    }
+
+    /**
+     * Mescla duas transações duplicadas mantendo os dados enriquecidos e removendo a duplicata.
+     */
+    public function mesclarDuplicidade(Request $request)
+    {
+        $user = Auth::user();
+        $validated = $request->validate([
+            'manter_id'  => 'required|integer',
+            'excluir_id' => 'required|integer',
+        ]);
+
+        try {
+            $res = TransactionDeduplicationService::mergeTransactions(
+                (int)$validated['manter_id'],
+                (int)$validated['excluir_id'],
+                $user->id
+            );
+
+            if ($request->wantsJson() || $request->ajax()) {
+                return response()->json($res);
+            }
+            return redirect()->back()->with('success', $res['mensagem']);
+        } catch (\Throwable $e) {
+            if ($request->wantsJson() || $request->ajax()) {
+                return response()->json(['sucesso' => false, 'mensagem' => $e->getMessage()], 422);
+            }
+            return redirect()->back()->withErrors(['erro' => $e->getMessage()]);
+        }
+    }
+
+    /**
+     * Mescla todas as duplicidades sugeridas em lote.
+     */
+    public function mesclarTodasDuplicidades(Request $request)
+    {
+        $user = Auth::user();
+        $mes = $request->filled('mes') ? (int)$request->get('mes') : null;
+        $ano = $request->filled('ano') ? (int)$request->get('ano') : null;
+
+        $pares = $request->input('pares');
+        if (empty($pares)) {
+            $pares = TransactionDeduplicationService::detectDuplicates($user->id, $mes, $ano);
+        }
+
+        $res = TransactionDeduplicationService::mergeAllSuggested($pares, $user->id);
+
+        if ($request->wantsJson() || $request->ajax()) {
+            return response()->json($res);
+        }
+
+        return redirect()->back()->with('success', $res['mensagem']);
+    }
+
+    /**
+     * Ignora um par de transações para que não seja mais sinalizado como duplicata.
+     */
+    public function ignorarDuplicidade(Request $request)
+    {
+        $user = Auth::user();
+        $validated = $request->validate([
+            'id_a' => 'required|integer',
+            'id_b' => 'required|integer',
+        ]);
+
+        TransactionDeduplicationService::ignorePair(
+            (int)$validated['id_a'],
+            (int)$validated['id_b'],
+            $user->id
+        );
+
+        if ($request->wantsJson() || $request->ajax()) {
+            return response()->json(['sucesso' => true, 'mensagem' => 'Par de lançamentos ignorado com sucesso.']);
+        }
+
+        return redirect()->back()->with('success', 'Duplicata ignorada.');
     }
 }

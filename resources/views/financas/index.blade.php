@@ -38,6 +38,105 @@
             position: relative;
         }
 
+        .badge-fatura-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            padding: 0.15rem 0.5rem;
+            border-radius: 999px;
+            font-size: 0.68rem;
+            font-weight: 700;
+            margin-left: 0.4rem;
+            vertical-align: middle;
+        }
+        .badge-fatura-status.fechada {
+            background: #dcfce7;
+            color: #15803d;
+        }
+        .badge-fatura-status.aberta {
+            background: #fef3c7;
+            color: #b45309;
+        }
+        .btn-duplicidades {
+            background: #fff;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            padding: 0.35rem 0.65rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #475569;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            transition: all 0.2s;
+        }
+        .btn-duplicidades:hover {
+            background: #f8fafc;
+            border-color: #94a3b8;
+            color: #1e293b;
+        }
+        .btn-duplicidades.has-dup {
+            background: #fffbeb;
+            border-color: #f59e0b;
+            color: #b45309;
+        }
+        .btn-duplicidades.has-dup:hover {
+            background: #fef3c7;
+        }
+        .dup-badge-counter {
+            background: #d97706;
+            color: white;
+            font-size: 0.68rem;
+            font-weight: 700;
+            padding: 0.1rem 0.4rem;
+            border-radius: 999px;
+            line-height: 1;
+        }
+        .alert-duplicidades-bar {
+            margin: 0.75rem 1.25rem 0;
+            padding: 0.75rem 1rem;
+            background: #fffbeb;
+            border: 1px solid #fde68a;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+        .btn-resolver-duplicidades {
+            background: #d97706;
+            color: white;
+            border: none;
+            padding: 0.35rem 0.75rem;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+        .btn-resolver-duplicidades:hover {
+            background: #b45309;
+        }
+        .badge-dup-tag {
+            background: #fef3c7;
+            color: #b45309;
+            border: 1px solid #fde68a;
+            padding: 0.1rem 0.45rem;
+            border-radius: 4px;
+            font-size: 0.68rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.15s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.2rem;
+        }
+        .badge-dup-tag:hover {
+            background: #fde68a;
+            color: #92400e;
+        }
         .toggle-btn {
             background: none;
             border: 1px solid var(--border);
@@ -564,20 +663,32 @@
                                 $valorFatura = $cpCard->fatura_valor;
                                 $totalPrevisto = $cpCard->total_previsto;
                                 $temPrevisao = $cpCard->limite_previsto > 0;
+                                $isFechada = $cpCard->is_fechada ?? false;
                             @endphp
                             <div class="prediction-row" style="background: #fdf2f2;">
                                 <div>
                                     <span style="font-weight: 700; color: #b91c1c;">Fatura: {{ $cartao->nome }}</span>
-                                    <span style="font-size: 0.75rem; color: var(--text-muted);"> • Cartão de Crédito</span>
+                                    <span style="font-size: 0.75rem; color: var(--text-muted);"> • Cartão</span>
+                                    @if($isFechada)
+                                        <span class="badge-fatura-status fechada" title="Fatura Fechada: novas compras não entram neste mês">✔ Fechada</span>
+                                    @else
+                                        <span class="badge-fatura-status aberta" title="Fatura Aberta: aceita compras até o fechamento">Aberta</span>
+                                    @endif
                                 </div>
                                 <div><span class="tag tag-despesa">Cartão</span></div>
                                 <div>
                                     <div style="display: flex; justify-content: space-between; font-size: 0.75rem; margin-bottom: 2px;">
                                         <span>Vencimento dia {{ $cartao->dia_vencimento }}</span>
                                         @if($temPrevisao)
-                                            <span style="font-weight: 600;" title="Fatura atual: R$ {{ number_format($valorFatura, 2, ',', '.') }} | Margem prevista restante: R$ {{ number_format($cpCard->margem_restante, 2, ',', '.') }}">
-                                                Fatura: R$ {{ number_format($valorFatura, 2, ',', '.') }} @if($cpCard->margem_restante > 0)<span style="color: #64748b; font-weight: normal;">(+R$ {{ number_format($cpCard->margem_restante, 2, ',', '.') }} margem)</span>@endif
-                                            </span>
+                                            @if($isFechada)
+                                                <span style="font-weight: 600;" title="Fatura fechada. Valor final: R$ {{ number_format($valorFatura, 2, ',', '.') }}">
+                                                    Fatura: R$ {{ number_format($valorFatura, 2, ',', '.') }}
+                                                </span>
+                                            @else
+                                                <span style="font-weight: 600;" title="Fatura atual: R$ {{ number_format($valorFatura, 2, ',', '.') }} | Margem prevista restante: R$ {{ number_format($cpCard->margem_restante, 2, ',', '.') }}">
+                                                    Fatura: R$ {{ number_format($valorFatura, 2, ',', '.') }} @if($cpCard->margem_restante > 0)<span style="color: #64748b; font-weight: normal;">(+R$ {{ number_format($cpCard->margem_restante, 2, ',', '.') }} margem)</span>@endif
+                                                </span>
+                                            @endif
                                         @else
                                             <span style="font-weight: 600;">Total: R$ {{ number_format($valorFatura, 2, ',', '.') }}</span>
                                         @endif
@@ -588,13 +699,28 @@
                                 </div>
                                 <div style="text-align: right; font-weight: 700;">
                                     <span style="color: var(--danger)">R$ {{ number_format($totalPrevisto, 2, ',', '.') }}</span>
-                                    @if($temPrevisao && $cpCard->margem_restante > 0)
+                                    @if($temPrevisao)
                                         <div style="font-size: 0.7rem; color: var(--text-muted); font-weight: normal;">
-                                            Meta: R$ {{ number_format($cpCard->limite_previsto, 2, ',', '.') }}
+                                            @if($isFechada)
+                                                Meta: R$ {{ number_format($cpCard->limite_previsto, 2, ',', '.') }} (Fechada)
+                                            @elseif($cpCard->margem_restante > 0)
+                                                Meta: R$ {{ number_format($cpCard->limite_previsto, 2, ',', '.') }}
+                                            @endif
                                         </div>
                                     @endif
                                 </div>
-                                <div style="text-align: right;">
+                                <div style="text-align: right; display: flex; gap: 4px; justify-content: flex-end; align-items: center;">
+                                    <button type="button" 
+                                            onclick="toggleFaturaFechamentoManual({{ $cartao->id }}, {{ $mes }}, {{ $ano }}, {{ $isFechada ? 'false' : 'true' }})" 
+                                            class="action-btn-small" 
+                                            title="{{ $isFechada ? 'Fatura está FECHADA. Clique para reabrir manualmente.' : 'Fatura está ABERTA. Clique para fechar manualmente.' }}"
+                                            style="color: {{ $isFechada ? '#10b981' : '#f59e0b' }}; background: {{ $isFechada ? '#ecfdf5' : '#fffbeb' }}; border: 1px solid {{ $isFechada ? '#a7f3d0' : '#fde68a' }};">
+                                        @if($isFechada)
+                                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                                        @else
+                                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 9.9-1"></path></svg>
+                                        @endif
+                                    </button>
                                     <a href="{{ route('cartoes.index') }}" class="action-btn-small" style="text-decoration: none; display: inline-flex; align-items: center; justify-content: center;" title="Ver Detalhes do Cartão">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
                                     </a>
@@ -637,13 +763,44 @@
                 </div>
 
                 <div class="table-container">
-                    <div class="table-header" style="padding: 1.25rem; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border);">
+                    <div class="table-header" style="padding: 1.25rem; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); flex-wrap: wrap; gap: 0.75rem;">
                         <div style="display: flex; align-items: center; gap: 1rem;">
                             <h2 style="font-size: 1.125rem;">Extrato Realizado</h2>
                             <button onclick="toggleSection('transactionsContent')" class="toggle-btn" id="btn-transactionsContent">Recolher</button>
                         </div>
-                        <button onclick="openModal()" class="btn-add">Nova Transação</button>
+                        <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                            <button type="button" 
+                                    onclick="openDuplicidadesModal()" 
+                                    class="btn-duplicidades {{ !empty($duplicidades) && count($duplicidades) > 0 ? 'has-dup' : '' }}" 
+                                    title="Verificar e conciliar possíveis lançamentos duplicados no extrato">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                </svg>
+                                <span>Verificar Duplicidades</span>
+                                <span id="headerDupCountBadge" class="dup-badge-counter" style="{{ empty($duplicidades) || count($duplicidades) === 0 ? 'display: none;' : '' }}">
+                                    {{ count($duplicidades ?? []) }}
+                                </span>
+                            </button>
+                            <button onclick="openModal()" class="btn-add">Nova Transação</button>
+                        </div>
                     </div>
+
+                    @if(!empty($duplicidades) && count($duplicidades) > 0)
+                        <div id="alertDuplicidadesBox" class="alert-duplicidades-bar">
+                            <div style="display: flex; align-items: center; gap: 0.65rem;">
+                                <span style="font-size: 1.15rem;">⚠️</span>
+                                <div style="font-size: 0.85rem; color: #92400e;">
+                                    <strong>{{ count($duplicidades) }} {{ count($duplicidades) === 1 ? 'duplicidade suspeita identificada' : 'duplicidades suspeitas identificadas' }}</strong> 
+                                    entre lançamentos manuais e o extrato bancário importado.
+                                </div>
+                            </div>
+                            <button type="button" onclick="openDuplicidadesModal()" class="btn-resolver-duplicidades">
+                                Resolver Agora
+                            </button>
+                        </div>
+                    @endif
+
                     <div id="transactionsContent" class="collapsible-content">
                     <table id="transactionsTable">
                         <thead>
@@ -653,7 +810,19 @@
                             @foreach($transacoes as $t)
                                 <tr data-id="{{ $t->id }}" data-tipo="{{ $t->tipo }}" data-valor="{{ $t->valor }}">
                                     <td>{{ \Carbon\Carbon::parse($t->data)->format('d/m/Y') }}</td>
-                                    <td style="font-weight: 600;">{{ $t->descricao }}</td>
+                                    <td style="font-weight: 600;">
+                                        <div style="display: flex; align-items: center; gap: 0.4rem; flex-wrap: wrap;">
+                                            <span>{{ $t->descricao }}</span>
+                                            @if(!empty($duplicateTransactionIds) && in_array($t->id, $duplicateTransactionIds))
+                                                <button type="button" 
+                                                        onclick="openDuplicidadesModal({{ $t->id }})" 
+                                                        class="badge-dup-tag" 
+                                                        title="Possível duplicata encontrada. Clique para verificar e conciliar.">
+                                                    ⚠️ Duplicata
+                                                </button>
+                                            @endif
+                                        </div>
+                                    </td>
                                     <td>
                                         <span>{{ $t->categoria ?? '-' }}</span>
                                         @if($t->subcategoria)<br><span style="font-size: 0.7rem; color: var(--text-muted);">{{ $t->subcategoria }}</span>@endif
@@ -2112,6 +2281,27 @@
                 }
             }
         });
+
+        async function toggleFaturaFechamentoManual(cartaoId, mes, ano, novaFechada) {
+            try {
+                const res = await fetch(`/financas/cartoes/${cartaoId}/fatura-fechamento`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({ mes, ano, fechada: novaFechada })
+                });
+                const data = await res.json();
+                if (!res.ok || !data.sucesso) {
+                    throw new Error(data.mensagem || 'Falha ao alterar fechamento da fatura.');
+                }
+                window.location.reload();
+            } catch (e) {
+                alert(e.message || 'Erro ao alterar fechamento da fatura.');
+            }
+        }
     </script>
 
     <!-- Barra flutuante de rodapé para soma dos lançamentos selecionados -->
@@ -2128,5 +2318,6 @@
         </div>
     </div>
     @include('components.import-extrato-modal')
+    @include('components.duplicidades-transacoes-modal')
 </body>
 </html>

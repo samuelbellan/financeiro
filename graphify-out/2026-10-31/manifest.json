@@ -40,8 +40,8 @@
     "semantic_hash": ""
   },
   "app/Http/Controllers/CartoesController.php": {
-    "mtime": 1793448517.0659032,
-    "ast_hash": "007a2f702de909b5c6fb9d8fca3d2baf",
+    "mtime": 1793461337.760971,
+    "ast_hash": "fac84e76d2dc3dbd77283b71f1a0595f",
     "semantic_hash": ""
   },
   "app/Http/Controllers/CategoriasController.php": {
@@ -65,8 +65,8 @@
     "semantic_hash": ""
   },
   "app/Http/Controllers/FinancasController.php": {
-    "mtime": 1793107013.9782636,
-    "ast_hash": "c24c7df1925ee462ce2a15445e0405bf",
+    "mtime": 1793466144.6264315,
+    "ast_hash": "ae574299cfab24d05437e3c6a4861296",
     "semantic_hash": ""
   },
   "app/Http/Controllers/HomeController.php": {
@@ -80,8 +80,8 @@
     "semantic_hash": ""
   },
   "app/Http/Controllers/TelegramWebhookController.php": {
-    "mtime": 1792889432.8050964,
-    "ast_hash": "d5d64ad879dab8fbc3910471222ba157",
+    "mtime": 1793461934.582253,
+    "ast_hash": "acbeb5f96d092df31a52eadf31b55ffd",
     "semantic_hash": ""
   },
   "app/Models/Cartao.php": {
@@ -165,13 +165,13 @@
     "semantic_hash": ""
   },
   "app/Services/CreditCardService.php": {
-    "mtime": 1786539960.8192275,
-    "ast_hash": "22bc77ca455093bcc14b5fe745f65074",
+    "mtime": 1793461201.2375646,
+    "ast_hash": "1b3319e5a66c8e101768f579a2854d91",
     "semantic_hash": ""
   },
   "app/Services/GeminiService.php": {
-    "mtime": 1791550613.3200147,
-    "ast_hash": "b2d3c207d9386bfbba97311642c32928",
+    "mtime": 1793456138.911492,
+    "ast_hash": "71ab36e45d34f36f036cfd06bbd31b01",
     "semantic_hash": ""
   },
   "app/Services/SalaryCalculatorService.php": {
@@ -455,8 +455,8 @@
     "semantic_hash": ""
   },
   "resources/views/financas/cartoes.blade.php": {
-    "mtime": 1793449032.0572562,
-    "ast_hash": "a7ff0e50f50bb1bc3f9d0198dd9d1867",
+    "mtime": 1793461478.144149,
+    "ast_hash": "88e170e77f15a9c2938c2aa51fa02168",
     "semantic_hash": ""
   },
   "resources/views/financas/categorias.blade.php": {
@@ -465,8 +465,8 @@
     "semantic_hash": ""
   },
   "resources/views/financas/index.blade.php": {
-    "mtime": 1793107124.9147418,
-    "ast_hash": "85640b1dd3b94f5e8cbfd86ec19037c1",
+    "mtime": 1793466296.230821,
+    "ast_hash": "7b068306365f73ff8792c2fd5263d58f",
     "semantic_hash": ""
   },
   "resources/views/home.blade.php": {
@@ -490,8 +490,8 @@
     "semantic_hash": ""
   },
   "routes/web.php": {
-    "mtime": 1793448562.2456975,
-    "ast_hash": "a635bf28cd75d477b77c3653d3ad4642",
+    "mtime": 1793466161.3898342,
+    "ast_hash": "aba09b4ff9d44ec2073c80ad2500f78c",
     "semantic_hash": ""
   },
   "tests/Feature/ExampleTest.php": {
@@ -925,13 +925,13 @@
     "semantic_hash": ""
   },
   "tests/Feature/FinancialSummaryAndCardLimitsTest.php": {
-    "mtime": 1791715710.2106006,
-    "ast_hash": "0a2aeef8e337dc8ceaef34b90351f886",
+    "mtime": 1793461885.6396842,
+    "ast_hash": "f639533931468136fdd1c387b6804683",
     "semantic_hash": ""
   },
   "resources/views/exports/resumo_financeiro_pdf.blade.php": {
-    "mtime": 1791715421.048413,
-    "ast_hash": "08093941e52b1fb7eef31602371bc2e8",
+    "mtime": 1793461517.804916,
+    "ast_hash": "ed2b5c88a79b0a796898b7e965ba7881",
     "semantic_hash": ""
   },
   "fix_gemini_chrome.ps1": {
@@ -980,8 +980,8 @@
     "semantic_hash": ""
   },
   "app/Services/Ofx/OfxImportService.php": {
-    "mtime": 1792889701.4311032,
-    "ast_hash": "f1fbbe36fc6a866641f2f4a3a4de886c",
+    "mtime": 1793466516.3317866,
+    "ast_hash": "01ceeeef8f2ca98abe15415fce835c83",
     "semantic_hash": ""
   },
   "app/Services/Ofx/OfxParserService.php": {
@@ -1000,13 +1000,8 @@
     "semantic_hash": ""
   },
   "importar_ofx.php": {
-    "mtime": 1792889158.634776,
-    "ast_hash": "2a984776b4cc8906318c84a18596f2f2",
-    "semantic_hash": ""
-  },
-  "public/importar_ofx.php": {
-    "mtime": 1793106138.089942,
-    "ast_hash": "1c10605bfc8b7395230f5643aeaba4f4",
+    "mtime": 1793459140.324633,
+    "ast_hash": "0ddf7e4340982dedc38908602ffdc058",
     "semantic_hash": ""
   },
   "resources/views/photos/album.blade.php": {
@@ -1105,13 +1100,13 @@
     "semantic_hash": ""
   },
   "extratos/README.txt": {
-    "mtime": 1793106100.7361524,
-    "ast_hash": "f9a3b6c4f6d096e880e63012c771fd2d",
+    "mtime": 1793459140.704453,
+    "ast_hash": "752b11c3c09a435cb6577054135b1fd5",
     "semantic_hash": ""
   },
   "app/Services/StatementImportService.php": {
-    "mtime": 1793107201.8645532,
-    "ast_hash": "43c12bad31e6b23d44fa1fb1c7f8308f",
+    "mtime": 1793466056.9356737,
+    "ast_hash": "8c95951241664108c71a4981d940bc2e",
     "semantic_hash": ""
   },
   "resources/views/components/import-extrato-modal.blade.php": {
@@ -1125,13 +1120,13 @@
     "semantic_hash": ""
   },
   "app/Services/CreditCardReconciliationService.php": {
-    "mtime": 1793448423.48042,
-    "ast_hash": "38810da4352062e06290a25fcd447443",
+    "mtime": 1793459689.0687165,
+    "ast_hash": "df00aa16ea78040835a3f8913a21d9eb",
     "semantic_hash": ""
   },
   "resources/views/components/conciliacao-fatura-modal.blade.php": {
-    "mtime": 1793448753.4634335,
-    "ast_hash": "2732713e8238ab4f25d1f7b6fab42f97",
+    "mtime": 1793460200.0261886,
+    "ast_hash": "e00a924a605f0cc8a2dac5bff748d017",
     "semantic_hash": ""
   },
   "resources/views/exports/conciliacao_fatura_pdf.blade.php": {
@@ -1140,8 +1135,48 @@
     "semantic_hash": ""
   },
   "tests/Feature/CreditCardReconciliationTest.php": {
-    "mtime": 1793449124.0900269,
-    "ast_hash": "8902690b409c49a4cce2e87c56d75746",
+    "mtime": 1793460370.7871304,
+    "ast_hash": "bc189450998f4894e054a239f0d1a5a8",
+    "semantic_hash": ""
+  },
+  "app/Models/CartaoFatura.php": {
+    "mtime": 1793459656.932578,
+    "ast_hash": "e945c270730b388f534c6484a538f725",
+    "semantic_hash": ""
+  },
+  "database/migrations/2026_10_31_120000_create_cartao_faturas_table.php": {
+    "mtime": 1793459644.544887,
+    "ast_hash": "a5a4ff5481ab09fc7540f840344d5523",
+    "semantic_hash": ""
+  },
+  "app/Models/CartaoFaturaFechamento.php": {
+    "mtime": 1793461161.664843,
+    "ast_hash": "a0a85833ce2bc3ed68950ff73fee1093",
+    "semantic_hash": ""
+  },
+  "database/migrations/2026_10_31_130000_create_cartao_fatura_fechamentos_table.php": {
+    "mtime": 1793461146.4025824,
+    "ast_hash": "dc251c3508750894395901b8f45b8223",
+    "semantic_hash": ""
+  },
+  "tests/Feature/CreditCardClosingTest.php": {
+    "mtime": 1793461645.6332855,
+    "ast_hash": "c8e317caa629621ab905c2b21d4a5b25",
+    "semantic_hash": ""
+  },
+  "app/Services/TransactionDeduplicationService.php": {
+    "mtime": 1793466362.7335987,
+    "ast_hash": "06cdd693551414a6c528a94a0a648111",
+    "semantic_hash": ""
+  },
+  "resources/views/components/duplicidades-transacoes-modal.blade.php": {
+    "mtime": 1793466217.3550646,
+    "ast_hash": "b392280289b9610d4964130b05147863",
+    "semantic_hash": ""
+  },
+  "tests/Feature/TransactionDeduplicationTest.php": {
+    "mtime": 1793466381.0347197,
+    "ast_hash": "5f74dfc15b03dc63ef3f3c97faf3d93d",
     "semantic_hash": ""
   }
 }

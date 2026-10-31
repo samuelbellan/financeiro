@@ -55,6 +55,16 @@ class CreditCardReconciliationService
             ];
         }
 
+        return $this->reconcileItems($faturaItens, $cartao, $mes, $ano);
+    }
+
+    /**
+     * Reconcilia uma lista de itens já extraídos da fatura contra as parcelas do cartão.
+     *
+     * @param array<int, array{data: string, descricao: string, valor: float, tipo?: string, parcela?: string|null}> $faturaItens
+     */
+    public function reconcileItems(array $faturaItens, Cartao $cartao, int $mes, int $ano): array
+    {
         // 2. Buscar parcelas do cartão no sistema para o mês/ano de vencimento
         $sistemaParcelas = CartaoParcela::whereHas('compra', function ($q) use ($cartao) {
                 $q->where('cartao_id', $cartao->id);
@@ -353,6 +363,7 @@ class CreditCardReconciliationService
                 'conciliados'         => $conciliados,
                 'pagamentos_estornos' => $faturaPagamentos,
             ],
+            'itens_extraidos' => $faturaItens,
         ];
     }
 

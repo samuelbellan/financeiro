@@ -6,6 +6,7 @@ namespace Tests\Feature;
 
 use App\Models\Cartao;
 use App\Models\CartaoCompra;
+use App\Models\CartaoFatura;
 use App\Models\CartaoParcela;
 use App\Models\User;
 use App\Services\CreditCardReconciliationService;
@@ -384,5 +385,148 @@ class CreditCardReconciliationTest extends TestCase
         // Deve processar sem lançar erro de método inexistente
         $this->assertIsArray($resultado);
         $this->assertArrayHasKey('sucesso', $resultado);
+    }
+
+    public function test_saved_fatura_can_be_reconciled_without_reuploading_file(): void
+    {
+        $fatura = CartaoFatura::create([
+            'user_id'               => $this->user->id,
+            'cartao_id'             => $this->cartao->id,
+            'mes'                   => 10,
+            'ano'                   => 2026,
+            'arquivo_nome_original' => 'fatura_outubro.csv',
+            'total_fatura'          => 75.00,
+            'total_despesas'        => 75.00,
+            'total_pagamentos'      => 0.0,
+            'itens_count'           => 1,
+            'itens_json'            => [
+                ['data' => '2026-10-15', 'descricao' => 'Restaurante Sabor', 'valor' => 75.00, 'tipo' => 'despesa', 'parcela_info' => '1/1'],
+            ],
+            'status'                => 'pendente',
+            'diferenca_total'       => 75.00,
+            'pendencias_count'      => 1,
+        ]);
+
+        $response = $this->actingAs($this->user)->postJson(route('cartoes.faturas.reconciliar', $fatura));
+
+        $response->assertOk();
+        $response->assertJsonPath('sucesso', true);
+        $response->assertJsonPath('fatura_id', $fatura->id);
+        $response->assertJsonPath('contadores.faltando_no_sistema', 1);
+    }
+
+    public function test_lancar_item_faltante_creates_purchase_and_updates_fatura(): void
+    {
+        $fatura = CartaoFatura::create([
+            'user_id'               => $this->user->id,
+            'cartao_id'             => $this->cartao->id,
+            'mes'                   => 10,
+            'ano'                   => 2026,
+            'arquivo_nome_original' => 'fatura_outubro.csv',
+            'total_fatura'          => 50.00,
+            'total_despesas'        => 50.00,
+            'total_pagamentos'      => 0.0,
+            'itens_count'           => 1,
+            'itens_json'            => [
+                ['data' => '2026-10-12', 'descricao' => 'Livraria Cultura', 'valor' => 50.00, 'tipo' => 'despesa', 'parcela_info' => '1/1'],
+            ],
+            'status'                => 'pendente',
+            'diferenca_total'       => 50.00,
+            'pendencias_count'      => 1,
+        ]);
+
+        $response = $this->actingAs($this->user)->postJson(route('cartoes.conciliar.lancar-item'), [
+            'cartao_id'       => $this->cartao->id,
+            'descricao'       => 'Livraria Cultura',
+            'valor_total'     => 50.00,
+            'data_compra'     => '2026-10-12',
+            'categoria'       => 'Educação',
+            'tipo'            => 'avista',
+            'numero_parcelas' => 1,
+            'fatura_id'       => $fatura->id,
+        ]);
+
+        $response->assertOk();
+        $response->assertJsonPath('sucesso', true);
+        $this->assertDatabaseHas('cartao_compras', [
+            'cartao_id'   => $this->cartao->id,
+            'descricao'   => 'Livraria Cultura',
+            'valor_total' => 50.00,
+        ]);
+        $this->assertDatabaseHas('cartao_parcelas', [
+            'valor_parcela' => 50.00,
+        ]);
+
+        // Fatura agora deve ter status conciliada
+        $fatura->refresh();
+        $this->assertEquals('conciliada', $fatura->status);
+        $this->assertEquals(0, $fatura->pendencias_count);
+    }
+
+    public function test_ajustar_centavos_via_parcela_and_via_novo_lancamento(): void
+    {
+        $compra = CartaoCompra::create([
+            'cartao_id'       => $this->cartao->id,
+            'descricao'       => 'Serviço Streaming',
+            'valor_total'     => 39.90,
+            'tipo'            => 'avista',
+            'numero_parcelas' => 1,
+            'data_compra'     => '2026-10-01',
+        ]);
+        $parcela = CartaoParcela::create([
+            'cartao_compra_id' => $compra->id,
+            'numero_parcela'   => 1,
+            'valor_parcela'    => 39.90,
+            'data_vencimento'  => '2026-10-12',
+            'status'           => 'aberta',
+        ]);
+
+        // 1. Ajuste na parcela existente (de 39.90 para 39.95)
+        $respAjuste = $this->actingAs($this->user)->postJson(route('cartoes.conciliar.ajustar-centavos'), [
+            'tipo_ajuste' => 'ajustar_parcela',
+            'parcela_id'  => $parcela->id,
+            'novo_valor'  => 39.95,
+        ]);
+        $respAjuste->assertOk();
+        $parcela->refresh();
+        $this->assertEquals(39.95, (float)$parcela->valor_parcela);
+
+        // 2. Novo lançamento de diferença de centavos (ex: 0.15 de IOF)
+        $respNovo = $this->actingAs($this->user)->postJson(route('cartoes.conciliar.ajustar-centavos'), [
+            'tipo_ajuste' => 'novo_lancamento',
+            'cartao_id'   => $this->cartao->id,
+            'descricao'   => 'Ajuste Diferença IOF',
+            'valor'       => 0.15,
+            'data_compra' => '2026-10-01',
+            'categoria'   => 'Ajuste / Tarifas',
+        ]);
+        $respNovo->assertOk();
+        $this->assertDatabaseHas('cartao_compras', [
+            'descricao'   => 'Ajuste Diferença IOF',
+            'valor_total' => 0.15,
+        ]);
+    }
+
+    public function test_destroy_saved_fatura(): void
+    {
+        $fatura = CartaoFatura::create([
+            'user_id'               => $this->user->id,
+            'cartao_id'             => $this->cartao->id,
+            'mes'                   => 10,
+            'ano'                   => 2026,
+            'arquivo_nome_original' => 'fatura_remover.pdf',
+            'total_fatura'          => 100.00,
+            'total_despesas'        => 100.00,
+            'total_pagamentos'      => 0.0,
+            'itens_count'           => 1,
+            'itens_json'            => [],
+            'status'                => 'pendente',
+            'diferenca_total'       => 100.00,
+            'pendencias_count'      => 1,
+        ]);
+
+        $response = $this->actingAs($this->user)->delete(route('cartoes.faturas.destroy', $fatura));
+        $response->assertRedirect();
+        $this->assertDatabaseMissing('cartao_faturas', ['id' => $fatura->id]);
     }
 }

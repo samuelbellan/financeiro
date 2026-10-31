@@ -60,6 +60,10 @@ Route::middleware('auth')->group(function () {
     Route::delete('/financas/mercado/itens/{item}', [MercadoController::class, 'destroyItem'])->name('financas.mercado.itens.destroy');
     Route::get('/financas/sugestoes-descricao', [FinancasController::class, 'sugestoesDescricao'])->name('financas.sugestoes-descricao');
     Route::post('/financas/importar-extrato', [FinancasController::class, 'importarExtrato'])->name('financas.importar-extrato');
+    Route::get('/financas/duplicidades', [FinancasController::class, 'listarDuplicidades'])->name('financas.duplicidades.index');
+    Route::post('/financas/duplicidades/mesclar', [FinancasController::class, 'mesclarDuplicidade'])->name('financas.duplicidades.mesclar');
+    Route::post('/financas/duplicidades/mesclar-todas', [FinancasController::class, 'mesclarTodasDuplicidades'])->name('financas.duplicidades.mesclar-todas');
+    Route::post('/financas/duplicidades/ignorar', [FinancasController::class, 'ignorarDuplicidade'])->name('financas.duplicidades.ignorar');
     Route::post('/financas', [FinancasController::class, 'store'])->name('financas.store');
     Route::post('/financas/previsoes', [FinancasController::class, 'storePrevisao'])->name('financas.previsoes.store');
     Route::put('/financas/previsoes/{previsao}', [FinancasController::class, 'updatePrevisao'])->name('financas.previsoes.update');
@@ -90,6 +94,12 @@ Route::middleware('auth')->group(function () {
     Route::put('/financas/cartoes/parcelas/{parcela}', [CartoesController::class, 'updateParcela'])->name('cartoes.parcelas.update');
     Route::post('/financas/cartoes/conciliar-fatura', [CartoesController::class, 'conciliarFatura'])->name('cartoes.conciliar.fatura');
     Route::get('/financas/cartoes/conciliar-fatura/pdf', [CartoesController::class, 'exportarRelatorioConciliacaoPdf'])->name('cartoes.conciliar.pdf');
+    Route::post('/financas/cartoes/faturas/{fatura}/reconciliar', [CartoesController::class, 'reconciliarFaturaSalva'])->name('cartoes.faturas.reconciliar');
+    Route::get('/financas/cartoes/faturas/{fatura}/download', [CartoesController::class, 'downloadFaturaArquivo'])->name('cartoes.faturas.download');
+    Route::delete('/financas/cartoes/faturas/{fatura}', [CartoesController::class, 'destroyFatura'])->name('cartoes.faturas.destroy');
+    Route::post('/financas/cartoes/conciliar/lancar-item', [CartoesController::class, 'lancarItemFaltante'])->name('cartoes.conciliar.lancar-item');
+    Route::post('/financas/cartoes/conciliar/ajustar-centavos', [CartoesController::class, 'ajustarCentavos'])->name('cartoes.conciliar.ajustar-centavos');
+    Route::post('/financas/cartoes/{cartao}/fatura-fechamento', [CartoesController::class, 'toggleFechamentoFatura'])->name('cartoes.fatura.fechamento');
     
     // WhatsApp Resumo
     Route::get('/financas/whatsapp/resumo', [FinancasController::class, 'whatsappResumo'])->name('financas.whatsapp.resumo');

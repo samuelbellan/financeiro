@@ -568,6 +568,40 @@ Retorne APENAS um JSON estrito (sem markdown, sem explicações adicionais) com 
                         ->exists();
                 }
 
+                // Checagem 3: Deduplicação inteligente com lançamento manual pré-existente
+                if (!$exists) {
+                    $matchManual = \App\Services\TransactionDeduplicationService::findDuplicateForImport(
+                        userId: $userId,
+                        valor: (float) $t['valor'],
+                        tipo: $t['tipo'],
+                        dataStr: (string) $t['data'],
+                        descricao: (string) $t['descricao']
+                    );
+
+                    if ($matchManual) {
+                        // Vincula e enriquece a transação existente com dados do extrato bancário
+                        if (!$matchManual->conta_id && $contaId) {
+                            $matchManual->conta_id = $contaId;
+                        }
+                        if (empty($matchManual->fitid) && !empty($t['fitid'])) {
+                            $matchManual->fitid = $t['fitid'];
+                        }
+                        if (empty($matchManual->numero_documento) && !empty($t['numero_documento'])) {
+                            $matchManual->numero_documento = $t['numero_documento'];
+                        }
+                        if (empty($matchManual->tipo_transacao_ofx) && !empty($formato)) {
+                            $matchManual->tipo_transacao_ofx = $formato;
+                        }
+                        if (empty($matchManual->memo)) {
+                            $matchManual->memo = "Conciliado via {$formato} com extrato bancário";
+                        }
+                        $matchManual->save();
+
+                        $duplicados++;
+                        continue;
+                    }
+                }
+
                 if ($exists) {
                     $duplicados++;
                     continue;

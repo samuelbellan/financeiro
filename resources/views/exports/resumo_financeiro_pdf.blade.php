@@ -301,15 +301,21 @@
             @php $totalGeralFaturas = 0; $totalGeralMargem = 0; @endphp
             @foreach($cartoes as $c)
                 @php
+                    $isFechada = \App\Services\CreditCardService::isFaturaFechada($c, (int)($periodo['mes'] ?? now()->month), (int)($periodo['ano'] ?? now()->year));
                     $faturaCartao = $faturasParcelas->where('compra.cartao_id', $c->id)->sum('valor_parcela');
                     $previsoesCartao = $cartaoPrevisoes->where('cartao_id', $c->id);
-                    $margemCartao = $previsoesCartao->sum('restante');
+                    $margemCartao = $isFechada ? 0.0 : $previsoesCartao->sum('restante');
                     $impactoTotal = $faturaCartao + $margemCartao;
                     $totalGeralFaturas += $faturaCartao;
                     $totalGeralMargem += $margemCartao;
                 @endphp
                 <tr>
-                    <td><strong>{{ $c->nome }}</strong> ({{ $c->bandeira ?? 'Crédito' }})</td>
+                    <td>
+                        <strong>{{ $c->nome }}</strong> ({{ $c->bandeira ?? 'Crédito' }})
+                        @if($isFechada)
+                            <span style="font-size: 8px; color: #166534; background: #dcfce7; padding: 1px 4px; border-radius: 3px; font-weight: bold;">Fechada</span>
+                        @endif
+                    </td>
                     <td>Dia {{ $c->dia_vencimento }}</td>
                     <td class="text-right val-negative">R$ {{ number_format($faturaCartao, 2, ',', '.') }}</td>
                     <td class="text-right" style="color: #64748b;">R$ {{ number_format($margemCartao, 2, ',', '.') }}</td>

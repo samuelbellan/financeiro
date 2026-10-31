@@ -37,6 +37,12 @@ class FinancialSummaryAndCardLimitsTest extends TestCase
         ]);
     }
 
+    protected function tearDown(): void
+    {
+        Carbon::setTestNow();
+        parent::tearDown();
+    }
+
     public function test_user_can_create_card_previsao_or_limit(): void
     {
         $response = $this->actingAs($this->user)->post(route('cartoes.previsoes.store'), [
@@ -182,6 +188,8 @@ class FinancialSummaryAndCardLimitsTest extends TestCase
 
     public function test_card_previsao_influences_checking_account_dashboard(): void
     {
+        Carbon::setTestNow('2026-10-05 10:00:00');
+
         // Previsão na CC de Despesa fixa: R$ 500
         TransacaoPrevisao::create([
             'user_id' => $this->user->id,

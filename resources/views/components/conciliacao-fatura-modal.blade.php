@@ -194,10 +194,11 @@
                             <table class="concilia-table">
                                 <thead>
                                     <tr>
-                                        <th style="width: 100px;">Data</th>
+                                        <th style="width: 95px;">Data</th>
                                         <th>Estabelecimento na Fatura</th>
                                         <th style="width: 80px;" class="text-center">Parcela</th>
                                         <th style="width: 110px;" class="text-right">Valor Fatura</th>
+                                        <th style="width: 100px;" class="text-center">Ação</th>
                                     </tr>
                                 </thead>
                                 <tbody id="tbodyFaltando"></tbody>
@@ -247,6 +248,7 @@
                                         <th style="width: 110px;" class="text-right">Valor Fatura</th>
                                         <th style="width: 110px;" class="text-right">Valor Sistema</th>
                                         <th style="width: 110px;" class="text-right">Diferença</th>
+                                        <th style="width: 130px;" class="text-center">Ação</th>
                                     </tr>
                                 </thead>
                                 <tbody id="tbodyDivergencias"></tbody>
@@ -271,7 +273,8 @@
                                         <th>Sistema</th>
                                         <th style="width: 80px;" class="text-center">Parcela</th>
                                         <th style="width: 110px;" class="text-right">Valor</th>
-                                        <th style="width: 85px;" class="text-center">Certeza</th>
+                                        <th style="width: 80px;" class="text-center">Certeza</th>
+                                        <th style="width: 130px;" class="text-center">Ação</th>
                                     </tr>
                                 </thead>
                                 <tbody id="tbodyConciliados"></tbody>
@@ -309,6 +312,135 @@
                     <button type="button" class="conciliacao-btn-secondary" onclick="closeConciliacaoModal()">Fechar</button>
                 </div>
             </div>
+        </div>
+    </div>
+</div>
+
+<!-- Mini-Modal: Lançar Compra Faltante -->
+<div id="quickLaunchModal" class="concilia-mini-backdrop" style="display: none;">
+    <div class="concilia-mini-card">
+        <div class="concilia-mini-header">
+            <h4>+ Lançar Compra no Cartão</h4>
+            <button type="button" class="concilia-close-mini" onclick="closeQuickLaunchModal()">&times;</button>
+        </div>
+        <form id="quickLaunchForm" onsubmit="submitQuickLaunch(event)">
+            <input type="hidden" id="qlCartaoId" name="cartao_id">
+            <input type="hidden" id="qlItemIndex" name="item_index">
+
+            <div class="concilia-mini-body">
+                <div class="concilia-mini-field">
+                    <label>Cartão</label>
+                    <input type="text" id="qlCartaoNome" class="concilia-mini-input" readonly style="background: #f1f5f9; cursor: not-allowed;">
+                </div>
+                <div class="concilia-mini-field">
+                    <label>Estabelecimento / Descrição</label>
+                    <input type="text" id="qlDescricao" name="descricao" class="concilia-mini-input" required>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+                    <div class="concilia-mini-field">
+                        <label>Data da Compra</label>
+                        <input type="date" id="qlData" name="data_compra" class="concilia-mini-input" required>
+                    </div>
+                    <div class="concilia-mini-field">
+                        <label>Valor (R$)</label>
+                        <input type="number" step="0.01" id="qlValor" name="valor_total" class="concilia-mini-input" required>
+                    </div>
+                </div>
+                <div style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 0.75rem;">
+                    <div class="concilia-mini-field">
+                        <label>Categoria</label>
+                        <select id="qlCategoria" name="categoria" class="concilia-mini-input">
+                            <option value="Geral">Geral</option>
+                            @if(isset($userCategorias))
+                                @foreach($userCategorias as $cat)
+                                    <option value="{{ $cat }}">{{ $cat }}</option>
+                                @endforeach
+                            @endif
+                        </select>
+                    </div>
+                    <div class="concilia-mini-field">
+                        <label>Parcelas</label>
+                        <div style="display: flex; gap: 0.4rem;">
+                            <select id="qlTipo" name="tipo" class="concilia-mini-input" onchange="toggleQlParcelas(this.value)">
+                                <option value="avista">À vista (1x)</option>
+                                <option value="parcelada">Parcelado</option>
+                            </select>
+                            <input type="number" id="qlParcelas" name="numero_parcelas" class="concilia-mini-input" value="1" min="1" max="72" style="width: 60px; display: none;">
+                        </div>
+                    </div>
+                </div>
+                <div id="qlAlert" class="conciliacao-alert conciliacao-alert-danger" style="display: none; margin-top: 0.75rem;"></div>
+            </div>
+            <div class="concilia-mini-footer">
+                <button type="button" class="conciliacao-btn-secondary" onclick="closeQuickLaunchModal()">Cancelar</button>
+                <button type="submit" id="qlSubmitBtn" class="conciliacao-btn-primary">
+                    <span id="qlBtnText">Confirmar e Lançar</span>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Mini-Modal: Resolver Diferença de Valor / Centavos -->
+<div id="quickDiffModal" class="concilia-mini-backdrop" style="display: none;">
+    <div class="concilia-mini-card">
+        <div class="concilia-mini-header">
+            <h4>Ajustar Diferença de Valor</h4>
+            <button type="button" class="concilia-close-mini" onclick="closeQuickDiffModal()">&times;</button>
+        </div>
+        <div class="concilia-mini-body">
+            <div class="diff-summary-box">
+                <div class="diff-item">
+                    <span class="diff-lbl">Fatura:</span>
+                    <strong id="qdValFatura" class="diff-val">R$ 0,00</strong>
+                </div>
+                <div class="diff-item">
+                    <span class="diff-lbl">Sistema:</span>
+                    <strong id="qdValSistema" class="diff-val">R$ 0,00</strong>
+                </div>
+                <div class="diff-item diff-item-highlight">
+                    <span class="diff-lbl">Diferença:</span>
+                    <strong id="qdValDiferenca" class="diff-val">R$ 0,00</strong>
+                </div>
+            </div>
+
+            <p style="font-size: 0.85rem; color: #475569; margin: 0.85rem 0 0.65rem;">Como deseja resolver essa diferença?</p>
+
+            <div class="diff-choice-card" onclick="executarAjusteParcela()">
+                <div class="diff-choice-icon" style="background: #e0f2fe; color: #0284c7;">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                    </svg>
+                </div>
+                <div>
+                    <strong style="color: #0f172a; font-size: 0.9rem;">Ajustar Parcela no Sistema</strong>
+                    <p style="margin: 0.2rem 0 0; font-size: 0.78rem; color: #64748b;">
+                        Atualiza o valor da parcela no sistema para igualar exatamente à fatura (elimina a diferença na compra original).
+                    </p>
+                </div>
+            </div>
+
+            <div class="diff-choice-card" onclick="executarLancamentoDiferenca()" style="margin-top: 0.65rem;">
+                <div class="diff-choice-icon" style="background: #fef3c7; color: #d97706;">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="12" y1="8" x2="12" y2="16"></line>
+                        <line x1="8" y1="12" x2="16" y2="12"></line>
+                    </svg>
+                </div>
+                <div>
+                    <strong style="color: #0f172a; font-size: 0.9rem;">Criar Lançamento Avulso da Diferença</strong>
+                    <p style="margin: 0.2rem 0 0; font-size: 0.78rem; color: #64748b;">
+                        Cria um novo lançamento com o valor da diferença (ex: ajuste de IOF, encargos ou centavos).
+                    </p>
+                </div>
+            </div>
+
+            <div id="qdAlert" class="conciliacao-alert conciliacao-alert-danger" style="display: none; margin-top: 0.85rem;"></div>
+        </div>
+        <div class="concilia-mini-footer">
+            <button type="button" class="conciliacao-btn-secondary" onclick="closeQuickDiffModal()">Cancelar</button>
         </div>
     </div>
 </div>
@@ -739,6 +871,191 @@
     color: #b91c1c;
 }
 
+/* Estilos dos Mini-Modals de Lançamento e Diferença */
+.concilia-mini-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(15, 23, 42, 0.72);
+    backdrop-filter: blur(3px);
+    z-index: 10050;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    animation: fadeInModal 0.15s ease-out;
+}
+.concilia-mini-card {
+    background: #ffffff;
+    border-radius: 14px;
+    width: 100%;
+    max-width: 480px;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.25);
+    overflow: hidden;
+    border: 1px solid #e2e8f0;
+}
+.concilia-mini-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.25rem;
+    background: #f8fafc;
+    border-bottom: 1px solid #e2e8f0;
+}
+.concilia-mini-header h4 {
+    margin: 0;
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #0f172a;
+}
+.concilia-close-mini {
+    background: transparent;
+    border: none;
+    font-size: 1.6rem;
+    color: #94a3b8;
+    cursor: pointer;
+    line-height: 1;
+    padding: 0 0.3rem;
+    transition: color 0.15s;
+}
+.concilia-close-mini:hover {
+    color: #0f172a;
+}
+.concilia-mini-body {
+    padding: 1.25rem;
+}
+.concilia-mini-field {
+    margin-bottom: 0.85rem;
+}
+.concilia-mini-field label {
+    display: block;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: #334155;
+    margin-bottom: 0.35rem;
+}
+.concilia-mini-input {
+    width: 100%;
+    padding: 0.55rem 0.75rem;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    font-size: 0.88rem;
+    color: #1e293b;
+    outline: none;
+    box-sizing: border-box;
+    transition: border-color 0.15s;
+}
+.concilia-mini-input:focus {
+    border-color: #6366f1;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+}
+.concilia-mini-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.6rem;
+    padding: 0.85rem 1.25rem;
+    background: #f8fafc;
+    border-top: 1px solid #e2e8f0;
+}
+.diff-summary-box {
+    display: flex;
+    justify-content: space-between;
+    background: #f1f5f9;
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    font-size: 0.85rem;
+}
+.diff-item {
+    display: flex;
+    flex-direction: column;
+}
+.diff-lbl {
+    font-size: 0.72rem;
+    color: #64748b;
+    text-transform: uppercase;
+    font-weight: 600;
+}
+.diff-val {
+    font-size: 0.95rem;
+    color: #1e293b;
+    margin-top: 0.15rem;
+}
+.diff-item-highlight .diff-val {
+    color: #ef4444;
+}
+.diff-choice-card {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.85rem;
+    padding: 0.85rem;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+.diff-choice-card:hover {
+    border-color: #4f46e5;
+    background: #f8fafc;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+}
+.diff-choice-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+.btn-concilia-row-action {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.35rem 0.65rem;
+    border-radius: 6px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    white-space: nowrap;
+}
+.btn-concilia-row-action.btn-launch {
+    background: #4f46e5;
+    color: #ffffff;
+}
+.btn-concilia-row-action.btn-launch:hover {
+    background: #4338ca;
+}
+.btn-concilia-row-action.btn-diff {
+    background: #f59e0b;
+    color: #ffffff;
+}
+.btn-concilia-row-action.btn-diff:hover {
+    background: #d97706;
+}
+.btn-concilia-row-action.btn-cents {
+    background: #0284c7;
+    color: #ffffff;
+}
+.btn-concilia-row-action.btn-cents:hover {
+    background: #0369a1;
+}
+.badge-resolved {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    background: #dcfce7;
+    color: #15803d;
+    padding: 0.3rem 0.6rem;
+    border-radius: 6px;
+    font-size: 0.76rem;
+    font-weight: 700;
+}
+
 @media (max-width: 768px) {
     .conciliacao-form-grid {
         grid-template-columns: 1fr;
@@ -934,13 +1251,20 @@ function renderConciliacaoResults(data) {
         document.getElementById('emptyFaltando').style.display = 'block';
     } else {
         document.getElementById('emptyFaltando').style.display = 'none';
-        faltando.forEach(item => {
+        faltando.forEach((item, idx) => {
             const tr = document.createElement('tr');
+            tr.id = `row-faltando-${idx}`;
             tr.innerHTML = `
                 <td>${formatDateBR(item.data)}</td>
                 <td><strong>${escapeHtml(item.descricao)}</strong></td>
                 <td class="text-center">${item.parcela_info || '1/1'}</td>
                 <td class="text-right" style="color: #ef4444; font-weight: bold;">${formatBRL(item.valor)}</td>
+                <td class="text-center" id="action-faltando-${idx}">
+                    <button type="button" class="btn-concilia-row-action btn-launch" onclick="openQuickLaunchModal(${idx})" title="Lançar compra no sistema">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                        <span>Lançar</span>
+                    </button>
+                </td>
             `;
             tbodyFaltando.appendChild(tr);
         });
@@ -976,8 +1300,9 @@ function renderConciliacaoResults(data) {
         document.getElementById('emptyDivergencias').style.display = 'block';
     } else {
         document.getElementById('emptyDivergencias').style.display = 'none';
-        divergencias.forEach(d => {
+        divergencias.forEach((d, idx) => {
             const tr = document.createElement('tr');
+            tr.id = `row-divergencia-${idx}`;
             const difClass = d.diferenca > 0 ? 'color: #ef4444;' : 'color: #f59e0b;';
             tr.innerHTML = `
                 <td>${formatDateBR(d.fatura_item.data)}</td>
@@ -988,6 +1313,11 @@ function renderConciliacaoResults(data) {
                 <td class="text-right">${formatBRL(d.valor_fatura)}</td>
                 <td class="text-right">${formatBRL(d.valor_sistema)}</td>
                 <td class="text-right" style="${difClass} font-weight: bold;">${d.diferenca > 0 ? '+' : ''}${formatBRL(d.diferenca)}</td>
+                <td class="text-center" id="action-divergencia-${idx}">
+                    <button type="button" class="btn-concilia-row-action btn-diff" onclick="openQuickDiffModal('divergencia', ${idx})" title="Resolver diferença de valor">
+                        <span>Resolver</span>
+                    </button>
+                </td>
             `;
             tbodyDivergencias.appendChild(tr);
         });
@@ -1001,14 +1331,25 @@ function renderConciliacaoResults(data) {
         document.getElementById('emptyConciliados').style.display = 'block';
     } else {
         document.getElementById('emptyConciliados').style.display = 'none';
-        conciliados.forEach(c => {
+        conciliados.forEach((c, idx) => {
             const tr = document.createElement('tr');
+            tr.id = `row-conciliado-${idx}`;
             const badgeCerteza = c.status === 'certeiro'
                 ? '<span style="background: #dcfce7; color: #15803d; padding: 2px 6px; border-radius: 4px; font-size: 0.75rem; font-weight: bold;">100%</span>'
                 : `<span style="background: #fef3c7; color: #b45309; padding: 2px 6px; border-radius: 4px; font-size: 0.75rem; font-weight: bold;">${c.confianca || 80}%</span>`;
             const difCentavos = c.status === 'tolerancia' && c.diferenca_valor
                 ? `<div style="font-size: 0.75rem; font-weight: normal; color: #b45309;" title="Valor no sistema: ${formatBRL(c.sistema_item.valor_parcela)}">${c.diferenca_valor > 0 ? '+' : '−'}${formatBRL(Math.abs(c.diferenca_valor))} vs sistema</div>`
                 : '';
+
+            let acaoHtml = '<span style="color:#94a3b8; font-size:0.8rem;">—</span>';
+            if (c.status === 'tolerancia' && c.diferenca_valor && Math.abs(c.diferenca_valor) > 0.001) {
+                acaoHtml = `
+                    <button type="button" class="btn-concilia-row-action btn-cents" onclick="openQuickDiffModal('tolerancia', ${idx})" title="Ajustar diferença de centavos">
+                        <span>Ajustar Centavos</span>
+                    </button>
+                `;
+            }
+
             tr.innerHTML = `
                 <td>${formatDateBR(c.fatura_item.data)}</td>
                 <td><strong>${escapeHtml(c.fatura_item.descricao)}</strong></td>
@@ -1016,6 +1357,7 @@ function renderConciliacaoResults(data) {
                 <td class="text-center">${c.sistema_item.parcela_texto}</td>
                 <td class="text-right" style="font-weight: bold;">${formatBRL(c.fatura_item.valor)}${difCentavos}</td>
                 <td class="text-center">${badgeCerteza}</td>
+                <td class="text-center" id="action-conciliado-${idx}">${acaoHtml}</td>
             `;
             tbodyConciliados.appendChild(tr);
         });
@@ -1071,5 +1413,363 @@ function escapeHtml(text) {
         "'": '&#039;'
     };
     return text.toString().replace(/[&<>"']/g, m => map[m]);
+}
+
+// ── MINI-MODAL: Lançar Compra Faltante ──
+function openQuickLaunchModal(idx) {
+    if (!lastConciliacaoResult) return;
+    const item = (lastConciliacaoResult.grupos.faltando_no_sistema || [])[idx];
+    if (!item) return;
+
+    document.getElementById('qlCartaoId').value = lastConciliacaoResult.cartao.id;
+    document.getElementById('qlCartaoNome').value = lastConciliacaoResult.cartao.nome;
+    document.getElementById('qlItemIndex').value = idx;
+    document.getElementById('qlDescricao').value = item.descricao || '';
+    document.getElementById('qlData').value = item.data || new Date().toISOString().split('T')[0];
+    document.getElementById('qlValor').value = parseFloat(item.valor) || 0;
+    document.getElementById('qlTipo').value = 'avista';
+    document.getElementById('qlParcelas').value = '1';
+    document.getElementById('qlParcelas').style.display = 'none';
+
+    // Parse de parcelas da fatura se houver (ex: 1/3)
+    if (item.parcela_info && item.parcela_info.includes('/')) {
+        const parts = item.parcela_info.split('/');
+        const totalP = parseInt(parts[1], 10);
+        if (totalP > 1) {
+            document.getElementById('qlTipo').value = 'parcelada';
+            document.getElementById('qlParcelas').value = totalP;
+            document.getElementById('qlParcelas').style.display = 'block';
+        }
+    }
+
+    document.getElementById('qlAlert').style.display = 'none';
+    document.getElementById('quickLaunchModal').style.display = 'flex';
+}
+
+function closeQuickLaunchModal() {
+    document.getElementById('quickLaunchModal').style.display = 'none';
+}
+
+function toggleQlParcelas(val) {
+    const pInput = document.getElementById('qlParcelas');
+    if (val === 'parcelada') {
+        pInput.style.display = 'block';
+        if (parseInt(pInput.value, 10) <= 1) pInput.value = '2';
+    } else {
+        pInput.style.display = 'none';
+        pInput.value = '1';
+    }
+}
+
+async function submitQuickLaunch(event) {
+    event.preventDefault();
+    const btn = document.getElementById('qlSubmitBtn');
+    const alertEl = document.getElementById('qlAlert');
+    alertEl.style.display = 'none';
+
+    btn.disabled = true;
+    document.getElementById('qlBtnText').textContent = 'Lançando...';
+
+    const itemIdx = document.getElementById('qlItemIndex').value;
+    const faturaId = lastConciliacaoResult ? lastConciliacaoResult.fatura_id : null;
+
+    const payload = {
+        cartao_id: document.getElementById('qlCartaoId').value,
+        descricao: document.getElementById('qlDescricao').value,
+        valor_total: document.getElementById('qlValor').value,
+        data_compra: document.getElementById('qlData').value,
+        categoria: document.getElementById('qlCategoria').value,
+        tipo: document.getElementById('qlTipo').value,
+        numero_parcelas: document.getElementById('qlParcelas').value,
+        fatura_id: faturaId,
+    };
+
+    try {
+        const res = await fetch("{{ route('cartoes.conciliar.lancar-item') }}", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (!res.ok || !data.sucesso) {
+            throw new Error(data.message || data.mensagem || 'Falha ao registrar compra.');
+        }
+
+        const actionTd = document.getElementById(`action-faltando-${itemIdx}`);
+        if (actionTd) {
+            actionTd.innerHTML = '<span class="badge-resolved">✔ Lançado</span>';
+        }
+
+        const lancadoValor = parseFloat(payload.valor_total) || 0;
+        lastConciliacaoResult.totais.sistema += lancadoValor;
+        lastConciliacaoResult.totais.diferenca = Math.round((lastConciliacaoResult.totais.fatura_despesas - lastConciliacaoResult.totais.sistema) * 100) / 100;
+        lastConciliacaoResult.contadores.faltando_no_sistema = Math.max(0, lastConciliacaoResult.contadores.faltando_no_sistema - 1);
+        lastConciliacaoResult.contadores.total_sistema += 1;
+        lastConciliacaoResult.contadores.conciliados += 1;
+
+        atualizarMetricasDinamicas();
+        if (data.fatura_atualizada) {
+            atualizarLinhaFaturaSalva(data.fatura_atualizada);
+        }
+
+        closeQuickLaunchModal();
+    } catch (err) {
+        alertEl.textContent = err.message;
+        alertEl.style.display = 'block';
+    } finally {
+        btn.disabled = false;
+        document.getElementById('qlBtnText').textContent = 'Confirmar e Lançar';
+    }
+}
+
+// ── MINI-MODAL: Resolver Diferença / Centavos ──
+let currentDiffContext = null;
+
+function openQuickDiffModal(type, idx) {
+    if (!lastConciliacaoResult) return;
+    currentDiffContext = { type, idx };
+    let itemData = null;
+    if (type === 'divergencia') {
+        itemData = (lastConciliacaoResult.grupos.divergencias_valor || [])[idx];
+    } else if (type === 'tolerancia') {
+        itemData = (lastConciliacaoResult.grupos.conciliados || [])[idx];
+    }
+
+    if (!itemData) return;
+
+    const valFatura = type === 'divergencia' ? itemData.valor_fatura : itemData.fatura_item.valor;
+    const valSistema = type === 'divergencia' ? itemData.valor_sistema : itemData.sistema_item.valor_parcela;
+    const diferenca = type === 'divergencia' ? itemData.diferenca : itemData.diferenca_valor;
+
+    document.getElementById('qdValFatura').textContent = formatBRL(valFatura);
+    document.getElementById('qdValSistema').textContent = formatBRL(valSistema);
+    document.getElementById('qdValDiferenca').textContent = (diferenca > 0 ? '+' : '') + formatBRL(diferenca);
+
+    document.getElementById('qdAlert').style.display = 'none';
+    document.getElementById('quickDiffModal').style.display = 'flex';
+}
+
+function closeQuickDiffModal() {
+    document.getElementById('quickDiffModal').style.display = 'none';
+}
+
+async function executarAjusteParcela() {
+    if (!currentDiffContext || !lastConciliacaoResult) return;
+    const { type, idx } = currentDiffContext;
+    const itemData = type === 'divergencia' 
+        ? lastConciliacaoResult.grupos.divergencias_valor[idx] 
+        : lastConciliacaoResult.grupos.conciliados[idx];
+
+    const valFatura = type === 'divergencia' ? itemData.valor_fatura : itemData.fatura_item.valor;
+    const parcelaId = itemData.sistema_item.id;
+    const diferenca = type === 'divergencia' ? itemData.diferenca : itemData.diferenca_valor;
+
+    const alertEl = document.getElementById('qdAlert');
+    alertEl.style.display = 'none';
+
+    try {
+        const res = await fetch("{{ route('cartoes.conciliar.ajustar-centavos') }}", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify({
+                tipo_ajuste: 'ajustar_parcela',
+                parcela_id: parcelaId,
+                novo_valor: valFatura,
+                fatura_id: lastConciliacaoResult.fatura_id || null,
+            })
+        });
+
+        const data = await res.json();
+        if (!res.ok || !data.sucesso) {
+            throw new Error(data.message || data.mensagem || 'Falha ao ajustar parcela.');
+        }
+
+        const actionTd = type === 'divergencia' 
+            ? document.getElementById(`action-divergencia-${idx}`)
+            : document.getElementById(`action-conciliado-${idx}`);
+        if (actionTd) {
+            actionTd.innerHTML = '<span class="badge-resolved">✔ Ajustado</span>';
+        }
+
+        lastConciliacaoResult.totais.sistema += diferenca;
+        lastConciliacaoResult.totais.diferenca = Math.round((lastConciliacaoResult.totais.fatura_despesas - lastConciliacaoResult.totais.sistema) * 100) / 100;
+        if (type === 'divergencia') {
+            lastConciliacaoResult.contadores.divergencias_valor = Math.max(0, lastConciliacaoResult.contadores.divergencias_valor - 1);
+            lastConciliacaoResult.contadores.conciliados += 1;
+        }
+
+        atualizarMetricasDinamicas();
+        if (data.fatura_atualizada) {
+            atualizarLinhaFaturaSalva(data.fatura_atualizada);
+        }
+
+        closeQuickDiffModal();
+    } catch (err) {
+        alertEl.textContent = err.message;
+        alertEl.style.display = 'block';
+    }
+}
+
+async function executarLancamentoDiferenca() {
+    if (!currentDiffContext || !lastConciliacaoResult) return;
+    const { type, idx } = currentDiffContext;
+    const itemData = type === 'divergencia' 
+        ? lastConciliacaoResult.grupos.divergencias_valor[idx] 
+        : lastConciliacaoResult.grupos.conciliados[idx];
+
+    const desc = type === 'divergencia' ? itemData.fatura_item.descricao : itemData.fatura_item.descricao;
+    const dataCompra = type === 'divergencia' ? itemData.fatura_item.data : itemData.fatura_item.data;
+    const diferenca = type === 'divergencia' ? itemData.diferenca : itemData.diferenca_valor;
+
+    const alertEl = document.getElementById('qdAlert');
+    alertEl.style.display = 'none';
+
+    try {
+        const res = await fetch("{{ route('cartoes.conciliar.ajustar-centavos') }}", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify({
+                tipo_ajuste: 'novo_lancamento',
+                cartao_id: lastConciliacaoResult.cartao.id,
+                descricao: `Ajuste Diferença - ${desc}`,
+                valor: Math.abs(diferenca),
+                data_compra: dataCompra || new Date().toISOString().split('T')[0],
+                categoria: 'Ajuste / Tarifas',
+                fatura_id: lastConciliacaoResult.fatura_id || null,
+            })
+        });
+
+        const data = await res.json();
+        if (!res.ok || !data.sucesso) {
+            throw new Error(data.message || data.mensagem || 'Falha ao lançar diferença.');
+        }
+
+        const actionTd = type === 'divergencia' 
+            ? document.getElementById(`action-divergencia-${idx}`)
+            : document.getElementById(`action-conciliado-${idx}`);
+        if (actionTd) {
+            actionTd.innerHTML = '<span class="badge-resolved">✔ Lançado</span>';
+        }
+
+        lastConciliacaoResult.totais.sistema += diferenca;
+        lastConciliacaoResult.totais.diferenca = Math.round((lastConciliacaoResult.totais.fatura_despesas - lastConciliacaoResult.totais.sistema) * 100) / 100;
+        if (type === 'divergencia') {
+            lastConciliacaoResult.contadores.divergencias_valor = Math.max(0, lastConciliacaoResult.contadores.divergencias_valor - 1);
+            lastConciliacaoResult.contadores.conciliados += 1;
+        }
+
+        atualizarMetricasDinamicas();
+        if (data.fatura_atualizada) {
+            atualizarLinhaFaturaSalva(data.fatura_atualizada);
+        }
+
+        closeQuickDiffModal();
+    } catch (err) {
+        alertEl.textContent = err.message;
+        alertEl.style.display = 'block';
+    }
+}
+
+function atualizarMetricasDinamicas() {
+    if (!lastConciliacaoResult) return;
+    document.getElementById('resTotalSistema').textContent = formatBRL(lastConciliacaoResult.totais.sistema);
+    document.getElementById('resQtdSistema').textContent = lastConciliacaoResult.contadores.total_sistema + ' parcelas cadastradas';
+
+    const difEl = document.getElementById('resDiferenca');
+    const statusEl = document.getElementById('resStatusBadge');
+    difEl.textContent = formatBRL(lastConciliacaoResult.totais.diferenca);
+
+    if (Math.abs(lastConciliacaoResult.totais.diferenca) < 0.01) {
+        difEl.className = 'metric-value metric-success';
+        statusEl.innerHTML = '<span style="color: #10b981; font-weight: bold;">✔ 100% Alinhado</span>';
+    } else {
+        difEl.className = 'metric-value metric-danger';
+        statusEl.innerHTML = '<span style="color: #ef4444; font-weight: bold;">⚠ Divergência detectada</span>';
+    }
+
+    document.getElementById('resItensOk').textContent = lastConciliacaoResult.contadores.conciliados + ' OK';
+    const totalDivergentes = (lastConciliacaoResult.contadores.faltando_no_sistema || 0) + 
+                            (lastConciliacaoResult.contadores.sobrando_no_sistema || 0) + 
+                            (lastConciliacaoResult.contadores.divergencias_valor || 0);
+    document.getElementById('resItensDivergentes').textContent = totalDivergentes + ' divergências';
+
+    document.getElementById('badgeCountFaltando').textContent = lastConciliacaoResult.contadores.faltando_no_sistema;
+    document.getElementById('badgeCountDivergencias').textContent = lastConciliacaoResult.contadores.divergencias_valor;
+    document.getElementById('badgeCountConciliados').textContent = lastConciliacaoResult.contadores.conciliados;
+}
+
+async function reabrirConciliacaoSalva(faturaId) {
+    const modal = document.getElementById('conciliacaoFaturaModal');
+    if (!modal) return;
+
+    modal.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+
+    document.getElementById('conciliacaoUploadStep').style.display = 'none';
+    document.getElementById('conciliacaoLoadingStep').style.display = 'block';
+    document.getElementById('conciliacaoResultsStep').style.display = 'none';
+    document.getElementById('conciliaErrorAlert').style.display = 'none';
+
+    try {
+        const response = await fetch(`/financas/cartoes/faturas/${faturaId}/reconciliar`, {
+            method: 'POST',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                'Accept': 'application/json'
+            }
+        });
+
+        const data = await response.json();
+        if (!response.ok || !data.sucesso) {
+            throw new Error(data.mensagem || 'Falha ao auditar fatura salva.');
+        }
+
+        lastConciliacaoResult = data;
+        renderConciliacaoResults(data);
+
+        document.getElementById('conciliacaoLoadingStep').style.display = 'none';
+        document.getElementById('conciliacaoResultsStep').style.display = 'block';
+
+        if (data.fatura_id) {
+            atualizarLinhaFaturaSalva({
+                id: data.fatura_id,
+                status: data.totais.is_alinhado ? 'conciliada' : 'pendente',
+                pendencias_count: (data.contadores.faltando_no_sistema + data.contadores.sobrando_no_sistema + data.contadores.divergencias_valor),
+                diferenca_total: data.totais.diferenca
+            });
+        }
+    } catch (err) {
+        document.getElementById('conciliacaoLoadingStep').style.display = 'none';
+        document.getElementById('conciliacaoUploadStep').style.display = 'block';
+        const errAlert = document.getElementById('conciliaErrorAlert');
+        errAlert.innerHTML = err.message || 'Erro ao reabrir fatura salva.';
+        errAlert.style.display = 'block';
+    }
+}
+
+function atualizarLinhaFaturaSalva(faturaData) {
+    const badgeEl = document.getElementById(`fatura-status-badge-${faturaData.id}`);
+    if (badgeEl) {
+        if (faturaData.status === 'conciliada' || faturaData.pendencias_count === 0) {
+            badgeEl.className = 'fatura-badge fatura-badge-success';
+            badgeEl.innerHTML = '✔ 100% Conciliada';
+        } else {
+            badgeEl.className = 'fatura-badge fatura-badge-warning';
+            badgeEl.innerHTML = `⚠ ${faturaData.pendencias_count} pendência(s)`;
+        }
+    }
 }
 </script>

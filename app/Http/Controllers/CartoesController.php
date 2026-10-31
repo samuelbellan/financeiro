@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Cartao;
 use App\Models\CartaoCompra;
+use App\Models\CartaoFatura;
 use App\Models\CartaoParcela;
 use App\Models\CartaoPrevisao;
 use App\Models\Categoria;
@@ -14,6 +15,7 @@ use App\Services\TransactionSuggestionService;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use Carbon\Carbon;
 
 class CartoesController extends Controller
@@ -25,6 +27,11 @@ class CartoesController extends Controller
         
         $currentMonth = $request->get('mes', now()->month);
         $currentYear = $request->get('ano', now()->year);
+
+        foreach ($cartoes as $c) {
+            $c->is_fatura_fechada = CreditCardService::isFaturaFechada($c, (int)$currentMonth, (int)$currentYear);
+            $c->data_fechamento_fatura = CreditCardService::getDataFechamentoFatura($c, (int)$currentMonth, (int)$currentYear);
+        }
 
         // Parcelas do período selecionado (apenas cartões ativos)
         $faturas = CartaoParcela::whereHas('compra.cartao', function($query) use ($user) {
@@ -64,8 +71,13 @@ class CartoesController extends Controller
                     && CategorySanitizer::isMatch($fatura->compra->categoria, $p->categoria);
             })->sum('valor_parcela');
             
+            $cartaoDaPrevisao = $cartoes->firstWhere('id', $p->cartao_id);
+            $isCartaoFechado = $cartaoDaPrevisao ? CreditCardService::isFaturaFechada($cartaoDaPrevisao, (int)$currentMonth, (int)$currentYear) : false;
+
+            $p->is_fechada = $isCartaoFechado;
             $p->consumo_real = $consumoReal;
-            $p->restante = max(0, $p->valor_previsto - $consumoReal);
+            // Se fatura está fechada, nenhuma compra a mais pode entrar: restante é zero
+            $p->restante = $isCartaoFechado ? 0.0 : max(0, $p->valor_previsto - $consumoReal);
             $p->porcentagem = $p->valor_previsto > 0 ? min(100, ($consumoReal / $p->valor_previsto) * 100) : 0;
         }
 
@@ -123,11 +135,16 @@ class CartoesController extends Controller
 
         $sugestoesDescricao = TransactionSuggestionService::getSuggestions($user->id, limit: 150);
 
+        $faturasSalvas = CartaoFatura::where('user_id', $user->id)
+            ->with('cartao')
+            ->orderByDesc('created_at')
+            ->get();
+
         return view('financas.cartoes', compact(
             'cartoes', 'faturasPorCartao', 'previsoes', 'gastosPorCategoria', 
             'currentMonth', 'currentYear', 'gastosChartAVista', 'gastosChartAPrazo',
             'gastosDiariosAVista', 'mediaDiaria', 'diasNoMes', 'comprasAVistaDetalhado',
-            'sugestoesDescricao', 'userCategorias'
+            'sugestoesDescricao', 'userCategorias', 'faturasSalvas'
         ));
     }
 
@@ -412,9 +429,18 @@ class CartoesController extends Controller
 
     public function destroy(Cartao $cartao)
     {
-        if ($cartao->user_id !== Auth::id()) abort(403);
+        if ($cartao->user_id !== Auth::id()) {
+            abort(403);
+        }
+
+        if ($cartao->ativo) {
+            return redirect()->back()->with('error', "O cartão \"{$cartao->nome}\" precisa ser desabilitado antes de ser excluído.");
+        }
+
+        $nome = $cartao->nome;
         $cartao->delete();
-        return redirect()->back()->with('success', 'Cartão excluído!');
+
+        return redirect()->back()->with('success', "Cartão \"{$nome}\" excluído com sucesso!");
     }
 
     public function toggleStatus(Cartao $cartao)
@@ -472,10 +498,303 @@ class CartoesController extends Controller
             return response()->json($resultado, 422);
         }
 
+        // Armazenar arquivo e registrar no histórico de faturas salvas
+        $path = $file->store('faturas', 'local');
+        $pendenciasCount = count($resultado['grupos']['faltando_no_sistema'] ?? []) +
+                           count($resultado['grupos']['sobrando_no_sistema'] ?? []) +
+                           count($resultado['grupos']['divergencias_valor'] ?? []);
+        $status = ($pendenciasCount === 0 && abs($resultado['totais']['diferenca'] ?? 0) < 0.01) ? 'conciliada' : 'pendente';
+
+        $cartaoFatura = CartaoFatura::create([
+            'user_id'               => Auth::id(),
+            'cartao_id'             => $cartao->id,
+            'mes'                   => (int) $request->mes,
+            'ano'                   => (int) $request->ano,
+            'arquivo_path'          => $path,
+            'arquivo_nome_original' => $file->getClientOriginalName(),
+            'total_fatura'          => $resultado['totais']['fatura_despesas'] ?? 0,
+            'total_despesas'        => $resultado['totais']['fatura_despesas'] ?? 0,
+            'total_pagamentos'      => $resultado['totais']['fatura_pagamentos'] ?? 0,
+            'itens_count'           => $resultado['contadores']['total_fatura'] ?? 0,
+            'itens_json'            => $resultado['itens_extraidos'] ?? [],
+            'status'                => $status,
+            'diferenca_total'       => $resultado['totais']['diferenca'] ?? 0,
+            'pendencias_count'      => $pendenciasCount,
+        ]);
+
+        $resultado['fatura_id'] = $cartaoFatura->id;
+
         // Salvar na sessão para permitir download imediato do PDF
         session(['ultima_conciliacao_fatura' => $resultado]);
 
         return response()->json($resultado);
+    }
+
+    /**
+     * Reexecuta a auditoria de uma fatura salva contra o banco de dados atual.
+     */
+    public function reconciliarFaturaSalva(CartaoFatura $fatura, CreditCardReconciliationService $service)
+    {
+        if ($fatura->user_id !== Auth::id()) {
+            abort(403);
+        }
+
+        $cartao = $fatura->cartao;
+        if (!$cartao) {
+            return response()->json([
+                'sucesso' => false,
+                'mensagem' => 'Cartão associado a esta fatura não foi encontrado.',
+            ], 404);
+        }
+
+        $itens = $fatura->itens_json ?? [];
+        if (empty($itens)) {
+            return response()->json([
+                'sucesso' => false,
+                'mensagem' => 'Esta fatura arquivada não possui lançamentos armazenados.',
+            ], 422);
+        }
+
+        $resultado = $service->reconcileItems(
+            faturaItens: $itens,
+            cartao: $cartao,
+            mes: $fatura->mes,
+            ano: $fatura->ano
+        );
+
+        if (!$resultado['sucesso']) {
+            return response()->json($resultado, 422);
+        }
+
+        $pendenciasCount = count($resultado['grupos']['faltando_no_sistema'] ?? []) +
+                           count($resultado['grupos']['sobrando_no_sistema'] ?? []) +
+                           count($resultado['grupos']['divergencias_valor'] ?? []);
+        $status = ($pendenciasCount === 0 && abs($resultado['totais']['diferenca'] ?? 0) < 0.01) ? 'conciliada' : 'pendente';
+
+        $fatura->update([
+            'status'           => $status,
+            'diferenca_total'  => $resultado['totais']['diferenca'] ?? 0,
+            'pendencias_count' => $pendenciasCount,
+        ]);
+
+        $resultado['fatura_id'] = $fatura->id;
+        session(['ultima_conciliacao_fatura' => $resultado]);
+
+        return response()->json($resultado);
+    }
+
+    /**
+     * Download do arquivo original da fatura arquivada.
+     */
+    public function downloadFaturaArquivo(CartaoFatura $fatura)
+    {
+        if ($fatura->user_id !== Auth::id()) {
+            abort(403);
+        }
+
+        if (!$fatura->arquivo_path || !Storage::disk('local')->exists($fatura->arquivo_path)) {
+            return redirect()->back()->with('error', 'Arquivo da fatura não encontrado no armazenamento.');
+        }
+
+        return Storage::disk('local')->download($fatura->arquivo_path, $fatura->arquivo_nome_original ?? 'fatura.pdf');
+    }
+
+    /**
+     * Remove uma fatura salva do histórico.
+     */
+    public function destroyFatura(CartaoFatura $fatura)
+    {
+        if ($fatura->user_id !== Auth::id()) {
+            abort(403);
+        }
+
+        if ($fatura->arquivo_path && Storage::disk('local')->exists($fatura->arquivo_path)) {
+            Storage::disk('local')->delete($fatura->arquivo_path);
+        }
+
+        $fatura->delete();
+
+        if (request()->wantsJson()) {
+            return response()->json(['sucesso' => true, 'mensagem' => 'Fatura removida do histórico com sucesso.']);
+        }
+
+        return redirect()->back()->with('success', 'Fatura removida do histórico com sucesso.');
+    }
+
+    /**
+     * Lança uma compra faltante identificada na conciliação da fatura via AJAX.
+     */
+    public function lancarItemFaltante(Request $request)
+    {
+        $validated = $request->validate([
+            'cartao_id'       => 'required|exists:cartoes,id',
+            'descricao'       => 'required|string|max:255',
+            'valor_total'     => 'required|numeric',
+            'data_compra'     => 'required|date',
+            'categoria'       => 'nullable|string|max:255',
+            'tipo'            => 'nullable|in:avista,parcelada,recorrente',
+            'numero_parcelas' => 'nullable|integer|min:1',
+            'fatura_id'       => 'nullable|exists:cartao_faturas,id',
+        ]);
+
+        $cartao = Cartao::where('user_id', Auth::id())->findOrFail($validated['cartao_id']);
+
+        $tipo = $validated['tipo'] ?? 'avista';
+        $numParcelas = (int) ($validated['numero_parcelas'] ?? 1);
+        if ($tipo === 'avista' && $numParcelas > 1) {
+            $tipo = 'parcelada';
+        }
+
+        $compra = CartaoCompra::create([
+            'cartao_id'       => $cartao->id,
+            'descricao'       => $validated['descricao'],
+            'valor_total'     => abs((float) $validated['valor_total']),
+            'data_compra'     => $validated['data_compra'],
+            'categoria'       => $validated['categoria'] ?: 'Geral',
+            'tipo'            => $tipo,
+            'numero_parcelas' => $tipo === 'parcelada' ? $numParcelas : 1,
+        ]);
+
+        $this->gerarParcelas($compra);
+
+        // Se veio vinculado a uma fatura salva, atualizar status
+        $faturaAtualizada = null;
+        if (!empty($validated['fatura_id'])) {
+            $fatura = CartaoFatura::where('user_id', Auth::id())->find($validated['fatura_id']);
+            if ($fatura) {
+                // Alinha o vencimento da 1ª parcela ao mês e ano da fatura que a cobrou
+                $primeiraParcela = $compra->parcelas()->first();
+                if ($primeiraParcela) {
+                    $diaVenc = min((int)($cartao->dia_vencimento ?: 10), 28);
+                    $vencEsperado = Carbon::create($fatura->ano, $fatura->mes, $diaVenc)->format('Y-m-d');
+                    if ($primeiraParcela->data_vencimento !== $vencEsperado) {
+                        $primeiraParcela->update(['data_vencimento' => $vencEsperado]);
+                    }
+                }
+
+                $service = app(CreditCardReconciliationService::class);
+                $res = $service->reconcileItems($fatura->itens_json ?? [], $cartao, $fatura->mes, $fatura->ano);
+                $pendenciasCount = count($res['grupos']['faltando_no_sistema'] ?? []) +
+                                   count($res['grupos']['sobrando_no_sistema'] ?? []) +
+                                   count($res['grupos']['divergencias_valor'] ?? []);
+                $status = ($pendenciasCount === 0 && abs($res['totais']['diferenca'] ?? 0) < 0.01) ? 'conciliada' : 'pendente';
+                $fatura->update([
+                    'status'           => $status,
+                    'diferenca_total'  => $res['totais']['diferenca'] ?? 0,
+                    'pendencias_count' => $pendenciasCount,
+                ]);
+                $faturaAtualizada = [
+                    'id'               => $fatura->id,
+                    'status'           => $fatura->status,
+                    'pendencias_count' => $fatura->pendencias_count,
+                    'diferenca_total'  => (float) $fatura->diferenca_total,
+                ];
+            }
+        }
+
+        return response()->json([
+            'sucesso'  => true,
+            'mensagem' => 'Lançamento realizado com sucesso!',
+            'compra'   => [
+                'id'          => $compra->id,
+                'descricao'   => $compra->descricao,
+                'valor_total' => (float) $compra->valor_total,
+                'data_compra' => $compra->data_compra,
+                'categoria'   => $compra->categoria,
+            ],
+            'fatura_atualizada' => $faturaAtualizada,
+        ]);
+    }
+
+    /**
+     * Ajusta centavos ou cria novo lançamento de ajuste de diferença via AJAX.
+     */
+    public function ajustarCentavos(Request $request)
+    {
+        $validated = $request->validate([
+            'tipo_ajuste' => 'required|in:ajustar_parcela,novo_lancamento',
+            'fatura_id'   => 'nullable|exists:cartao_faturas,id',
+            // Para ajustar_parcela:
+            'parcela_id'  => 'required_if:tipo_ajuste,ajustar_parcela|nullable|exists:cartao_parcelas,id',
+            'novo_valor'  => 'required_if:tipo_ajuste,ajustar_parcela|nullable|numeric',
+            // Para novo_lancamento:
+            'cartao_id'   => 'required_if:tipo_ajuste,novo_lancamento|nullable|exists:cartoes,id',
+            'descricao'   => 'required_if:tipo_ajuste,novo_lancamento|nullable|string|max:255',
+            'valor'       => 'required_if:tipo_ajuste,novo_lancamento|nullable|numeric',
+            'data_compra' => 'required_if:tipo_ajuste,novo_lancamento|nullable|date',
+            'categoria'   => 'nullable|string|max:255',
+        ]);
+
+        if ($validated['tipo_ajuste'] === 'ajustar_parcela') {
+            $parcela = CartaoParcela::with('compra.cartao')->findOrFail($validated['parcela_id']);
+            if ($parcela->compra->cartao->user_id !== Auth::id()) {
+                abort(403);
+            }
+
+            $novoValor = (float) $validated['novo_valor'];
+            $parcela->update(['valor_parcela' => $novoValor]);
+
+            if ($parcela->compra->tipo === 'avista' || $parcela->compra->numero_parcelas <= 1) {
+                $parcela->compra->update(['valor_total' => $novoValor]);
+            }
+            $cartao = $parcela->compra->cartao;
+            $msg = 'Parcela ajustada com sucesso!';
+        } else {
+            $cartao = Cartao::where('user_id', Auth::id())->findOrFail($validated['cartao_id']);
+            $compra = CartaoCompra::create([
+                'cartao_id'       => $cartao->id,
+                'descricao'       => $validated['descricao'],
+                'valor_total'     => abs((float) $validated['valor']),
+                'data_compra'     => $validated['data_compra'],
+                'categoria'       => $validated['categoria'] ?: 'Ajuste / Tarifas',
+                'tipo'            => 'avista',
+                'numero_parcelas' => 1,
+            ]);
+            $this->gerarParcelas($compra);
+            $msg = 'Lançamento de diferença registrado com sucesso!';
+        }
+
+        // Se vinculado a uma fatura salva, atualizar status
+        $faturaAtualizada = null;
+        if (!empty($validated['fatura_id'])) {
+            $fatura = CartaoFatura::where('user_id', Auth::id())->find($validated['fatura_id']);
+            if ($fatura) {
+                if ($validated['tipo_ajuste'] === 'novo_lancamento' && isset($compra)) {
+                    $primeiraParcela = $compra->parcelas()->first();
+                    if ($primeiraParcela) {
+                        $diaVenc = min((int)($cartao->dia_vencimento ?: 10), 28);
+                        $vencEsperado = Carbon::create($fatura->ano, $fatura->mes, $diaVenc)->format('Y-m-d');
+                        if ($primeiraParcela->data_vencimento !== $vencEsperado) {
+                            $primeiraParcela->update(['data_vencimento' => $vencEsperado]);
+                        }
+                    }
+                }
+
+                $service = app(CreditCardReconciliationService::class);
+                $res = $service->reconcileItems($fatura->itens_json ?? [], $cartao, $fatura->mes, $fatura->ano);
+                $pendenciasCount = count($res['grupos']['faltando_no_sistema'] ?? []) +
+                                   count($res['grupos']['sobrando_no_sistema'] ?? []) +
+                                   count($res['grupos']['divergencias_valor'] ?? []);
+                $status = ($pendenciasCount === 0 && abs($res['totais']['diferenca'] ?? 0) < 0.01) ? 'conciliada' : 'pendente';
+                $fatura->update([
+                    'status'           => $status,
+                    'diferenca_total'  => $res['totais']['diferenca'] ?? 0,
+                    'pendencias_count' => $pendenciasCount,
+                ]);
+                $faturaAtualizada = [
+                    'id'               => $fatura->id,
+                    'status'           => $fatura->status,
+                    'pendencias_count' => $fatura->pendencias_count,
+                    'diferenca_total'  => (float) $fatura->diferenca_total,
+                ];
+            }
+        }
+
+        return response()->json([
+            'sucesso'           => true,
+            'mensagem'          => $msg,
+            'fatura_atualizada' => $faturaAtualizada,
+        ]);
     }
 
     /**
@@ -496,5 +815,43 @@ class CartoesController extends Controller
         $filename = "relatorio_conciliacao_{$cartaoNome}_{$mes}_{$ano}.pdf";
 
         return $pdf->download($filename);
+    }
+
+    /**
+     * Alterna ou define manualmente o fechamento da fatura de um cartão em determinado mês/ano.
+     */
+    public function toggleFechamentoFatura(Request $request, Cartao $cartao)
+    {
+        if ($cartao->user_id !== Auth::id()) {
+            abort(403);
+        }
+
+        $validated = $request->validate([
+            'mes'     => 'required|integer|between:1,12',
+            'ano'     => 'required|integer|min:2020|max:2050',
+            'fechada' => 'nullable|boolean',
+        ]);
+
+        $fechada = $request->has('fechada') ? (bool) $request->fechada : null;
+        $registro = CreditCardService::setFaturaFechada(
+            cartao: $cartao,
+            mes: (int) $validated['mes'],
+            ano: (int) $validated['ano'],
+            fechada: $fechada,
+            userId: Auth::id()
+        );
+
+        $statusStr = $registro->fechada ? 'FECHADA' : 'ABERTA';
+        $msg = "Fatura de {$cartao->nome} ({$validated['mes']}/{$validated['ano']}) marcada como {$statusStr} com sucesso.";
+
+        if ($request->wantsJson() || $request->ajax()) {
+            return response()->json([
+                'sucesso'  => true,
+                'fechada'  => (bool) $registro->fechada,
+                'mensagem' => $msg,
+            ]);
+        }
+
+        return redirect()->back()->with('success', $msg);
     }
 }

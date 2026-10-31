@@ -9,6 +9,12 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="{{ asset('js/sidebar.js') }}"></script>
     <style>
+        .fatura-badge { display: inline-flex; align-items: center; gap: 0.25rem; padding: 3px 8px; border-radius: 999px; font-size: 0.75rem; font-weight: 700; }
+        .fatura-badge-success { background: #dcfce7; color: #15803d; }
+        .fatura-badge-warning { background: #fef3c7; color: #b45309; }
+        .badge-fatura-status { display: inline-flex; align-items: center; gap: 0.25rem; padding: 0.15rem 0.5rem; border-radius: 999px; font-size: 0.68rem; font-weight: 700; margin-left: 0.4rem; vertical-align: middle; }
+        .badge-fatura-status.fechada { background: #dcfce7; color: #15803d; }
+        .badge-fatura-status.aberta { background: #fef3c7; color: #b45309; }
         .dashboard-analysis { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem; background: #f8fafc; padding: 1.5rem; border-radius: 1rem; border: 1px solid #e2e8f0; }
         .analysis-card { background: white; padding: 1rem; border-radius: 0.75rem; border: 1px solid #e2e8f0; display: flex; flex-direction: column; }
         .analysis-label { font-size: 0.7rem; color: #64748b; font-weight: 700; text-transform: uppercase; margin-bottom: 0.25rem; }
@@ -464,6 +470,14 @@
                                         @endif
                                     </button>
                                 </form>
+                                @if(!$cartao->ativo)
+                                    <form action="{{ route('cartoes.destroy', $cartao->id) }}" method="POST" style="display:inline;" onsubmit="return confirm('ATENÇÃO: Deseja realmente excluir permanentemente o cartão &quot;{{ $cartao->nome }}&quot; e todo o seu histórico?')">
+                                        @csrf @method('DELETE')
+                                        <button type="submit" style="background:rgba(239, 68, 68, 0.85); border:1px solid #ef4444; color:white; padding:4px 8px; border-radius:4px; cursor:pointer; font-size:0.7rem; display:flex; align-items:center; gap:4px;" title="Excluir Cartão Desabilitado">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg> Excluir
+                                        </button>
+                                    </form>
+                                @endif
                                 <button onclick="editCard({{ json_encode($cartao) }})" style="background:rgba(255,255,255,0.15); border:1px solid rgba(255,255,255,0.25); color:white; padding:4px; border-radius:4px; cursor:pointer;" title="Editar Cartão"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4L18.5 2.5z"></path></svg></button>
                             </div>
                             <div class="card-details" @if($cartao->ativo) onclick="openPurchaseModal({{ $cartao->id }}, '{{ $cartao->nome }}')" style="cursor:pointer;" @else style="cursor:not-allowed;" title="Cartão desabilitado" @endif>
@@ -482,6 +496,12 @@
                             <div class="invoice-title">
                                 <div style="width: 12px; height: 12px; border-radius: 50%; background: {{ $cartao->cor }}"></div>
                                 {{ $cartao->nome }}
+                                <span style="font-size:0.75rem; color:#64748b; font-weight:normal;">• Venc. dia {{ $cartao->dia_vencimento }}</span>
+                                @if($cartao->is_fatura_fechada)
+                                    <span class="badge-fatura-status fechada" title="Fatura Fechada: novas compras caem no mês seguinte">✔ Fechada</span>
+                                @else
+                                    <span class="badge-fatura-status aberta" title="Fatura Aberta: aceita compras até a data de fechamento">Aberta</span>
+                                @endif
                                 @if(!$cartao->ativo)
                                     <span style="background: #fee2e2; color: #991b1b; padding: 0.15rem 0.5rem; border-radius: 4px; font-size: 0.65rem; font-weight: 700; margin-left: 0.5rem; text-transform: uppercase;">Desabilitado - Ignorado nos Totais</span>
                                 @endif
@@ -491,6 +511,15 @@
                                     Total: R$ {{ number_format($faturasPorCartao->get($cartao->id)?->sum('valor_parcela') ?? 0, 2, ',', '.') }}
                                 </div>
                                 <div style="display: flex; gap: 0.25rem;">
+                                    <form action="{{ route('cartoes.fatura.fechamento', $cartao->id) }}" method="POST" style="display:inline;">
+                                        @csrf
+                                        <input type="hidden" name="mes" value="{{ $currentMonth }}">
+                                        <input type="hidden" name="ano" value="{{ $currentYear }}">
+                                        <input type="hidden" name="fechada" value="{{ $cartao->is_fatura_fechada ? 0 : 1 }}">
+                                        <button type="submit" class="btn-action" style="background: {{ $cartao->is_fatura_fechada ? '#475569' : '#d97706' }}; padding:0.3rem 0.6rem; font-size:0.7rem;" title="{{ $cartao->is_fatura_fechada ? 'Reabrir fatura deste mês' : 'Marcar fatura deste mês como fechada' }}">
+                                            {{ $cartao->is_fatura_fechada ? 'Reabrir Fatura' : 'Fechar Fatura' }}
+                                        </button>
+                                    </form>
                                     <form action="{{ route('cartoes.recalcular', $cartao->id) }}" method="POST" style="display:inline;" onsubmit="return confirm('Recalcular vencimentos de todas as parcelas abertas deste cartão?')">
                                         @csrf
                                         <button type="submit" class="btn-action" style="background:#3b82f6; padding:0.3rem 0.6rem; font-size:0.7rem;" title="Recalcular vencimentos de todas as parcelas abertas com base no fechamento/vencimento do cartão">
@@ -503,6 +532,15 @@
                                             {{ $cartao->ativo ? 'Desabilitar' : 'Habilitar' }}
                                         </button>
                                     </form>
+                                    @if(!$cartao->ativo)
+                                        <form action="{{ route('cartoes.destroy', $cartao->id) }}" method="POST" style="display:inline;" onsubmit="return confirm('ATENÇÃO: Deseja realmente excluir permanentemente o cartão &quot;{{ $cartao->nome }}&quot; e todo o seu histórico?')">
+                                            @csrf @method('DELETE')
+                                            <button type="submit" class="btn-action" style="background:#dc2626; padding:0.3rem 0.6rem; font-size:0.7rem; display:inline-flex; align-items:center; gap:3px;" title="Excluir Cartão Desabilitado">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                                                Excluir Cartão
+                                            </button>
+                                        </form>
+                                    @endif
                                     <button type="button" onclick="openConciliacaoModal({{ $cartao->id }})" class="btn-action" style="background:#4f46e5; padding:0.3rem 0.6rem; font-size:0.7rem;" title="Conciliar fatura fechada deste cartão">
                                         Conciliar
                                     </button>
@@ -620,6 +658,107 @@
                         </table>
                     </div>
                 @endforeach
+
+                <!-- Histórico de Faturas Arquivadas e Conciliadas -->
+                <div class="section-header" style="margin-top: 2.5rem; display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <h2 style="font-size: 1.15rem; font-weight: 700; color: #1e293b; margin: 0;">Histórico de Faturas Arquivadas</h2>
+                        <p style="font-size: 0.85rem; color: #64748b; margin: 0.2rem 0 0;">
+                            Faturas enviadas e salvas para auditoria comparativa com os lançamentos do sistema.
+                        </p>
+                    </div>
+                    <button type="button" onclick="openConciliacaoModal()" class="btn-action" style="background: #4f46e5; font-size: 0.8rem; box-shadow: 0 2px 4px rgba(79,70,229,0.3);">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
+                            <line x1="1" y1="10" x2="23" y2="10"></line>
+                        </svg>
+                        + Nova Conciliação de Fatura
+                    </button>
+                </div>
+
+                <div class="table-container" style="background: #ffffff; border-radius: 12px; border: 1px solid #e2e8f0; overflow-x: auto; margin-bottom: 2.5rem;">
+                    @if(isset($faturasSalvas) && $faturasSalvas->count() > 0)
+                        <table style="width: 100%; border-collapse: collapse; font-size: 0.85rem;">
+                            <thead>
+                                <tr style="background: #f8fafc; border-bottom: 1px solid #e2e8f0; color: #475569; text-transform: uppercase; font-size: 0.75rem;">
+                                    <th style="padding: 0.75rem 1rem; text-align: left;">Cartão</th>
+                                    <th style="padding: 0.75rem 1rem; text-align: left;">Mês/Ano</th>
+                                    <th style="padding: 0.75rem 1rem; text-align: left;">Arquivo</th>
+                                    <th style="padding: 0.75rem 1rem; text-align: left;">Data do Upload</th>
+                                    <th style="padding: 0.75rem 1rem; text-align: right;">Total Fatura</th>
+                                    <th style="padding: 0.75rem 1rem; text-align: center;">Status Auditoria</th>
+                                    <th style="padding: 0.75rem 1rem; text-align: center;">Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($faturasSalvas as $fat)
+                                    <tr style="border-bottom: 1px solid #f1f5f9; transition: background 0.15s;" onmouseover="this.style.background='#f8fafc'" onmouseout="this.style.background='transparent'">
+                                        <td style="padding: 0.75rem 1rem;">
+                                            <span style="font-weight: 700; color: #1e293b;">{{ $fat->cartao->nome ?? 'Cartão' }}</span>
+                                        </td>
+                                        <td style="padding: 0.75rem 1rem;">
+                                            <span style="background: #e2e8f0; color: #334155; padding: 2px 7px; border-radius: 4px; font-weight: 600; font-size: 0.8rem;">
+                                                {{ $fat->periodo_formatado }}
+                                            </span>
+                                        </td>
+                                        <td style="padding: 0.75rem 1rem; color: #475569;" title="{{ $fat->arquivo_nome_original }}">
+                                            <div style="display: flex; align-items: center; gap: 0.35rem;">
+                                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+                                                <span style="max-width: 170px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                                                    {{ $fat->arquivo_nome_original ?? 'fatura.pdf' }}
+                                                </span>
+                                            </div>
+                                        </td>
+                                        <td style="padding: 0.75rem 1rem; color: #64748b; font-size: 0.8rem;">
+                                            {{ $fat->created_at->format('d/m/Y H:i') }}
+                                        </td>
+                                        <td style="padding: 0.75rem 1rem; text-align: right; font-weight: 700; color: #0f172a;">
+                                            R$ {{ number_format($fat->total_fatura, 2, ',', '.') }}
+                                        </td>
+                                        <td style="padding: 0.75rem 1rem; text-align: center;">
+                                            <span id="fatura-status-badge-{{ $fat->id }}" class="fatura-badge {{ $fat->status === 'conciliada' || $fat->pendencias_count === 0 ? 'fatura-badge-success' : 'fatura-badge-warning' }}">
+                                                @if($fat->status === 'conciliada' || $fat->pendencias_count === 0)
+                                                    ✔ 100% Conciliada
+                                                @else
+                                                    ⚠ {{ $fat->pendencias_count }} pendência(s)
+                                                @endif
+                                            </span>
+                                        </td>
+                                        <td style="padding: 0.75rem 1rem; text-align: center;">
+                                            <div style="display: flex; gap: 0.35rem; justify-content: center; align-items: center;">
+                                                <button type="button" onclick="reabrirConciliacaoSalva({{ $fat->id }})" class="btn-action" style="background: #4f46e5; padding: 0.3rem 0.65rem; font-size: 0.75rem;" title="Auditar e comparar com lançamentos atuais">
+                                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
+                                                    <span>Comparar</span>
+                                                </button>
+                                                @if($fat->arquivo_path)
+                                                    <a href="{{ route('cartoes.faturas.download', $fat) }}" class="btn-action" style="background: #0284c7; padding: 0.3rem 0.55rem; font-size: 0.75rem; text-decoration: none;" title="Baixar arquivo original">
+                                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                                                    </a>
+                                                @endif
+                                                <form action="{{ route('cartoes.faturas.destroy', $fat) }}" method="POST" onsubmit="return confirm('Deseja realmente remover esta fatura salva do histórico?')" style="display: inline;">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit" class="btn-action" style="background: #ef4444; padding: 0.3rem 0.55rem; font-size: 0.75rem;" title="Excluir fatura salva">
+                                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    @else
+                        <div style="text-align: center; padding: 2.5rem 1rem; color: #64748b;">
+                            <svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.5" style="margin-bottom: 0.5rem;"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
+                            <p style="margin: 0; font-size: 0.95rem; font-weight: 600; color: #334155;">Nenhuma fatura arquivada ainda</p>
+                            <p style="margin: 0.3rem 0 1rem; font-size: 0.82rem;">Quando você realizar a conciliação de uma fatura de cartão, ela ficará salva aqui para você auditar a qualquer momento.</p>
+                            <button type="button" onclick="openConciliacaoModal()" class="btn-action" style="background: #4f46e5; font-size: 0.8rem;">
+                                Conciliar Primeira Fatura
+                            </button>
+                        </div>
+                    @endif
+                </div>
             </div>
         </main>
     </div>
@@ -800,6 +939,19 @@
             }
         }
         function openCardModal() { document.getElementById('cardModalTitle').innerText = 'Novo Cartão'; document.getElementById('cardForm').action = "{{ route('cartoes.store') }}"; document.getElementById('cardMethod').innerHTML = ''; document.getElementById('modalCard').style.display = 'flex'; }
+        function editCard(cartao) {
+            document.getElementById('cardModalTitle').innerText = 'Editar Cartão';
+            document.getElementById('cardForm').action = `/financas/cartoes/${cartao.id}`;
+            document.getElementById('cardMethod').innerHTML = '@method("PUT")';
+            document.getElementById('cardName').value = cartao.nome;
+            document.getElementById('cardColor').value = cartao.cor || '#6366f1';
+            document.getElementById('cardBrand').value = cartao.bandeira || '';
+            const lim = parseFloat(cartao.limite) || 0;
+            document.getElementById('cardLimit').value = lim.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            document.getElementById('cardClose').value = cartao.dia_fechamento;
+            document.getElementById('cardDue').value = cartao.dia_vencimento;
+            document.getElementById('modalCard').style.display = 'flex';
+        }
         function openCardPrevisaoModal() {
             document.getElementById('cardPrevisaoModalTitle').innerText = 'Novo Limite / Previsão';
             document.getElementById('cardPrevisaoForm').action = "{{ route('cartoes.previsoes.store') }}";
