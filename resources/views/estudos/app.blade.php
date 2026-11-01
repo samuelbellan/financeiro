@@ -26,6 +26,7 @@
          data-csrf="{{ csrf_token() }}"
          data-sync-url="{{ route('estudos.sync', [], false) }}"
          data-token-url="{{ route('estudos.token', [], false) }}"
+         data-rooms-url="{{ route('estudos.salas', [], false) }}"
          data-login-url="{{ route('login', [], false) }}"
          data-home-url="{{ route('home', [], false) }}"
          data-sw-url="{{ $useServiceWorker ? '/estudos-sw.js?v=' . $swVersion : '' }}"

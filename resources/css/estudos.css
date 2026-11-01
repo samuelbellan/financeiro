@@ -392,6 +392,45 @@ body.focus-on { overflow: hidden; }
 .focus-btn { width: 76px; height: 76px; border-radius: 50%; border: 0; background: var(--c); color: #fff; font-size: 1.6rem; }
 .focus-hint { margin: 0; color: var(--muted); font-size: .8rem; }
 
+/* Modo foco, tela "sala de estudo": cartão do tempo atual e uma mesa por matéria (estilo YPT). */
+.focus-switch { position: absolute; top: calc(12px + env(safe-area-inset-top)); right: 16px; border: 0; background: none; color: var(--muted); font-size: 1.5rem; padding: 6px 8px; }
+.focus.sala { justify-content: flex-start; align-items: stretch; gap: 14px; overflow-y: auto; }
+.focus.sala .focus-switch { color: var(--text); }
+.room-head { display: flex; align-items: center; gap: 12px; padding-right: 44px; font-size: 1.25rem; min-height: 40px; }
+.room-head b { display: flex; align-items: center; gap: 8px; font-weight: 500; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.room-head > span { font-variant-numeric: tabular-nums; color: var(--muted); }
+.room-close { border: 0; background: none; color: var(--muted); font-size: 1.2rem; padding: 4px; }
+.room-card { display: flex; align-items: center; justify-content: space-between; gap: 12px; background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 18px; }
+.room-card small { color: var(--text); font-size: 1rem; font-weight: 600; }
+.room-time { display: flex; align-items: center; gap: 10px; margin: 4px 0 0; font-size: clamp(2.4rem, 13vw, 3.4rem); font-weight: 700; font-variant-numeric: tabular-nums; letter-spacing: -.02em; }
+.room-time.rest { color: var(--muted); }
+.room-btn { flex: none; width: 48px; height: 48px; border-radius: 50%; border: 0; background: var(--text); color: var(--bg); font-size: 1rem; }
+.room-me { display: grid; justify-items: center; gap: 2px; }
+.room-me b { color: var(--primary); font-size: 1.1rem; font-variant-numeric: tabular-nums; }
+.room { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 18px 12px; }
+.room h4 { margin: 0 4px; font-size: 1.3rem; font-weight: 600; }
+.room p { margin: 6px 4px 14px; color: var(--muted); font-size: .9rem; }
+.room p span { color: var(--primary); }
+.room .chips { padding: 0 0 10px; }
+.room-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.room-code { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; margin: 18px 4px 0 !important; font-size: .82rem !important; }
+.room-code b { color: var(--text); letter-spacing: .08em; }
+.room-code button { border: 0; background: none; padding: 2px 0; color: var(--primary); font-size: .82rem; }
+.room-code button[data-action="room-leave"] { color: var(--danger); }
+.room-members { list-style: none; margin: 0 0 8px; padding: 0; display: grid; gap: 6px; }
+.room-members li { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.room-members .btn { width: auto; padding: 4px 12px; }
+.seats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px 6px; }
+.seat { display: grid; justify-items: center; align-content: end; gap: 2px; min-height: 112px; padding: 8px 2px; border: 2px solid transparent; border-radius: 10px;
+    color: var(--muted); opacity: .6; }
+.seat.studied { opacity: .85; }
+.seat.studying { opacity: 1; color: var(--text); }
+.seat .desk { width: 52px; height: 40px; margin-bottom: 4px; }
+.seat small { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: .85rem; }
+.seat b { font-size: .9rem; font-weight: 500; font-variant-numeric: tabular-nums; }
+.seat.me { border-color: var(--primary); color: var(--primary); opacity: 1; }
+.seat.me b, .seat.me small { font-weight: 600; }
+
 /* Avatar Pixel Art */
 .avatar { display: flex; justify-content: center; margin: 4px auto 0; }
 .avatar svg {

@@ -266,6 +266,48 @@
                             </tbody>
                         </table>
                     </div>
+
+                    <div class="form-card" style="margin-top: 2rem;">
+                        <h3 style="margin-bottom: 0.5rem;">Gestores</h3>
+                        <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1.25rem;">
+                            Gestores podem convidar e remover usuários e criar e gerenciar salas de estudo.
+                            @if(auth()->user()->is_owner)
+                                Só você, dono do sistema, delega ou retira essa função.
+                            @else
+                                Só o dono do sistema delega ou retira essa função.
+                            @endif
+                        </p>
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Usuário</th>
+                                    <th>Função</th>
+                                    <th style="text-align: right;">Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($users as $user)
+                                    <tr>
+                                        <td><b>{{ $user->name }}</b><br><span style="color: var(--text-muted); font-size: 0.8rem;">{{ $user->email }}</span></td>
+                                        <td style="color: var(--text-muted);">{{ $user->is_owner ? 'Dono' : ($user->is_admin ? 'Gestor' : 'Usuário') }}</td>
+                                        <td style="text-align: right;">
+                                            @if(auth()->user()->is_owner && !$user->is_owner)
+                                                <form action="{{ route('admin.usuarios.gestor', $user->id) }}" method="POST" style="display: inline;"
+                                                      onsubmit="return confirm(@js(($user->is_admin ? 'Retirar a função de gestor de ' : 'Tornar gestor: ') . $user->name . '?'));">
+                                                    @csrf
+                                                    <button type="submit" class="{{ $user->is_admin ? 'btn-remove' : 'btn-add' }}" style="height: auto; padding: 0.4rem 0.8rem; font-size: 0.8rem;">
+                                                        {{ $user->is_admin ? 'Retirar gestão' : 'Tornar gestor' }}
+                                                    </button>
+                                                </form>
+                                            @else
+                                                <span style="color: var(--text-muted); font-size: 0.8rem;">—</span>
+                                            @endif
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </main>

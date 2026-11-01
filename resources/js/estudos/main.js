@@ -9,6 +9,7 @@ import { playFocusEndSound, playLevelUpSound, playRestDueSound, playRestSoonSoun
 import { AVATARS, AVATAR_LIMITES_MIN, avatarStage, avatarSvg } from './avatars.js';
 import { ensureUser, getMeta, loadAll, saveLocal, setMeta, uuid } from './db.js';
 import { planImport } from './importer.js';
+import { createRoomsApi, memberTodayMs } from './rooms.js';
 import { createSync } from './sync.js';
 import { createWidget, widgetSupported } from './widget.js';
 import {
@@ -39,6 +40,8 @@ const state = {
     statsAnchor: null,
     trendSubject: null,
     focusOpen: false,
+    focusView: 'classico', // 'classico' ou 'sala' (sala de estudo com os colegas); lembrado neste aparelho
+    roomId: null, // sala mostrada na tela "sala" (lembrada neste aparelho)
     avatarStage: null,
     sync: { state: 'idle', pending: 0 },
     lastExportAt: null,
@@ -372,7 +375,14 @@ function renderFocus() {
 
     const subject = subjectById((running ?? rest.session).subject_id);
     panel.style.setProperty('--c', subject?.cor ?? '#888');
-    panel.innerHTML = running ? `
+    panel.classList.toggle('sala', state.focusView === 'sala');
+    const switcher = `<button type="button" class="focus-switch" data-action="focus-view"
+        aria-label="${state.focusView === 'sala' ? 'Ver o cronômetro grande' : 'Ver a sala de estudo'}" title="Alternar tela">⇆</button>`;
+    if (state.focusView === 'sala') {
+        panel.innerHTML = renderStudyRoom(running, rest, subject) + switcher;
+        return;
+    }
+    panel.innerHTML = switcher + (running ? `
         <button type="button" class="focus-close" data-action="focus-close" aria-label="Sair do modo foco">✕</button>
         ${avatarBlock(todayTotals().totalMs, 150, false)}
         <p class="focus-label">Focando</p>
@@ -392,7 +402,176 @@ function renderFocus() {
             <div><small>Hoje</small><b data-live="total">--</b></div>
         </div>
         <button type="button" class="focus-btn" data-action="toggle" data-id="${rest.session.subject_id}" aria-label="Retomar ${esc(subject?.nome ?? '')}">▶</button>
-        <p class="focus-hint">Toque em ▶ para retomar ${esc(subject?.nome ?? 'a matéria')}</p>`;
+        <p class="focus-hint">Toque em ▶ para retomar ${esc(subject?.nome ?? 'a matéria')}</p>`);
+}
+
+// Mesa vazia (com relógio quando a pessoa já estudou hoje), como na sala de estudo do YPT.
+const DESK_SVG = (studied) => `<svg class="desk" viewBox="0 0 64 48" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linejoin="round">
+    ${studied ? '<circle cx="16" cy="12" r="9"/><path d="M16 7v5l3.5 2"/>' : ''}
+    <path d="M42 4h10l3 9H39z"/><path d="M47 13v15"/><path d="M4 28h56M4 34h56M8 34v12M56 34v12"/></svg>`;
+
+// ── Salas de estudo ─────────────────────────────────────────────────────────
+// A tela "sala" do modo foco mostra os membros da sala: quem está estudando agora e quanto cada um
+// estudou hoje. Busca o servidor a cada 20 s enquanto a tela está aberta; sem rede, mostra o último estado.
+const ROOMS_REFRESH_MS = 20_000;
+const roomsApi = createRoomsApi({ baseUrl: config.roomsUrl, tokenUrl: config.tokenUrl, initialToken: config.csrf });
+const rooms = { data: null, fetchedAt: 0, lastTry: 0, loading: false, error: '' };
+
+/** Busca as salas (ou roda `action`, que devolve a mesma visão). Erro de `action` sobe para quem chamou. */
+async function refreshRooms(action = null) {
+    rooms.lastTry = nowMs();
+    rooms.loading = true;
+    try {
+        rooms.data = await (action ?? roomsApi.list)();
+        rooms.fetchedAt = nowMs();
+        rooms.error = '';
+    } catch (error) {
+        if (action) throw error;
+        rooms.error = navigator.onLine === false ? 'Sem conexão' : error.message;
+    } finally {
+        rooms.loading = false;
+        if (state.focusOpen && state.focusView === 'sala') renderFocus();
+    }
+}
+
+const currentRoom = () => rooms.data?.rooms.find((r) => r.id === state.roomId) ?? rooms.data?.rooms[0] ?? null;
+
+function roomSection(stats, running) {
+    if (!rooms.data) {
+        return `<section class="room"><h4>Sala de estudo</h4><p>${rooms.error ? `⚠ ${esc(rooms.error)}` : 'Carregando…'}</p></section>`;
+    }
+    const room = currentRoom();
+    const manager = rooms.data.pode_gerenciar; // criar e gerenciar salas é só para gestores
+    if (!room) {
+        return `<section class="room"><h4>Sala de estudo</h4>
+            <p>Você ainda não está em nenhuma sala. ${manager
+                ? 'Crie uma e mande o código para os colegas, ou entre com o código de alguém.'
+                : 'Peça o código da sala a um gestor e entre com ele.'}</p>
+            <div class="room-actions">
+                ${manager ? '<button type="button" class="btn" data-action="room-create">Criar sala</button>' : ''}
+                <button type="button" class="btn ${manager ? 'ghost' : ''}" data-action="room-join">Entrar com código</button>
+            </div></section>`;
+    }
+    const picker = rooms.data.rooms.length > 1
+        ? `<div class="chips">${rooms.data.rooms.map((r) => `<button type="button" data-action="room-pick" data-id="${r.id}" class="${r.id === room.id ? 'active' : ''}">${esc(r.nome)}</button>`).join('')}</div>`
+        : '';
+    const studying = room.membros.filter((m) => (m.eu ? running : m.estudando_desde)).length;
+    const seats = room.membros.map((m) => {
+        const name = `<small>${esc(m.nome)}</small>`;
+        if (m.eu) {
+            const icon = running ? avatarBlock(stats.totalMs, 52, false) : DESK_SVG(stats.totalMs > 0);
+            return `<div class="seat me ${running ? 'studying' : ''}">${icon}${name}<b data-live="total">${formatDuration(stats.totalMs, { seconds: true })}</b></div>`;
+        }
+        const today = memberTodayMs(m, rooms.fetchedAt, nowMs());
+        const icon = m.estudando_desde
+            ? `<div class="avatar is-running">${avatarSvg(m.avatar, avatarStage(today).stage, { size: 52 })}</div>`
+            : DESK_SVG(m.hoje_ms > 0);
+        return `<div class="seat ${m.estudando_desde ? 'studying' : ''} ${m.hoje_ms > 0 ? 'studied' : ''}">${icon}${name}
+            <b data-live="member" data-ms="${m.hoje_ms}" data-studying="${m.estudando_desde ? 1 : ''}">${formatDuration(today, { seconds: true })}</b></div>`;
+    }).join('');
+    return `<section class="room">
+        ${picker}
+        <h4>${esc(room.nome)}</h4>
+        <p><span>${studying} ${studying === 1 ? 'membro' : 'membros'}</span> estudando${rooms.error ? ` · ⚠ ${esc(rooms.error)}: mostrando o último estado` : ''}</p>
+        <div class="seats">${seats}</div>
+        <p class="room-code">Código <b>${esc(room.codigo)}</b>
+            <button type="button" data-action="room-copy">Copiar convite</button>
+            <button type="button" data-action="room-join">Entrar em outra</button>
+            ${manager ? `<button type="button" data-action="room-create">Nova sala</button>
+            <button type="button" data-action="room-manage">Gerenciar sala</button>` : ''}
+            <button type="button" data-action="room-leave" data-id="${room.id}">Sair da sala</button></p>
+    </section>`;
+}
+
+/** Gestores: remover membros ou excluir a sala. */
+function openRoomManageDialog() {
+    const room = currentRoom();
+    if (!room) return;
+    const others = room.membros.filter((m) => !m.eu);
+    openDialog(`
+        <h3>Gerenciar "${esc(room.nome)}"</h3>
+        <ul class="room-members">${others.map((m) => `<li><span>${esc(m.nome)}</span>
+            <button class="btn ghost" value="remove:${m.user_id}" formnovalidate>Remover</button></li>`).join('')
+            || '<li class="muted">Ninguém além de você ainda.</li>'}</ul>
+        <p class="form-error"></p>
+        <div class="actions">
+            <button class="btn ghost" value="cancel" formnovalidate>Fechar</button>
+            <button class="btn danger" value="delete" formnovalidate>Excluir sala</button>
+        </div>`,
+    async (action) => {
+        let request;
+        if (action === 'delete') {
+            if (!confirm(`Excluir a sala "${room.nome}" para todos os membros?`)) return 'Exclusão cancelada.';
+            request = () => roomsApi.destroy(room.id);
+        } else if (action?.startsWith('remove:')) {
+            const member = others.find((m) => String(m.user_id) === action.slice(7));
+            if (!confirm(`Remover ${member?.nome ?? 'este membro'} da sala?`)) return 'Remoção cancelada.';
+            request = () => roomsApi.remove(room.id, action.slice(7));
+        } else {
+            return null;
+        }
+        try {
+            await refreshRooms(request);
+        } catch (error) {
+            return error.message;
+        }
+        return null;
+    });
+}
+
+function openRoomDialog(kind) {
+    const create = kind === 'create';
+    openDialog(`
+        <h3>${create ? 'Nova sala de estudo' : 'Entrar numa sala'}</h3>
+        ${create
+            ? '<label>Nome da sala<input name="nome" maxlength="60" required autofocus placeholder="Concursos e afins"></label>'
+            : '<label>Código da sala<input name="codigo" maxlength="12" required autofocus autocapitalize="characters" placeholder="ABC234"></label>'}
+        <p class="form-error"></p>
+        <div class="actions">
+            <button class="btn" value="save">${create ? 'Criar' : 'Entrar'}</button>
+            <button class="btn ghost" value="cancel" formnovalidate>Cancelar</button>
+        </div>
+        <small class="muted">Na sala, os colegas veem só o seu nome, o tempo estudado hoje e se você está estudando agora.</small>`,
+    async (action, data) => {
+        const before = new Set(rooms.data?.rooms.map((r) => r.id) ?? []);
+        try {
+            await refreshRooms(() => (create
+                ? roomsApi.create(String(data.get('nome')).trim())
+                : roomsApi.join(String(data.get('codigo')).trim())));
+        } catch (error) {
+            return error.message;
+        }
+        const joined = rooms.data.rooms.find((r) => !before.has(r.id))
+            ?? rooms.data.rooms.find((r) => r.codigo === String(data.get('codigo') ?? '').trim().toUpperCase());
+        if (joined) {
+            state.roomId = joined.id;
+            await setMeta('room_id', joined.id);
+        }
+        return null;
+    });
+}
+
+/** Tela alternativa do modo foco: cartão do tempo atual e a sala de estudo com os colegas. */
+function renderStudyRoom(running, rest, subject) {
+    const stats = todayTotals();
+    const current = running ?? rest.session;
+    const live = running ? 'session' : 'rest';
+    return `
+        <header class="room-head">
+            <button type="button" class="room-close" data-action="focus-close" aria-label="Sair do modo foco">✕</button>
+            <b><span class="dot"></span>${esc(subject?.nome ?? 'Matéria')}</b>
+            <span data-live="${live}">--</span>
+        </header>
+        <section class="room-card">
+            <div>
+                <small>${running ? 'Tempo de foco atual' : `Descanso${esc(restLimitText())}`}</small>
+                <p class="room-time ${running ? '' : 'rest'}"><span data-live="${live}">--</span>
+                    <button type="button" class="room-btn" data-action="toggle" data-id="${current.subject_id}"
+                        aria-label="${running ? 'Pausar' : `Retomar ${esc(subject?.nome ?? '')}`}">${running ? '❚❚' : '▶'}</button></p>
+            </div>
+            <div class="room-me">${avatarBlock(stats.totalMs, 56, false)}<b data-live="total">--</b></div>
+        </section>
+        ${roomSection(stats, running)}`;
 }
 
 function renderSyncBadge() {
@@ -1005,6 +1184,11 @@ function renderSettings() {
 // Atualiza apenas os números vivos (evita re-renderizar a tela toda a cada segundo).
 function tick() {
     checkRestAlert();
+    if (state.focusOpen && state.focusView === 'sala' && !rooms.loading && nowMs() - rooms.lastTry >= ROOMS_REFRESH_MS) refreshRooms();
+    root.querySelectorAll('[data-live="member"]').forEach((el) => {
+        const member = { hoje_ms: Number(el.dataset.ms), estudando_desde: el.dataset.studying ? 'sim' : null };
+        el.textContent = formatDuration(memberTodayMs(member, rooms.fetchedAt, nowMs()), { seconds: true });
+    });
     const running = runningSession();
     const day = today();
     const stats = todayTotals();
@@ -1271,6 +1455,26 @@ root.addEventListener('click', async (event) => {
     const handlers = {
         toggle: () => toggleSubject(id),
         'focus-open': () => openFocus(),
+        'room-create': () => openRoomDialog('create'),
+        'room-join': () => openRoomDialog('join'),
+        'room-manage': () => openRoomManageDialog(),
+        'room-pick': async () => { state.roomId = id; await setMeta('room_id', id); renderFocus(); tick(); },
+        'room-copy': async () => {
+            const room = currentRoom();
+            const text = `Entra na minha sala de estudo "${room.nome}" no Horas de Estudo: código ${room.codigo} (${location.origin}/estudos → modo foco → ⇆).`;
+            try { await navigator.clipboard.writeText(text); alert('Convite copiado.'); } catch { prompt('Copie o convite:', text); }
+        },
+        'room-leave': async () => {
+            const room = currentRoom();
+            if (!room || !confirm(`Sair da sala "${room.nome}"?`)) return;
+            try { await refreshRooms(() => roomsApi.leave(room.id)); } catch (error) { alert(error.message); }
+        },
+        'focus-view': async () => {
+            state.focusView = state.focusView === 'sala' ? 'classico' : 'sala';
+            await setMeta('focus_view', state.focusView);
+            renderFocus();
+            tick();
+        },
         'widget-open': () => openWidget(),
         'pick-avatar': async () => { await persist('settings', { ...state.settings, avatar: id }); render(); },
         'focus-close': () => {
@@ -1384,6 +1588,8 @@ async function boot() {
     state.lastExportAt = await getMeta('last_export_at');
     state.widgetAuto = (await getMeta('widget_auto')) ?? true;
     state.widgetHintSeen = Boolean(await getMeta('widget_hint_seen'));
+    state.focusView = (await getMeta('focus_view')) ?? 'classico';
+    state.roomId = (await getMeta('room_id')) ?? null;
     restAlert.notified = (await getMeta('rest_alert')) ?? null;
 
     sync = createSync({

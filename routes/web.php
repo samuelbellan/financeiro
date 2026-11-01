@@ -9,6 +9,7 @@ use App\Http\Controllers\CategoriasController;
 use App\Http\Controllers\ExportController;
 use App\Http\Controllers\TelegramWebhookController;
 use App\Http\Controllers\EstudosController;
+use App\Http\Controllers\StudyRoomsController;
 use App\Http\Controllers\PhotoController;
 use App\Http\Controllers\SalaryController;
 use App\Http\Controllers\FiscalConcursosController;
@@ -54,6 +55,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/admin/convites', [\App\Http\Controllers\Admin\AllowedEmailController::class, 'index'])->name('admin.convites');
     Route::post('/admin/convites', [\App\Http\Controllers\Admin\AllowedEmailController::class, 'store'])->name('admin.convites.store');
     Route::delete('/admin/convites/{id}', [\App\Http\Controllers\Admin\AllowedEmailController::class, 'destroy'])->name('admin.convites.destroy');
+    Route::post('/admin/usuarios/{user}/gestor', [\App\Http\Controllers\Admin\AllowedEmailController::class, 'toggleManager'])->name('admin.usuarios.gestor');
 
     // Sincronização Nuvem Neon
     Route::get('/sync/status', [DatabaseSyncController::class, 'status'])->name('sync.status');
@@ -122,6 +124,12 @@ Route::middleware('auth')->group(function () {
     Route::get('/estudos', [EstudosController::class, 'index'])->name('estudos.index');
     Route::post('/estudos/sync', [EstudosController::class, 'sync'])->name('estudos.sync');
     Route::get('/estudos/token', [EstudosController::class, 'token'])->name('estudos.token');
+    Route::get('/estudos/salas', [StudyRoomsController::class, 'index'])->name('estudos.salas');
+    Route::post('/estudos/salas', [StudyRoomsController::class, 'store'])->name('estudos.salas.store');
+    Route::post('/estudos/salas/entrar', [StudyRoomsController::class, 'join'])->name('estudos.salas.join');
+    Route::post('/estudos/salas/{room}/sair', [StudyRoomsController::class, 'leave'])->whereUuid('room')->name('estudos.salas.leave');
+    Route::post('/estudos/salas/{room}/remover/{user}', [StudyRoomsController::class, 'removeMember'])->whereUuid('room')->whereNumber('user')->name('estudos.salas.remove');
+    Route::delete('/estudos/salas/{room}', [StudyRoomsController::class, 'destroy'])->whereUuid('room')->name('estudos.salas.destroy');
 
 
 
