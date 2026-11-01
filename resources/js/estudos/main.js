@@ -14,7 +14,7 @@ import { createWidget, widgetSupported } from './widget.js';
 import {
     addDays, buildDaily, compareWithPrevious, comparisonSeries, dayBounds, dayGaps, dayStats, daysUntil, findOverlaps,
     formatClock, formatDuration, heatLevel, hourProfile, isSuspicious, lastStopped, lastTypeFor, localInputToMs, NO_TYPE, STUDY_TYPES, studyTypeName, monthRange, msToLocalInput,
-    quarterWeeks, rangeStats, restAlertStage, streak, studyDayOf, studyVsOther, timelineRows, toMs, trendBuckets, weekdayAverages,
+    quarterWeeks, rangeStats, restAlertStage, restMaxGapMs, streak, studyDayOf, studyVsOther, timelineRows, toMs, trendBuckets, weekdayAverages,
     weekRange, yearMonths,
 } from './metrics.js';
 
@@ -239,42 +239,35 @@ function closeFocus() {
     render();
 }
 
-const restInfo = () => lastStopped(state.sessions, nowMs());
+const restInfo = () => lastStopped(state.sessions, nowMs(), restMaxGapMs(state.settings));
 
 // ── Aviso de fim do descanso ────────────────────────────────────────────────
 // Bip + tela piscando 1 min antes e ao atingir o tempo de descanso configurado. O alerta de fim
-// segue piscando (e bipa de novo a cada minuto, até 5 vezes) até um clique no app ou no widget.
+// pisca por 30 s (ou até um clique no app ou no widget) e para sozinho; 3 min depois do tempo a
+// pausa deixa de contar como descanso (restMaxGapMs).
 // Roda pelo tick do app e pelo relógio do widget (que não desacelera com o app minimizado).
-const REST_REPEAT_MS = 60_000;
-const REST_MAX_REPEATS = 5;
-const restAlert = { sessionId: null, stage: 'none', notified: null, dismissed: false, lastBeepAt: 0, repeats: 0 };
+const restAlert = { sessionId: null, stage: 'none', notified: null, dismissed: false };
 
 function checkRestAlert() {
     const rest = runningSession() ? null : restInfo();
     const id = rest?.session.id ?? null;
     const stage = rest ? restAlertStage(rest.sinceMs, state.settings?.descanso_min) : 'none';
-    if (id !== restAlert.sessionId) Object.assign(restAlert, { sessionId: id, stage: 'none', dismissed: false, repeats: 0 });
-    const now = nowMs();
+    if (id !== restAlert.sessionId) Object.assign(restAlert, { sessionId: id, stage: 'none', dismissed: false });
     if (stage !== restAlert.stage) {
         restAlert.stage = stage;
         const key = `${id}:${stage}`;
-        if (stage !== 'none' && restAlert.notified !== key) {
+        if ((stage === 'soon' || stage === 'due') && restAlert.notified !== key) {
             restAlert.notified = key;
             setMeta('rest_alert', key);
-            restAlert.lastBeepAt = now;
             if (stage === 'due') playRestDueSound(); else playRestSoonSound();
         } else if (stage === 'due') {
             restAlert.dismissed = true; // já avisado antes de a página recarregar
         }
-    } else if (stage === 'due' && !restAlert.dismissed && restAlert.repeats < REST_MAX_REPEATS && now - restAlert.lastBeepAt >= REST_REPEAT_MS) {
-        restAlert.repeats++;
-        restAlert.lastBeepAt = now;
-        playRestDueSound();
     }
     const classes = {
         'rest-soon': restAlert.stage === 'soon',
         'rest-due': restAlert.stage === 'due' && !restAlert.dismissed,
-        'rest-over': restAlert.stage === 'due',
+        'rest-over': restAlert.stage === 'due' || restAlert.stage === 'over',
     };
     for (const [name, on] of Object.entries(classes)) document.body.classList.toggle(name, on);
     widget.setClasses(classes);
@@ -914,7 +907,7 @@ function renderSettings() {
                 <input type="number" name="meta_diaria_min" min="0" max="1440" step="5" value="${s.meta_diaria_min ?? ''}" placeholder="Sem meta"></label>
             <label>Tempo de descanso (minutos)
                 <input type="number" name="descanso_min" min="1" max="240" value="${s.descanso_min ?? ''}" placeholder="Sem aviso">
-                <small>Bip e tela piscando 1 min antes e quando o descanso acabar.</small></label>
+                <small>Bip e tela piscando 1 min antes e por 30 s quando o descanso acabar; 3 min depois, a pausa deixa de contar como descanso.</small></label>
             <label>Confirmar sessão aberta após (minutos)
                 <input type="number" name="limite_suspeita_min" min="30" max="1440" step="10" value="${s.limite_suspeita_min}" required></label>
             <label>Fuso horário
@@ -968,10 +961,11 @@ function tick() {
     if (current) set('[data-live="current-subject"]', formatDuration(stats.bySubject[current.subject_id] ?? 0, { seconds: true }));
     const rest = running ? null : restInfo();
     if (rest) set('[data-live="rest"]', formatDuration(rest.sinceMs, { seconds: true }));
-    // Descanso passou do limite (6h) ou outra aba/aparelho mudou o estado: atualiza cabeçalho e foco.
+    // Descanso passou do limite ou outra aba/aparelho mudou o estado: atualiza cabeçalho, foco e faixa.
     if (!running && !rest && (state.focusOpen || !root.querySelector('[data-current]').hidden)) {
         renderCurrent();
         renderFocus();
+        root.querySelector('.rest-banner')?.remove();
     }
     set('[data-live="total"]', formatDuration(stats.totalMs, { seconds: true }));
     set('[data-live="maxfocus"]', formatDuration(stats.maxFocusMs));

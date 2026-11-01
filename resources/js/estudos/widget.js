@@ -3,7 +3,7 @@
 // O relógio roda dentro da janela do widget: ela fica visível, então o Chrome não desacelera o timer
 // mesmo com o app minimizado.
 
-import { buildDaily, dayBounds, dayStats, formatDuration, lastStopped, restAlertStage, studyDayOf, toMs } from './metrics.js';
+import { buildDaily, dayBounds, dayStats, formatDuration, lastStopped, restAlertStage, restMaxGapMs, studyDayOf, toMs } from './metrics.js';
 
 // Altura útil do conteúdo; o Chrome desconta ~56 px da altura pedida para a própria barra da janela.
 const SIZE = { width: 260, height: 100 };
@@ -16,7 +16,8 @@ export const widgetSupported = () => typeof window !== 'undefined' && 'documentP
  * O que o widget mostra no instante nowMs.
  * mode: 'running' (sessão aberta), 'rest' (até 6h depois da última sessão do cronômetro) ou 'idle'.
  * resumeId: matéria que o "Retomar" inicia; null se a última foi arquivada/excluída (o botão vira "Abrir app").
- * restLimitMs/alert: duração do descanso configurada e o estágio do aviso ('none', 'soon', 'due').
+ * restLimitMs/alert: duração do descanso configurada e o estágio do aviso ('none', 'soon', 'due', 'over').
+ * Com descanso configurado, a pausa deixa de ser descanso 3 min depois do tempo (vira 'idle').
  */
 export function widgetView({ sessions, subjects, settings }, nowMs) {
     const live = sessions.filter((s) => !s.deleted_at);
@@ -36,7 +37,7 @@ export function widgetView({ sessions, subjects, settings }, nowMs) {
     }
     const subject = last ? subjectOf(last.subject_id) : null;
     const resumeId = subject && !subject.deleted_at && !subject.arquivada_em ? subject.id : null;
-    const rest = lastStopped(live, nowMs);
+    const rest = lastStopped(live, nowMs, restMaxGapMs(settings));
     const restMs = rest?.sinceMs ?? null;
     return {
         mode: rest ? 'rest' : 'idle',

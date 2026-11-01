@@ -546,25 +546,35 @@ export function trendBuckets(daily, unit, count, today) {
     return buckets;
 }
 
-/**
- * Descanso: última sessão cronometrada encerrada (sem nenhuma em andamento), se terminou há menos de maxGapMs.
- * Retorna { session, sinceMs } ou null.
- */
 /** Antecedência do primeiro aviso de fim do descanso. */
 export const REST_WARN_MS = 60_000;
+/** Por quanto tempo o aviso de fim (bip + tela piscando) fica ativo antes de parar sozinho. */
+export const REST_ALERT_MS = 30_000;
+/** Depois do tempo de descanso configurado, por quanto tempo ainda conta como descanso. */
+export const REST_GRACE_MS = 3 * MIN;
 
 /**
- * Estágio do aviso de descanso: 'none', 'soon' (falta até 1 min; só para descansos de 2 min ou mais)
- * ou 'due' (o tempo de descanso configurado foi atingido).
+ * Estágio do aviso de descanso: 'none', 'soon' (falta até 1 min; só para descansos de 2 min ou mais),
+ * 'due' (atingiu o tempo configurado; dura REST_ALERT_MS) ou 'over' (passou do tempo, aviso já encerrado).
  */
 export function restAlertStage(restMs, descansoMin) {
     if (!descansoMin || restMs === null || restMs === undefined) return 'none';
     const limit = descansoMin * MIN;
+    if (restMs >= limit + REST_ALERT_MS) return 'over';
     if (restMs >= limit) return 'due';
     if (descansoMin >= 2 && restMs >= limit - REST_WARN_MS) return 'soon';
     return 'none';
 }
 
+/** Até quando a pausa conta como descanso: tempo configurado + REST_GRACE_MS; sem configuração, 6h. */
+export function restMaxGapMs(settings) {
+    return settings?.descanso_min ? settings.descanso_min * MIN + REST_GRACE_MS : 6 * HOUR;
+}
+
+/**
+ * Descanso: última sessão cronometrada encerrada (sem nenhuma em andamento), se terminou há menos de maxGapMs.
+ * Retorna { session, sinceMs } ou null.
+ */
 export function lastStopped(sessions, nowMs, maxGapMs = 6 * HOUR) {
     let last = null;
     for (const s of sessions) {

@@ -116,7 +116,12 @@ describe('restAlertStage', () => {
         expect(restAlertStage(9 * M, 10)).toBe('soon');
         expect(restAlertStage(10 * M - 1, 10)).toBe('soon');
         expect(restAlertStage(10 * M, 10)).toBe('due');
-        expect(restAlertStage(25 * M, 10)).toBe('due');
+    });
+
+    it('o aviso de fim dura 30 s e depois vira só "passou do tempo"', () => {
+        expect(restAlertStage(10 * M + 29_999, 10)).toBe('due');
+        expect(restAlertStage(10 * M + 30_000, 10)).toBe('over');
+        expect(restAlertStage(25 * M, 10)).toBe('over');
     });
 
     it('descanso de 1 min não tem aviso prévio', () => {
@@ -132,5 +137,17 @@ describe('widgetView com descanso configurado', () => {
 
         expect(view.restLimitMs).toBe(10 * M);
         expect(view.alert).toBe('soon');
+    });
+
+    it('3 min depois do tempo de descanso a pausa deixa de contar como descanso', () => {
+        const sessions = [session('dir', '2026-10-31T08:00:00', '2026-10-31T09:00:00')];
+        const withRest = { ...settings, descanso_min: 10 };
+
+        expect(widgetView({ sessions, subjects, settings: withRest }, at('2026-10-31T09:12:59')))
+            .toMatchObject({ mode: 'rest', alert: 'over' });
+        expect(widgetView({ sessions, subjects, settings: withRest }, at('2026-10-31T09:13:01')))
+            .toMatchObject({ mode: 'idle', alert: 'none' });
+        // Sem descanso configurado, continua valendo o limite de 6h.
+        expect(widgetView({ sessions, subjects, settings }, at('2026-10-31T09:13:01')).mode).toBe('rest');
     });
 });
