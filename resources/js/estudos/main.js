@@ -10,6 +10,7 @@ import { AVATARS, AVATAR_LIMITES_MIN, avatarStage, avatarSvg } from './avatars.j
 import { ensureUser, getMeta, loadAll, saveLocal, setMeta, uuid } from './db.js';
 import { planImport } from './importer.js';
 import { createSync } from './sync.js';
+import { createWidget, widgetSupported } from './widget.js';
 import {
     addDays, buildDaily, compareWithPrevious, comparisonSeries, dayBounds, dayGaps, dayStats, daysUntil, findOverlaps,
     formatClock, formatDuration, heatLevel, hourProfile, isSuspicious, lastStopped, localInputToMs, monthRange, msToLocalInput,
@@ -41,10 +42,31 @@ const state = {
     avatarStage: null,
     sync: { state: 'idle', pending: 0 },
     lastExportAt: null,
+    widgetAuto: true,
+    widgetHintSeen: false,
 };
 
 let charts = [];
 let sync;
+
+// Widget flutuante (Chrome/Edge no PC): abre pelo ⧉ do cabeçalho ou ao iniciar uma matéria.
+const widget = createWidget({
+    getState: () => state,
+    onToggle: (subjectId) => toggleSubject(subjectId),
+    onClose: () => { sync?.setFast(false); renderWidgetButton(); },
+});
+
+// Precisa rodar dentro de um clique: o Chrome só abre a janela flutuante com gesto do usuário.
+async function openWidget() {
+    const opened = await widget.open({ hint: !state.widgetHintSeen });
+    if (!opened) return;
+    sync?.setFast(true);
+    renderWidgetButton();
+    if (!state.widgetHintSeen) {
+        state.widgetHintSeen = true;
+        await setMeta('widget_hint_seen', true);
+    }
+}
 
 // ── Utilidades ───────────────────────────────────────────────────────────────
 
@@ -125,6 +147,9 @@ async function toggleSubject(subjectId) {
         openSessionNoteDialog(stopped);
         if (running.subject_id === subjectId) return render();
     }
+    // Abre o widget antes de qualquer await, enquanto o clique ainda vale como gesto do usuário.
+    const autoWidget = state.widgetAuto && widgetSupported() && !widget.isOpen();
+    const opening = autoWidget ? openWidget() : null;
     await persist('sessions', {
         id: uuid(),
         subject_id: subjectId,
@@ -136,7 +161,9 @@ async function toggleSubject(subjectId) {
         deleted_at: null,
         created_at: iso(at),
     });
-    openFocus();
+    await opening;
+    // Com o widget, o estudo acontece em outra janela: tela cheia atrapalharia.
+    openFocus({ fullscreen: !autoWidget && !widget.isOpen() });
 }
 
 async function checkSuspicious() {
@@ -159,8 +186,16 @@ function render() {
     renderSyncBadge();
     renderCurrent();
     renderFocus();
+    renderWidgetButton();
+    widget.refresh();
     if (state.tab === 'stats') mountStatsCharts();
     tick();
+}
+
+function renderWidgetButton() {
+    const button = root.querySelector('[data-widget-open]');
+    button.hidden = !widgetSupported();
+    button.classList.toggle('active', widget.isOpen());
 }
 
 // ── Modo foco, descanso e matéria atual ─────────────────────────────────────
@@ -181,9 +216,9 @@ async function keepScreenOn(on) {
     }
 }
 
-function openFocus() {
+function openFocus({ fullscreen = true } = {}) {
     state.focusOpen = true;
-    if (!document.fullscreenElement) document.documentElement.requestFullscreen?.().catch(() => {});
+    if (fullscreen && !document.fullscreenElement) document.documentElement.requestFullscreen?.().catch(() => {});
     keepScreenOn(true);
     render();
 }
@@ -812,6 +847,10 @@ function renderSettings() {
                 <input type="checkbox" name="retro_sound" ${s.retro_sound ? 'checked' : ''}>
                 Sons retrô 8-bit (ao subir de nível e pausar foco)
             </label>
+            ${widgetSupported() ? `<label class="checkbox">
+                <input type="checkbox" name="widget_auto" ${state.widgetAuto ? 'checked' : ''}>
+                Abrir o widget flutuante ao iniciar uma matéria (neste computador)
+            </label>` : ''}
             <button class="btn" type="submit">Salvar preferências</button>
         </form>
 
@@ -1094,6 +1133,7 @@ root.addEventListener('click', async (event) => {
     const handlers = {
         toggle: () => toggleSubject(id),
         'focus-open': () => openFocus(),
+        'widget-open': () => openWidget(),
         'pick-avatar': async () => { await persist('settings', { ...state.settings, avatar: id }); render(); },
         'focus-close': () => closeFocus(),
         'new-subject': () => openSubjectDialog(),
@@ -1158,6 +1198,10 @@ root.addEventListener('submit', async (event) => {
             meta_diaria_min: meta === '' ? null : Number(meta),
             retro_sound: data.get('retro_sound') === 'on',
         });
+        if (widgetSupported()) {
+            state.widgetAuto = data.get('widget_auto') === 'on';
+            await setMeta('widget_auto', state.widgetAuto);
+        }
     } else if (form.dataset.form === 'dday') {
         await persist('ddays', { id: uuid(), titulo: String(data.get('titulo')).trim(), data: String(data.get('data')), deleted_at: null, created_at: iso(nowMs()) });
     }
@@ -1184,6 +1228,8 @@ async function boot() {
     await ensureUser(Number(config.userId));
     await reload();
     state.lastExportAt = await getMeta('last_export_at');
+    state.widgetAuto = (await getMeta('widget_auto')) ?? true;
+    state.widgetHintSeen = Boolean(await getMeta('widget_hint_seen'));
 
     sync = createSync({
         syncUrl: config.syncUrl,

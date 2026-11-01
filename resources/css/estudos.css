@@ -261,6 +261,34 @@ dialog p { margin: 0; }
 .current-chip + .sync-badge { margin-left: 0; }
 .current-chip[hidden] { display: none; }
 
+/* Botão do widget flutuante no cabeçalho */
+.widget-btn {
+    margin-left: auto; border: 1px solid var(--border); background: var(--card); color: var(--text);
+    border-radius: 99px; width: 30px; height: 26px; font-size: .9rem; line-height: 1; cursor: pointer;
+}
+.current-chip:not([hidden]) + .widget-btn { margin-left: 0; }
+.widget-btn.active { border-color: var(--primary, #4F86F7); color: var(--primary, #4F86F7); }
+.widget-btn[hidden] { display: none; }
+
+/* Janela do widget flutuante (Document Picture-in-Picture) */
+.widget-body { margin: 0; padding: 0; overflow: hidden; }
+.widget-body .w {
+    height: 100vh; box-sizing: border-box; padding: 8px 10px 8px 14px; display: flex; flex-direction: column; gap: 2px;
+    background: var(--card); border-left: 5px solid var(--c); user-select: none;
+}
+.widget-body .w-top { display: flex; align-items: center; gap: 6px; font-size: .8rem; color: var(--muted); }
+.widget-body .w-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 600; color: var(--text); }
+.widget-body .w-app { border: 0; background: none; color: var(--muted); cursor: pointer; font-size: .9rem; padding: 0 2px; }
+.widget-body .w-time { font-size: 1.9rem; font-weight: 700; font-variant-numeric: tabular-nums; line-height: 1.1; color: var(--text); }
+.widget-body .w-time.rest { color: var(--muted); }
+.widget-body .w-bottom { display: flex; align-items: center; justify-content: space-between; gap: 8px; font-size: .8rem; color: var(--muted); }
+.widget-body .w-today b { color: var(--text); font-variant-numeric: tabular-nums; }
+.widget-body .w-btn {
+    border: 1px solid var(--border); background: var(--bg); color: var(--text); border-radius: 99px;
+    padding: 3px 10px; font: inherit; font-size: .78rem; cursor: pointer;
+}
+.widget-body .w-hint { margin: 4px 0 0; font-size: .7rem; color: var(--muted); line-height: 1.25; }
+
 /* Descanso na aba Cronômetro */
 .rest-banner {
     margin: 14px 0 0; padding: 10px 12px; border-radius: 14px; display: flex; align-items: center; gap: 10px;

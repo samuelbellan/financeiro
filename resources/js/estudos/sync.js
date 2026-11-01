@@ -1,10 +1,12 @@
 // Sincronização com o servidor: fila local → POST /estudos/sync → aplica mudanças do servidor.
-// Gatilhos: abrir o app, voltar a conexão, 5 s após uma alteração e a cada 5 min.
+// Gatilhos: abrir o app, voltar a conexão, 5 s após uma alteração e a cada 5 min
+// (a cada 60 s com o widget flutuante aberto, mesmo com o app minimizado).
 
 import { applyServerChanges, dropFromQueue, getMeta, pendingQueue, setMeta } from './db.js';
 
 const BACKOFF_MS = [10_000, 30_000, 120_000, 300_000];
 const PERIODIC_MS = 5 * 60_000;
+const FAST_PERIODIC_MS = 60_000;
 const DEBOUNCE_MS = 5_000;
 // Itens por envio (o servidor aceita até 1000 por tipo). Matérias vão primeiro: o servidor valida subject_id.
 // Após uma falha o lote cai pela metade (até MIN_BATCH_SIZE), para um lote pesado não travar a fila para sempre.
@@ -20,6 +22,8 @@ export function createSync({ syncUrl, tokenUrl, initialToken, onStatus, onApplie
     let batchSize = BATCH_SIZE;
     let retryTimer = null;
     let debounceTimer = null;
+    let periodicTimer = null;
+    let fast = false;
 
     const status = { state: 'idle', pending: 0, lastSyncAt: null, rejected: [], conflicts: [], message: '' };
 
@@ -137,9 +141,19 @@ export function createSync({ syncUrl, tokenUrl, initialToken, onStatus, onApplie
         document.addEventListener('visibilitychange', () => {
             if (document.visibilityState === 'visible') syncNow();
         });
-        setInterval(() => document.visibilityState === 'visible' && syncNow(), PERIODIC_MS);
+        setFast(false);
         syncNow();
     }
 
-    return { start, syncNow, schedule, status: () => ({ ...status }) };
+    // Modo rápido (widget aberto): sincroniza a cada 60 s mesmo com a página escondida.
+    function setFast(on) {
+        fast = on;
+        clearInterval(periodicTimer);
+        periodicTimer = setInterval(
+            () => (fast || document.visibilityState === 'visible') && syncNow(),
+            fast ? FAST_PERIODIC_MS : PERIODIC_MS,
+        );
+    }
+
+    return { start, syncNow, schedule, setFast, status: () => ({ ...status }) };
 }

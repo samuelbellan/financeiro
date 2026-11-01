@@ -32,6 +32,7 @@
         <header class="topbar">
             <a href="{{ route('home', [], false) }}" class="brand" aria-label="Voltar ao sistema">Estudos</a>
             <button type="button" class="current-chip" data-current data-action="focus-open" hidden></button>
+            <button type="button" class="widget-btn" data-widget-open data-action="widget-open" title="Widget flutuante" aria-label="Abrir widget flutuante" hidden>⧉</button>
             <span class="sync-badge" data-sync-badge></span>
         </header>
         <div class="conflicts" data-conflicts hidden></div>
