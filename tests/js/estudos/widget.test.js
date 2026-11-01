@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { DEFAULT_SETTINGS } from '../../../resources/js/estudos/metrics.js';
+import { DEFAULT_SETTINGS, restAlertStage } from '../../../resources/js/estudos/metrics.js';
 import { widgetView } from '../../../resources/js/estudos/widget.js';
 
 const H = 3_600_000;
@@ -102,5 +102,35 @@ describe('widgetView', () => {
         const view = widgetView({ sessions: [], subjects, settings }, at('2026-10-31T09:00:00'));
 
         expect(view).toMatchObject({ mode: 'idle', subject: null, resumeId: null, todayMs: 0 });
+    });
+});
+
+describe('restAlertStage', () => {
+    it('sem descanso configurado ou sem descanso em andamento: nenhum aviso', () => {
+        expect(restAlertStage(30 * M, null)).toBe('none');
+        expect(restAlertStage(null, 10)).toBe('none');
+    });
+
+    it('avisa 1 min antes e ao atingir o tempo', () => {
+        expect(restAlertStage(8 * M, 10)).toBe('none');
+        expect(restAlertStage(9 * M, 10)).toBe('soon');
+        expect(restAlertStage(10 * M - 1, 10)).toBe('soon');
+        expect(restAlertStage(10 * M, 10)).toBe('due');
+        expect(restAlertStage(25 * M, 10)).toBe('due');
+    });
+
+    it('descanso de 1 min não tem aviso prévio', () => {
+        expect(restAlertStage(30_000, 1)).toBe('none');
+        expect(restAlertStage(M, 1)).toBe('due');
+    });
+});
+
+describe('widgetView com descanso configurado', () => {
+    it('expõe o limite do descanso', () => {
+        const sessions = [session('dir', '2026-10-31T08:00:00', '2026-10-31T09:00:00')];
+        const view = widgetView({ sessions, subjects, settings: { ...settings, descanso_min: 10 } }, at('2026-10-31T09:09:30'));
+
+        expect(view.restLimitMs).toBe(10 * M);
+        expect(view.alert).toBe('soon');
     });
 });

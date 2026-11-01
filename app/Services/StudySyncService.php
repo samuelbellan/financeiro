@@ -208,6 +208,7 @@ class StudySyncService
             'timezone' => 'required|timezone:all',
             'avatar' => ['nullable', 'string', 'max:40', 'regex:/^[a-z0-9-]+$/'],
             'retro_sound' => 'nullable|boolean',
+            'descanso_min' => 'nullable|integer|min:1|max:240',
         ]);
         if (!$data) {
             return;
@@ -222,6 +223,7 @@ class StudySyncService
                 'timezone' => $data['timezone'],
                 'avatar' => $data['avatar'] ?? 'bichinho',
                 'retro_sound' => (bool) ($data['retro_sound'] ?? false),
+                'descanso_min' => $data['descanso_min'] ?? null,
                 'updated_at' => $this->stamp(),
             ]
         );
@@ -373,7 +375,7 @@ class StudySyncService
                 $row[$col] = $row[$col] === null ? null : Carbon::parse($row[$col], 'UTC')->format('Y-m-d\TH:i:s.v\Z');
             }
         }
-        foreach (['ordem', 'virada_hora', 'limite_suspeita_min', 'meta_diaria_min'] as $col) {
+        foreach (['ordem', 'virada_hora', 'limite_suspeita_min', 'meta_diaria_min', 'descanso_min'] as $col) {
             if (isset($row[$col])) {
                 $row[$col] = (int) $row[$col];
             }

@@ -5,7 +5,7 @@ import {
     ArcElement, BarController, BarElement, CategoryScale, Chart, DoughnutController, Filler, Legend, LinearScale,
     LineController, LineElement, PointElement, Tooltip,
 } from 'chart.js';
-import { playFocusEndSound, playLevelUpSound } from './audio.js';
+import { playFocusEndSound, playLevelUpSound, playRestDueSound, playRestSoonSound } from './audio.js';
 import { AVATARS, AVATAR_LIMITES_MIN, avatarStage, avatarSvg } from './avatars.js';
 import { ensureUser, getMeta, loadAll, saveLocal, setMeta, uuid } from './db.js';
 import { planImport } from './importer.js';
@@ -14,7 +14,7 @@ import { createWidget, widgetSupported } from './widget.js';
 import {
     addDays, buildDaily, compareWithPrevious, comparisonSeries, dayBounds, dayGaps, dayStats, daysUntil, findOverlaps,
     formatClock, formatDuration, heatLevel, hourProfile, isSuspicious, lastStopped, localInputToMs, monthRange, msToLocalInput,
-    quarterWeeks, rangeStats, streak, studyDayOf, studyVsOther, timelineSlots, toMs, trendBuckets, weekdayAverages,
+    quarterWeeks, rangeStats, restAlertStage, streak, studyDayOf, studyVsOther, timelineSlots, toMs, trendBuckets, weekdayAverages,
     weekRange, yearMonths,
 } from './metrics.js';
 
@@ -54,6 +54,8 @@ const widget = createWidget({
     getState: () => state,
     onToggle: (subjectId) => toggleSubject(subjectId),
     onClose: () => { sync?.setFast(false); renderWidgetButton(); },
+    onTick: () => checkRestAlert(),
+    onInteract: () => dismissRestAlert(),
 });
 
 // Precisa rodar dentro de um clique: o Chrome só abre a janela flutuante com gesto do usuário.
@@ -232,6 +234,53 @@ function closeFocus() {
 
 const restInfo = () => lastStopped(state.sessions, nowMs());
 
+// ── Aviso de fim do descanso ────────────────────────────────────────────────
+// Bip + tela piscando 1 min antes e ao atingir o tempo de descanso configurado. O alerta de fim
+// segue piscando (e bipa de novo a cada minuto, até 5 vezes) até um clique no app ou no widget.
+// Roda pelo tick do app e pelo relógio do widget (que não desacelera com o app minimizado).
+const REST_REPEAT_MS = 60_000;
+const REST_MAX_REPEATS = 5;
+const restAlert = { sessionId: null, stage: 'none', notified: null, dismissed: false, lastBeepAt: 0, repeats: 0 };
+
+function checkRestAlert() {
+    const rest = runningSession() ? null : restInfo();
+    const id = rest?.session.id ?? null;
+    const stage = rest ? restAlertStage(rest.sinceMs, state.settings?.descanso_min) : 'none';
+    if (id !== restAlert.sessionId) Object.assign(restAlert, { sessionId: id, stage: 'none', dismissed: false, repeats: 0 });
+    const now = nowMs();
+    if (stage !== restAlert.stage) {
+        restAlert.stage = stage;
+        const key = `${id}:${stage}`;
+        if (stage !== 'none' && restAlert.notified !== key) {
+            restAlert.notified = key;
+            setMeta('rest_alert', key);
+            restAlert.lastBeepAt = now;
+            if (stage === 'due') playRestDueSound(); else playRestSoonSound();
+        } else if (stage === 'due') {
+            restAlert.dismissed = true; // já avisado antes de a página recarregar
+        }
+    } else if (stage === 'due' && !restAlert.dismissed && restAlert.repeats < REST_MAX_REPEATS && now - restAlert.lastBeepAt >= REST_REPEAT_MS) {
+        restAlert.repeats++;
+        restAlert.lastBeepAt = now;
+        playRestDueSound();
+    }
+    const classes = {
+        'rest-soon': restAlert.stage === 'soon',
+        'rest-due': restAlert.stage === 'due' && !restAlert.dismissed,
+        'rest-over': restAlert.stage === 'due',
+    };
+    for (const [name, on] of Object.entries(classes)) document.body.classList.toggle(name, on);
+    widget.setClasses(classes);
+}
+
+function dismissRestAlert() {
+    if (restAlert.stage !== 'due' || restAlert.dismissed) return;
+    restAlert.dismissed = true;
+    checkRestAlert();
+}
+
+const restLimitText = () => (state.settings?.descanso_min ? ` / ${state.settings.descanso_min} min` : '');
+
 function nextStageText(nextInMs) {
     return nextInMs === null ? 'Estágio máximo do dia!' : `Próximo estágio em ${formatDuration(nextInMs)}`;
 }
@@ -318,7 +367,7 @@ function renderFocus() {
         : `
         <button type="button" class="focus-close" data-action="focus-close" aria-label="Sair do modo foco">✕</button>
         ${avatarBlock(todayTotals().totalMs, 150, false)}
-        <p class="focus-label">Descanso</p>
+        <p class="focus-label">Descanso${esc(restLimitText())}</p>
         <p class="focus-time rest" data-live="rest">--</p>
         <div class="focus-sub">
             <div><small><span class="dot"></span>${esc(subject?.nome ?? 'Matéria')}</small><b data-live="current-subject">--</b></div>
@@ -420,7 +469,7 @@ function renderRestBanner() {
     if (!rest) return '';
     const subject = subjectById(rest.session.subject_id);
     return `<section class="rest-banner" style="--c:${esc(subject?.cor ?? '#888')}">
-        <span>Descanso <b data-live="rest">${formatDuration(rest.sinceMs, { seconds: true })}</b></span>
+        <span>Descanso <b data-live="rest">${formatDuration(rest.sinceMs, { seconds: true })}</b>${esc(restLimitText())}</span>
         <button type="button" data-action="toggle" data-id="${rest.session.subject_id}">▶ Retomar ${esc(subject?.nome ?? '')}</button>
     </section>`;
 }
@@ -836,6 +885,9 @@ function renderSettings() {
                 <small>Estudo antes dessa hora conta para o dia anterior.</small></label>
             <label>Meta diária (minutos)
                 <input type="number" name="meta_diaria_min" min="0" max="1440" step="5" value="${s.meta_diaria_min ?? ''}" placeholder="Sem meta"></label>
+            <label>Tempo de descanso (minutos)
+                <input type="number" name="descanso_min" min="1" max="240" value="${s.descanso_min ?? ''}" placeholder="Sem aviso">
+                <small>Bip e tela piscando 1 min antes e quando o descanso acabar.</small></label>
             <label>Confirmar sessão aberta após (minutos)
                 <input type="number" name="limite_suspeita_min" min="30" max="1440" step="10" value="${s.limite_suspeita_min}" required></label>
             <label>Fuso horário
@@ -879,6 +931,7 @@ function renderSettings() {
 
 // Atualiza apenas os números vivos (evita re-renderizar a tela toda a cada segundo).
 function tick() {
+    checkRestAlert();
     const running = runningSession();
     const day = today();
     const stats = todayTotals();
@@ -1122,6 +1175,7 @@ function shiftStats(direction) {
 
 root.addEventListener('click', async (event) => {
     markSeen();
+    dismissRestAlert();
     const tab = event.target.closest('[data-tab]');
     if (tab) {
         state.tab = tab.dataset.tab;
@@ -1184,6 +1238,7 @@ root.addEventListener('submit', async (event) => {
     const data = new FormData(form);
     if (form.dataset.form === 'settings') {
         const meta = String(data.get('meta_diaria_min') ?? '').trim();
+        const descanso = String(data.get('descanso_min') ?? '').trim();
         const timezone = String(data.get('timezone')).trim();
         try {
             new Intl.DateTimeFormat('pt-BR', { timeZone: timezone });
@@ -1196,6 +1251,7 @@ root.addEventListener('submit', async (event) => {
             virada_hora: Number(data.get('virada_hora')),
             limite_suspeita_min: Number(data.get('limite_suspeita_min')),
             meta_diaria_min: meta === '' ? null : Number(meta),
+            descanso_min: descanso === '' ? null : Number(descanso),
             retro_sound: data.get('retro_sound') === 'on',
         });
         if (widgetSupported()) {
@@ -1230,6 +1286,7 @@ async function boot() {
     state.lastExportAt = await getMeta('last_export_at');
     state.widgetAuto = (await getMeta('widget_auto')) ?? true;
     state.widgetHintSeen = Boolean(await getMeta('widget_hint_seen'));
+    restAlert.notified = (await getMeta('rest_alert')) ?? null;
 
     sync = createSync({
         syncUrl: config.syncUrl,

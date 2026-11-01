@@ -65,3 +65,28 @@ export function playFocusEndSound() {
         // Silêncio em caso de bloqueio
     }
 }
+
+/** Bip curto: falta 1 minuto para acabar o descanso (toca mesmo com os sons retrô desligados). */
+export function playRestSoonSound() {
+    try {
+        const ctx = getAudioContext();
+        if (!ctx) return;
+        playNote(ctx, 880.00, ctx.currentTime, 0.18, 0.08); // A5
+    } catch {
+        // Silêncio em caso de bloqueio
+    }
+}
+
+/** Três bipes: o tempo de descanso acabou. */
+export function playRestDueSound() {
+    try {
+        const ctx = getAudioContext();
+        if (!ctx) return;
+        const now = ctx.currentTime;
+        for (let i = 0; i < 3; i++) {
+            playNote(ctx, 1046.50, now + i * 0.32, 0.2, 0.1); // C6
+        }
+    } catch {
+        // Silêncio em caso de bloqueio
+    }
+}

@@ -264,6 +264,15 @@ class StudySyncTest extends TestCase
         $this->sync(['settings' => $base + ['avatar' => '<script>']])->assertOk()->assertJsonPath('rejected.0.type', 'settings');
     }
 
+    public function test_settings_store_rest_duration(): void
+    {
+        $base = ['virada_hora' => 3, 'limite_suspeita_min' => 180, 'timezone' => 'America/Sao_Paulo'];
+
+        $this->sync(['settings' => $base + ['descanso_min' => 10]])->assertOk()->assertJsonPath('changes.settings.descanso_min', 10);
+        $this->sync(['settings' => $base])->assertOk()->assertJsonPath('changes.settings.descanso_min', null);
+        $this->sync(['settings' => $base + ['descanso_min' => 0]])->assertOk()->assertJsonPath('rejected.0.type', 'settings');
+    }
+
     public function test_large_import_batch_uses_a_bounded_number_of_queries(): void
     {
         $subject = $this->makeSubject();

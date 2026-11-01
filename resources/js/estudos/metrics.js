@@ -20,6 +20,7 @@ export const DEFAULT_SETTINGS = Object.freeze({
     timezone: 'America/Sao_Paulo',
     avatar: 'bichinho',
     retro_sound: false,
+    descanso_min: null,
 });
 
 const partsFormatters = new Map();
@@ -484,6 +485,21 @@ export function trendBuckets(daily, unit, count, today) {
  * Descanso: última sessão cronometrada encerrada (sem nenhuma em andamento), se terminou há menos de maxGapMs.
  * Retorna { session, sinceMs } ou null.
  */
+/** Antecedência do primeiro aviso de fim do descanso. */
+export const REST_WARN_MS = 60_000;
+
+/**
+ * Estágio do aviso de descanso: 'none', 'soon' (falta até 1 min; só para descansos de 2 min ou mais)
+ * ou 'due' (o tempo de descanso configurado foi atingido).
+ */
+export function restAlertStage(restMs, descansoMin) {
+    if (!descansoMin || restMs === null || restMs === undefined) return 'none';
+    const limit = descansoMin * MIN;
+    if (restMs >= limit) return 'due';
+    if (descansoMin >= 2 && restMs >= limit - REST_WARN_MS) return 'soon';
+    return 'none';
+}
+
 export function lastStopped(sessions, nowMs, maxGapMs = 6 * HOUR) {
     let last = null;
     for (const s of sessions) {
