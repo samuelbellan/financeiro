@@ -13,7 +13,7 @@ import { createSync } from './sync.js';
 import { createWidget, widgetSupported } from './widget.js';
 import {
     addDays, buildDaily, compareWithPrevious, comparisonSeries, dayBounds, dayGaps, dayStats, daysUntil, findOverlaps,
-    formatClock, formatDuration, heatLevel, hourProfile, isSuspicious, lastStopped, localInputToMs, monthRange, msToLocalInput,
+    formatClock, formatDuration, heatLevel, hourProfile, isSuspicious, lastStopped, lastTypeFor, localInputToMs, NO_TYPE, STUDY_TYPES, studyTypeName, monthRange, msToLocalInput,
     quarterWeeks, rangeStats, restAlertStage, streak, studyDayOf, studyVsOther, timelineSlots, toMs, trendBuckets, weekdayAverages,
     weekRange, yearMonths,
 } from './metrics.js';
@@ -121,27 +121,34 @@ async function stopSession(session, atMs) {
     }
 }
 
+function typePicker(selected) {
+    return `<fieldset class="type-picker"><legend>Tipo de estudo</legend>
+        ${STUDY_TYPES.map((t) => `<label><input type="radio" name="tipo" value="${t.id}" ${t.id === selected ? 'checked' : ''}><span>${esc(t.nome)}</span></label>`).join('')}
+    </fieldset>`;
+}
+
+// Ao parar: registra o tipo de estudo (sugere o último usado na matéria) e uma anotação opcional.
 function openSessionNoteDialog(session) {
     const subject = subjectById(session.subject_id);
+    const others = state.sessions.filter((s) => s.id !== session.id);
+    const suggested = session.tipo ?? lastTypeFor(others, session.subject_id);
     openDialog(`
-        <h3>Sessão de ${esc(subject?.nome ?? 'Estudo')}</h3>
-        <p class="muted">Deseja adicionar uma observação sobre o que estudou nesta sessão?</p>
-        <label>Conteúdo / Anotações
-            <textarea name="observacao" rows="3" placeholder="Ex.: Resolução de questões, revisão de tópicos, páginas...">${esc(session.observacao ?? '')}</textarea>
+        <h3>Sessão de ${esc(subject?.nome ?? 'Estudo')} · ${formatDuration(toMs(session.fim) - toMs(session.inicio))}</h3>
+        ${typePicker(suggested)}
+        <label>Anotações (opcional)
+            <textarea name="observacao" rows="3" placeholder="Ex.: Questões do cap. 3, revisão de depreciação, arts. 1º a 20...">${esc(session.observacao ?? '')}</textarea>
         </label>
         <div class="actions">
-            <button class="btn" value="save">Salvar anotação</button>
+            <button class="btn" value="save">Salvar</button>
             <button class="btn ghost" value="cancel" formnovalidate>Pular</button>
         </div>`,
     async (action, data) => {
-        if (action === 'save') {
-            const obs = String(data?.get('observacao') ?? '').trim();
-            const current = state.sessions.find((s) => s.id === session.id);
-            if (current) {
-                await persist('sessions', { ...current, observacao: obs || null });
-                render();
-            }
-        }
+        if (action !== 'save') return null;
+        const current = state.sessions.find((s) => s.id === session.id);
+        if (!current) return null;
+        const obs = String(data?.get('observacao') ?? '').trim();
+        await persist('sessions', { ...current, tipo: String(data?.get('tipo') ?? '') || null, observacao: obs || null });
+        return null;
     });
 }
 
@@ -512,6 +519,7 @@ function renderTimeline() {
             <span class="dot"></span>
             <div class="session-main">
                 <span class="name">${esc(subject?.nome ?? 'Matéria removida')}
+                    ${s.tipo ? `<em class="tipo">${esc(studyTypeName(s.tipo))}</em>` : ''}
                     ${s.origem === 'manual' ? '<em>manual</em>' : ''}
                     ${s.origem === 'importado' ? '<em>importado</em>' : ''}
                     ${s.status === 'suspeita' ? '<em class="warn">a confirmar</em>' : ''}
@@ -613,7 +621,8 @@ function renderStats() {
         ${mode !== 'day' ? '<div class="chart-box"><canvas data-chart="bars"></canvas></div>' : ''}
         ${mode === 'month' ? renderMonthCalendar(range, from) : ''}
         ${mode === 'month' ? renderWeekdayAndHours(d, from, to, t) : ''}
-        ${renderSubjectShare(range.bySubject, range.totalMs)}`;
+        ${renderSubjectShare(range.bySubject, range.totalMs, range.bySubjectType)}
+        ${renderTypeShare(range.byType, range.totalMs)}`;
 }
 
 function renderComparison(d, mode, t) {
@@ -673,17 +682,35 @@ function renderWeekdayAndHours(d, from, to, t) {
         <div class="chart-box small"><canvas data-chart="hours" data-from="${from}" data-to="${to}"></canvas></div>`;
 }
 
-function renderSubjectShare(bySubject, totalMs) {
+function typeSplit(types = {}) {
+    const typed = Object.entries(types).filter(([id]) => id !== NO_TYPE).sort((a, b) => b[1] - a[1]);
+    if (!typed.length) return '';
+    return `<small class="type-split">${typed.map(([id, ms]) => `${esc(studyTypeName(id))} ${formatDuration(ms)}`).join(' · ')}</small>`;
+}
+
+function renderSubjectShare(bySubject, totalMs, bySubjectType = {}) {
     const subjects = Object.entries(bySubject).sort((a, b) => b[1] - a[1]);
     const rows = subjects.map(([id, ms]) => {
         const s = subjectById(id);
         const pct = totalMs ? Math.round((ms / totalMs) * 100) : 0;
-        return `<li style="--c:${esc(s?.cor ?? '#888')}"><span class="dot"></span><span class="name">${esc(s?.nome ?? 'Removida')}</span>
+        return `<li style="--c:${esc(s?.cor ?? '#888')}"><span class="dot"></span>
+            <div class="share-main"><span class="name">${esc(s?.nome ?? 'Removida')}</span>${typeSplit(bySubjectType[id])}</div>
             <span>${formatDuration(ms)}</span><span class="muted">${pct}%</span></li>`;
     }).join('');
     return `<h3>Por matéria</h3>
         ${subjects.length ? '<div class="chart-box small"><canvas data-chart="donut"></canvas></div>' : ''}
         <ul class="subject-share">${rows || '<li class="empty">Sem estudo no período.</li>'}</ul>`;
+}
+
+function renderTypeShare(byType, totalMs) {
+    const entries = Object.entries(byType).sort((a, b) => b[1] - a[1]);
+    if (!entries.length) return '';
+    const rows = entries.map(([id, ms]) => {
+        const pct = totalMs ? Math.round((ms / totalMs) * 100) : 0;
+        return `<li class="${id === NO_TYPE ? 'untyped' : ''}"><span class="name">${esc(studyTypeName(id === NO_TYPE ? null : id))}</span>
+            <span>${formatDuration(ms)}</span><span class="muted">${pct}%</span></li>`;
+    }).join('');
+    return `<h3>Por tipo de estudo</h3><ul class="subject-share type-share">${rows}</ul>`;
 }
 
 function trendSessions() {
@@ -1040,6 +1067,10 @@ function openSessionDialog(session = null, day = today(), gap = null) {
         </select></label>
         <label>Início<input type="datetime-local" name="inicio" required value="${msToLocalInput(defaultStart, tz)}"></label>
         <label>Fim<input type="datetime-local" name="fim" required value="${msToLocalInput(defaultEnd, tz)}"></label>
+        <label>Tipo de estudo<select name="tipo">
+            <option value="">Sem tipo</option>
+            ${STUDY_TYPES.map((t) => `<option value="${t.id}" ${t.id === session?.tipo ? 'selected' : ''}>${esc(t.nome)}</option>`).join('')}
+        </select></label>
         <label>Observação / Conteúdo estudado
             <textarea name="observacao" rows="2" placeholder="Ex.: Artigos lidos, exercícios, tópicos...">${esc(session?.observacao ?? '')}</textarea>
         </label>
@@ -1066,6 +1097,7 @@ function openSessionDialog(session = null, day = today(), gap = null) {
             ...(session ?? { id: uuid(), origem: 'manual', device_id: await getMeta('device_id'), created_at: iso(nowMs()) }),
             subject_id: String(data.get('subject_id')), inicio: iso(inicio), fim: iso(fim), status: 'ok', deleted_at: null,
             observacao,
+            tipo: String(data.get('tipo') ?? '') || null,
         };
         const overlaps = findOverlaps(candidate, liveSessions(), nowMs());
         if (overlaps.length) {

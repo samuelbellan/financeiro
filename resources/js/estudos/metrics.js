@@ -23,6 +23,33 @@ export const DEFAULT_SETTINGS = Object.freeze({
     descanso_min: null,
 });
 
+/** Tipos de estudo da sessão (mesma lista de StudySyncService::SESSION_TYPES). Sessão sem tipo conta como NO_TYPE. */
+export const STUDY_TYPES = Object.freeze([
+    { id: 'teoria', nome: 'Teoria / leitura' },
+    { id: 'questoes', nome: 'Questões' },
+    { id: 'revisao', nome: 'Revisão' },
+    { id: 'lei_seca', nome: 'Lei seca' },
+    { id: 'videoaula', nome: 'Videoaula' },
+    { id: 'resumo', nome: 'Resumo / mapas' },
+    { id: 'simulado', nome: 'Simulado' },
+    { id: 'outro', nome: 'Outro' },
+]);
+export const NO_TYPE = 'sem_tipo';
+
+export function studyTypeName(id) {
+    return STUDY_TYPES.find((t) => t.id === id)?.nome ?? 'Sem tipo';
+}
+
+/** Último tipo usado numa sessão encerrada da matéria (sugestão ao registrar a próxima). */
+export function lastTypeFor(sessions, subjectId) {
+    let last = null;
+    for (const s of sessions) {
+        if (s.deleted_at || !s.fim || !s.tipo || s.subject_id !== subjectId) continue;
+        if (!last || toMs(s.fim) > toMs(last.fim)) last = s;
+    }
+    return last?.tipo ?? null;
+}
+
 const partsFormatters = new Map();
 
 function partsFormatter(timezone) {
@@ -124,7 +151,7 @@ export function splitSession(session, settings, nowMs) {
 }
 
 function emptyDay(day) {
-    return { day, totalMs: 0, timerMs: 0, maxFocusMs: 0, startMs: null, endMs: null, bySubject: {}, pieces: [] };
+    return { day, totalMs: 0, timerMs: 0, maxFocusMs: 0, startMs: null, endMs: null, bySubject: {}, byType: {}, bySubjectType: {}, pieces: [] };
 }
 
 /** Estatísticas por dia de estudo. Retorna Map<day, stats>. */
@@ -137,6 +164,10 @@ export function buildDaily(sessions, settings, nowMs) {
             const duration = piece.end - piece.start;
             stats.totalMs += duration;
             stats.bySubject[session.subject_id] = (stats.bySubject[session.subject_id] ?? 0) + duration;
+            const type = session.tipo || NO_TYPE;
+            stats.byType[type] = (stats.byType[type] ?? 0) + duration;
+            const subjectTypes = (stats.bySubjectType[session.subject_id] ??= {});
+            subjectTypes[type] = (subjectTypes[type] ?? 0) + duration;
             stats.pieces.push(piece);
             if (session.origem === 'timer') {
                 stats.timerMs += duration;
@@ -172,7 +203,7 @@ export function streak(daily, today) {
 export function rangeStats(daily, fromDay, toDay, today) {
     const lastDay = today < toDay ? today : toDay;
     const elapsedDays = Math.max(0, daysBetween(fromDay, lastDay) + 1);
-    const result = { fromDay, toDay, totalMs: 0, bySubject: {}, daysStudied: 0, maxFocusMs: 0, avgPerDayMs: 0, days: [] };
+    const result = { fromDay, toDay, totalMs: 0, bySubject: {}, byType: {}, bySubjectType: {}, daysStudied: 0, maxFocusMs: 0, avgPerDayMs: 0, days: [] };
     for (let day = fromDay; day <= toDay; day = addDays(day, 1)) {
         const stats = dayStats(daily, day);
         result.days.push(stats);
@@ -181,6 +212,13 @@ export function rangeStats(daily, fromDay, toDay, today) {
         if (stats.totalMs > 0) result.daysStudied++;
         for (const [subjectId, ms] of Object.entries(stats.bySubject)) {
             result.bySubject[subjectId] = (result.bySubject[subjectId] ?? 0) + ms;
+        }
+        for (const [type, ms] of Object.entries(stats.byType)) {
+            result.byType[type] = (result.byType[type] ?? 0) + ms;
+        }
+        for (const [subjectId, types] of Object.entries(stats.bySubjectType)) {
+            const target = (result.bySubjectType[subjectId] ??= {});
+            for (const [type, ms] of Object.entries(types)) target[type] = (target[type] ?? 0) + ms;
         }
     }
     result.avgPerDayMs = elapsedDays > 0 ? result.totalMs / elapsedDays : 0;

@@ -21,6 +21,9 @@ class StudySyncService
     /** Margem (segundos) subtraída do cursor devolvido; registros nessa janela são reenviados (idempotente). */
     public const CURSOR_MARGIN_SECONDS = 5;
 
+    /** Tipos de estudo aceitos (mesma lista de STUDY_TYPES em resources/js/estudos/metrics.js). */
+    public const SESSION_TYPES = ['teoria', 'questoes', 'revisao', 'lei_seca', 'videoaula', 'resumo', 'simulado', 'outro'];
+
     /** Duração máxima aceita para uma sessão. */
     public const MAX_SESSION_HOURS = 24;
 
@@ -119,6 +122,7 @@ class StudySyncService
                 'origem' => 'required|in:timer,manual,importado',
                 'status' => 'required|in:ok,suspeita',
                 'observacao' => 'nullable|string|max:1000',
+                'tipo' => 'nullable|in:' . implode(',', self::SESSION_TYPES),
                 'device_id' => 'nullable|uuid',
                 'deleted_at' => 'nullable|date',
             ]);
@@ -164,6 +168,7 @@ class StudySyncService
                 'origem' => $data['origem'],
                 'status' => $data['status'],
                 'observacao' => $data['observacao'] ?? null,
+                'tipo' => $data['tipo'] ?? null,
                 'device_id' => $data['device_id'] ?? $deviceId,
             ], $deleted];
             // Sessões importadas têm horários fictícios: não geram conflito.

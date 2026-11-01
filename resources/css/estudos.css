@@ -448,3 +448,16 @@ body.rest-over [data-live="rest"], body.rest-over [data-w-time] { color: var(--d
 @media (prefers-reduced-motion: reduce) {
     body.rest-soon::after, body.rest-due::after { animation-duration: 2s; }
 }
+
+/* Tipo de estudo da sessão */
+.type-picker { border: 0; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: 6px; }
+.type-picker legend { font-size: .85rem; color: var(--muted); margin-bottom: 6px; padding: 0; }
+.type-picker label { display: inline-flex; cursor: pointer; }
+.type-picker input { position: absolute; opacity: 0; pointer-events: none; }
+.type-picker span { border: 1px solid var(--border); border-radius: 99px; padding: 5px 11px; font-size: .82rem; background: var(--bg); }
+.type-picker input:checked + span { background: var(--primary); border-color: var(--primary); color: #fff; }
+.type-picker input:focus-visible + span { outline: 2px solid var(--primary); outline-offset: 2px; }
+.session-list em.tipo { color: var(--primary); }
+.subject-share .share-main { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.type-split { font-size: .75rem; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.type-share li.untyped .name { color: var(--muted); font-style: italic; }

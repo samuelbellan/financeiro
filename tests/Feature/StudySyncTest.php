@@ -264,6 +264,20 @@ class StudySyncTest extends TestCase
         $this->sync(['settings' => $base + ['avatar' => '<script>']])->assertOk()->assertJsonPath('rejected.0.type', 'settings');
     }
 
+    public function test_session_type_is_stored_and_validated(): void
+    {
+        $subject = $this->makeSubject();
+        $session = $this->makeSession($subject['id'], ['tipo' => 'questoes']);
+
+        $this->sync(['subjects' => [$subject], 'sessions' => [$session]])
+            ->assertOk()
+            ->assertJsonPath('rejected', [])
+            ->assertJsonPath('changes.sessions.0.tipo', 'questoes');
+
+        $bad = $this->makeSession($subject['id'], ['tipo' => 'cochilo', 'inicio' => '2026-10-30T16:00:00.000Z', 'fim' => '2026-10-30T17:00:00.000Z']);
+        $this->sync(['sessions' => [$bad]])->assertOk()->assertJsonPath('rejected.0.id', $bad['id']);
+    }
+
     public function test_settings_store_rest_duration(): void
     {
         $base = ['virada_hora' => 3, 'limite_suspeita_min' => 180, 'timezone' => 'America/Sao_Paulo'];

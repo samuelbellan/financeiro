@@ -106,6 +106,7 @@ export function planImport(backup, local) {
             origem: ['timer', 'manual', 'importado'].includes(session.origem) ? session.origem : 'importado',
             status: 'ok',
             observacao: session.observacao ?? null,
+            tipo: session.tipo ?? null,
             device_id: session.device_id ?? null,
             deleted_at: null,
             created_at: session.created_at ?? new Date().toISOString(),
