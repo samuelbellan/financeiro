@@ -60,6 +60,7 @@ const esc = (value) => String(value ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&
  */
 export function createWidget({ getState, onToggle, onClose, onTick, onInteract }) {
     let win = null;
+    let opening = null;
     let shapeKey = null;
 
     function shape(view, hint) {
@@ -114,7 +115,12 @@ export function createWidget({ getState, onToggle, onClose, onTick, onInteract }
     }
 
     /** Precisa ser chamada dentro de um clique (exigência do Chrome). */
-    async function open({ hint = false } = {}) {
+    function open(options) {
+        opening ??= openWindow(options).finally(() => { opening = null; });
+        return opening;
+    }
+
+    async function openWindow({ hint = false } = {}) {
         if (!widgetSupported()) return false;
         if (win) return true;
         try {

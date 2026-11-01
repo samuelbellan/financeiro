@@ -44,12 +44,15 @@ const state = {
     lastExportAt: null,
     widgetAuto: true,
     widgetHintSeen: false,
+    widgetPending: false,
 };
 
 let charts = [];
 let sync;
 
-// Widget flutuante (Chrome/Edge no PC): abre pelo ⧉ do cabeçalho ou ao iniciar uma matéria.
+// Widget flutuante (Chrome/Edge no PC): abre pelo ⧉ do cabeçalho ou ao sair da tela cheia do modo foco.
+// O Chrome aceita só uma janela especial por clique (tela cheia OU widget), por isso o ▶ abre a tela
+// cheia e o widget vem ao fechar o foco (✕) ou, se a tela cheia foi fechada com Esc, no próximo clique.
 const widget = createWidget({
     getState: () => state,
     onToggle: (subjectId) => toggleSubject(subjectId),
@@ -69,6 +72,8 @@ async function openWidget() {
         await setMeta('widget_hint_seen', true);
     }
 }
+
+const shouldAutoWidget = () => state.widgetAuto && widgetSupported() && !widget.isOpen() && Boolean(runningSession() || restInfo());
 
 // ── Utilidades ───────────────────────────────────────────────────────────────
 
@@ -149,9 +154,6 @@ async function toggleSubject(subjectId) {
         openSessionNoteDialog(stopped);
         if (running.subject_id === subjectId) return render();
     }
-    // Abre o widget antes de qualquer await, enquanto o clique ainda vale como gesto do usuário.
-    const autoWidget = state.widgetAuto && widgetSupported() && !widget.isOpen();
-    const opening = autoWidget ? openWidget() : null;
     await persist('sessions', {
         id: uuid(),
         subject_id: subjectId,
@@ -163,9 +165,7 @@ async function toggleSubject(subjectId) {
         deleted_at: null,
         created_at: iso(at),
     });
-    await opening;
-    // Com o widget, o estudo acontece em outra janela: tela cheia atrapalharia.
-    openFocus({ fullscreen: !autoWidget && !widget.isOpen() });
+    openFocus();
 }
 
 async function checkSuspicious() {
@@ -218,9 +218,9 @@ async function keepScreenOn(on) {
     }
 }
 
-function openFocus({ fullscreen = true } = {}) {
+function openFocus() {
     state.focusOpen = true;
-    if (fullscreen && !document.fullscreenElement) document.documentElement.requestFullscreen?.().catch(() => {});
+    if (!document.fullscreenElement) document.documentElement.requestFullscreen?.().catch(() => {});
     keepScreenOn(true);
     render();
 }
@@ -901,7 +901,7 @@ function renderSettings() {
             </label>
             ${widgetSupported() ? `<label class="checkbox">
                 <input type="checkbox" name="widget_auto" ${state.widgetAuto ? 'checked' : ''}>
-                Abrir o widget flutuante ao iniciar uma matéria (neste computador)
+                Abrir o widget flutuante ao sair da tela cheia do modo foco (neste computador)
             </label>` : ''}
             <button class="btn" type="submit">Salvar preferências</button>
         </form>
@@ -1176,6 +1176,11 @@ function shiftStats(direction) {
 root.addEventListener('click', async (event) => {
     markSeen();
     dismissRestAlert();
+    // Saiu da tela cheia com Esc (sem clique): o widget abre no primeiro clique seguinte.
+    if (state.widgetPending && !event.target.closest('[data-action="focus-close"], [data-action="widget-open"]')) {
+        state.widgetPending = false;
+        if (shouldAutoWidget()) openWidget();
+    }
     const tab = event.target.closest('[data-tab]');
     if (tab) {
         state.tab = tab.dataset.tab;
@@ -1189,7 +1194,12 @@ root.addEventListener('click', async (event) => {
         'focus-open': () => openFocus(),
         'widget-open': () => openWidget(),
         'pick-avatar': async () => { await persist('settings', { ...state.settings, avatar: id }); render(); },
-        'focus-close': () => closeFocus(),
+        'focus-close': () => {
+            const autoWidget = shouldAutoWidget();
+            state.widgetPending = false;
+            if (autoWidget) openWidget(); // antes do render: o clique ainda vale como gesto
+            closeFocus();
+        },
         'new-subject': () => openSubjectDialog(),
         'edit-subject': () => openSubjectDialog(subjectById(id)),
         'move-subject': async () => {
@@ -1262,6 +1272,10 @@ root.addEventListener('submit', async (event) => {
         await persist('ddays', { id: uuid(), titulo: String(data.get('titulo')).trim(), data: String(data.get('data')), deleted_at: null, created_at: iso(nowMs()) });
     }
     render();
+});
+
+document.addEventListener('fullscreenchange', () => {
+    if (!document.fullscreenElement && state.focusOpen) state.widgetPending = true;
 });
 
 document.addEventListener('visibilitychange', async () => {
