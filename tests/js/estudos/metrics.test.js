@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
     DEFAULT_SETTINGS, buildDaily, dayBounds, dayStats, findOverlaps, formatClock, isSuspicious,
-    monthRange, rangeStats, streak, studyDayOf, timelineRows, timelineSlots, weekRange,
+    monthRange, rangeStats, streak, studyDayOf, timelineBlocks, timelineSlots, weekRange,
 } from '../../../resources/js/estudos/metrics.js';
 
 const H = 3_600_000;
@@ -206,23 +206,39 @@ describe('sobreposição', () => {
 });
 
 
-describe('grade estilo YPT (precisão de minuto)', () => {
-    it('preenche cada hora proporcionalmente, partindo a sessão entre horas', () => {
+describe('linha do tempo vertical (blocos estilo YPT)', () => {
+    it('junta trechos seguidos da mesma matéria, guarda as pausas e abre a janela com 1h de folga', () => {
         const daily = buildDaily([
-            session('2026-10-30T04:51', '2026-10-30T06:10'),
-            session('2026-10-30T06:12', '2026-10-30T06:51', { subject_id: 'port', origem: 'manual' }),
-            session('2026-10-30T07:00', '2026-10-30T08:00', { origem: 'importado' }),
+            session('2026-10-30T13:38', '2026-10-30T13:53'),
+            session('2026-10-30T14:00', '2026-10-30T14:44'), // pausa de 7 min: mesmo bloco
+            session('2026-10-30T14:50', '2026-10-30T15:10', { subject_id: 'port', origem: 'manual' }),
+            session('2026-10-30T15:40', '2026-10-30T15:50', { subject_id: 'port', origem: 'manual' }), // 30 min depois: outro bloco
         ], settings, NOW);
-        const rows = timelineRows(dayStats(daily, '2026-10-30'), settings); // virada 3h: linha 0 = 03h
+        const { blocks, fromMs, toMs: endMs } = timelineBlocks(dayStats(daily, '2026-10-30'), settings);
 
-        expect(rows).toHaveLength(24);
-        expect(rows[1]).toEqual([{ subjectId: 'dir', manual: false, start: 85, end: 100 }]); // 04:51–05:00
-        expect(rows[2]).toEqual([{ subjectId: 'dir', manual: false, start: 0, end: 100 }]); // 05h inteira
-        expect(rows[3][0]).toMatchObject({ subjectId: 'dir', start: 0 });
-        expect(rows[3][0].end).toBeCloseTo(16.67, 1); // até 06:10
-        expect(rows[3][1].manual).toBe(true);
-        expect(rows[3][1].start).toBe(20);
-        expect(rows[3][1].end).toBe(85);
-        expect(rows[4]).toEqual([]); // importado fica fora da grade
+        expect(blocks).toHaveLength(3);
+        expect(blocks[0]).toMatchObject({ subjectId: 'dir', manual: false, studiedMs: 59 * 60_000, lane: 0 });
+        expect(blocks[0].gaps).toHaveLength(1);
+        expect(blocks[0].gaps[0].end - blocks[0].gaps[0].start).toBe(7 * 60_000);
+        expect(blocks[1]).toMatchObject({ subjectId: 'port', manual: true, studiedMs: 20 * 60_000 });
+        expect(blocks[2].studiedMs).toBe(10 * 60_000);
+        expect(blocks[1].start - fromMs).toBe((2 * 60 + 50) * 60_000); // janela começa às 12:00
+        expect(endMs - blocks[2].end).toBe(70 * 60_000); // e termina às 17:00
+    });
+
+    it('blocos que se cruzam no tempo vão para faixas diferentes', () => {
+        const daily = buildDaily([
+            session('2026-10-30T10:00', '2026-10-30T11:00'),
+            session('2026-10-30T10:30', '2026-10-30T10:50', { subject_id: 'port' }),
+            session('2026-10-30T11:10', '2026-10-30T11:30', { subject_id: 'port' }),
+        ], settings, NOW);
+        const { blocks } = timelineBlocks(dayStats(daily, '2026-10-30'), settings);
+
+        expect(blocks.map((b) => b.lane)).toEqual([0, 1, 0]);
+    });
+
+    it('dia sem estudo: nenhum bloco', () => {
+        const daily = buildDaily([], settings, NOW);
+        expect(timelineBlocks(dayStats(daily, '2026-10-30'), settings)).toEqual({ blocks: [], fromMs: null, toMs: null });
     });
 });

@@ -199,17 +199,22 @@ main > .btn { width: 100%; margin-top: 6px; }
 /* Linha do tempo */
 .day-nav { display: flex; align-items: center; justify-content: space-between; margin: 6px 0; }
 .day-nav button { border: 1px solid var(--border); background: var(--card); width: 40px; height: 40px; border-radius: 10px; font-size: 1.2rem; }
-.planner { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 8px; }
-.hour { display: grid; grid-template-columns: 28px 1fr; gap: 2px; margin-bottom: 2px; align-items: center; }
-.hour span { font-size: .68rem; color: var(--muted); font-variant-numeric: tabular-nums; }
-/* 6 blocos de 10 min por hora; o preenchimento é recortado pela mesma máscara para respeitar os vãos. */
-.hour .track, .hour .fill {
-    --cells: repeating-linear-gradient(to right, #000 0 calc(100% / 6 - 2px), transparent calc(100% / 6 - 2px) calc(100% / 6));
-}
-.hour .track { position: relative; height: 14px; background: var(--heat-0); -webkit-mask: var(--cells); mask: var(--cells); }
-.hour .fill { position: absolute; inset: 0; }
-.hour .fill b { position: absolute; top: 0; bottom: 0; background: var(--c); }
-.hour .fill b.manual { background: repeating-linear-gradient(45deg, var(--c) 0 3px, color-mix(in srgb, var(--c) 45%, transparent) 3px 6px); }
+/* Linha do tempo vertical (estilo YPT): horas tracejadas, barras arredondadas por bloco e o nome ao lado. */
+.vtl { position: relative; margin-top: 12px; --axis: 58px; }
+.vtl-hour { position: absolute; left: 0; right: 0; border-top: 1px dashed var(--border); }
+.vtl-hour span { position: absolute; top: -.6em; left: 0; width: 46px; background: var(--bg); font-size: .75rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+.vtl-pill { position: absolute; left: calc(var(--axis) + var(--lane) * var(--lane-w)); width: 16px; min-height: 16px; overflow: hidden;
+    border-radius: 99px; background: var(--c); }
+.vtl-pill i { position: absolute; left: 0; right: 0; background: rgba(0, 0, 0, .35); }
+.vtl-pill.dot { height: 10px; min-height: 0; margin-top: -5px; }
+.vtl-pill.manual { background: repeating-linear-gradient(-45deg, var(--c) 0 4px, color-mix(in srgb, var(--c) 55%, transparent) 4px 8px); }
+.vtl-pill.running { animation: vtl-pulse 1.6s ease-in-out infinite; }
+@keyframes vtl-pulse { 50% { opacity: .55; } }
+@media (prefers-reduced-motion: reduce) { .vtl-pill.running { animation: none; } }
+.vtl-label { position: absolute; left: calc(var(--axis) + var(--lanes) * var(--lane-w) + 10px); right: 0; line-height: 1.15; }
+.vtl-label b { display: block; font-size: 1.05rem; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.vtl-label small { font-size: .9rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+.vtl-empty { margin: 28px 0; }
 .session-list .range, .session-list .dur { font-size: .82rem; color: var(--muted); font-variant-numeric: tabular-nums; }
 .session-list button, .manage button { border: 0; background: none; padding: 4px 6px; color: var(--muted); }
 

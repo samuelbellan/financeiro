@@ -274,30 +274,51 @@ export function timelineSlots(stats, settings, slotMinutes = 10) {
 }
 
 /**
- * Grade estilo YPT: 24 linhas (uma por hora, a partir da virada), cada uma com os trechos estudados
- * na precisão do minuto: { subjectId, manual, start, end } em % da hora (0–100).
+ * Linha do tempo vertical (estilo YPT): trechos seguidos da mesma matéria, separados por até mergeGapMs,
+ * viram um bloco; as pausas dentro do bloco ficam em `gaps`. Blocos que se cruzam no tempo vão para
+ * faixas (lane) lado a lado. Retorna { blocks, fromMs, toMs }, com a janela arredondada à hora cheia
+ * (relativa ao início do dia de estudo) e 1h de folga antes e depois, dentro do dia.
  */
-export function timelineRows(stats, settings) {
-    const [dayStart] = dayBounds(stats.day, settings);
-    const rows = Array.from({ length: 24 }, () => []);
-    for (const piece of stats.pieces) {
-        if (piece.session.origem === 'importado') continue;
-        const firstHour = Math.max(0, Math.floor((piece.start - dayStart) / HOUR));
-        const lastHour = Math.min(23, Math.floor((piece.end - 1 - dayStart) / HOUR));
-        for (let h = firstHour; h <= lastHour; h++) {
-            const hourStart = dayStart + h * HOUR;
-            const from = Math.max(piece.start, hourStart);
-            const to = Math.min(piece.end, hourStart + HOUR);
-            if (to <= from) continue;
-            rows[h].push({
-                subjectId: piece.session.subject_id,
-                manual: piece.session.origem === 'manual',
-                start: ((from - hourStart) / HOUR) * 100,
-                end: ((to - hourStart) / HOUR) * 100,
-            });
+export function timelineBlocks(stats, settings, mergeGapMs = 15 * MIN) {
+    const [dayStart, dayEnd] = dayBounds(stats.day, settings);
+    const pieces = [...stats.pieces].sort((a, b) => a.start - b.start);
+    const blocks = [];
+    for (const piece of pieces) {
+        const last = blocks[blocks.length - 1];
+        if (last && last.subjectId === piece.session.subject_id && piece.start - last.end <= mergeGapMs) {
+            if (piece.start > last.end) last.gaps.push({ start: last.end, end: piece.start });
+            last.end = Math.max(last.end, piece.end);
+            last.studiedMs += piece.end - piece.start;
+            last.manual = last.manual && piece.session.origem === 'manual';
+            last.running ||= !piece.session.fim;
+            continue;
         }
+        blocks.push({
+            subjectId: piece.session.subject_id,
+            start: piece.start,
+            end: piece.end,
+            studiedMs: piece.end - piece.start,
+            manual: piece.session.origem === 'manual',
+            running: !piece.session.fim,
+            gaps: [],
+            lane: 0,
+        });
     }
-    return rows;
+    const laneEnds = [];
+    for (const block of blocks) {
+        let lane = laneEnds.findIndex((end) => end <= block.start);
+        if (lane < 0) lane = laneEnds.length;
+        laneEnds[lane] = block.end;
+        block.lane = lane;
+    }
+    if (!blocks.length) return { blocks, fromMs: null, toMs: null };
+    const first = Math.floor((blocks[0].start - dayStart) / HOUR) - 1;
+    const last = Math.ceil((Math.max(...blocks.map((b) => b.end)) - dayStart) / HOUR) + 1;
+    return {
+        blocks,
+        fromMs: dayStart + Math.max(0, first) * HOUR,
+        toMs: Math.min(dayEnd, dayStart + last * HOUR),
+    };
 }
 
 /** Sessões (não excluídas) que se sobrepõem ao intervalo [inicio, fim). */

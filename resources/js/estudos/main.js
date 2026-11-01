@@ -14,7 +14,7 @@ import { createWidget, widgetSupported } from './widget.js';
 import {
     addDays, buildDaily, compareWithPrevious, comparisonSeries, dayBounds, dayGaps, dayStats, daysUntil, findOverlaps,
     formatClock, formatDuration, heatLevel, hourProfile, isSuspicious, lastStopped, lastTypeFor, localInputToMs, NO_TYPE, STUDY_TYPES, studyTypeName, monthRange, msToLocalInput,
-    quarterWeeks, rangeStats, restAlertStage, restMaxGapMs, streak, studyDayOf, studyVsOther, timelineRows, toMs, trendBuckets, weekdayAverages,
+    quarterWeeks, rangeStats, restAlertStage, restMaxGapMs, streak, studyDayOf, studyVsOther, timelineBlocks, toMs, trendBuckets, weekdayAverages,
     weekRange, yearMonths,
 } from './metrics.js';
 
@@ -492,21 +492,52 @@ function renderRestBanner() {
     </section>`;
 }
 
+// Linha do tempo vertical (estilo YPT): uma barra por bloco de estudo, com as pausas internas mais
+// escuras; blocos curtos viram um ponto. 1 px por minuto.
+const VTL_PX_PER_MIN = 1;
+const VTL_DOT_MS = 12 * 60_000;
+const VTL_LANE_PX = 22;
+const VTL_LABEL_PX = 40;
+
+/** "1h 05m" ou "59m 17s", como no YPT. */
+function vtlDuration(ms) {
+    const total = Math.floor(ms / 1000);
+    const h = Math.floor(total / 3600);
+    const m = Math.floor((total % 3600) / 60);
+    return h ? `${h}h ${String(m).padStart(2, '0')}m` : `${m}m ${String(total % 60).padStart(2, '0')}s`;
+}
+
+function renderVerticalTimeline(stats, day) {
+    const { blocks, fromMs, toMs: endMs } = timelineBlocks(stats, state.settings);
+    if (!blocks.length) return '<p class="vtl-empty muted center">Nenhum estudo neste dia.</p>';
+    const y = (ms) => ((ms - fromMs) / 60_000) * VTL_PX_PER_MIN;
+    const clock = (ms) => formatClock(ms, day, state.settings);
+    let hours = '';
+    for (let t = fromMs; t <= endMs; t += 3_600_000) {
+        hours += `<div class="vtl-hour" style="top:${y(t)}px"><span>${clock(t)}</span></div>`;
+    }
+    const lanes = Math.max(...blocks.map((b) => b.lane)) + 1;
+    let labelBottom = -Infinity;
+    const items = blocks.map((block) => {
+        const subject = subjectById(block.subjectId);
+        const name = esc(subject?.nome ?? 'Matéria removida');
+        const dot = block.end - block.start < VTL_DOT_MS;
+        const top = y(block.start);
+        const gaps = block.gaps.map((g) => `<i style="top:${y(g.start) - top}px;height:${y(g.end) - y(g.start)}px"></i>`).join('');
+        const classes = ['vtl-pill', dot && 'dot', block.manual && 'manual', block.running && 'running'].filter(Boolean).join(' ');
+        const pill = `<div class="${classes}" style="--c:${esc(subject?.cor ?? '#888')};--lane:${block.lane};top:${top}px;${dot ? '' : `height:${y(block.end) - top}px`}"
+            title="${name} · ${clock(block.start)}–${clock(block.end)} · ${formatDuration(block.studiedMs)}">${gaps}</div>`;
+        if (dot) return pill;
+        const labelTop = Math.max(top, labelBottom);
+        labelBottom = labelTop + VTL_LABEL_PX;
+        return pill + `<div class="vtl-label" style="top:${labelTop}px"><b>${name}</b><small>${vtlDuration(block.studiedMs)}</small></div>`;
+    }).join('');
+    return `<div class="vtl" style="--lanes:${lanes};--lane-w:${VTL_LANE_PX}px;height:${Math.max(y(endMs), labelBottom) + 12}px">${hours}${items}</div>`;
+}
+
 function renderTimeline() {
     const day = state.timelineDay ?? today();
     const stats = dayStats(daily(), day);
-    const rows = timelineRows(stats, state.settings);
-    const virada = state.settings.virada_hora;
-
-    // Cada hora é uma faixa com 6 blocos de 10 min; o preenchimento segue o minuto exato (como no YPT).
-    let grid = '';
-    rows.forEach((segments, h) => {
-        const fill = segments.map((seg) => {
-            const color = subjectById(seg.subjectId)?.cor ?? '#888';
-            return `<b class="${seg.manual ? 'manual' : ''}" style="--c:${esc(color)};left:${seg.start.toFixed(2)}%;width:${(seg.end - seg.start).toFixed(2)}%"></b>`;
-        }).join('');
-        grid += `<div class="hour"><span>${String((virada + h) % 24).padStart(2, '0')}</span><div class="track"><div class="fill">${fill}</div></div></div>`;
-    });
 
     const [dayStart, dayEnd] = dayBounds(day, state.settings);
     const sessions = liveSessions()
@@ -552,7 +583,7 @@ function renderTimeline() {
             <button type="button" data-action="day-next" aria-label="Próximo dia" ${day >= today() ? 'disabled' : ''}>›</button>
         </nav>
         <p class="center muted">Total ${formatDuration(stats.totalMs)} · Máx. foco ${formatDuration(stats.maxFocusMs)}</p>
-        <div class="planner">${grid}</div>
+        ${renderVerticalTimeline(stats, day)}
         <h3>Sessões</h3>
         <ul class="session-list">${list || '<li class="empty">Nenhuma sessão neste dia.</li>'}</ul>
         <button type="button" class="btn ghost" data-action="new-session" data-day="${day}">+ Sessão manual</button>`;
