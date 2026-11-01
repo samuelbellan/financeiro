@@ -136,7 +136,7 @@ em.warn { background: color-mix(in srgb, var(--warn) 18%, transparent); color: v
 
 .tabbar {
     position: fixed; left: 0; right: 0; bottom: 0;
-    display: grid; grid-template-columns: repeat(4, 1fr);
+    display: grid; grid-template-columns: repeat(5, 1fr);
     background: var(--card); border-top: 1px solid var(--border);
     padding-bottom: env(safe-area-inset-bottom);
 }
@@ -417,6 +417,7 @@ body.focus-on { overflow: hidden; }
 .room-code b { color: var(--text); letter-spacing: .08em; }
 .room-code button { border: 0; background: none; padding: 2px 0; color: var(--primary); font-size: .82rem; }
 .room-code button[data-action="room-leave"] { color: var(--danger); }
+.room.tab { margin-top: 16px; }
 .room-members { list-style: none; margin: 0 0 8px; padding: 0; display: grid; gap: 6px; }
 .room-members li { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
 .room-members .btn { width: auto; padding: 4px 12px; }

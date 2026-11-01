@@ -210,7 +210,7 @@ function render() {
     applyTheme();
     charts.forEach((c) => c.destroy());
     charts = [];
-    const views = { timer: renderTimer, timeline: renderTimeline, stats: renderStats, settings: renderSettings };
+    const views = { timer: renderTimer, sala: renderRoomTab, timeline: renderTimeline, stats: renderStats, settings: renderSettings };
     root.querySelector('[data-view]').innerHTML = views[state.tab]();
     root.querySelectorAll('[data-tab]').forEach((b) => b.classList.toggle('active', b.dataset.tab === state.tab));
     renderSyncBadge();
@@ -431,19 +431,25 @@ async function refreshRooms(action = null) {
     } finally {
         rooms.loading = false;
         if (state.focusOpen && state.focusView === 'sala') renderFocus();
+        if (state.tab === 'sala') root.querySelector('[data-view]').innerHTML = renderRoomTab();
     }
+}
+
+/** Aba "Sala": a mesma visão dos colegas do modo foco, sem precisar estar estudando. */
+function renderRoomTab() {
+    return roomSection(todayTotals(), runningSession(), 'tab');
 }
 
 const currentRoom = () => rooms.data?.rooms.find((r) => r.id === state.roomId) ?? rooms.data?.rooms[0] ?? null;
 
-function roomSection(stats, running) {
+function roomSection(stats, running, extraClass = '') {
     if (!rooms.data) {
-        return `<section class="room"><h4>Sala de estudo</h4><p>${rooms.error ? `⚠ ${esc(rooms.error)}` : 'Carregando…'}</p></section>`;
+        return `<section class="room ${extraClass}"><h4>Sala de estudo</h4><p>${rooms.error ? `⚠ ${esc(rooms.error)}` : 'Carregando…'}</p></section>`;
     }
     const room = currentRoom();
     const manager = rooms.data.pode_gerenciar; // criar e gerenciar salas é só para gestores
     if (!room) {
-        return `<section class="room"><h4>Sala de estudo</h4>
+        return `<section class="room ${extraClass}"><h4>Sala de estudo</h4>
             <p>Você ainda não está em nenhuma sala. ${manager
                 ? 'Crie uma e mande o código para os colegas, ou entre com o código de alguém.'
                 : 'Peça o código da sala a um gestor e entre com ele.'}</p>
@@ -469,7 +475,7 @@ function roomSection(stats, running) {
         return `<div class="seat ${m.estudando_desde ? 'studying' : ''} ${m.hoje_ms > 0 ? 'studied' : ''}">${icon}${name}
             <b data-live="member" data-ms="${m.hoje_ms}" data-studying="${m.estudando_desde ? 1 : ''}">${formatDuration(today, { seconds: true })}</b></div>`;
     }).join('');
-    return `<section class="room">
+    return `<section class="room ${extraClass}">
         ${picker}
         <h4>${esc(room.nome)}</h4>
         <p><span>${studying} ${studying === 1 ? 'membro' : 'membros'}</span> estudando${rooms.error ? ` · ⚠ ${esc(rooms.error)}: mostrando o último estado` : ''}</p>
@@ -1184,7 +1190,8 @@ function renderSettings() {
 // Atualiza apenas os números vivos (evita re-renderizar a tela toda a cada segundo).
 function tick() {
     checkRestAlert();
-    if (state.focusOpen && state.focusView === 'sala' && !rooms.loading && nowMs() - rooms.lastTry >= ROOMS_REFRESH_MS) refreshRooms();
+    const roomsVisible = state.tab === 'sala' || (state.focusOpen && state.focusView === 'sala');
+    if (roomsVisible && !rooms.loading && nowMs() - rooms.lastTry >= ROOMS_REFRESH_MS) refreshRooms();
     root.querySelectorAll('[data-live="member"]').forEach((el) => {
         const member = { hoje_ms: Number(el.dataset.ms), estudando_desde: el.dataset.studying ? 'sim' : null };
         el.textContent = formatDuration(memberTodayMs(member, rooms.fetchedAt, nowMs()), { seconds: true });
