@@ -263,4 +263,64 @@ class StudySyncTest extends TestCase
         $this->sync(['settings' => $base + ['avatar' => 'planta']])->assertOk()->assertJsonPath('changes.settings.avatar', 'planta');
         $this->sync(['settings' => $base + ['avatar' => '<script>']])->assertOk()->assertJsonPath('rejected.0.type', 'settings');
     }
+
+    public function test_large_import_batch_uses_a_bounded_number_of_queries(): void
+    {
+        $subject = $this->makeSubject();
+        $this->sync(['subjects' => [$subject]])->assertOk();
+
+        $sessions = [];
+        for ($i = 0; $i < 400; $i++) {
+            $start = Carbon::parse('2026-01-01T08:00:00Z')->addHours($i);
+            $sessions[] = $this->makeSession($subject['id'], [
+                'origem' => 'importado',
+                'inicio' => $start->format('Y-m-d\TH:i:s.v\Z'),
+                'fim' => $start->copy()->addMinutes(50)->format('Y-m-d\TH:i:s.v\Z'),
+            ]);
+        }
+
+        DB::enableQueryLog();
+        $this->sync(['sessions' => $sessions])->assertOk()->assertJsonPath('rejected', []);
+        $queries = count(DB::getQueryLog());
+        DB::disableQueryLog();
+
+        $this->assertSame(400, DB::table('study_sessions')->count());
+        // Antes eram ~4 consultas por sessão (1600+); em lote, poucas dezenas no total.
+        $this->assertLessThan(30, $queries);
+    }
+
+    public function test_batch_mixing_new_existing_and_tombstoned_records(): void
+    {
+        $subject = $this->makeSubject();
+        $kept = $this->makeSession($subject['id']);
+        $gone = $this->makeSession($subject['id'], ['inicio' => '2026-10-30T16:00:00.000Z', 'fim' => '2026-10-30T17:00:00.000Z']);
+        $this->sync(['subjects' => [$subject], 'sessions' => [$kept, $gone]])->assertOk();
+        $cursor = $this->sync(['sessions' => [array_merge($gone, ['deleted_at' => '2026-10-31T10:00:00.000Z'])]])->json('cursor');
+        $createdAt = DB::table('study_sessions')->where('id', $kept['id'])->value('created_at');
+
+        $new = $this->makeSession($subject['id'], ['inicio' => '2026-10-30T18:00:00.000Z', 'fim' => '2026-10-30T19:00:00.000Z']);
+        $response = $this->sync(['sessions' => [
+            array_merge($kept, ['observacao' => 'editada']),
+            array_merge($gone, ['observacao' => 'ressuscitar?']),
+            $new,
+        ]], $cursor)->assertOk()->assertJsonPath('rejected', []);
+
+        $this->assertSame('editada', DB::table('study_sessions')->where('id', $kept['id'])->value('observacao'));
+        $this->assertSame($createdAt, DB::table('study_sessions')->where('id', $kept['id'])->value('created_at'));
+        $this->assertNull(DB::table('study_sessions')->where('id', $gone['id'])->value('observacao'));
+        $this->assertSame(3, DB::table('study_sessions')->count());
+        $ids = collect($response->json('changes.sessions'))->pluck('id');
+        $this->assertTrue($ids->contains($gone['id']));
+        $this->assertTrue($ids->contains($new['id']));
+    }
+
+    public function test_session_observacao_is_persisted_and_synced(): void
+    {
+        $subject = $this->makeSubject();
+        $session = $this->makeSession($subject['id'], ['observacao' => '20 questões de Dir. Tributário']);
+
+        $res = $this->sync(['subjects' => [$subject], 'sessions' => [$session]])->assertOk();
+        $res->assertJsonPath('rejected', []);
+        $res->assertJsonPath('changes.sessions.0.observacao', '20 questões de Dir. Tributário');
+    }
 }

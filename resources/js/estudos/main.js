@@ -92,11 +92,37 @@ async function stopSession(session, atMs) {
     }
 }
 
+function openSessionNoteDialog(session) {
+    const subject = subjectById(session.subject_id);
+    openDialog(`
+        <h3>Sessão de ${esc(subject?.nome ?? 'Estudo')}</h3>
+        <p class="muted">Deseja adicionar uma observação sobre o que estudou nesta sessão?</p>
+        <label>Conteúdo / Anotações
+            <textarea name="observacao" rows="3" placeholder="Ex.: Resolução de questões, revisão de tópicos, páginas...">${esc(session.observacao ?? '')}</textarea>
+        </label>
+        <div class="actions">
+            <button class="btn" value="save">Salvar anotação</button>
+            <button class="btn ghost" value="cancel" formnovalidate>Pular</button>
+        </div>`,
+    async (action, data) => {
+        if (action === 'save') {
+            const obs = String(data?.get('observacao') ?? '').trim();
+            const current = state.sessions.find((s) => s.id === session.id);
+            if (current) {
+                await persist('sessions', { ...current, observacao: obs || null });
+                render();
+            }
+        }
+    });
+}
+
 async function toggleSubject(subjectId) {
     const at = nowMs();
     const running = runningSession();
     if (running) {
         await stopSession(running, at);
+        const stopped = { ...running, fim: iso(Math.max(at, toMs(running.inicio))) };
+        openSessionNoteDialog(stopped);
         if (running.subject_id === subjectId) return render();
     }
     await persist('sessions', {
@@ -400,11 +426,14 @@ function renderTimeline() {
         const overlap = findOverlaps(s, liveSessions(), nowMs()).length > 0;
         const html = `<li style="--c:${esc(subject?.cor ?? '#888')}">
             <span class="dot"></span>
-            <span class="name">${esc(subject?.nome ?? 'Matéria removida')}
-                ${s.origem === 'manual' ? '<em>manual</em>' : ''}
-                ${s.origem === 'importado' ? '<em>importado</em>' : ''}
-                ${s.status === 'suspeita' ? '<em class="warn">a confirmar</em>' : ''}
-                ${overlap ? '<em class="warn">sobreposta</em>' : ''}</span>
+            <div class="session-main">
+                <span class="name">${esc(subject?.nome ?? 'Matéria removida')}
+                    ${s.origem === 'manual' ? '<em>manual</em>' : ''}
+                    ${s.origem === 'importado' ? '<em>importado</em>' : ''}
+                    ${s.status === 'suspeita' ? '<em class="warn">a confirmar</em>' : ''}
+                    ${overlap ? '<em class="warn">sobreposta</em>' : ''}</span>
+                ${s.observacao ? `<p class="session-obs">📝 ${esc(s.observacao)}</p>` : ''}
+            </div>
             <span class="range">${formatClock(toMs(s.inicio), day, state.settings)} – ${s.fim ? formatClock(end, day, state.settings) : 'agora'}</span>
             <span class="dur">${formatDuration(end - toMs(s.inicio))}</span>
             ${s.fim ? `<button type="button" data-action="edit-session" data-id="${s.id}" aria-label="Editar">✎</button>` : ''}
@@ -919,6 +948,9 @@ function openSessionDialog(session = null, day = today(), gap = null) {
         </select></label>
         <label>Início<input type="datetime-local" name="inicio" required value="${msToLocalInput(defaultStart, tz)}"></label>
         <label>Fim<input type="datetime-local" name="fim" required value="${msToLocalInput(defaultEnd, tz)}"></label>
+        <label>Observação / Conteúdo estudado
+            <textarea name="observacao" rows="2" placeholder="Ex.: Artigos lidos, exercícios, tópicos...">${esc(session?.observacao ?? '')}</textarea>
+        </label>
         ${!session || session.origem === 'manual' ? '<small class="muted">Sessões manuais contam no total, mas não no máximo de foco nem no início/término.</small>' : ''}
         <p class="form-error"></p>
         <div class="actions">
@@ -937,9 +969,11 @@ function openSessionDialog(session = null, day = today(), gap = null) {
         if (!(fim > inicio)) return 'O fim precisa ser depois do início.';
         if (fim - inicio > MAX_SESSION_MS) return 'Uma sessão pode ter no máximo 24h.';
         if (fim > nowMs() + 60_000) return 'A sessão não pode terminar no futuro.';
+        const observacao = String(data.get('observacao') ?? '').trim() || null;
         const candidate = {
             ...(session ?? { id: uuid(), origem: 'manual', device_id: await getMeta('device_id'), created_at: iso(nowMs()) }),
             subject_id: String(data.get('subject_id')), inicio: iso(inicio), fim: iso(fim), status: 'ok', deleted_at: null,
+            observacao,
         };
         const overlaps = findOverlaps(candidate, liveSessions(), nowMs());
         if (overlaps.length) {

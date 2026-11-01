@@ -26,6 +26,9 @@ class StudySyncService
 
     protected const DB_FORMAT = 'Y-m-d H:i:s.v';
 
+    /** Registros por consulta em lote (12 colunas × 500 fica bem abaixo do limite de parâmetros do Postgres). */
+    protected const CHUNK = 500;
+
     protected const TABLES = [
         'subjects' => 'study_subjects',
         'sessions' => 'study_sessions',
@@ -54,19 +57,12 @@ class StudySyncService
         $changes = $payload['changes'] ?? [];
         $conflicts = [];
 
+        // Cada tipo é gravado em lote (poucas consultas por requisição, não por item): o banco fica em
+        // outra rede e uma importação grande com consultas item a item estourava o tempo do Render.
         DB::transaction(function () use ($changes, $payload, &$conflicts) {
-            foreach ($changes['subjects'] ?? [] as $item) {
-                $this->applySubject($item);
-            }
-            $touchedSessions = [];
-            foreach ($changes['sessions'] ?? [] as $item) {
-                if ($id = $this->applySession($item, $payload['device_id'] ?? null)) {
-                    $touchedSessions[] = $id;
-                }
-            }
-            foreach ($changes['ddays'] ?? [] as $item) {
-                $this->applyDday($item);
-            }
+            $this->applySubjects($changes['subjects'] ?? []);
+            $touchedSessions = $this->applySessions($changes['sessions'] ?? [], $payload['device_id'] ?? null);
+            $this->applyDdays($changes['ddays'] ?? []);
             if (!empty($changes['settings'])) {
                 $this->applySettings($changes['settings']);
             }
@@ -82,90 +78,125 @@ class StudySyncService
         ];
     }
 
-    protected function applySubject(mixed $item): void
+    protected function applySubjects(array $items): void
     {
-        $data = $this->validateItem('subjects', $item, [
-            'id' => 'required|uuid',
-            'nome' => 'required|string|min:1|max:60',
-            'cor' => ['required', 'regex:/^#[0-9a-fA-F]{6}$/'],
-            'ordem' => 'nullable|integer|min:0|max:100000',
-            'arquivada_em' => 'nullable|date',
-            'deleted_at' => 'nullable|date',
-        ]);
-        if (!$data || !$this->guardOwnership('subjects', $data['id'])) {
-            return;
+        $records = [];
+        foreach ($items as $item) {
+            $data = $this->validateItem('subjects', $item, [
+                'id' => 'required|uuid',
+                'nome' => 'required|string|min:1|max:60',
+                'cor' => ['required', 'regex:/^#[0-9a-fA-F]{6}$/'],
+                'ordem' => 'nullable|integer|min:0|max:100000',
+                'arquivada_em' => 'nullable|date',
+                'deleted_at' => 'nullable|date',
+            ]);
+            if (!$data) {
+                continue;
+            }
+            $records[$data['id']] = [[
+                'nome' => $data['nome'],
+                'cor' => strtoupper($data['cor']),
+                'ordem' => $data['ordem'] ?? 0,
+                'arquivada_em' => $this->toDb($data['arquivada_em'] ?? null),
+            ], !empty($data['deleted_at'])];
         }
 
-        $this->write('subjects', $data['id'], [
-            'nome' => $data['nome'],
-            'cor' => strtoupper($data['cor']),
-            'ordem' => $data['ordem'] ?? 0,
-            'arquivada_em' => $this->toDb($data['arquivada_em'] ?? null),
-        ], !empty($data['deleted_at']));
+        $this->writeMany('subjects', $records);
     }
 
-    protected function applySession(mixed $item, ?string $deviceId): ?string
+    /**
+     * @return array<int, string> sessões ativas gravadas que entram na checagem de sobreposição
+     */
+    protected function applySessions(array $items, ?string $deviceId): array
     {
-        $data = $this->validateItem('sessions', $item, [
-            'id' => 'required|uuid',
-            'subject_id' => 'required|uuid',
-            'inicio' => 'required|date',
-            'fim' => 'nullable|date|after_or_equal:inicio',
-            'origem' => 'required|in:timer,manual,importado',
-            'status' => 'required|in:ok,suspeita',
-            'device_id' => 'nullable|uuid',
-            'deleted_at' => 'nullable|date',
-        ]);
-        if (!$data || !$this->guardOwnership('sessions', $data['id'])) {
-            return null;
+        $valid = [];
+        foreach ($items as $item) {
+            $data = $this->validateItem('sessions', $item, [
+                'id' => 'required|uuid',
+                'subject_id' => 'required|uuid',
+                'inicio' => 'required|date',
+                'fim' => 'nullable|date|after_or_equal:inicio',
+                'origem' => 'required|in:timer,manual,importado',
+                'status' => 'required|in:ok,suspeita',
+                'observacao' => 'nullable|string|max:1000',
+                'device_id' => 'nullable|uuid',
+                'deleted_at' => 'nullable|date',
+            ]);
+            if (!$data) {
+                continue;
+            }
+
+            $inicio = Carbon::parse($data['inicio'])->utc();
+            $fim = !empty($data['fim']) ? Carbon::parse($data['fim'])->utc() : null;
+            if ($inicio->gt(Carbon::now('UTC')->addDay())) {
+                $this->reject('sessions', $data['id'], 'Início no futuro.');
+                continue;
+            }
+            if ($fim && $inicio->diffInHours($fim) > self::MAX_SESSION_HOURS) {
+                $this->reject('sessions', $data['id'], 'Sessão com mais de ' . self::MAX_SESSION_HOURS . 'h.');
+                continue;
+            }
+            $valid[$data['id']] = [$data, $inicio, $fim];
         }
 
-        $inicio = Carbon::parse($data['inicio'])->utc();
-        $fim = !empty($data['fim']) ? Carbon::parse($data['fim'])->utc() : null;
-
-        if ($inicio->gt(Carbon::now('UTC')->addDay())) {
-            return $this->reject('sessions', $data['id'], 'Início no futuro.');
-        }
-        if ($fim && $inicio->diffInHours($fim) > self::MAX_SESSION_HOURS) {
-            return $this->reject('sessions', $data['id'], 'Sessão com mais de ' . self::MAX_SESSION_HOURS . 'h.');
-        }
-        $subjectOk = DB::table('study_subjects')
-            ->where('id', $data['subject_id'])
-            ->where('user_id', $this->userId)
-            ->exists();
-        if (!$subjectOk) {
-            return $this->reject('sessions', $data['id'], 'Matéria inexistente.');
+        $subjectIds = array_unique(array_map(fn ($v) => $v[0]['subject_id'], $valid));
+        $ownSubjects = [];
+        foreach (array_chunk($subjectIds, self::CHUNK) as $chunk) {
+            $ownSubjects += array_flip(DB::table('study_subjects')
+                ->where('user_id', $this->userId)
+                ->whereIn('id', $chunk)
+                ->pluck('id')
+                ->all());
         }
 
-        $deleted = !empty($data['deleted_at']);
-        $written = $this->write('sessions', $data['id'], [
-            'subject_id' => $data['subject_id'],
-            'inicio' => $inicio->format(self::DB_FORMAT),
-            'fim' => $fim?->format(self::DB_FORMAT),
-            'origem' => $data['origem'],
-            'status' => $data['status'],
-            'device_id' => $data['device_id'] ?? $deviceId,
-        ], $deleted);
+        $records = [];
+        $overlapCandidates = [];
+        foreach ($valid as $id => [$data, $inicio, $fim]) {
+            if (!isset($ownSubjects[$data['subject_id']])) {
+                $this->reject('sessions', $id, 'Matéria inexistente.');
+                continue;
+            }
+            $deleted = !empty($data['deleted_at']);
+            $records[$id] = [[
+                'subject_id' => $data['subject_id'],
+                'inicio' => $inicio->format(self::DB_FORMAT),
+                'fim' => $fim?->format(self::DB_FORMAT),
+                'origem' => $data['origem'],
+                'status' => $data['status'],
+                'observacao' => $data['observacao'] ?? null,
+                'device_id' => $data['device_id'] ?? $deviceId,
+            ], $deleted];
+            // Sessões importadas têm horários fictícios: não geram conflito.
+            if (!$deleted && $data['origem'] !== 'importado') {
+                $overlapCandidates[] = $id;
+            }
+        }
 
-        return ($written && !$deleted) ? $data['id'] : null;
+        $written = $this->writeMany('sessions', $records);
+
+        return array_values(array_intersect($overlapCandidates, $written));
     }
 
-    protected function applyDday(mixed $item): void
+    protected function applyDdays(array $items): void
     {
-        $data = $this->validateItem('ddays', $item, [
-            'id' => 'required|uuid',
-            'titulo' => 'required|string|min:1|max:80',
-            'data' => 'required|date_format:Y-m-d',
-            'deleted_at' => 'nullable|date',
-        ]);
-        if (!$data || !$this->guardOwnership('ddays', $data['id'])) {
-            return;
+        $records = [];
+        foreach ($items as $item) {
+            $data = $this->validateItem('ddays', $item, [
+                'id' => 'required|uuid',
+                'titulo' => 'required|string|min:1|max:80',
+                'data' => 'required|date_format:Y-m-d',
+                'deleted_at' => 'nullable|date',
+            ]);
+            if (!$data) {
+                continue;
+            }
+            $records[$data['id']] = [[
+                'titulo' => $data['titulo'],
+                'data' => $data['data'],
+            ], !empty($data['deleted_at'])];
         }
 
-        $this->write('ddays', $data['id'], [
-            'titulo' => $data['titulo'],
-            'data' => $data['data'],
-        ], !empty($data['deleted_at']));
+        $this->writeMany('ddays', $records);
     }
 
     protected function applySettings(mixed $item): void
@@ -197,41 +228,57 @@ class StudySyncService
     }
 
     /**
-     * Grava (insert/update) carimbando updated_at. Registros já excluídos não são alterados.
+     * Grava em lote (upsert) carimbando updated_at. Registros de outro usuário são recusados e
+     * registros já excluídos não são alterados (voltam ao cliente como tombstone).
+     *
+     * @param array<string, array{0: array, 1: bool}> $records id => [valores, excluir?]
+     * @return array<int, string> ids gravados
      */
-    protected function write(string $type, string $id, array $values, bool $delete): bool
+    protected function writeMany(string $type, array $records): array
     {
-        $table = DB::table(self::TABLES[$type]);
-        $existing = (clone $table)->where('id', $id)->first();
+        if (!$records) {
+            return [];
+        }
+
+        $table = self::TABLES[$type];
+        $existing = [];
+        foreach (array_chunk(array_keys($records), self::CHUNK) as $chunk) {
+            foreach (DB::table($table)->whereIn('id', $chunk)->get(['id', 'user_id', 'deleted_at']) as $row) {
+                $existing[$row->id] = $row;
+            }
+        }
+
         $stamp = $this->stamp();
-
-        if ($existing && $existing->deleted_at !== null) {
-            $this->forced[$type][] = $id;
-            return false;
+        $rows = [];
+        foreach ($records as $id => [$values, $delete]) {
+            $current = $existing[$id] ?? null;
+            if ($current && (int) $current->user_id !== $this->userId) {
+                $this->reject($type, $id, 'Registro pertence a outro usuário.');
+                continue;
+            }
+            if ($current && $current->deleted_at !== null) {
+                $this->forced[$type][] = $id;
+                continue;
+            }
+            $rows[] = $values + [
+                'id' => $id,
+                'user_id' => $this->userId,
+                'created_at' => $stamp,
+                'updated_at' => $stamp,
+                'deleted_at' => $delete ? $stamp : null,
+            ];
+        }
+        if (!$rows) {
+            return [];
         }
 
-        $values['updated_at'] = $stamp;
-        if ($delete) {
-            $values['deleted_at'] = $stamp;
+        // Na atualização, id, dono e created_at ficam como estão.
+        $update = array_values(array_diff(array_keys($rows[0]), ['id', 'user_id', 'created_at']));
+        foreach (array_chunk($rows, self::CHUNK) as $chunk) {
+            DB::table($table)->upsert($chunk, ['id'], $update);
         }
 
-        if ($existing) {
-            (clone $table)->where('id', $id)->update($values);
-        } else {
-            (clone $table)->insert($values + ['id' => $id, 'user_id' => $this->userId, 'created_at' => $stamp]);
-        }
-
-        return true;
-    }
-
-    protected function guardOwnership(string $type, string $id): bool
-    {
-        $owner = DB::table(self::TABLES[$type])->where('id', $id)->value('user_id');
-        if ($owner !== null && (int) $owner !== $this->userId) {
-            $this->reject($type, $id, 'Registro pertence a outro usuário.');
-            return false;
-        }
-        return true;
+        return array_column($rows, 'id');
     }
 
     protected function validateItem(string $type, mixed $item, array $rules): ?array
@@ -263,12 +310,15 @@ class StudySyncService
     protected function detectOverlaps(array $sessionIds): array
     {
         $conflicts = [];
+        if (!$sessionIds) {
+            return $conflicts;
+        }
         $now = Carbon::now('UTC')->format(self::DB_FORMAT);
 
+        // Só sessões de cronômetro/manuais chegam aqui (poucas por sincronização): uma consulta por sessão.
+        $sessions = DB::table('study_sessions')->whereIn('id', array_unique($sessionIds))->get()->keyBy('id');
         foreach (array_unique($sessionIds) as $id) {
-            $session = DB::table('study_sessions')->where('id', $id)->first();
-            // Sessões importadas têm horários fictícios: não geram conflito.
-            if (!$session || $session->origem === 'importado') {
+            if (!$session = $sessions->get($id)) {
                 continue;
             }
             $end = $session->fim ?? $now;
