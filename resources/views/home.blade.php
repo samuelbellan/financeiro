@@ -94,6 +94,18 @@
                         <span>Treinos & Exercícios</span>
                     </a>
 
+                    @if(auth()->user()->is_admin)
+                    <a href="{{ route('admin.convites') }}" class="nav-item" style="color: #60a5fa;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="9" cy="7" r="4"></circle>
+                            <path d="M19 8v6"></path>
+                            <path d="M22 11h-6"></path>
+                        </svg>
+                        <span>Convites Google</span>
+                    </a>
+                    @endif
+
                     <a href="{{ route('celular') }}" class="nav-item" style="color: #34d399;">
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <rect x="5" y="2" width="14" height="20" rx="2" ry="2"/>
@@ -262,6 +274,22 @@
                         <p>Acompanhamento completo de musculação, corrida, alongamento, composição corporal e PRs.</p>
                         <a href="{{ route('treinos.index') }}" class="card-link">Acessar →</a>
                     </div>
+
+                    @if(auth()->user()->is_admin)
+                    <div class="info-card">
+                        <div class="card-icon card-icon-blue" style="background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+                                <circle cx="9" cy="7" r="4"></circle>
+                                <path d="M19 8v6"></path>
+                                <path d="M22 11h-6"></path>
+                            </svg>
+                        </div>
+                        <h3>Convites & Usuários</h3>
+                        <p>Autorize novos e-mails do Google (Gmail) para utilizar o sistema com contas próprias.</p>
+                        <a href="{{ route('admin.convites') }}" class="card-link">Gerenciar →</a>
+                    </div>
+                    @endif
                 </div>
             </div>
         </main>

@@ -44,9 +44,16 @@ Route::get('/celular', function () { return view('celular'); })->name('celular')
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
 Route::post('/login', [AuthController::class, 'authenticate'])->name('login.post');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+Route::get('/auth/google', [AuthController::class, 'redirectToGoogle'])->name('auth.google');
+Route::get('/auth/google/callback', [AuthController::class, 'handleGoogleCallback'])->name('auth.google.callback');
 
 Route::middleware('auth')->group(function () {
     Route::get('/home', [HomeController::class, 'index'])->name('home');
+
+    // Gestão de Convites / Whitelist Google (Admin)
+    Route::get('/admin/convites', [\App\Http\Controllers\Admin\AllowedEmailController::class, 'index'])->name('admin.convites');
+    Route::post('/admin/convites', [\App\Http\Controllers\Admin\AllowedEmailController::class, 'store'])->name('admin.convites.store');
+    Route::delete('/admin/convites/{id}', [\App\Http\Controllers\Admin\AllowedEmailController::class, 'destroy'])->name('admin.convites.destroy');
 
     // Sincronização Nuvem Neon
     Route::get('/sync/status', [DatabaseSyncController::class, 'status'])->name('sync.status');

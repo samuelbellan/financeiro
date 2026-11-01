@@ -43,4 +43,9 @@ services:
         sync: false
       - key: TELEGRAM_LOCAL_WEBHOOK_URL
         value: https://unfrosted-surreal-ducky.ngrok-free.dev/webhook/telegram
-
+      - key: GOOGLE_CLIENT_ID
+        sync: false
+      - key: GOOGLE_CLIENT_SECRET
+        sync: false
+      - key: GOOGLE_REDIRECT_URI
+        value: https://financeiro-app-mrik.onrender.com/auth/google/callback
