@@ -25,7 +25,18 @@ fi
 # Executa as migrações no banco de dados se não desativado
 if [ "$SKIP_MIGRATIONS" != "true" ]; then
     echo "Executando migrações do banco de dados..."
-    php artisan migrate --force || echo "Aviso: Falha ao rodar migrações. Verifique a conexão com o banco de dados."
+    # Até 3 tentativas (o banco pode estar acordando). Se todas falharem, o container não sobe:
+    # assim o Render mantém a versão anterior no ar em vez de rodar código novo sem as colunas novas.
+    attempt=1
+    until php artisan migrate --force; do
+        if [ "$attempt" -ge 3 ]; then
+            echo "Erro: migrações falharam após $attempt tentativas. Abortando o deploy."
+            exit 1
+        fi
+        echo "Aviso: falha ao rodar migrações (tentativa $attempt). Nova tentativa em 5 s..."
+        attempt=$((attempt + 1))
+        sleep 5
+    done
 fi
 
 # Executa o seeder de produção se solicitado explicitamente via variável de ambiente
