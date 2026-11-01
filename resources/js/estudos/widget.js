@@ -5,7 +5,9 @@
 
 import { buildDaily, dayBounds, dayStats, formatDuration, lastStopped, studyDayOf, toMs } from './metrics.js';
 
-const SIZE = { width: 260, height: 120 };
+// Altura útil do conteúdo; o Chrome desconta ~56 px da altura pedida para a própria barra da janela.
+const SIZE = { width: 260, height: 100 };
+const WINDOW_CHROME_HEIGHT = 56;
 const HINT_EXTRA_HEIGHT = 34;
 
 export const widgetSupported = () => typeof window !== 'undefined' && 'documentPictureInPicture' in window;
@@ -104,7 +106,7 @@ export function createWidget({ getState, onToggle, onClose }) {
         try {
             win = await window.documentPictureInPicture.requestWindow({
                 width: SIZE.width,
-                height: SIZE.height + (hint ? HINT_EXTRA_HEIGHT : 0),
+                height: SIZE.height + WINDOW_CHROME_HEIGHT + (hint ? HINT_EXTRA_HEIGHT : 0),
             });
         } catch (error) {
             console.warn('Widget:', error);

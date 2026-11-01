@@ -288,6 +288,9 @@ dialog p { margin: 0; }
     padding: 3px 10px; font: inherit; font-size: .78rem; cursor: pointer;
 }
 .widget-body .w-hint { margin: 4px 0 0; font-size: .7rem; color: var(--muted); line-height: 1.25; }
+/* Janela redimensionada para baixo: some primeiro a dica, depois o relógio encolhe. */
+@media (max-height: 125px) { .widget-body .w-hint { display: none; } }
+@media (max-height: 90px) { .widget-body .w-time { font-size: 1.4rem; } .widget-body .w { padding-top: 4px; padding-bottom: 4px; } }
 
 /* Descanso na aba Cronômetro */
 .rest-banner {
