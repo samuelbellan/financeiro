@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
     DEFAULT_SETTINGS, buildDaily, dayBounds, dayStats, findOverlaps, formatClock, isSuspicious,
-    monthRange, rangeStats, streak, studyDayOf, timelineSlots, weekRange,
+    monthRange, rangeStats, streak, studyDayOf, timelineRows, timelineSlots, weekRange,
 } from '../../../resources/js/estudos/metrics.js';
 
 const H = 3_600_000;
@@ -205,3 +205,24 @@ describe('sobreposição', () => {
     });
 });
 
+
+describe('grade estilo YPT (precisão de minuto)', () => {
+    it('preenche cada hora proporcionalmente, partindo a sessão entre horas', () => {
+        const daily = buildDaily([
+            session('2026-10-30T04:51', '2026-10-30T06:10'),
+            session('2026-10-30T06:12', '2026-10-30T06:51', { subject_id: 'port', origem: 'manual' }),
+            session('2026-10-30T07:00', '2026-10-30T08:00', { origem: 'importado' }),
+        ], settings, NOW);
+        const rows = timelineRows(dayStats(daily, '2026-10-30'), settings); // virada 3h: linha 0 = 03h
+
+        expect(rows).toHaveLength(24);
+        expect(rows[1]).toEqual([{ subjectId: 'dir', manual: false, start: 85, end: 100 }]); // 04:51–05:00
+        expect(rows[2]).toEqual([{ subjectId: 'dir', manual: false, start: 0, end: 100 }]); // 05h inteira
+        expect(rows[3][0]).toMatchObject({ subjectId: 'dir', start: 0 });
+        expect(rows[3][0].end).toBeCloseTo(16.67, 1); // até 06:10
+        expect(rows[3][1].manual).toBe(true);
+        expect(rows[3][1].start).toBe(20);
+        expect(rows[3][1].end).toBe(85);
+        expect(rows[4]).toEqual([]); // importado fica fora da grade
+    });
+});

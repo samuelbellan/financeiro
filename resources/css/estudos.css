@@ -138,11 +138,16 @@ main > .btn { width: 100%; margin-top: 6px; }
 .day-nav { display: flex; align-items: center; justify-content: space-between; margin: 6px 0; }
 .day-nav button { border: 1px solid var(--border); background: var(--card); width: 40px; height: 40px; border-radius: 10px; font-size: 1.2rem; }
 .planner { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 8px; }
-.hour { display: grid; grid-template-columns: 28px repeat(6, 1fr); gap: 2px; margin-bottom: 2px; align-items: center; }
+.hour { display: grid; grid-template-columns: 28px 1fr; gap: 2px; margin-bottom: 2px; align-items: center; }
 .hour span { font-size: .68rem; color: var(--muted); font-variant-numeric: tabular-nums; }
-.hour i { height: 14px; background: var(--heat-0); border-radius: 2px; }
-.hour i[style] { background: var(--c); }
-.hour i.manual { background: repeating-linear-gradient(45deg, var(--c) 0 3px, color-mix(in srgb, var(--c) 45%, transparent) 3px 6px); }
+/* 6 blocos de 10 min por hora; o preenchimento é recortado pela mesma máscara para respeitar os vãos. */
+.hour .track, .hour .fill {
+    --cells: repeating-linear-gradient(to right, #000 0 calc(100% / 6 - 2px), transparent calc(100% / 6 - 2px) calc(100% / 6));
+}
+.hour .track { position: relative; height: 14px; background: var(--heat-0); -webkit-mask: var(--cells); mask: var(--cells); }
+.hour .fill { position: absolute; inset: 0; }
+.hour .fill b { position: absolute; top: 0; bottom: 0; background: var(--c); }
+.hour .fill b.manual { background: repeating-linear-gradient(45deg, var(--c) 0 3px, color-mix(in srgb, var(--c) 45%, transparent) 3px 6px); }
 .session-list .range, .session-list .dur { font-size: .82rem; color: var(--muted); font-variant-numeric: tabular-nums; }
 .session-list button, .manage button { border: 0; background: none; padding: 4px 6px; color: var(--muted); }
 

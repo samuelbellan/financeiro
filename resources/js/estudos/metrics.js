@@ -272,6 +272,33 @@ export function timelineSlots(stats, settings, slotMinutes = 10) {
     });
 }
 
+/**
+ * Grade estilo YPT: 24 linhas (uma por hora, a partir da virada), cada uma com os trechos estudados
+ * na precisão do minuto: { subjectId, manual, start, end } em % da hora (0–100).
+ */
+export function timelineRows(stats, settings) {
+    const [dayStart] = dayBounds(stats.day, settings);
+    const rows = Array.from({ length: 24 }, () => []);
+    for (const piece of stats.pieces) {
+        if (piece.session.origem === 'importado') continue;
+        const firstHour = Math.max(0, Math.floor((piece.start - dayStart) / HOUR));
+        const lastHour = Math.min(23, Math.floor((piece.end - 1 - dayStart) / HOUR));
+        for (let h = firstHour; h <= lastHour; h++) {
+            const hourStart = dayStart + h * HOUR;
+            const from = Math.max(piece.start, hourStart);
+            const to = Math.min(piece.end, hourStart + HOUR);
+            if (to <= from) continue;
+            rows[h].push({
+                subjectId: piece.session.subject_id,
+                manual: piece.session.origem === 'manual',
+                start: ((from - hourStart) / HOUR) * 100,
+                end: ((to - hourStart) / HOUR) * 100,
+            });
+        }
+    }
+    return rows;
+}
+
 /** Sessões (não excluídas) que se sobrepõem ao intervalo [inicio, fim). */
 export function findOverlaps(candidate, sessions, nowMs) {
     const start = toMs(candidate.inicio);

@@ -14,7 +14,7 @@ import { createWidget, widgetSupported } from './widget.js';
 import {
     addDays, buildDaily, compareWithPrevious, comparisonSeries, dayBounds, dayGaps, dayStats, daysUntil, findOverlaps,
     formatClock, formatDuration, heatLevel, hourProfile, isSuspicious, lastStopped, lastTypeFor, localInputToMs, NO_TYPE, STUDY_TYPES, studyTypeName, monthRange, msToLocalInput,
-    quarterWeeks, rangeStats, restAlertStage, streak, studyDayOf, studyVsOther, timelineSlots, toMs, trendBuckets, weekdayAverages,
+    quarterWeeks, rangeStats, restAlertStage, streak, studyDayOf, studyVsOther, timelineRows, toMs, trendBuckets, weekdayAverages,
     weekRange, yearMonths,
 } from './metrics.js';
 
@@ -484,18 +484,18 @@ function renderRestBanner() {
 function renderTimeline() {
     const day = state.timelineDay ?? today();
     const stats = dayStats(daily(), day);
-    const slots = timelineSlots(stats, state.settings);
+    const rows = timelineRows(stats, state.settings);
     const virada = state.settings.virada_hora;
 
+    // Cada hora é uma faixa com 6 blocos de 10 min; o preenchimento segue o minuto exato (como no YPT).
     let grid = '';
-    for (let h = 0; h < 24; h++) {
-        const cells = slots.slice(h * 6, h * 6 + 6).map((slot) => {
-            if (!slot) return '<i></i>';
-            const color = subjectById(slot.subjectId)?.cor ?? '#888';
-            return `<i class="${slot.manual ? 'manual' : ''}" style="--c:${esc(color)}"></i>`;
+    rows.forEach((segments, h) => {
+        const fill = segments.map((seg) => {
+            const color = subjectById(seg.subjectId)?.cor ?? '#888';
+            return `<b class="${seg.manual ? 'manual' : ''}" style="--c:${esc(color)};left:${seg.start.toFixed(2)}%;width:${(seg.end - seg.start).toFixed(2)}%"></b>`;
         }).join('');
-        grid += `<div class="hour"><span>${String((virada + h) % 24).padStart(2, '0')}</span>${cells}</div>`;
-    }
+        grid += `<div class="hour"><span>${String((virada + h) % 24).padStart(2, '0')}</span><div class="track"><div class="fill">${fill}</div></div></div>`;
+    });
 
     const [dayStart, dayEnd] = dayBounds(day, state.settings);
     const sessions = liveSessions()
