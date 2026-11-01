@@ -88,6 +88,7 @@ export function createWidget({ getState, onToggle, onClose, onTick, onInteract }
 
     function refresh() {
         if (!win) return;
+        win.document.documentElement.dataset.theme = document.documentElement.dataset.theme ?? 'auto';
         const view = widgetView(getState(), Date.now());
         const key = [view.mode, view.subjectId, view.resumeId, view.subject?.nome, view.subject?.cor, view.restLimitMs].join('|');
         if (key !== shapeKey) {

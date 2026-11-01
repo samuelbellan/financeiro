@@ -287,6 +287,15 @@ class StudySyncTest extends TestCase
         $this->sync(['settings' => $base + ['descanso_min' => 0]])->assertOk()->assertJsonPath('rejected.0.type', 'settings');
     }
 
+    public function test_settings_store_theme(): void
+    {
+        $base = ['virada_hora' => 3, 'limite_suspeita_min' => 180, 'timezone' => 'America/Sao_Paulo'];
+
+        $this->sync(['settings' => $base + ['tema' => 'floresta']])->assertOk()->assertJsonPath('changes.settings.tema', 'floresta');
+        $this->sync(['settings' => $base])->assertOk()->assertJsonPath('changes.settings.tema', 'auto');
+        $this->sync(['settings' => $base + ['tema' => 'neon']])->assertOk()->assertJsonPath('rejected.0.type', 'settings');
+    }
+
     public function test_large_import_batch_uses_a_bounded_number_of_queries(): void
     {
         $subject = $this->makeSubject();

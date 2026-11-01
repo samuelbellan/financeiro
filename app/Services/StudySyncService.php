@@ -214,6 +214,7 @@ class StudySyncService
             'avatar' => ['nullable', 'string', 'max:40', 'regex:/^[a-z0-9-]+$/'],
             'retro_sound' => 'nullable|boolean',
             'descanso_min' => 'nullable|integer|min:1|max:240',
+            'tema' => 'nullable|in:auto,claro,escuro,floresta,lavanda,areia,contraste',
         ]);
         if (!$data) {
             return;
@@ -229,6 +230,7 @@ class StudySyncService
                 'avatar' => $data['avatar'] ?? 'bichinho',
                 'retro_sound' => (bool) ($data['retro_sound'] ?? false),
                 'descanso_min' => $data['descanso_min'] ?? null,
+                'tema' => $data['tema'] ?? 'auto',
                 'updated_at' => $this->stamp(),
             ]
         );

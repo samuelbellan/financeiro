@@ -21,6 +21,7 @@ export const DEFAULT_SETTINGS = Object.freeze({
     avatar: 'bichinho',
     retro_sound: false,
     descanso_min: null,
+    tema: 'auto',
 });
 
 /** Tipos de estudo da sessão (mesma lista de StudySyncService::SESSION_TYPES). Sessão sem tipo conta como NO_TYPE. */

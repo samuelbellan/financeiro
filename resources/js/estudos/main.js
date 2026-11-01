@@ -186,7 +186,25 @@ async function checkSuspicious() {
 
 // ── Renderização ─────────────────────────────────────────────────────────────
 
+const THEMES = [
+    ['auto', 'Automático (segue o sistema)'],
+    ['claro', 'Claro'],
+    ['escuro', 'Escuro'],
+    ['floresta', 'Floresta (escuro verde)'],
+    ['lavanda', 'Lavanda (escuro roxo)'],
+    ['areia', 'Areia (claro quente)'],
+    ['contraste', 'Alto contraste'],
+];
+
+// O tema também fica no localStorage para o <head> aplicá-lo antes da primeira pintura (sem piscar).
+function applyTheme(theme = state.settings?.tema ?? 'auto') {
+    document.documentElement.dataset.theme = theme;
+    try { localStorage.setItem('estudos_tema', theme); } catch { /* sem armazenamento: só não pré-aplica */ }
+    document.querySelector('meta[name="theme-color"]')?.setAttribute('content', cssVar('--bg') || '#4F86F7');
+}
+
 function render() {
+    applyTheme();
     charts.forEach((c) => c.destroy());
     charts = [];
     const views = { timer: renderTimer, timeline: renderTimeline, stats: renderStats, settings: renderSettings };
@@ -915,6 +933,10 @@ function renderSettings() {
                 <datalist id="estudos-timezones">${['America/Sao_Paulo', 'America/Cuiaba', 'America/Manaus', 'America/Belem', 'America/Fortaleza', 'America/Recife', 'America/Rio_Branco', 'America/Noronha']
                     .map((tz) => `<option value="${tz}">`).join('')}</datalist>
                 <small>Este aparelho: ${esc(Intl.DateTimeFormat().resolvedOptions().timeZone)}</small></label>
+            <label>Tema
+                <select name="tema" data-theme-picker>${THEMES.map(([value, label]) =>
+                    `<option value="${value}" ${(s.tema ?? 'auto') === value ? 'selected' : ''}>${label}</option>`).join('')}</select>
+                <small>Muda as cores na hora; salve para manter (vale em todos os aparelhos).</small></label>
             <label class="checkbox">
                 <input type="checkbox" name="retro_sound" ${s.retro_sound ? 'checked' : ''}>
                 Sons retrô 8-bit (ao subir de nível e pausar foco)
@@ -1261,6 +1283,10 @@ root.addEventListener('click', async (event) => {
 });
 
 root.addEventListener('change', async (event) => {
+    if (event.target.matches('[data-theme-picker]')) {
+        applyTheme(event.target.value); // prévia; o render volta ao tema salvo se não salvar
+        return;
+    }
     const input = event.target.closest('[data-import]');
     if (!input?.files?.length) return;
     await importBackup(input.files[0]);
@@ -1289,6 +1315,7 @@ root.addEventListener('submit', async (event) => {
             meta_diaria_min: meta === '' ? null : Number(meta),
             descanso_min: descanso === '' ? null : Number(descanso),
             retro_sound: data.get('retro_sound') === 'on',
+            tema: String(data.get('tema') ?? 'auto'),
         });
         if (widgetSupported()) {
             state.widgetAuto = data.get('widget_auto') === 'on';

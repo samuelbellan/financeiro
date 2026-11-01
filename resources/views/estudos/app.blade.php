@@ -17,6 +17,7 @@
     <link rel="manifest" href="{{ asset('estudos.webmanifest') }}">
     <link rel="icon" type="image/png" sizes="192x192" href="{{ asset('img/estudos/icon-192.png') }}">
     <link rel="apple-touch-icon" href="{{ asset('img/estudos/icon-192.png') }}">
+    <script>try { document.documentElement.dataset.theme = localStorage.getItem('estudos_tema') || 'auto'; } catch (e) {}</script>
     @vite(['resources/css/estudos.css', 'resources/js/estudos/main.js'])
 </head>
 <body>

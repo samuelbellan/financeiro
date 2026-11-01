@@ -1,5 +1,7 @@
 /* PWA de horas de estudo — CSS próprio, sem dependências externas (funciona offline). */
 
+/* Temas: escolhidos nas Preferências (data-theme no <html>). "auto" segue o claro/escuro do sistema.
+   Cada escala de calor tem a cor do texto (--ink-N) que contrasta com o fundo daquele nível. */
 :root {
     --bg: #F5F7FB;
     --card: #FFFFFF;
@@ -7,29 +9,89 @@
     --muted: #6B7280;
     --border: #E5E7EB;
     --primary: #4F86F7;
+    --on-primary: #FFFFFF;
     --danger: #E5484D;
     --warn: #B45309;
-    --heat-0: #EBEDF0;
-    --heat-1: #C6DBFD;
-    --heat-2: #8DB3F9;
-    --heat-3: #4F86F7;
-    --heat-4: #1E4FC2;
-    --heat-5: #10307A;
+    --heat-0: #EBEDF0; --ink-0: #1F2937;
+    --heat-1: #C6DBFD; --ink-1: #10213F;
+    --heat-2: #8DB3F9; --ink-2: #10213F;
+    --heat-3: #4F86F7; --ink-3: #FFFFFF;
+    --heat-4: #1E4FC2; --ink-4: #FFFFFF;
+    --heat-5: #10307A; --ink-5: #FFFFFF;
     --compare-prev: rgba(125, 133, 151, .28);
     color-scheme: light;
 }
 
+/* Escuro (azul): a escala vai do apagado ao brilhante, para não ofuscar no fundo escuro. */
 @media (prefers-color-scheme: dark) {
-    :root {
-        --bg: #0F141C;
-        --card: #18202B;
-        --text: #E6EAF0;
-        --muted: #94A0B2;
-        --border: #2A3442;
-        --heat-0: #222B37;
-        --warn: #F5A524;
+    :root:not([data-theme]), :root[data-theme="auto"] {
+        --bg: #0F141C; --card: #18202B; --text: #E6EAF0; --muted: #94A0B2; --border: #2A3442; --warn: #F5A524;
+        --heat-0: #222B37; --ink-0: #E6EAF0;
+        --heat-1: #1C3461; --ink-1: #DCE7FF;
+        --heat-2: #24498F; --ink-2: #EEF3FF;
+        --heat-3: #3466CC; --ink-3: #FFFFFF;
+        --heat-4: #6E9CF8; --ink-4: #0B1630;
+        --heat-5: #B4CEFC; --ink-5: #0B1630;
         color-scheme: dark;
     }
+}
+:root[data-theme="escuro"] {
+    --bg: #0F141C; --card: #18202B; --text: #E6EAF0; --muted: #94A0B2; --border: #2A3442; --warn: #F5A524;
+    --heat-0: #222B37; --ink-0: #E6EAF0;
+    --heat-1: #1C3461; --ink-1: #DCE7FF;
+    --heat-2: #24498F; --ink-2: #EEF3FF;
+    --heat-3: #3466CC; --ink-3: #FFFFFF;
+    --heat-4: #6E9CF8; --ink-4: #0B1630;
+    --heat-5: #B4CEFC; --ink-5: #0B1630;
+    color-scheme: dark;
+}
+/* Floresta: escuro esverdeado. */
+:root[data-theme="floresta"] {
+    --bg: #0E1612; --card: #16211B; --text: #E3EEE7; --muted: #8FA79A; --border: #26372D; --primary: #3FB57A; --on-primary: #06200F;
+    --warn: #F2B33D; --danger: #F0605D;
+    --heat-0: #1F2C25; --ink-0: #E3EEE7;
+    --heat-1: #173D2A; --ink-1: #D5F2E2;
+    --heat-2: #1F5F3F; --ink-2: #EAFBF1;
+    --heat-3: #2E8A5B; --ink-3: #FFFFFF;
+    --heat-4: #5FC98F; --ink-4: #0A2216;
+    --heat-5: #A6E8C3; --ink-5: #0A2216;
+    color-scheme: dark;
+}
+/* Lavanda: escuro arroxeado. */
+:root[data-theme="lavanda"] {
+    --bg: #13111C; --card: #1C1928; --text: #ECE8F6; --muted: #A49CBA; --border: #2F2A42; --primary: #9B7BF2; --on-primary: #150E2B;
+    --warn: #F5B34A; --danger: #F2647A;
+    --heat-0: #262236; --ink-0: #ECE8F6;
+    --heat-1: #2E2358; --ink-1: #E4DCFF;
+    --heat-2: #44338A; --ink-2: #F1ECFF;
+    --heat-3: #6A4FC9; --ink-3: #FFFFFF;
+    --heat-4: #A68BF5; --ink-4: #1A1236;
+    --heat-5: #D4C6FB; --ink-5: #1A1236;
+    color-scheme: dark;
+}
+/* Areia: claro e quente, com destaque laranja. */
+:root[data-theme="areia"] {
+    --bg: #F7F2EA; --card: #FFFDF8; --text: #2E2519; --muted: #7A6A55; --border: #E6DCCB; --primary: #C2611A; --on-primary: #FFFFFF;
+    --warn: #A15C07; --danger: #C93A3A;
+    --heat-0: #EDE5D8; --ink-0: #2E2519;
+    --heat-1: #F8DDBF; --ink-1: #3D2408;
+    --heat-2: #F1B67C; --ink-2: #3D2408;
+    --heat-3: #D9772B; --ink-3: #FFFFFF;
+    --heat-4: #A4521A; --ink-4: #FFFFFF;
+    --heat-5: #6B3410; --ink-5: #FFFFFF;
+    color-scheme: light;
+}
+/* Alto contraste: fundo preto, texto branco, escala em amarelo. */
+:root[data-theme="contraste"] {
+    --bg: #000000; --card: #0D0D0D; --text: #FFFFFF; --muted: #C8C8C8; --border: #5A5A5A; --primary: #FFD400; --on-primary: #000000;
+    --warn: #FFB000; --danger: #FF5555;
+    --heat-0: #1A1A1A; --ink-0: #FFFFFF;
+    --heat-1: #3D3300; --ink-1: #FFFFFF;
+    --heat-2: #7A6600; --ink-2: #FFFFFF;
+    --heat-3: #C9A800; --ink-3: #000000;
+    --heat-4: #FFD400; --ink-4: #000000;
+    --heat-5: #FFF099; --ink-5: #000000;
+    color-scheme: dark;
 }
 
 * { box-sizing: border-box; }
@@ -127,7 +189,7 @@ li.empty { justify-content: center; color: var(--muted); }
 
 .btn {
     display: inline-block; border: 0; border-radius: 10px; padding: 10px 16px;
-    background: var(--primary); color: #fff; font-weight: 600; text-decoration: none; text-align: center;
+    background: var(--primary); color: var(--on-primary); font-weight: 600; text-decoration: none; text-align: center;
 }
 .btn.ghost { background: var(--card); color: var(--text); border: 1px solid var(--border); }
 .btn.danger { background: var(--danger); }
@@ -154,7 +216,7 @@ main > .btn { width: 100%; margin-top: 6px; }
 /* Estatísticas */
 .segmented { display: grid; grid-template-columns: repeat(3, 1fr); background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 3px; }
 .segmented button { border: 0; background: none; padding: 7px; border-radius: 8px; color: var(--muted); }
-.segmented button.active { background: var(--primary); color: #fff; font-weight: 600; }
+.segmented button.active { background: var(--primary); color: var(--on-primary); font-weight: 600; }
 .segmented.four { grid-template-columns: repeat(4, 1fr); }
 .segmented.four button { padding: 7px 2px; font-size: .85rem; }
 .cards { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
@@ -176,20 +238,20 @@ main > .btn { width: 100%; margin-top: 6px; }
 .heatmap { display: grid; grid-template-columns: repeat(15, 1fr); gap: 3px; }
 .heatmap div { display: grid; gap: 3px; }
 .heatmap i { aspect-ratio: 1; border-radius: 3px; }
-.lv0 { background: var(--heat-0); }
-.lv1 { background: var(--heat-1); color: #10213F; }
-.lv2 { background: var(--heat-2); color: #10213F; }
-.lv3 { background: var(--heat-3); color: #fff; }
-.lv4 { background: var(--heat-4); color: #fff; }
-.lv5 { background: var(--heat-5); color: #fff; }
+.lv0 { background: var(--heat-0); color: var(--ink-0); }
+.lv1 { background: var(--heat-1); color: var(--ink-1); }
+.lv2 { background: var(--heat-2); color: var(--ink-2); }
+.lv3 { background: var(--heat-3); color: var(--ink-3); }
+.lv4 { background: var(--heat-4); color: var(--ink-4); }
+.lv5 { background: var(--heat-5); color: var(--ink-5); }
 
 /* Grades de semanas do trimestre e meses do ano */
 .period-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; margin: 12px 0 4px; }
 .period-grid.months { grid-template-columns: repeat(4, 1fr); }
-.period-grid button { border: 0; border-radius: 8px; padding: 8px 2px; display: grid; gap: 2px; color: inherit; }
+.period-grid button { border: 0; border-radius: 8px; padding: 8px 2px; display: grid; gap: 2px; }
 .period-grid button:disabled { background: transparent; opacity: .45; }
 .period-grid button.selected { outline: 2px solid var(--text); outline-offset: -2px; }
-.period-grid small { font-size: .72rem; opacity: .8; text-transform: capitalize; }
+.period-grid small { font-size: .72rem; opacity: .85; text-transform: capitalize; }
 .period-grid b { font-size: .8rem; font-variant-numeric: tabular-nums; }
 
 /* Comparação com o período anterior */
@@ -215,7 +277,7 @@ main > .btn { width: 100%; margin-top: 6px; }
 .chips { display: flex; gap: 6px; overflow-x: auto; padding: 12px 0 4px; scrollbar-width: none; }
 .chips button { flex: none; border: 1px solid var(--border); background: var(--card); border-radius: 99px; padding: 6px 12px; font-size: .82rem; }
 .chips button[style] { border-left: 4px solid var(--c); }
-.chips button.active { background: var(--primary); border-color: var(--primary); color: #fff; }
+.chips button.active { background: var(--primary); border-color: var(--primary); color: var(--on-primary); }
 
 /* Intervalos na linha do tempo */
 .session-list li.gap { background: transparent; border-style: dashed; padding: 6px 12px; }
@@ -460,7 +522,7 @@ body.rest-over [data-live="rest"], body.rest-over [data-w-time] { color: var(--d
 .type-picker label { display: inline-flex; cursor: pointer; }
 .type-picker input { position: absolute; opacity: 0; pointer-events: none; }
 .type-picker span { border: 1px solid var(--border); border-radius: 99px; padding: 5px 11px; font-size: .82rem; background: var(--bg); }
-.type-picker input:checked + span { background: var(--primary); border-color: var(--primary); color: #fff; }
+.type-picker input:checked + span { background: var(--primary); border-color: var(--primary); color: var(--on-primary); }
 .type-picker input:focus-visible + span { outline: 2px solid var(--primary); outline-offset: 2px; }
 .session-list em.tipo { color: var(--primary); }
 .subject-share .share-main { flex: 1; min-width: 0; display: flex; flex-direction: column; }
