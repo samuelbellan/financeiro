@@ -391,6 +391,17 @@ body.focus-on { overflow: hidden; }
 .focus-sub b { font-size: 1.25rem; font-variant-numeric: tabular-nums; color: var(--muted); }
 .focus-btn { width: 76px; height: 76px; border-radius: 50%; border: 0; background: var(--c); color: #fff; font-size: 1.6rem; }
 .focus-hint { margin: 0; color: var(--muted); font-size: .8rem; }
+.focus-other { margin-top: 14px; }
+
+/* Escolha de matéria no descanso: lista rolável dentro do diálogo. */
+.subject-picker { display: grid; gap: 6px; max-height: min(50vh, 360px); overflow-y: auto; overscroll-behavior: contain; padding-right: 2px; }
+.subject-pick {
+    display: flex; align-items: center; gap: 10px; width: 100%; text-align: left;
+    font: inherit; color: var(--text); background: var(--bg);
+    border: 1px solid var(--border); border-radius: 10px; padding: 12px;
+}
+.subject-pick .dot { width: 12px; height: 12px; border-radius: 50%; background: var(--c); flex: none; }
+.subject-pick small { color: var(--muted); }
 
 /* Modo foco, tela "sala de estudo": cartão do tempo atual e uma mesa por matéria (estilo YPT). */
 .focus-switch { position: absolute; top: calc(12px + env(safe-area-inset-top)); right: 16px; border: 0; background: none; color: var(--muted); font-size: 1.5rem; padding: 6px 8px; }

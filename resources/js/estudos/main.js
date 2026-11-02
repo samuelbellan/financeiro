@@ -402,7 +402,8 @@ function renderFocus() {
             <div><small>Hoje</small><b data-live="total">--</b></div>
         </div>
         <button type="button" class="focus-btn" data-action="toggle" data-id="${rest.session.subject_id}" aria-label="Retomar ${esc(subject?.nome ?? '')}">▶</button>
-        <p class="focus-hint">Toque em ▶ para retomar ${esc(subject?.nome ?? 'a matéria')}</p>`);
+        <p class="focus-hint">Toque em ▶ para retomar ${esc(subject?.nome ?? 'a matéria')}</p>
+        <button type="button" class="btn ghost focus-other" data-action="pick-subject">Começar outra matéria</button>`);
 }
 
 // Mesa vazia (com relógio quando a pessoa já estudou hoje), como na sala de estudo do YPT.
@@ -1290,6 +1291,25 @@ function openSubjectDialog(subject = null) {
     });
 }
 
+// Escolha de matéria no descanso: lista rolável para não virar uma tela enorme com muitas matérias.
+function openSubjectPicker() {
+    const current = restInfo()?.session.subject_id;
+    const subjects = state.subjects.filter((s) => !s.deleted_at && !s.arquivada_em).sort((a, b) => a.ordem - b.ordem);
+    if (!subjects.length) return alert('Crie uma matéria primeiro.');
+    openDialog(`
+        <h3>Começar matéria</h3>
+        <div class="subject-picker">
+            ${subjects.map((s) => `<button class="subject-pick" value="${s.id}" style="--c:${esc(s.cor)}" formnovalidate>
+                <span class="dot"></span>${esc(s.nome)}${s.id === current ? ' <small>(atual)</small>' : ''}</button>`).join('')}
+        </div>
+        <p class="form-error"></p>
+        <div class="actions"><button class="btn ghost" value="cancel" formnovalidate>Cancelar</button></div>`,
+    async (subjectId) => {
+        await toggleSubject(subjectId);
+        return null;
+    });
+}
+
 function openSessionDialog(session = null, day = today(), gap = null) {
     const tz = state.settings.timezone;
     const subjects = state.subjects.filter((s) => !s.deleted_at && (!s.arquivada_em || s.id === session?.subject_id));
@@ -1491,6 +1511,7 @@ root.addEventListener('click', async (event) => {
             closeFocus();
         },
         'new-subject': () => openSubjectDialog(),
+        'pick-subject': () => openSubjectPicker(),
         'edit-subject': () => openSubjectDialog(subjectById(id)),
         'move-subject': async () => {
             const list = state.subjects.filter((x) => !x.deleted_at).sort((a, b) => a.ordem - b.ordem);
