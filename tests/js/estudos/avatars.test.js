@@ -24,6 +24,17 @@ describe('AVATARS', () => {
         }
     });
 
+    it('todo desenho fecha os grupos que abre', () => {
+        for (const avatar of Object.values(AVATARS)) {
+            avatar.estagios.forEach((svg) => expect((svg.match(/<g[\s>]/g) ?? []).length).toBe((svg.match(/<\/g>/g) ?? []).length));
+        }
+    });
+
+    it('avatares vetoriais usam o viewBox 120x120 e os pixel art 48x48', () => {
+        expect(avatarSvg('heroi', 0)).toContain('viewBox="0 0 120 120"');
+        expect(avatarSvg('bichinho', 0)).toContain('viewBox="0 0 48 48"');
+    });
+
     it('id desconhecido cai no avatar padrão', () => {
         expect(avatarSvg('nao-existe', 0)).toBe(avatarSvg('bichinho', 0));
     });

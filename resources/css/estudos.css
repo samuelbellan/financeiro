@@ -445,13 +445,47 @@ body.focus-on { overflow: hidden; }
 
 /* Avatar Pixel Art */
 .avatar { display: flex; justify-content: center; margin: 4px auto 0; }
-.avatar svg {
-    display: block;
-    overflow: visible;
+.avatar svg { display: block; overflow: visible; }
+.avatar svg.px {
     image-rendering: pixelated;
     image-rendering: crisp-edges;
     shape-rendering: crispEdges;
 }
+
+/* Avatares vetoriais: animações v-* (mais rápidas com o cronômetro rodando) */
+.avatar [class^="v-"] { transform-box: fill-box; transform-origin: center; }
+.avatar .v-bob { animation: v-bob 2.6s ease-in-out infinite; transform-origin: center bottom; }
+.avatar.is-running .v-bob { animation-duration: 1s; }
+@keyframes v-bob { 50% { transform: translateY(-2px); } }
+.avatar .v-blink { animation: v-blink 4.5s infinite; }
+@keyframes v-blink { 0%, 93%, 100% { transform: scaleY(1); } 95% { transform: scaleY(.1); } }
+.avatar .v-sweat { animation: v-sweat 1.6s ease-in infinite; }
+@keyframes v-sweat { 0% { opacity: 0; transform: translateY(-2px); } 25% { opacity: 1; } 100% { opacity: 0; transform: translateY(7px); } }
+.avatar .v-zzz { animation: v-zzz 2.6s ease-out infinite; }
+@keyframes v-zzz { 0% { opacity: 0; transform: translate(0, 2px); } 40% { opacity: .7; } 100% { opacity: 0; transform: translate(4px, -6px); } }
+.avatar .v-steam { animation: v-steam 2.2s ease-out infinite; }
+@keyframes v-steam { 0% { opacity: 0; transform: translateY(2px); } 40% { opacity: 1; } 100% { opacity: 0; transform: translateY(-6px); } }
+.avatar .v-flame { animation: v-flame .5s ease-in-out infinite alternate; transform-origin: center bottom; }
+@keyframes v-flame { to { transform: scale(1.06, .92); } }
+.avatar .v-twinkle { animation: v-twinkle 1.4s ease-in-out infinite; }
+@keyframes v-twinkle { 50% { opacity: .55; transform: scale(.75); } }
+.avatar .v-lines { animation: v-lines .5s steps(2) infinite; }
+@keyframes v-lines { 50% { opacity: .15; } }
+.avatar .v-bubble { animation: v-bubble 2.4s ease-in-out infinite; }
+@keyframes v-bubble { 0%, 100% { transform: scale(.5); } 60% { transform: scale(1.15); } }
+.avatar .v-float { animation: v-float 3s ease-in-out infinite; }
+@keyframes v-float { 50% { transform: translateY(-4px) rotate(3deg); } }
+.avatar .v-confetti { animation: v-float 2s ease-in-out infinite; }
+.avatar .v-hop { animation: v-hop .9s ease-in-out infinite; transform-origin: center bottom; }
+@keyframes v-hop { 50% { transform: translateY(-3px); } }
+.avatar .v-wag { animation: v-wag .35s ease-in-out infinite alternate; transform-origin: left bottom; }
+@keyframes v-wag { from { transform: rotate(-12deg); } to { transform: rotate(14deg); } }
+.avatar .v-run { animation: v-run .25s steps(2) infinite; }
+@keyframes v-run { 50% { transform: translateX(3px) scaleX(-1); } }
+.avatar .v-spin { animation: v-spin 3s linear infinite; }
+.avatar .v-spin.v-fast { animation-duration: .9s; }
+.avatar.is-running .v-spin.v-fast { animation-duration: .5s; }
+@keyframes v-spin { to { transform: rotate(360deg); } }
 .avatar-hint { display: block; color: var(--muted); font-size: .75rem; margin-top: 2px; }
 
 /* Animações de Repouso (Idle) */
@@ -547,6 +581,7 @@ body.focus-on { overflow: hidden; }
     .avatar .headphone-pulse,
     .avatar .lamp-glow,
     .avatar .star-pixel,
+    .avatar [class^="v-"],
     .avatar.level-up svg {
         animation: none !important;
     }
