@@ -182,7 +182,7 @@ const CAOTICO = [
     `${shadow(46)}${confetti()}${bulb}${cTorso}${cHead}${cHair}${cFace('vitoria')}${sunglasses}${desk}${bookStack}${openBook}${cHands}${gradePaper}${sparkle(12, 30, 0.9)}`,
 ];
 
-// ── FAMÍLIA: a criança estuda e a família vai chegando para torcer ───────────
+// ── FAMÍLIA: ele estuda e a família (mulher, menino e bebê) vai chegando para torcer ───────────
 
 const F_KID_SKIN = '#F1C7A3';
 const F_KID_HAIR = '#5B3A29';
@@ -207,47 +207,47 @@ function adult(x, { skin, shirt, hair, longHair = false, mood = 'feliz', armL, a
 const ends = (d) => d.match(/(-?[\d.]+) (-?[\d.]+)$/).slice(1).map(Number);
 const withHands = (html, arms, skin) => html + arms.map((d) => hand(...ends(d), skin, 3.6)).join('');
 
-const MOM = { skin: '#E8B48A', shirt: '#E85D75', hair: '#3A2318', longHair: true };
+const MOM = { skin: '#E8B48A', shirt: '#E85D75', hair: '#E3BE6A', longHair: true };
 const momJuice = (mood) => withHands(adult(18, { ...MOM, mood, armL: 'M10 72 Q6 82 8 90', armR: 'M26 72 Q32 78 34 82' }), ['M10 72 Q6 82 8 90', 'M26 72 Q32 78 34 82'], MOM.skin)
     + `<rect x="31" y="70" width="8" height="11" rx="1.5" fill="#FFB347" opacity=".9" ${LINE}/>`;
-const momCheer = (mood) => withHands(adult(18, { ...MOM, mood, armL: 'M10 72 Q4 62 6 52', armR: 'M26 72 Q32 62 30 52' }), ['M10 72 Q4 62 6 52', 'M26 72 Q32 62 30 52'], MOM.skin);
 
-const DAD = { skin: '#C98E64', shirt: '#4F86F7', hair: '#2B2327' };
-const dadSign = (text, mood = 'feliz') => withHands(adult(102, { ...DAD, mood, armL: 'M93 72 Q88 52 92 36', armR: 'M111 72 Q116 52 112 36' }), ['M93 72 Q88 52 92 36', 'M111 72 Q116 52 112 36'], DAD.skin)
+/** Bebê de colo enrolado na mantinha, cabelinho castanho-claro e a mãozinha na boca. */
+const baby = `<ellipse cx="19" cy="85" rx="10" ry="7.5" fill="#F7D6E0" ${LINE}/><path d="M12 82 q7 4 14 0" fill="none" stroke="#E7A9BE" stroke-width="1.6"/>`
+    + `<circle cx="19" cy="74" r="7.5" fill="#F6D2B5" ${LINE}/><path d="M11.8 73 q0 -9 7.2 -9 q7.2 0 7.2 9 q-2 -4 -4 -3.5 q-1.5 -2.5 -3.2 -1 q-2 -2 -3.6 0 q-2 -1 -3.6 4.5z" fill="#B98A5E" ${LINE}/>`
+    + `<circle cx="16.5" cy="74" r="1.1" fill="${INK}"/><circle cx="21.5" cy="74" r="1.1" fill="${INK}"/><ellipse cx="15" cy="77" rx="1.6" ry="1" fill="#F49AA7" opacity=".8"/>`
+    + `<circle cx="20.5" cy="78.3" r="2.6" fill="#F6D2B5" stroke="${INK}" stroke-width="1.4"/>`;
+const BABY_ARM = 'M10 72 Q9 86 17 89';
+/** Mãe com o bebê no colo; com `cheer` ela ergue o outro braço para torcer. */
+const momBaby = (mood, cheer = false) => {
+    const armR = cheer ? 'M26 72 Q32 62 30 52' : 'M26 72 Q31 84 24 89';
+    return withHands(adult(18, { ...MOM, mood, armL: BABY_ARM, armR }) + baby, [BABY_ARM, armR], MOM.skin);
+};
+
+const BOY = { skin: '#F1C7A3', shirt: '#4F86F7', hair: '#F2D27A' };
+const boySign = (text, mood = 'feliz') => withHands(adult(102, { ...BOY, mood, armL: 'M93 72 Q88 52 92 36', armR: 'M111 72 Q116 52 112 36' }), ['M93 72 Q88 52 92 36', 'M111 72 Q116 52 112 36'], BOY.skin)
     + `<rect x="84" y="18" width="34" height="18" rx="2" fill="#fff" ${LINE}/><text x="101" y="32" text-anchor="middle" font-size="11" fill="#D62839" ${FONT}>${text}</text>`;
-const dadCheer = withHands(adult(102, { ...DAD, mood: 'vitoria', armL: 'M93 72 Q86 62 88 50', armR: 'M111 72 Q118 62 116 50' }), ['M93 72 Q86 62 88 50', 'M111 72 Q118 62 116 50'], DAD.skin);
-
-const dog = `<g class="v-hop"><g class="v-wag"><path d="M37 100 q8 -4 9 -12" fill="none" stroke="${INK}" stroke-width="6" stroke-linecap="round"/><path d="M37 100 q8 -4 9 -12" fill="none" stroke="#C9925A" stroke-width="3" stroke-linecap="round"/></g>`
-    + `<ellipse cx="28" cy="99" rx="11" ry="9" fill="#C9925A" ${LINE}/><ellipse cx="24" cy="106" rx="4" ry="2.5" fill="#C9925A" ${LINE}/><ellipse cx="33" cy="106" rx="4" ry="2.5" fill="#C9925A" ${LINE}/>`
-    + `<circle cx="22" cy="86" r="8.5" fill="#C9925A" ${LINE}/><path d="M15 82 q-5 6 -1 12 q4 -2 4 -8z" fill="#7A5230" ${LINE}/><path d="M28 81 q5 5 2 11 q-4 -2 -4 -8z" fill="#7A5230" ${LINE}/>`
-    + `<circle cx="20" cy="85" r="1.5" fill="${INK}"/><circle cx="25" cy="85" r="1.5" fill="${INK}"/><ellipse cx="22.5" cy="89" rx="2" ry="1.5" fill="${INK}"/><path d="M22 92 q1 3 3 0" fill="#F49AA7" stroke="${INK}" stroke-width="1"/></g>`;
-
-const sibling = `<g class="v-hop" style="animation-delay:.3s">${limb('M89 104 V108', '#4A5568', 4)}${limb('M95 104 V108', '#4A5568', 4)}<rect x="85" y="88" width="14" height="17" rx="6" fill="#B39DDB" ${LINE}/>`
-    + `${limb('M86 92 Q80 86 81 79', '#B39DDB', 4)}${limb('M98 92 Q104 86 103 79', '#B39DDB', 4)}`
-    + `<circle cx="80" cy="77" r="5.5" fill="#F6C343" stroke="${INK}" stroke-width="1.6"/><circle cx="104" cy="77" r="5.5" fill="#E85D75" stroke="${INK}" stroke-width="1.6"/>`
-    + `<circle cx="92" cy="80" r="9" fill="${F_KID_SKIN}" ${LINE}/><path d="M83 79 q0 -10 9 -10 q9 0 9 10 q-4 -4 -9 -3 q-5 -1 -9 3z" fill="#E09F3E" ${LINE}/>`
-    + `<circle cx="99" cy="71" r="3" fill="#E85D75" stroke="${INK}" stroke-width="1.3"/>${face(92, 81, { gap: 3.5, r: 1.8, mood: 'vitoria', blush: false })}</g>`;
+const boyCheer = withHands(adult(102, { ...BOY, mood: 'vitoria', armL: 'M93 72 Q86 62 88 50', armR: 'M111 72 Q118 62 116 50' }), ['M93 72 Q86 62 88 50', 'M111 72 Q118 62 116 50'], BOY.skin);
 
 const banner = `<path d="M6 6 q54 12 108 0 v16 q-54 12 -108 0z" fill="#E85D75" ${LINE}/><text x="60" y="23" text-anchor="middle" font-size="12" fill="#fff" ${FONT}>ORGULHO!</text>`;
 const medal = `<path d="M55 74 l5 8 l5 -8" fill="none" stroke="#D62839" stroke-width="2.5"/><circle cx="60" cy="84" r="4.5" fill="${GOLD}" stroke="${INK}" stroke-width="1.6"/>`;
 const kidCheer = withHands(limb('M48 82 Q40 74 42 62', '#6CC3A0', 5) + limb('M72 82 Q80 74 78 62', '#6CC3A0', 5), ['M48 82 Q40 74 42 62', 'M72 82 Q80 74 78 62'], F_KID_SKIN);
 
 const FAMILIA = [
-    // 0: noite, a criança cochilou em cima do caderno
+    // 0: noite, ele cochilou em cima do caderno
     `${shadow(30)}${moon}${sparkle(96, 16, 0.7, '#FFE27A')}${sparkle(80, 30, 0.5, '#FFE27A', 0.6)}${kidTorso}<g transform="rotate(16 60 74)">${kidHead}${kidFace('dormindo')}</g>${fDesk}${kidHands}${zzz(78, 40)}`,
     // 1: acordou e abriu o livro
     `${shadow(30)}${kidTorso}${kidHead}${kidFace('feliz')}${fDesk}${kidBook}${kidHands}`,
-    // 2: a mãe traz um suco
+    // 2: a mulher traz um suco
     `${shadow(50)}${momJuice('feliz')}${kidTorso}${kidHead}${kidFace('focado')}${fDesk}${kidBook}${kidHands}`,
-    // 3: o pai chega com a plaquinha
-    `${shadow(54)}${momJuice('feliz')}${dadSign('VAI!')}${kidTorso}${kidHead}${kidFace('focado')}${fDesk}${kidBook}${kidHands}${sweat(76, 48)}`,
-    // 4: o cachorro vem fazer companhia
-    `${shadow(54)}${momJuice('feliz')}${dadSign('VAI!')}${kidTorso}${kidHead}${kidFace('esforco')}${fDesk}${kidBook}${hand(49, 88, F_KID_SKIN, 4)}${kidPencil}${dog}${sweat(76, 48)}${sweat(42, 50, 0.6)}`,
-    // 5: todo mundo torcendo, a irmã com pompons
-    `${shadow(54)}<g class="v-hop">${momCheer('vitoria')}</g>${dadSign('VAI!!', 'vitoria')}${kidTorso}${kidHead}${kidFace('esforco')}${fDesk}${kidBook}${hand(49, 88, F_KID_SKIN, 4)}${kidPencil}${dog}${sibling}`
+    // 3: o menino chega com a plaquinha
+    `${shadow(54)}${momJuice('feliz')}${boySign('VAI!')}${kidTorso}${kidHead}${kidFace('focado')}${fDesk}${kidBook}${kidHands}${sweat(76, 48)}`,
+    // 4: a bebê vem no colo da mãe
+    `${shadow(54)}${momBaby('feliz')}${boySign('VAI!')}${kidTorso}${kidHead}${kidFace('esforco')}${fDesk}${kidBook}${hand(49, 88, F_KID_SKIN, 4)}${kidPencil}${sweat(76, 48)}${sweat(42, 50, 0.6)}`,
+    // 5: todo mundo torcendo
+    `${shadow(54)}<g class="v-hop">${momBaby('vitoria', true)}</g>${boySign('VAI!!', 'vitoria')}${kidTorso}${kidHead}${kidFace('esforco')}${fDesk}${kidBook}${hand(49, 88, F_KID_SKIN, 4)}${kidPencil}`
         + `${sweat(76, 48)}${sweat(42, 50, 0.5)}${sweat(78, 62, 1)}${actionLines('M40 40 l-5 -5 M80 40 l5 -5 M60 36 v-6')}`,
     // 6: festa! faixa, confete e medalha
-    `${shadow(54)}${confetti()}${banner}<g class="v-hop">${momCheer('vitoria')}</g><g class="v-hop" style="animation-delay:.2s">${dadCheer}</g>${kidTorso}${medal}${kidCheer}${kidHead}${kidFace('vitoria')}${fDesk}${kidBook}${dog}${sibling}`,
+    `${shadow(54)}${confetti()}${banner}<g class="v-hop">${momBaby('vitoria', true)}</g><g class="v-hop" style="animation-delay:.2s">${boyCheer}</g>${kidTorso}${medal}${kidCheer}${kidHead}${kidFace('vitoria')}${fDesk}${kidBook}`,
 ];
 
 // ── HAMSTER (animais): do ninho à rodinha soltando faísca até o pódio ────────
