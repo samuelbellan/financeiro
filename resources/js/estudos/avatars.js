@@ -4,8 +4,9 @@
 // Para criar um avatar novo: adicione uma entrada em AVATARS com um id (letras minúsculas, números e
 // hífen), um nome e exatamente 7 desenhos em `estagios` (um por limite de AVATAR_LIMITES_MIN),
 // todos no viewBox "0 0 48 48". Ele aparece sozinho no seletor de Ajustes.
-// Avatares vetoriais (120x120) ficam em avatars-vetor.js.
+// Avatares vetoriais (120x120) ficam em avatars-vetor.js e os de ilustração pronta em avatars-imagem.js.
 
+import { AVATARS_IMAGEM } from './avatars-imagem.js';
 import { AVATARS_VETOR } from './avatars-vetor.js';
 
 /** Minutos estudados no dia para alcançar cada estágio (0 a 6). */
@@ -340,12 +341,17 @@ export const AVATARS = {
     bichinho: { nome: 'Bichinho', estagios: BICHINHO, estilo: 'pixel' },
     planta: { nome: 'Planta', estagios: PLANTA, estilo: 'pixel' },
     ...Object.fromEntries(Object.entries(AVATARS_VETOR).map(([id, a]) => [id, { ...a, estilo: 'vetor' }])),
+    ...Object.fromEntries(Object.entries(AVATARS_IMAGEM).map(([id, a]) => [id, { ...a, estilo: 'imagem' }])),
 };
+
+let svgSeq = 0;
 
 /** SVG completo do avatar (cai no padrão se o id não existir, ex.: escolhido em outro aparelho mais novo). */
 export function avatarSvg(id, stage, { size = 120, label = '' } = {}) {
     const avatar = AVATARS[id] ?? AVATARS[AVATAR_PADRAO];
     const art = avatar.estagios[Math.max(0, Math.min(stage, avatar.estagios.length - 1))];
-    const [cls, viewBox] = avatar.estilo === 'vetor' ? ['vec', '0 0 120 120'] : ['px', '0 0 48 48'];
-    return `<svg class="${cls}" viewBox="${viewBox}" width="${size}" height="${size}" role="img" aria-label="${label || `${avatar.nome}, estágio ${stage + 1} de 7`}">${art}</svg>`;
+    const [cls, viewBox] = avatar.estilo === 'pixel' ? ['px', '0 0 48 48'] : ['vec', '0 0 120 120'];
+    // Degradês usam ids "__ID__x": cada desenho ganha um prefixo próprio para não colidir com outro avatar na tela.
+    const uniqueArt = art.includes('__ID__') ? art.replaceAll('__ID__', `av${++svgSeq}-`) : art;
+    return `<svg class="${cls}" viewBox="${viewBox}" width="${size}" height="${size}" role="img" aria-label="${label || `${avatar.nome}, estágio ${stage + 1} de 7`}">${uniqueArt}</svg>`;
 }

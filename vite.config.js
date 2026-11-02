@@ -4,7 +4,8 @@ import tailwindcss from '@tailwindcss/vite';
 
 export default defineConfig({
     plugins: [
-        laravel({
+        // Nos testes (Vitest) o plugin do Laravel deixa a URL dos assets importados como "undefined/...".
+        !process.env.VITEST && laravel({
             input: [
                 'resources/css/app.css',
                 'resources/js/app.js',

@@ -46,7 +46,7 @@ na virada do dia. Aparece no Cronômetro e no modo foco, com animação ao subir
 Ajustes → Avatar e sincroniza entre aparelhos (`study_settings.avatar`).
 
 Para criar um avatar novo, adicione uma entrada em `AVATARS` (`resources/js/estudos/avatars.js`): id em
-minúsculas/números/hífen, nome e 7 desenhos em pixel art no viewBox `0 0 48 48` (use o helper `P`); avatares vetoriais (viewBox `0 0 120 120`, animações `v-*` em `estudos.css`) ficam em `resources/js/estudos/avatars-vetor.js`. O teste
+minúsculas/números/hífen, nome e 7 desenhos em pixel art no viewBox `0 0 48 48` (use o helper `P`); avatares vetoriais (viewBox `0 0 120 120`, animações `v-*` em `estudos.css`) ficam em `resources/js/estudos/avatars-vetor.js`. Avatares em ilustração pronta (7 imagens WebP 480x480 em `resources/images/estudos/<id>/0.webp` a `6.webp`, importadas pelo Vite) ficam em `resources/js/estudos/avatars-imagem.js`. O teste
 `tests/js/estudos/avatars.test.js` confere que todo avatar tem os 7 estágios.
 
 ## Backup no PC

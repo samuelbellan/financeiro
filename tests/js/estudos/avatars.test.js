@@ -35,6 +35,13 @@ describe('AVATARS', () => {
         expect(avatarSvg('bichinho', 0)).toContain('viewBox="0 0 48 48"');
     });
 
+    it('cada desenho com degradê recebe ids próprios', () => {
+        const a = avatarSvg('familia', 3);
+        const b = avatarSvg('familia', 3);
+        expect(a).not.toContain('__ID__');
+        expect(a.match(/id="([^"]+)"/)[1]).not.toBe(b.match(/id="([^"]+)"/)[1]);
+    });
+
     it('id desconhecido cai no avatar padrão', () => {
         expect(avatarSvg('nao-existe', 0)).toBe(avatarSvg('bichinho', 0));
     });

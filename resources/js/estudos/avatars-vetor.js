@@ -1,5 +1,5 @@
 // Avatares vetoriais (viewBox 120x120): quanto mais tempo estudado no dia, mais o personagem se esforça.
-// Temas: RPG (Herói), comédia (Estudante Caótico), família (Família) e animais (Hamster).
+// Temas: RPG (Herói), comédia (Estudante Caótico) e animais (Hamster). A Família usa ilustrações (avatars-imagem.js).
 //
 // As classes v-* ganham animação em estudos.css (mais rápidas com o cronômetro rodando). Nunca coloque uma
 // classe v-* num elemento que tenha o atributo transform: a animação CSS substituiria a posição. Envolva num <g>.
@@ -18,15 +18,15 @@ const limb = (d, color, w = 6) => `<path d="${d}" fill="none" stroke="${INK}" st
 
 const hand = (x, y, color, r = 4.5) => `<circle cx="${x}" cy="${y}" r="${r}" fill="${color}" ${LINE}/>`;
 
-const sweat = (x, y, delay = 0) => `<path class="v-sweat" style="animation-delay:${delay}s" d="M${x} ${y} q-4.5 7 0 9.5 q4.5 -2.5 0 -9.5z" fill="#8FD3FF" stroke="${INK}" stroke-width="1.5" stroke-linejoin="round"/>`;
+export const sweat = (x, y, delay = 0) => `<path class="v-sweat" style="animation-delay:${delay}s" d="M${x} ${y} q-4.5 7 0 9.5 q4.5 -2.5 0 -9.5z" fill="#8FD3FF" stroke="${INK}" stroke-width="1.5" stroke-linejoin="round"/>`;
 
-const zzz = (x, y) => `<g class="v-zzz" fill="${INK}" opacity=".6" ${FONT}><text x="${x}" y="${y}" font-size="14">z</text><text x="${x + 10}" y="${y - 11}" font-size="10">z</text></g>`;
+export const zzz = (x, y) => `<g class="v-zzz" fill="${INK}" opacity=".6" ${FONT}><text x="${x}" y="${y}" font-size="14">z</text><text x="${x + 10}" y="${y - 11}" font-size="10">z</text></g>`;
 
-const sparkle = (x, y, s = 1, color = '#FFD166', delay = 0) => `<g transform="translate(${x} ${y}) scale(${s})"><path class="v-twinkle" style="animation-delay:${delay}s" d="M0 -8 Q1.5 -1.5 8 0 Q1.5 1.5 0 8 Q-1.5 1.5 -8 0 Q-1.5 -1.5 0 -8z" fill="${color}" stroke="${INK}" stroke-width="1.2"/></g>`;
+export const sparkle = (x, y, s = 1, color = '#FFD166', delay = 0) => `<g transform="translate(${x} ${y}) scale(${s})"><path class="v-twinkle" style="animation-delay:${delay}s" d="M0 -8 Q1.5 -1.5 8 0 Q1.5 1.5 0 8 Q-1.5 1.5 -8 0 Q-1.5 -1.5 0 -8z" fill="${color}" stroke="${INK}" stroke-width="1.2"/></g>`;
 
 const actionLines = (d) => `<path class="v-lines" d="${d}" fill="none" stroke="${INK}" stroke-width="2.2" stroke-linecap="round" opacity=".7"/>`;
 
-const confetti = () => `<g class="v-confetti">${[
+export const confetti = () => `<g class="v-confetti">${[
     [12, 20, '#E85D75', 20], [26, 8, '#4F86F7', -30], [96, 10, '#86D46B', 45], [108, 26, '#F6C343', -15],
     [18, 44, '#F6C343', 60], [104, 48, '#E85D75', 10], [40, 4, '#86D46B', 15], [82, 4, '#B39DDB', -40],
 ].map(([x, y, c, a]) => `<rect x="${x}" y="${y}" width="6" height="3.5" rx="1" fill="${c}" transform="rotate(${a} ${x + 3} ${y + 2})"/>`).join('')}</g>`;
@@ -182,74 +182,6 @@ const CAOTICO = [
     `${shadow(46)}${confetti()}${bulb}${cTorso}${cHead}${cHair}${cFace('vitoria')}${sunglasses}${desk}${bookStack}${openBook}${cHands}${gradePaper}${sparkle(12, 30, 0.9)}`,
 ];
 
-// ── FAMÍLIA: ele estuda e a família (mulher, menino e bebê) vai chegando para torcer ───────────
-
-const F_KID_SKIN = '#F1C7A3';
-const F_KID_HAIR = '#5B3A29';
-const fDesk = `<rect x="32" y="88" width="56" height="6" rx="3" fill="#C68B59" ${LINE}/><rect x="37" y="94" width="46" height="14" fill="#9C6B43" ${LINE}/>`;
-const kidTorso = `<path d="M44 90 q0 -16 16 -16 q16 0 16 16z" fill="#6CC3A0" ${LINE}/>`;
-const kidHead = `<circle cx="60" cy="60" r="15" fill="${F_KID_SKIN}" ${LINE}/><path d="M45 58 q0 -16 15 -16 q15 0 15 16 q-4 -6 -8 -5 q-3 -4 -7 -2 q-4 -3 -8 1 q-4 -1 -7 6z" fill="${F_KID_HAIR}" ${LINE}/>`;
-const kidFace = (mood) => face(60, 62, { gap: 6, r: 2.6, mood });
-const kidHands = hand(49, 88, F_KID_SKIN, 4) + hand(71, 88, F_KID_SKIN, 4);
-const kidBook = `<path d="M46 89 L60 86 L74 89 L74 82 L60 79 L46 82Z" fill="#fff" ${LINE}/><path d="M60 79 V86" stroke="#9AA8B6" stroke-width="1.4"/>`;
-const kidPencil = `${limb('M72 86 L80 75', '#F6C343', 2.5)}${hand(71, 87, F_KID_SKIN, 4)}`;
-const moon = `<path d="M18 8 a11 11 0 1 0 12 16 a9 9 0 1 1 -12 -16z" fill="#FFE27A" ${LINE}/>`;
-
-/** Adulto de pé: corpo centrado em x; braços como caminhos a partir dos ombros. */
-function adult(x, { skin, shirt, hair, longHair = false, mood = 'feliz', armL, armR, extra = '' }) {
-    const legs = limb(`M${x - 5} 96 V104`, '#4A5568', 6) + limb(`M${x + 5} 96 V104`, '#4A5568', 6);
-    const back = longHair ? `<path d="M${x - 13} 52 q0 -15 13 -15 q13 0 13 15 v17 q-4 2 -8 0 v-14 h-10 v14 q-4 2 -8 0z" fill="${hair}" ${LINE}/>` : '';
-    const top = `<path d="M${x - 12} 51 q0 -13 12 -13 q12 0 12 13 q-6 -6 -12 -4 q-6 -2 -12 4z" fill="${hair}" ${LINE}/>`;
-    return `${back}${legs}<rect x="${x - 11}" y="66" width="22" height="32" rx="9" fill="${shirt}" ${LINE}/>`
-        + `${limb(armL, shirt, 5)}${limb(armR, shirt, 5)}<circle cx="${x}" cy="54" r="12" fill="${skin}" ${LINE}/>${top}`
-        + face(x, 56, { gap: 5, r: 2.2, mood }) + extra;
-}
-const ends = (d) => d.match(/(-?[\d.]+) (-?[\d.]+)$/).slice(1).map(Number);
-const withHands = (html, arms, skin) => html + arms.map((d) => hand(...ends(d), skin, 3.6)).join('');
-
-const MOM = { skin: '#E8B48A', shirt: '#E85D75', hair: '#E3BE6A', longHair: true };
-const momJuice = (mood) => withHands(adult(18, { ...MOM, mood, armL: 'M10 72 Q6 82 8 90', armR: 'M26 72 Q32 78 34 82' }), ['M10 72 Q6 82 8 90', 'M26 72 Q32 78 34 82'], MOM.skin)
-    + `<rect x="31" y="70" width="8" height="11" rx="1.5" fill="#FFB347" opacity=".9" ${LINE}/>`;
-
-/** Bebê de colo enrolado na mantinha, cabelinho castanho-claro e a mãozinha na boca. */
-const baby = `<ellipse cx="19" cy="85" rx="10" ry="7.5" fill="#F7D6E0" ${LINE}/><path d="M12 82 q7 4 14 0" fill="none" stroke="#E7A9BE" stroke-width="1.6"/>`
-    + `<circle cx="19" cy="74" r="7.5" fill="#F6D2B5" ${LINE}/><path d="M11.8 73 q0 -9 7.2 -9 q7.2 0 7.2 9 q-2 -4 -4 -3.5 q-1.5 -2.5 -3.2 -1 q-2 -2 -3.6 0 q-2 -1 -3.6 4.5z" fill="#B98A5E" ${LINE}/>`
-    + `<circle cx="16.5" cy="74" r="1.1" fill="${INK}"/><circle cx="21.5" cy="74" r="1.1" fill="${INK}"/><ellipse cx="15" cy="77" rx="1.6" ry="1" fill="#F49AA7" opacity=".8"/>`
-    + `<circle cx="20.5" cy="78.3" r="2.6" fill="#F6D2B5" stroke="${INK}" stroke-width="1.4"/>`;
-const BABY_ARM = 'M10 72 Q9 86 17 89';
-/** Mãe com o bebê no colo; com `cheer` ela ergue o outro braço para torcer. */
-const momBaby = (mood, cheer = false) => {
-    const armR = cheer ? 'M26 72 Q32 62 30 52' : 'M26 72 Q31 84 24 89';
-    return withHands(adult(18, { ...MOM, mood, armL: BABY_ARM, armR }) + baby, [BABY_ARM, armR], MOM.skin);
-};
-
-const BOY = { skin: '#F1C7A3', shirt: '#4F86F7', hair: '#F2D27A' };
-const boySign = (text, mood = 'feliz') => withHands(adult(102, { ...BOY, mood, armL: 'M93 72 Q88 52 92 36', armR: 'M111 72 Q116 52 112 36' }), ['M93 72 Q88 52 92 36', 'M111 72 Q116 52 112 36'], BOY.skin)
-    + `<rect x="84" y="18" width="34" height="18" rx="2" fill="#fff" ${LINE}/><text x="101" y="32" text-anchor="middle" font-size="11" fill="#D62839" ${FONT}>${text}</text>`;
-const boyCheer = withHands(adult(102, { ...BOY, mood: 'vitoria', armL: 'M93 72 Q86 62 88 50', armR: 'M111 72 Q118 62 116 50' }), ['M93 72 Q86 62 88 50', 'M111 72 Q118 62 116 50'], BOY.skin);
-
-const banner = `<path d="M6 6 q54 12 108 0 v16 q-54 12 -108 0z" fill="#E85D75" ${LINE}/><text x="60" y="23" text-anchor="middle" font-size="12" fill="#fff" ${FONT}>ORGULHO!</text>`;
-const medal = `<path d="M55 74 l5 8 l5 -8" fill="none" stroke="#D62839" stroke-width="2.5"/><circle cx="60" cy="84" r="4.5" fill="${GOLD}" stroke="${INK}" stroke-width="1.6"/>`;
-const kidCheer = withHands(limb('M48 82 Q40 74 42 62', '#6CC3A0', 5) + limb('M72 82 Q80 74 78 62', '#6CC3A0', 5), ['M48 82 Q40 74 42 62', 'M72 82 Q80 74 78 62'], F_KID_SKIN);
-
-const FAMILIA = [
-    // 0: noite, ele cochilou em cima do caderno
-    `${shadow(30)}${moon}${sparkle(96, 16, 0.7, '#FFE27A')}${sparkle(80, 30, 0.5, '#FFE27A', 0.6)}${kidTorso}<g transform="rotate(16 60 74)">${kidHead}${kidFace('dormindo')}</g>${fDesk}${kidHands}${zzz(78, 40)}`,
-    // 1: acordou e abriu o livro
-    `${shadow(30)}${kidTorso}${kidHead}${kidFace('feliz')}${fDesk}${kidBook}${kidHands}`,
-    // 2: a mulher traz um suco
-    `${shadow(50)}${momJuice('feliz')}${kidTorso}${kidHead}${kidFace('focado')}${fDesk}${kidBook}${kidHands}`,
-    // 3: o menino chega com a plaquinha
-    `${shadow(54)}${momJuice('feliz')}${boySign('VAI!')}${kidTorso}${kidHead}${kidFace('focado')}${fDesk}${kidBook}${kidHands}${sweat(76, 48)}`,
-    // 4: a bebê vem no colo da mãe
-    `${shadow(54)}${momBaby('feliz')}${boySign('VAI!')}${kidTorso}${kidHead}${kidFace('esforco')}${fDesk}${kidBook}${hand(49, 88, F_KID_SKIN, 4)}${kidPencil}${sweat(76, 48)}${sweat(42, 50, 0.6)}`,
-    // 5: todo mundo torcendo
-    `${shadow(54)}<g class="v-hop">${momBaby('vitoria', true)}</g>${boySign('VAI!!', 'vitoria')}${kidTorso}${kidHead}${kidFace('esforco')}${fDesk}${kidBook}${hand(49, 88, F_KID_SKIN, 4)}${kidPencil}`
-        + `${sweat(76, 48)}${sweat(42, 50, 0.5)}${sweat(78, 62, 1)}${actionLines('M40 40 l-5 -5 M80 40 l5 -5 M60 36 v-6')}`,
-    // 6: festa! faixa, confete e medalha
-    `${shadow(54)}${confetti()}${banner}<g class="v-hop">${momBaby('vitoria', true)}</g><g class="v-hop" style="animation-delay:.2s">${boyCheer}</g>${kidTorso}${medal}${kidCheer}${kidHead}${kidFace('vitoria')}${fDesk}${kidBook}`,
-];
-
 // ── HAMSTER (animais): do ninho à rodinha soltando faísca até o pódio ────────
 
 const FUR = '#E9A15B';
@@ -311,6 +243,5 @@ const HAMSTER = [
 export const AVATARS_VETOR = {
     heroi: { nome: 'Herói (RPG)', estagios: HEROI },
     caotico: { nome: 'Estudante Caótico', estagios: CAOTICO },
-    familia: { nome: 'Família', estagios: FAMILIA },
     hamster: { nome: 'Hamster', estagios: HAMSTER },
 };
