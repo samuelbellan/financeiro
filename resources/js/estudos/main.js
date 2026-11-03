@@ -1373,10 +1373,13 @@ async function openSuspiciousDialog(session) {
     const subject = subjectById(session.subject_id);
     const lastSeen = await getMeta('last_seen', nowMs());
     const suggestion = Math.max(toMs(session.inicio), Math.min(lastSeen, nowMs()));
+    const startDay = studyDayOf(toMs(session.inicio), state.settings);
+    const startedAt = formatClock(toMs(session.inicio), startDay, state.settings)
+        + (startDay === today() ? '' : ` de ${formatDay(startDay)}`);
     openDialog(`
         <h3>Ainda está estudando?</h3>
         <p>O cronômetro de <b>${esc(subject?.nome ?? 'Matéria')}</b> está ligado há
-            <b>${formatDuration(nowMs() - toMs(session.inicio))}</b>. Enquanto você não confirmar, essa sessão não entra nas estatísticas.</p>
+            <b>${formatDuration(nowMs() - toMs(session.inicio))}</b> (começou às <b>${startedAt}</b>). Enquanto você não confirmar, essa sessão não entra nas estatísticas.</p>
         <label>Parei em<input type="datetime-local" name="fim" value="${msToLocalInput(suggestion, tz)}"></label>
         <p class="form-error"></p>
         <div class="actions">
