@@ -89,7 +89,22 @@ const activeSubjects = () => state.subjects.filter((s) => !s.deleted_at && !s.ar
 const liveSessions = () => state.sessions.filter((s) => !s.deleted_at);
 const runningSession = () => liveSessions().find((s) => !s.fim);
 
-function formatDay(day, opts = { weekday: 'short', day: '2-digit', month: '2-digit' }) {
+/** Texto legível sobre a cor da matéria: escuro em cores claras, branco nas demais. */
+function inkOn(hex) {
+    const m = /^#?([0-9a-f]{6})$/i.exec(String(hex ?? '').trim());
+    if (!m) return '#fff';
+    const lin = (i) => {
+        const c = parseInt(m[1].slice(i, i + 2), 16) / 255;
+        return c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
+    };
+    const lum = 0.2126 * lin(0) + 0.7152 * lin(2) + 0.0722 * lin(4);
+    return lum > 0.4 ? '#14121c' : '#fff';
+}
+
+/** Variáveis de cor de uma matéria para style="": --c (fundo) e --on-c (texto). */
+const colorVars = (cor) => `--c:${esc(cor ?? '#888')};--on-c:${inkOn(cor)}`;
+
+function formatDay(day,opts = { weekday: 'short', day: '2-digit', month: '2-digit' }) {
     const text = new Date(day + 'T12:00:00Z').toLocaleDateString('pt-BR', { timeZone: 'UTC', ...opts });
     return text.charAt(0).toUpperCase() + text.slice(1);
 }
@@ -375,6 +390,7 @@ function renderFocus() {
 
     const subject = subjectById((running ?? rest.session).subject_id);
     panel.style.setProperty('--c', subject?.cor ?? '#888');
+    panel.style.setProperty('--on-c', inkOn(subject?.cor));
     panel.classList.toggle('sala', state.focusView === 'sala');
     const switcher = `<button type="button" class="focus-switch" data-action="focus-view"
         aria-label="${state.focusView === 'sala' ? 'Ver o cronômetro grande' : 'Ver a sala de estudo'}" title="Alternar tela">⇆</button>`;
@@ -632,18 +648,7 @@ function renderTimer() {
     const day = today();
     const stats = dayStats(daily(), day);
     const running = runningSession();
-    const subjects = activeSubjects();
-
-    const rows = subjects.map((s) => {
-        const isRunning = running?.subject_id === s.id;
-        return `<li class="subject ${isRunning ? 'running' : ''}" style="--c:${esc(s.cor)}">
-            <button type="button" class="play" data-action="toggle" data-id="${s.id}" aria-label="${isRunning ? 'Parar' : 'Iniciar'} ${esc(s.nome)}">
-                ${isRunning ? '❚❚' : '▶'}
-            </button>
-            <span class="name">${esc(s.nome)}</span>
-            <span class="time" data-live="subject" data-id="${s.id}">${formatDuration(stats.bySubject[s.id] ?? 0, { seconds: true })}</span>
-        </li>`;
-    }).join('');
+    const hasSubjects = activeSubjects().length > 0;
 
     return `
         <section class="today">
@@ -658,13 +663,15 @@ function renderTimer() {
                 <div><small>Término</small><b data-live="end">${stats.endMs ? formatClock(stats.endMs, day, state.settings) : '--:--'}</b></div>
             </div>
         </section>
-        ${running ? `<section class="now-running" style="--c:${esc(subjectById(running.subject_id)?.cor ?? '#888')}">
+        ${running ? `<section class="now-running" style="${colorVars(subjectById(running.subject_id)?.cor)}">
             <span>${esc(subjectById(running.subject_id)?.nome ?? 'Matéria')}</span>
             <b data-live="session">${formatDuration(nowMs() - toMs(running.inicio), { seconds: true })}</b>
             <button type="button" data-action="focus-open" aria-label="Abrir modo foco">⛶</button>
             <button type="button" data-action="toggle" data-id="${running.subject_id}">Parar</button>
         </section>` : renderRestBanner()}
-        <ul class="subjects">${rows || '<li class="empty">Crie sua primeira matéria para começar.</li>'}</ul>
+        ${hasSubjects
+            ? `<button type="button" class="btn start-study" data-action="pick-subject">${running ? '⇆ Trocar matéria' : '▶ Iniciar estudo'}</button>`
+            : '<ul class="subjects"><li class="empty">Crie sua primeira matéria para começar.</li></ul>'}
         <button type="button" class="btn ghost" data-action="new-subject">+ Matéria</button>`;
 }
 
@@ -672,7 +679,7 @@ function renderRestBanner() {
     const rest = restInfo();
     if (!rest) return '';
     const subject = subjectById(rest.session.subject_id);
-    return `<section class="rest-banner" style="--c:${esc(subject?.cor ?? '#888')}">
+    return `<section class="rest-banner" style="${colorVars(subject?.cor)}">
         <span>Descanso <b data-live="rest">${formatDuration(rest.sinceMs, { seconds: true })}</b>${esc(restLimitText())}</span>
         <button type="button" data-action="toggle" data-id="${rest.session.subject_id}">▶ Retomar ${esc(subject?.nome ?? '')}</button>
     </section>`;
@@ -1291,16 +1298,19 @@ function openSubjectDialog(subject = null) {
     });
 }
 
-// Escolha de matéria no descanso: lista rolável para não virar uma tela enorme com muitas matérias.
+// Escolha de matéria (tela inicial e descanso): lista rolável, em ordem alfabética, para não virar
+// uma tela enorme com muitas matérias.
 function openSubjectPicker() {
-    const current = restInfo()?.session.subject_id;
-    const subjects = state.subjects.filter((s) => !s.deleted_at && !s.arquivada_em).sort((a, b) => a.ordem - b.ordem);
+    const current = runningSession()?.subject_id ?? restInfo()?.session.subject_id;
+    const subjects = activeSubjects().sort((a, b) => a.nome.localeCompare(b.nome, 'pt-BR', { sensitivity: 'base' }));
     if (!subjects.length) return alert('Crie uma matéria primeiro.');
+    const stats = dayStats(daily(), today());
     openDialog(`
         <h3>Começar matéria</h3>
         <div class="subject-picker">
             ${subjects.map((s) => `<button class="subject-pick" value="${s.id}" style="--c:${esc(s.cor)}" formnovalidate>
-                <span class="dot"></span>${esc(s.nome)}${s.id === current ? ' <small>(atual)</small>' : ''}</button>`).join('')}
+                <span class="dot"></span><span class="name">${esc(s.nome)}${s.id === current ? ' <small>(atual)</small>' : ''}</span>
+                <small class="time">${formatDuration(stats.bySubject[s.id] ?? 0, { seconds: true })}</small></button>`).join('')}
         </div>
         <p class="form-error"></p>
         <div class="actions"><button class="btn ghost" value="cancel" formnovalidate>Cancelar</button></div>`,
