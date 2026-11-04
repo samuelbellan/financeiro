@@ -16,7 +16,7 @@ import { createSync } from './sync.js';
 import { createWidget, widgetSupported } from './widget.js';
 import {
     addDays, buildDaily, compareWithPrevious, comparisonSeries, dayBounds, dayGaps, dayStats, daysUntil, findOverlaps,
-    formatClock, formatDuration, heatLevel, hourProfile, isSuspicious, lastStopped, lastTypeFor, localInputToMs, NO_TYPE, STUDY_TYPES, studyTypeName, monthRange, msToLocalInput,
+    formatClock, formatDuration, heatLevel, hourProfile, isSuspicious, lastStopped, lastTypeFor, localInputToMs, customTypes, CUSTOM_TYPE_MAX, typeIdFromName, NO_TYPE, STUDY_TYPES, studyTypeName, monthRange, msToLocalInput,
     quarterWeeks, rangeStats, restAlertStage, restMaxGapMs, streak, studyDayOf, studyVsOther, timelineBlocks, toMs, trendBuckets, weekdayAverages,
     weekRange, yearMonths,
 } from './metrics.js';
@@ -144,10 +144,25 @@ async function stopSession(session, atMs) {
     }
 }
 
+/** Tipos padrão + personalizados já usados (e o selecionado, se for um personalizado ainda sem sessão). */
+function allTypes(selected = null) {
+    const custom = customTypes(state.sessions);
+    if (selected?.startsWith('x:') && !custom.includes(selected)) custom.push(selected);
+    return [...STUDY_TYPES.map((t) => ({ id: t.id, nome: t.nome })), ...custom.map((id) => ({ id, nome: studyTypeName(id) }))];
+}
+
+// Chips dos tipos + campo para criar um tipo novo na hora (o nome digitado vale mais que o chip marcado).
 function typePicker(selected) {
     return `<fieldset class="type-picker"><legend>Tipo de estudo</legend>
-        ${STUDY_TYPES.map((t) => `<label><input type="radio" name="tipo" value="${t.id}" ${t.id === selected ? 'checked' : ''}><span>${esc(t.nome)}</span></label>`).join('')}
+        ${allTypes(selected).map((t) => `<label><input type="radio" name="tipo" value="${esc(t.id)}" ${t.id === selected ? 'checked' : ''}><span>${esc(t.nome)}</span></label>`).join('')}
+        <input class="type-new" name="tipo_novo" maxlength="${CUSTOM_TYPE_MAX}" placeholder="+ Outro tipo (ex.: Flashcards)" autocomplete="off" aria-label="Novo tipo de estudo">
     </fieldset>`;
+}
+
+/** Tipo escolhido no formulário: o novo digitado tem prioridade sobre o chip/seleção. */
+function typeFromForm(data) {
+    const typed = typeIdFromName(data?.get('tipo_novo'), customTypes(state.sessions));
+    return typed ?? (String(data?.get('tipo') ?? '') || null);
 }
 
 // Ao parar: registra o tipo de estudo (sugere o último usado na matéria) e uma anotação opcional.
@@ -170,7 +185,7 @@ function openSessionNoteDialog(session) {
         const current = state.sessions.find((s) => s.id === session.id);
         if (!current) return null;
         const obs = String(data?.get('observacao') ?? '').trim();
-        await persist('sessions', { ...current, tipo: String(data?.get('tipo') ?? '') || null, observacao: obs || null });
+        await persist('sessions', { ...current, tipo: typeFromForm(data), observacao: obs || null });
         return null;
     });
 }
@@ -1272,7 +1287,8 @@ function tick() {
 // ── Jornada (bosses derrotados com dias de objetivo cumprido) ────────────────
 
 function objectiveLabel(objetivo) {
-    const [kind, id] = objetivo.split(':');
+    const sep = objetivo.indexOf(':');
+    const [kind, id] = sep < 0 ? [objetivo, ''] : [objetivo.slice(0, sep), objetivo.slice(sep + 1)];
     if (kind === 'tipo') return studyTypeName(id);
     if (kind === 'materia') return subjectById(id)?.nome ?? 'Matéria removida';
     return 'Estudo total';
@@ -1282,7 +1298,7 @@ function objectiveOptions(selected) {
     const opt = (value, label) => `<option value="${esc(value)}" ${value === selected ? 'selected' : ''}>${esc(label)}</option>`;
     const subjects = state.subjects.filter((x) => !x.deleted_at && (!x.arquivada_em || `materia:${x.id}` === selected)).sort((a, b) => a.ordem - b.ordem);
     return opt('total', 'Estudo total do dia')
-        + `<optgroup label="Tipo de estudo">${STUDY_TYPES.map((t) => opt(`tipo:${t.id}`, t.nome)).join('')}</optgroup>`
+        + `<optgroup label="Tipo de estudo">${allTypes(selected.startsWith('tipo:') ? selected.slice(5) : null).map((t) => opt(`tipo:${t.id}`, t.nome)).join('')}</optgroup>`
         + (subjects.length ? `<optgroup label="Matéria">${subjects.map((x) => opt(`materia:${x.id}`, x.nome)).join('')}</optgroup>` : '');
 }
 
@@ -1493,6 +1509,13 @@ function openSubjectDialog(subject = null) {
 
 // Escolha de matéria (tela inicial e descanso): lista rolável, em ordem alfabética, para não virar
 // uma tela enorme com muitas matérias.
+// Tempo de hoje da matéria separado por tipo, quando houver mais de um (inclui "Sem tipo", ex.: sessão rodando).
+function pickTypeSplit(types = {}) {
+    const entries = Object.entries(types).filter(([, ms]) => ms >= 1000).sort((a, b) => b[1] - a[1]);
+    if (entries.length < 2) return '';
+    return `<span class="pick-types">${entries.map(([id, ms]) => `<span><i>${esc(studyTypeName(id === NO_TYPE ? null : id))}</i> ${formatDuration(ms, { seconds: true })}</span>`).join('')}</span>`;
+}
+
 function openSubjectPicker() {
     const current = runningSession()?.subject_id ?? restInfo()?.session.subject_id;
     const subjects = activeSubjects().sort((a, b) => a.nome.localeCompare(b.nome, 'pt-BR', { sensitivity: 'base' }));
@@ -1502,7 +1525,8 @@ function openSubjectPicker() {
         <h3>Começar matéria</h3>
         <div class="subject-picker">
             ${subjects.map((s) => `<button class="subject-pick" value="${s.id}" style="--c:${esc(s.cor)}" formnovalidate>
-                <span class="dot"></span><span class="name">${esc(s.nome)}${s.id === current ? ' <small>(atual)</small>' : ''}</span>
+                <span class="dot"></span><span class="pick-main"><span class="name">${esc(s.nome)}${s.id === current ? ' <small>(atual)</small>' : ''}</span>
+                ${pickTypeSplit(stats.bySubjectType[s.id])}</span>
                 <small class="time">${formatDuration(stats.bySubject[s.id] ?? 0, { seconds: true })}</small></button>`).join('')}
         </div>
         <p class="form-error"></p>
@@ -1530,8 +1554,9 @@ function openSessionDialog(session = null, day = today(), gap = null) {
         <label>Fim<input type="datetime-local" name="fim" required value="${msToLocalInput(defaultEnd, tz)}"></label>
         <label>Tipo de estudo<select name="tipo">
             <option value="">Sem tipo</option>
-            ${STUDY_TYPES.map((t) => `<option value="${t.id}" ${t.id === session?.tipo ? 'selected' : ''}>${esc(t.nome)}</option>`).join('')}
+            ${allTypes(session?.tipo).map((t) => `<option value="${esc(t.id)}" ${t.id === session?.tipo ? 'selected' : ''}>${esc(t.nome)}</option>`).join('')}
         </select></label>
+        <label>Ou crie um tipo novo<input name="tipo_novo" maxlength="${CUSTOM_TYPE_MAX}" placeholder="Ex.: Flashcards" autocomplete="off"></label>
         <label>Observação / Conteúdo estudado
             <textarea name="observacao" rows="2" placeholder="Ex.: Artigos lidos, exercícios, tópicos...">${esc(session?.observacao ?? '')}</textarea>
         </label>
@@ -1558,7 +1583,7 @@ function openSessionDialog(session = null, day = today(), gap = null) {
             ...(session ?? { id: uuid(), origem: 'manual', device_id: await getMeta('device_id'), created_at: iso(nowMs()) }),
             subject_id: String(data.get('subject_id')), inicio: iso(inicio), fim: iso(fim), status: 'ok', deleted_at: null,
             observacao,
-            tipo: String(data.get('tipo') ?? '') || null,
+            tipo: typeFromForm(data),
         };
         const overlaps = findOverlaps(candidate, liveSessions(), nowMs());
         if (overlaps.length) {

@@ -24,6 +24,9 @@ class StudySyncService
     /** Tipos de estudo aceitos (mesma lista de STUDY_TYPES em resources/js/estudos/metrics.js). */
     public const SESSION_TYPES = ['teoria', 'questoes', 'revisao', 'lei_seca', 'videoaula', 'resumo', 'simulado', 'outro'];
 
+    /** Tipo criado pela pessoa: "x:" + nome (até 40 caracteres, sem < >). */
+    public const CUSTOM_TYPE_REGEX = '/^x:[^<>\x00-\x1F]{1,40}$/u';
+
     /** Duração máxima aceita para uma sessão. */
     public const MAX_SESSION_HOURS = 24;
 
@@ -122,7 +125,11 @@ class StudySyncService
                 'origem' => 'required|in:timer,manual,importado',
                 'status' => 'required|in:ok,suspeita',
                 'observacao' => 'nullable|string|max:1000',
-                'tipo' => 'nullable|in:' . implode(',', self::SESSION_TYPES),
+                'tipo' => ['nullable', 'string', 'max:60', function (string $attribute, mixed $value, \Closure $fail) {
+                    if (!in_array($value, self::SESSION_TYPES, true) && !preg_match(self::CUSTOM_TYPE_REGEX, (string) $value)) {
+                        $fail('Tipo de estudo inválido.');
+                    }
+                }],
                 'device_id' => 'nullable|uuid',
                 'deleted_at' => 'nullable|date',
             ]);
@@ -217,7 +224,7 @@ class StudySyncService
             'tema' => 'nullable|in:auto,claro,escuro,floresta,lavanda,areia,contraste',
             'jornada' => 'nullable|array:inicio,objetivo,minutos',
             'jornada.inicio' => 'required_with:jornada|date_format:Y-m-d',
-            'jornada.objetivo' => ['required_with:jornada', 'string', 'max:60', 'regex:/^(total|tipo:[a-z_]+|materia:[0-9a-f-]{36})$/'],
+            'jornada.objetivo' => ['required_with:jornada', 'string', 'max:60', 'regex:/^(total|tipo:([a-z_]+|x:[^<>\x00-\x1F]{1,40})|materia:[0-9a-f-]{36})$/u'],
             'jornada.minutos' => 'required_with:jornada|integer|min:10|max:1440',
         ]);
         if (!$data) {

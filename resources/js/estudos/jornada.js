@@ -35,7 +35,8 @@ export function normalizeJornada(jornada) {
 
 /** Quanto do dia conta para o objetivo (ms). */
 export function objectiveProgressMs(stats, objetivo) {
-    const [kind, id] = objetivo.split(':');
+    const sep = objetivo.indexOf(':');
+    const [kind, id] = sep < 0 ? [objetivo, ''] : [objetivo.slice(0, sep), objetivo.slice(sep + 1)];
     if (kind === 'tipo') return stats.byType[id || NO_TYPE] ?? 0;
     if (kind === 'materia') return stats.bySubject[id] ?? 0;
     return stats.totalMs;
