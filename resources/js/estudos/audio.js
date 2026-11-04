@@ -90,3 +90,22 @@ export function playRestDueSound() {
         // Silêncio em caso de bloqueio
     }
 }
+
+/** Golpe no boss da Jornada: ataque descendente e impacto grave. Com `ko`, fanfarra de vitória em seguida. */
+export function playBossHitSound(ko = false) {
+    try {
+        const ctx = getAudioContext();
+        if (!ctx) return;
+        const now = ctx.currentTime;
+        playNote(ctx, 1318.51, now, 0.05, 0.06); // E6
+        playNote(ctx, 987.77, now + 0.04, 0.05, 0.06); // B5
+        playNote(ctx, 659.25, now + 0.08, 0.06, 0.07); // E5
+        playNote(ctx, 110.00, now + 0.12, 0.25, 0.12); // A2 (impacto)
+        if (!ko) return;
+        [523.25, 523.25, 523.25, 698.46, 880.00, 1046.50].forEach((f, i) => {
+            playNote(ctx, f, now + 0.5 + i * 0.12, i === 5 ? 0.4 : 0.1, 0.07);
+        });
+    } catch {
+        // Silêncio em caso de bloqueio
+    }
+}

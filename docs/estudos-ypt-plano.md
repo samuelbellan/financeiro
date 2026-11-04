@@ -49,6 +49,23 @@ Para criar um avatar novo, adicione uma entrada em `AVATARS` (`resources/js/estu
 minúsculas/números/hífen, nome e 7 desenhos em pixel art no viewBox `0 0 48 48` (use o helper `P`); avatares vetoriais (viewBox `0 0 120 120`, animações `v-*` em `estudos.css`) ficam em `resources/js/estudos/avatars-vetor.js`. Avatares em ilustração pronta (7 imagens WebP 480x480 em `resources/images/estudos/<id>/0.webp` a `6.webp`, importadas pelo Vite) ficam em `resources/js/estudos/avatars-imagem.js`. O teste
 `tests/js/estudos/avatars.test.js` confere que todo avatar tem os 7 estágios.
 
+## Jornada dos Bosses
+
+Gamificação por objetivo diário (aba **Jornada** e card no Cronômetro). A pessoa escolhe o que conta
+(estudo total, um tipo de estudo ou uma matéria), a meta por dia (padrão 5h) e a data de início. Cada dia de
+estudo em que a meta é cumprida vira **um golpe** (1 de vida) no boss da vez; quando a vida zera ele é
+derrotado naquele dia e o próximo entra. São 8 bosses (vida 3 · 5 · 7 · 10 · 12 · 15 · 20 · 30); depois do
+último a jornada recomeça num ciclo "+" com vida 50% maior. Dias abaixo da meta não tiram vida do jogador,
+só quebram o combo.
+
+- Só a configuração é gravada (`study_settings.jornada`, JSON `{ inicio, objetivo, minutos }`); golpes,
+  derrotas e combo são calculados no aparelho a partir das sessões (`resources/js/estudos/jornada.js`),
+  então editar/excluir sessões corrige a jornada e tudo bate entre aparelhos.
+- Ao cumprir a meta com o cronômetro rodando, o boss leva o golpe ao vivo (tremida, "−1" e, com sons retrô
+  ligados, efeito sonoro; no nocaute, fanfarra e faixa de vitória).
+- Os desenhos ficam em `resources/js/estudos/bosses.js` (SVG 200x200, animações `b-*` em `estudos.css`),
+  com marcas de dano conforme a vida cai, nocaute (cinza + estrelinhas) e silhueta para os ainda não vistos.
+
 ## Backup no PC
 
 **Exportar backup (principal):** em Ajustes → Backup, o app baixa um JSON com tudo o que está no

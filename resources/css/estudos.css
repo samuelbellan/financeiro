@@ -136,7 +136,7 @@ em.warn { background: color-mix(in srgb, var(--warn) 18%, transparent); color: v
 
 .tabbar {
     position: fixed; left: 0; right: 0; bottom: 0;
-    display: grid; grid-template-columns: repeat(5, 1fr);
+    display: grid; grid-template-columns: repeat(6, 1fr);
     background: var(--card); border-top: 1px solid var(--border);
     padding-bottom: env(safe-area-inset-bottom);
 }
@@ -266,7 +266,7 @@ main > .btn { width: 100%; margin-top: 6px; }
 .lv5 { background: var(--heat-5); color: var(--ink-5); }
 
 /* Grades de semanas do trimestre e meses do ano */
-.period-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; margin: 12px 0 4px; }
+.period-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 4px; margin: 12px 0 4px; }
 .period-grid.months { grid-template-columns: repeat(4, 1fr); }
 .period-grid button { border: 0; border-radius: 8px; padding: 8px 2px; display: grid; gap: 2px; }
 .period-grid button:disabled { background: transparent; opacity: .45; }
@@ -636,3 +636,152 @@ body.rest-over [data-live="rest"], body.rest-over [data-w-time] { color: var(--d
 .subject-share .share-main { flex: 1; min-width: 0; display: flex; flex-direction: column; }
 .type-split { font-size: .75rem; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .type-share li.untyped .name { color: var(--muted); font-style: italic; }
+
+/* ── Jornada: bosses derrotados com dias de objetivo cumprido ───────────────── */
+.boss-art { display: block; overflow: visible; }
+.boss-art [class^="b-"] { transform-box: fill-box; transform-origin: center; }
+.boss-art.is-locked { filter: brightness(0) opacity(.35); }
+.boss-art.is-locked * { animation: none !important; }
+.boss-art.is-defeated .b-body { filter: grayscale(.85) brightness(.9); transform: rotate(-8deg) translateY(6px); transform-origin: 50% 95%; transform-box: view-box; }
+.boss-art.is-defeated .b-body * { animation: none !important; }
+
+.boss-art .b-idle { animation: b-idle 3s ease-in-out infinite; transform-origin: center bottom; }
+@keyframes b-idle { 50% { transform: translateY(-3px) scale(1.01, .99); } }
+.boss-art .b-squish { animation: b-squish 2.8s ease-in-out infinite; transform-origin: center bottom; }
+@keyframes b-squish { 50% { transform: scale(1.04, .95); } }
+.boss-art .b-hover { animation: b-hover 3.4s ease-in-out infinite; }
+@keyframes b-hover { 50% { transform: translateY(-7px); } }
+.boss-art .b-breathe { animation: b-breathe 4s ease-in-out infinite; transform-origin: center bottom; }
+@keyframes b-breathe { 50% { transform: scale(1.015); } }
+.boss-art .b-stomp { animation: b-stomp 2.4s ease-in-out infinite; transform-origin: center bottom; }
+@keyframes b-stomp { 0%, 100% { transform: rotate(0); } 25% { transform: rotate(-1.2deg); } 75% { transform: rotate(1.2deg); } }
+.boss-art .b-blink { animation: b-blink 5s infinite; }
+@keyframes b-blink { 0%, 94%, 100% { transform: scaleY(1); } 96% { transform: scaleY(.1); } }
+.boss-art .b-glow { animation: b-glow 2.2s ease-in-out infinite; }
+@keyframes b-glow { 50% { opacity: .55; } }
+.boss-art .b-zzz { animation: b-zzz 3s ease-out infinite; }
+@keyframes b-zzz { 0% { opacity: 0; transform: translate(0, 4px); } 40% { opacity: 1; } 100% { opacity: 0; transform: translate(6px, -8px); } }
+.boss-art .b-float { animation: b-float 2.6s ease-in-out infinite; }
+.boss-art .b-float2 { animation: b-float 3.2s ease-in-out .6s infinite; }
+@keyframes b-float { 50% { transform: translateY(-5px); } }
+.boss-art .b-twinkle { animation: b-twinkle 1.8s ease-in-out infinite; }
+@keyframes b-twinkle { 50% { opacity: .4; transform: scale(.9); } }
+.boss-art .b-page { animation: b-page 3.2s ease-in-out infinite; }
+@keyframes b-page { 0%, 100% { transform: translate(0, 0) rotate(0); opacity: 1; } 50% { transform: translate(3px, -7px) rotate(8deg); opacity: .55; } }
+.boss-art .b-swirl { animation: b-swirl 6s linear infinite; }
+@keyframes b-swirl { 50% { transform: scale(1.06); } }
+.boss-art .b-tick { animation: b-tick 4s steps(8) infinite; transform-origin: 50% 100%; }
+@keyframes b-tick { to { transform: rotate(360deg); } }
+.boss-art .b-arm-l { animation: b-arm 2.4s ease-in-out infinite; transform-origin: 80% 10%; }
+.boss-art .b-arm-r { animation: b-arm 2.4s ease-in-out 1.2s infinite; transform-origin: 20% 10%; }
+@keyframes b-arm { 50% { transform: rotate(2deg) translateY(2px); } }
+.boss-art .b-wing-l { animation: b-wing-l 1.6s ease-in-out infinite; transform-origin: 100% 60%; }
+.boss-art .b-wing-r { animation: b-wing-r 1.6s ease-in-out infinite; transform-origin: 0% 60%; }
+@keyframes b-wing-l { 50% { transform: rotate(8deg); } }
+@keyframes b-wing-r { 50% { transform: rotate(-8deg); } }
+.boss-art .b-ring { animation: b-ring 1.4s ease-in-out infinite; transform-origin: 50% 0%; }
+@keyframes b-ring { 0%, 60%, 100% { transform: rotate(0); } 10% { transform: rotate(16deg); } 25% { transform: rotate(-14deg); } 40% { transform: rotate(8deg); } }
+.boss-art .b-lines { animation: b-glow .7s steps(2) infinite; }
+.boss-art .b-cape { animation: b-cape 3.6s ease-in-out infinite; transform-origin: 50% 0%; }
+@keyframes b-cape { 50% { transform: skewX(2deg) scaleY(1.01); } }
+.boss-art .b-plume { animation: b-arm 3s ease-in-out infinite; transform-origin: 0% 100%; }
+.boss-art .b-droop { animation: b-droop 4s ease-in-out infinite; }
+@keyframes b-droop { 50% { transform: translateY(1.5px) scaleY(.7); } }
+.boss-art .b-neck-l { animation: b-neck-l 2.2s ease-in-out infinite; transform-origin: 90% 100%; }
+.boss-art .b-neck-r { animation: b-neck-r 2.6s ease-in-out infinite; transform-origin: 10% 100%; }
+.boss-art .b-neck-c { animation: b-hover 1.9s ease-in-out infinite; }
+@keyframes b-neck-l { 50% { transform: rotate(-5deg); } }
+@keyframes b-neck-r { 50% { transform: rotate(5deg); } }
+.boss-art .b-yawn { animation: b-yawn 4s ease-in-out infinite; }
+@keyframes b-yawn { 50% { transform: scale(1.15, 1.3); } }
+.boss-art .b-drip { animation: b-drip 2.8s ease-in infinite; }
+@keyframes b-drip { 0% { transform: scaleY(.3); opacity: 0; } 30% { opacity: 1; } 100% { transform: translateY(8px); opacity: 0; } }
+.boss-art .b-dangle { animation: b-arm 2.8s ease-in-out infinite; }
+.boss-art .b-smoke { animation: b-zzz 2.4s ease-out infinite; }
+.boss-art .b-ember { animation: b-ember 3s ease-in-out infinite; }
+@keyframes b-ember { 50% { transform: translateY(-8px); opacity: .3; } }
+.boss-art .b-slash { animation: b-glow 1.6s ease-in-out infinite; }
+.boss-art .b-sweat { animation: v-sweat 1.6s ease-in infinite; }
+.boss-art .b-ko { animation: b-ko 1.6s linear infinite; transform-box: view-box; transform-origin: 0 0; }
+@keyframes b-ko { to { transform: rotate(360deg); } }
+
+/* Card no cronômetro */
+.boss-card { display: flex; align-items: center; gap: 12px; width: 100%; max-width: 420px; margin: 4px auto 12px; padding: 10px 12px; text-align: left;
+    color: inherit; font: inherit; background: linear-gradient(120deg, color-mix(in srgb, var(--boss, var(--primary)) 18%, var(--card)), var(--card) 70%);
+    border: 1px solid color-mix(in srgb, var(--boss, var(--primary)) 45%, var(--border)); border-radius: 16px; cursor: pointer; }
+.boss-card .boss-mini { flex: none; display: grid; place-items: center; }
+.boss-card .boss-info { flex: 1; min-width: 0; display: grid; gap: 4px; }
+.boss-card .boss-info > small { color: var(--muted); font-size: .72rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.boss-card .boss-info > b { font-size: .98rem; }
+.boss-card.invite .boss-info small { white-space: normal; font-size: .8rem; }
+.boss-card.fx-hit .boss-mini, .boss-card.fx-ko .boss-mini { animation: boss-hit .6s ease-out 2; }
+
+.hp { display: grid; grid-template-columns: repeat(var(--n), 1fr); gap: 2px; height: 10px; padding: 2px; border-radius: 6px; background: #1E1A22; flex: 1; }
+.hp i { border-radius: 2px; background: #3A3340; }
+.hp i.on { background: linear-gradient(#FF8A8A, #E0283C 60%, #A3101F); }
+.hp.solid { display: block; }
+.hp.solid span { display: block; height: 100%; border-radius: 3px; background: linear-gradient(#FF8A8A, #E0283C 60%, #A3101F); transition: width .6s; }
+.charge { display: grid; gap: 3px; }
+.charge-bar { height: 6px; border-radius: 99px; background: var(--border); overflow: hidden; }
+.charge-bar span { display: block; height: 100%; border-radius: 99px; background: linear-gradient(90deg, #F6C343, #FF7A1A); transition: width .5s; }
+.charge small { color: var(--muted); font-size: .74rem; }
+.charge.full .charge-bar span { background: linear-gradient(90deg, #43AA8B, #86D46B); }
+.charge.full small { color: var(--text); font-weight: 600; }
+
+/* Arena */
+.arena { position: relative; overflow: hidden; margin-top: 8px; padding: 16px 16px 14px; text-align: center; border-radius: 20px;
+    border: 1px solid color-mix(in srgb, var(--boss) 45%, var(--border));
+    background: radial-gradient(120% 70% at 50% 62%, color-mix(in srgb, var(--boss) 30%, transparent), transparent 70%),
+        linear-gradient(180deg, color-mix(in srgb, var(--boss) 10%, var(--card)), var(--card)); }
+.arena h2 { margin: 2px 0 0; font-size: 1.35rem; }
+.arena-tag { margin: 0; font-size: .72rem; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.arena-title { margin: 0; color: var(--muted); font-size: .85rem; font-style: italic; }
+.arena-stage { position: relative; display: grid; justify-items: center; margin: 8px 0 6px; }
+.arena-boss { display: grid; place-items: center; max-width: 100%; }
+.arena-boss svg { max-width: 100%; height: auto; }
+.taunt { position: relative; margin: 0 auto 2px; max-width: 280px; padding: 6px 12px; font-size: .82rem; border-radius: 12px;
+    background: var(--card); border: 1px solid var(--border); box-shadow: 0 2px 6px rgb(0 0 0 / .08); }
+.taunt::after { content: ''; position: absolute; left: 50%; bottom: -6px; width: 10px; height: 10px; background: inherit;
+    border: inherit; border-width: 0 1px 1px 0; transform: translateX(-50%) rotate(45deg); }
+.hp-row { display: flex; align-items: center; gap: 8px; max-width: 360px; margin: 0 auto 10px; font-size: .8rem; }
+.hp-row > span { font-weight: 800; color: #E0283C; }
+.hp-row > b { font-variant-numeric: tabular-nums; min-width: 3.4em; text-align: right; }
+.hp-row .hp { height: 14px; }
+.arena .charge { max-width: 360px; margin: 0 auto; }
+.arena-goal { margin: 10px 0 0; font-size: .75rem; color: var(--muted); }
+.arena.intro p { color: var(--muted); font-size: .9rem; max-width: 420px; margin: 8px auto 12px; }
+.arena .lineup { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px; }
+.arena + .cards { margin-top: 12px; }
+.chips.hits button { cursor: pointer; }
+
+.arena.fx-hit .arena-boss { animation: boss-hit .55s ease-out 2; }
+.arena.fx-hit::after { content: ''; position: absolute; inset: 0; opacity: 0; pointer-events: none; background: #fff; animation: boss-flash .5s ease-out 2; }
+.arena.fx-enter .arena-boss { animation: boss-enter 1s cubic-bezier(.2, 1.4, .4, 1); }
+@keyframes boss-hit { 0% { transform: translateX(0); filter: none; } 15% { transform: translateX(-10px) rotate(-3deg); filter: brightness(2) saturate(0) sepia(1) hue-rotate(-50deg) saturate(6); }
+    35% { transform: translateX(8px) rotate(2deg); } 55% { transform: translateX(-5px); filter: none; } 100% { transform: translateX(0); } }
+@keyframes boss-flash { 0% { opacity: .6; } 100% { opacity: 0; } }
+@keyframes boss-enter { 0% { transform: translateY(40px) scale(.6); opacity: 0; } 100% { transform: none; opacity: 1; } }
+.dmg { position: absolute; top: 34%; left: 58%; font-size: 2.4rem; font-weight: 900; color: #FF4D5E; pointer-events: none;
+    -webkit-text-stroke: 2px #1E1A22; paint-order: stroke; animation: dmg-pop 1.4s ease-out forwards; }
+@keyframes dmg-pop { 0% { transform: translateY(10px) scale(.4); opacity: 0; } 20% { transform: translateY(-6px) scale(1.25); opacity: 1; } 100% { transform: translateY(-48px) scale(1); opacity: 0; } }
+
+.victory { display: flex; align-items: center; gap: 12px; margin-top: 8px; padding: 10px 14px; border-radius: 16px; font-size: .88rem;
+    background: linear-gradient(120deg, color-mix(in srgb, #F6C343 30%, var(--card)), var(--card)); border: 1px solid color-mix(in srgb, #F6C343 60%, var(--border)); }
+.victory b { display: block; font-size: 1.1rem; color: #C98A00; }
+.victory-boss { flex: none; }
+.victory.fx-ko { animation: victory-in .8s cubic-bezier(.2, 1.4, .4, 1); }
+@keyframes victory-in { 0% { transform: scale(.7); opacity: 0; } 100% { transform: none; opacity: 1; } }
+
+.boss-map { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+.boss-map li { display: grid; justify-items: center; gap: 2px; padding: 8px 4px; text-align: center; border-radius: 12px; background: var(--card); border: 1px solid var(--border); }
+.boss-map li { min-width: 0; }
+.boss-map li .name { font-size: .72rem; font-weight: 600; line-height: 1.15; white-space: normal; overflow: visible; max-width: 100%; overflow-wrap: break-word; hyphens: auto; }
+.boss-map li small { font-size: .68rem; color: var(--muted); }
+.boss-map li.current { border-color: var(--boss); box-shadow: 0 0 0 1px var(--boss); background: color-mix(in srgb, var(--boss) 12%, var(--card)); }
+.boss-map li.locked .name { color: var(--muted); }
+.form .hm { display: flex; align-items: center; gap: 6px; }
+.form .hm input { width: 5.5em; }
+
+@media (prefers-reduced-motion: reduce) {
+    .boss-art *, .arena *, .arena::after, .boss-card *, .victory { animation: none !important; }
+}
