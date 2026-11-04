@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
-    DEFAULT_SETTINGS, NO_TYPE, buildDaily, dayStats, lastTypeFor, rangeStats, studyTypeName,
+    DEFAULT_SETTINGS, NO_TYPE, buildDaily, customTypes, dayStats, lastTypeFor, rangeStats, studyTypeName, typeIdFromName,
 } from '../../../resources/js/estudos/metrics.js';
 
 const H = 3_600_000;
@@ -48,5 +48,24 @@ describe('tipos de estudo', () => {
     it('nomes dos tipos', () => {
         expect(studyTypeName('lei_seca')).toBe('Lei seca');
         expect(studyTypeName(null)).toBe('Sem tipo');
+    });
+});
+
+describe('tipos personalizados', () => {
+    it('nome do tipo personalizado vem do próprio id', () => {
+        expect(studyTypeName('x:Flashcards')).toBe('Flashcards');
+    });
+
+    it('reaproveita tipo padrão ou personalizado com o mesmo nome e cria o resto', () => {
+        expect(typeIdFromName('  questões ')).toBe('questoes');
+        expect(typeIdFromName('flashcards', ['x:Flashcards'])).toBe('x:Flashcards');
+        expect(typeIdFromName('Mapa <mental>   novo')).toBe('x:Mapa mental novo');
+        expect(typeIdFromName('   ')).toBeNull();
+        expect(typeIdFromName('a'.repeat(60))).toBe('x:' + 'a'.repeat(40));
+    });
+
+    it('lista os personalizados usados em sessões ativas, sem repetir', () => {
+        const list = customTypes([{ tipo: 'x:Simulado oral' }, { tipo: 'questoes' }, { tipo: 'x:Anki' }, { tipo: 'x:Anki' }, { tipo: 'x:Velho', deleted_at: '2026-01-01' }]);
+        expect(list).toEqual(['x:Anki', 'x:Simulado oral']);
     });
 });

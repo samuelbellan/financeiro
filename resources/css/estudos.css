@@ -417,7 +417,12 @@ body.focus-on { overflow: hidden; }
 }
 .subject-pick .dot { width: 12px; height: 12px; border-radius: 50%; background: var(--c); flex: none; }
 .subject-pick small { color: var(--muted); }
-.subject-pick .time { font-variant-numeric: tabular-nums; }
+.subject-pick .time { font-variant-numeric: tabular-nums; margin-left: auto; }
+.subject-pick .pick-main { flex: 1; min-width: 0; display: grid; gap: 3px; }
+.subject-pick .pick-types { display: flex; flex-wrap: wrap; gap: 2px 10px; font-size: .78rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+.subject-pick .pick-types i { font-style: normal; color: var(--text); opacity: .8; }
+.type-picker input.type-new { position: static; opacity: 1; pointer-events: auto; flex: 1 1 100%; margin-top: 4px; font: inherit; font-size: .85rem; color: var(--text); background: var(--bg);
+    border: 1px dashed var(--border); border-radius: 99px; padding: 6px 12px; }
 .btn.start-study { width: 100%; margin: 14px 0 8px; padding: 14px 16px; font-size: 1.1rem; }
 
 /* Modo foco, tela "sala de estudo": cartão do tempo atual e uma mesa por matéria (estilo YPT). */

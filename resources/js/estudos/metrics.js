@@ -38,8 +38,36 @@ export const STUDY_TYPES = Object.freeze([
 ]);
 export const NO_TYPE = 'sem_tipo';
 
+/** Prefixo dos tipos criados pela pessoa: o id é "x:" + nome (ex.: "x:Flashcards"). */
+export const CUSTOM_TYPE_PREFIX = 'x:';
+export const CUSTOM_TYPE_MAX = 40;
+
 export function studyTypeName(id) {
+    if (typeof id === 'string' && id.startsWith(CUSTOM_TYPE_PREFIX)) return id.slice(CUSTOM_TYPE_PREFIX.length);
     return STUDY_TYPES.find((t) => t.id === id)?.nome ?? 'Sem tipo';
+}
+
+/** Tipos personalizados já usados em sessões (ordem alfabética), para oferecer de novo. */
+export function customTypes(sessions) {
+    const ids = new Set();
+    for (const s of sessions) {
+        if (!s.deleted_at && typeof s.tipo === 'string' && s.tipo.startsWith(CUSTOM_TYPE_PREFIX)) ids.add(s.tipo);
+    }
+    return [...ids].sort((a, b) => studyTypeName(a).localeCompare(studyTypeName(b), 'pt-BR', { sensitivity: 'base' }));
+}
+
+/**
+ * Id para um nome digitado: reaproveita um tipo padrão ou personalizado com o mesmo nome (sem diferenciar
+ * maiúsculas/acentos); senão cria "x:Nome". Nome vazio → null.
+ */
+export function typeIdFromName(name, existing = []) {
+    const clean = String(name ?? '').replace(/[<>]/g, '').replace(/\s+/g, ' ').trim().slice(0, CUSTOM_TYPE_MAX).trim();
+    if (!clean) return null;
+    const key = (text) => text.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+    const builtIn = STUDY_TYPES.find((t) => key(t.nome) === key(clean) || key(t.id) === key(clean));
+    if (builtIn) return builtIn.id;
+    const custom = existing.find((id) => key(studyTypeName(id)) === key(clean));
+    return custom ?? CUSTOM_TYPE_PREFIX + clean;
 }
 
 /** Último tipo usado numa sessão encerrada da matéria (sugestão ao registrar a próxima). */
