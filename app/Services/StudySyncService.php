@@ -215,6 +215,10 @@ class StudySyncService
             'retro_sound' => 'nullable|boolean',
             'descanso_min' => 'nullable|integer|min:1|max:240',
             'tema' => 'nullable|in:auto,claro,escuro,floresta,lavanda,areia,contraste',
+            'jornada' => 'nullable|array:inicio,objetivo,minutos',
+            'jornada.inicio' => 'required_with:jornada|date_format:Y-m-d',
+            'jornada.objetivo' => ['required_with:jornada', 'string', 'max:60', 'regex:/^(total|tipo:[a-z_]+|materia:[0-9a-f-]{36})$/'],
+            'jornada.minutos' => 'required_with:jornada|integer|min:10|max:1440',
         ]);
         if (!$data) {
             return;
@@ -231,6 +235,11 @@ class StudySyncService
                 'retro_sound' => (bool) ($data['retro_sound'] ?? false),
                 'descanso_min' => $data['descanso_min'] ?? null,
                 'tema' => $data['tema'] ?? 'auto',
+                'jornada' => empty($data['jornada']) ? null : json_encode([
+                    'inicio' => $data['jornada']['inicio'],
+                    'objetivo' => $data['jornada']['objetivo'],
+                    'minutos' => (int) $data['jornada']['minutos'],
+                ]),
                 'updated_at' => $this->stamp(),
             ]
         );
@@ -389,6 +398,9 @@ class StudySyncService
         }
         if (isset($row['retro_sound'])) {
             $row['retro_sound'] = (bool) $row['retro_sound'];
+        }
+        if (array_key_exists('jornada', $row)) {
+            $row['jornada'] = is_string($row['jornada']) ? json_decode($row['jornada'], true) : null;
         }
         if ($type === 'ddays' && isset($row['data'])) {
             $row['data'] = substr((string) $row['data'], 0, 10);

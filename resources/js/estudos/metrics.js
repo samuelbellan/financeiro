@@ -22,6 +22,7 @@ export const DEFAULT_SETTINGS = Object.freeze({
     retro_sound: false,
     descanso_min: null,
     tema: 'auto',
+    jornada: null, // { inicio, objetivo, minutos }: ver jornada.js
 });
 
 /** Tipos de estudo da sessão (mesma lista de StudySyncService::SESSION_TYPES). Sessão sem tipo conta como NO_TYPE. */

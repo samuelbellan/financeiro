@@ -296,6 +296,30 @@ class StudySyncTest extends TestCase
         $this->sync(['settings' => $base + ['tema' => 'neon']])->assertOk()->assertJsonPath('rejected.0.type', 'settings');
     }
 
+    public function test_settings_store_jornada(): void
+    {
+        $base = ['virada_hora' => 1, 'limite_suspeita_min' => 180, 'timezone' => 'America/Sao_Paulo'];
+        $jornada = ['inicio' => '2026-11-01', 'objetivo' => 'total', 'minutos' => 300];
+
+        $this->sync(['settings' => $base + ['jornada' => $jornada]])
+            ->assertOk()
+            ->assertJsonPath('rejected', [])
+            ->assertJsonPath('changes.settings.jornada', $jornada);
+
+        $porTipo = ['inicio' => '2026-11-02', 'objetivo' => 'tipo:questoes', 'minutos' => 90];
+        $this->sync(['settings' => $base + ['jornada' => $porTipo]])->assertOk()->assertJsonPath('changes.settings.jornada', $porTipo);
+
+        $this->sync(['settings' => $base])->assertOk()->assertJsonPath('changes.settings.jornada', null);
+
+        foreach ([
+            ['inicio' => '01/11/2026', 'objetivo' => 'total', 'minutos' => 300],
+            ['inicio' => '2026-11-01', 'objetivo' => '<script>', 'minutos' => 300],
+            ['inicio' => '2026-11-01', 'objetivo' => 'total', 'minutos' => 5],
+        ] as $bad) {
+            $this->sync(['settings' => $base + ['jornada' => $bad]])->assertOk()->assertJsonPath('rejected.0.type', 'settings');
+        }
+    }
+
     public function test_large_import_batch_uses_a_bounded_number_of_queries(): void
     {
         $subject = $this->makeSubject();

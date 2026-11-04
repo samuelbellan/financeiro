@@ -5,10 +5,12 @@ import {
     ArcElement, BarController, BarElement, CategoryScale, Chart, DoughnutController, Filler, Legend, LinearScale,
     LineController, LineElement, PointElement, Tooltip,
 } from 'chart.js';
-import { playFocusEndSound, playLevelUpSound, playRestDueSound, playRestSoonSound } from './audio.js';
+import { playBossHitSound, playFocusEndSound, playLevelUpSound, playRestDueSound, playRestSoonSound } from './audio.js';
 import { AVATARS, AVATAR_LIMITES_MIN, avatarStage, avatarSvg } from './avatars.js';
+import { BOSSES, bossSvg } from './bosses.js';
 import { ensureUser, getMeta, loadAll, saveLocal, setMeta, uuid } from './db.js';
 import { planImport } from './importer.js';
+import { BOSS_HP, cycleMark, JORNADA_PADRAO, jornadaState, normalizeJornada, objectiveProgressMs } from './jornada.js';
 import { createRoomsApi, memberTodayMs } from './rooms.js';
 import { createSync } from './sync.js';
 import { createWidget, widgetSupported } from './widget.js';
@@ -49,6 +51,8 @@ const state = {
     widgetAuto: true,
     widgetHintSeen: false,
     widgetPending: false,
+    jornadaMet: null, // objetivo de hoje já cumprido (para detectar o golpe ao vivo)
+    jornadaFx: null, // 'hit' ou 'ko': animação a tocar no próximo render
 };
 
 let charts = [];
@@ -226,7 +230,7 @@ function render() {
     applyTheme();
     charts.forEach((c) => c.destroy());
     charts = [];
-    const views = { timer: renderTimer, sala: renderRoomTab, timeline: renderTimeline, stats: renderStats, settings: renderSettings };
+    const views = { timer: renderTimer, sala: renderRoomTab, jornada: renderJornada, timeline: renderTimeline, stats: renderStats, settings: renderSettings };
     root.querySelector('[data-view]').innerHTML = views[state.tab]();
     root.querySelectorAll('[data-tab]').forEach((b) => b.classList.toggle('active', b.dataset.tab === state.tab));
     renderSyncBadge();
@@ -234,6 +238,7 @@ function render() {
     renderFocus();
     renderWidgetButton();
     widget.refresh();
+    if (!state.focusOpen) state.jornadaFx = null; // golpe durante o foco: anima ao fechar
     if (state.tab === 'stats') mountStatsCharts();
     tick();
 }
@@ -658,6 +663,7 @@ function renderTimer() {
             <p class="day-label">${formatDay(day, { weekday: 'long', day: '2-digit', month: 'long' })}</p>
             <p class="total" data-live="total">${formatDuration(stats.totalMs, { seconds: true })}</p>
             ${metaBar(stats)}
+            ${bossCard()}
             <div class="mini-stats">
                 <div><small>Máx. foco</small><b data-live="maxfocus">${formatDuration(stats.maxFocusMs)}</b></div>
                 <div><small>Início</small><b>${stats.startMs ? formatClock(stats.startMs, day, state.settings) : '--:--'}</b></div>
@@ -1254,12 +1260,171 @@ function tick() {
         el.textContent = formatDuration(stats.bySubject[el.dataset.id] ?? 0, { seconds: true });
     });
     if (running) set('[data-live="session"]', formatDuration(nowMs() - toMs(running.inicio), { seconds: true }));
+    tickJornada(stats);
     const meta = state.settings.meta_diaria_min;
     if (meta) {
         const pct = Math.min(100, (stats.totalMs / (meta * 60_000)) * 100);
         root.querySelectorAll('[data-live="goal-bar"]').forEach((el) => { el.style.width = `${pct}%`; });
         set('[data-live="goal-pct"]', String(Math.floor(pct)));
     }
+}
+
+// ── Jornada (bosses derrotados com dias de objetivo cumprido) ────────────────
+
+function objectiveLabel(objetivo) {
+    const [kind, id] = objetivo.split(':');
+    if (kind === 'tipo') return studyTypeName(id);
+    if (kind === 'materia') return subjectById(id)?.nome ?? 'Matéria removida';
+    return 'Estudo total';
+}
+
+function objectiveOptions(selected) {
+    const opt = (value, label) => `<option value="${esc(value)}" ${value === selected ? 'selected' : ''}>${esc(label)}</option>`;
+    const subjects = state.subjects.filter((x) => !x.deleted_at && (!x.arquivada_em || `materia:${x.id}` === selected)).sort((a, b) => a.ordem - b.ordem);
+    return opt('total', 'Estudo total do dia')
+        + `<optgroup label="Tipo de estudo">${STUDY_TYPES.map((t) => opt(`tipo:${t.id}`, t.nome)).join('')}</optgroup>`
+        + (subjects.length ? `<optgroup label="Matéria">${subjects.map((x) => opt(`materia:${x.id}`, x.nome)).join('')}</optgroup>` : '');
+}
+
+/** Vida do boss: segmentos (um por golpe) até 20 de vida; acima disso, barra contínua. */
+function hpBar(current) {
+    const aria = `role="meter" aria-label="Vida do boss" aria-valuemin="0" aria-valuemax="${current.maxHp}" aria-valuenow="${current.hp}"`;
+    if (current.maxHp > 20) {
+        return `<div class="hp solid" ${aria}><span style="width:${(current.hp / current.maxHp) * 100}%"></span></div>`;
+    }
+    return `<div class="hp" style="--n:${current.maxHp}" ${aria}>${Array.from({ length: current.maxHp }, (_, i) => `<i class="${i < current.hp ? 'on' : ''}"></i>`).join('')}</div>`;
+}
+
+function chargeText(met, remainingMs) {
+    return met ? '⚔ Golpe de hoje desferido!' : `Faltam ${formatDuration(remainingMs)} para o golpe de hoje`;
+}
+
+function chargeBar(j) {
+    const { met, pct, goalMs, progressMs } = j.today;
+    return `<div class="charge ${met ? 'full' : ''}" data-live="jornada-charge">
+        <div class="charge-bar"><span data-live="jornada-bar" style="width:${pct}%"></span></div>
+        <small data-live="jornada-text">${chargeText(met, goalMs - progressMs)}</small></div>`;
+}
+
+const bossLabel = (current) => `Boss ${current.index + 1}/${BOSSES.length}${cycleMark(current.cycle)}`;
+
+function bossCard() {
+    const j = jornadaState(daily(), state.settings.jornada, today());
+    if (!j) {
+        return `<button type="button" class="boss-card invite" data-action="goto-jornada">
+            <span class="boss-mini">${bossSvg(BOSSES.length - 1, { size: 64, locked: true })}</span>
+            <span class="boss-info"><b>⚔ Jornada dos Bosses</b>
+            <small>Cumpra um objetivo por dia (ex.: 5h de estudo) e derrote ${BOSSES.length} chefões.</small></span></button>`;
+    }
+    state.jornadaMet = j.today.met;
+    const { current } = j;
+    const boss = BOSSES[current.index];
+    const fx = state.jornadaFx ? `fx-${state.jornadaFx}` : '';
+    return `<button type="button" class="boss-card ${fx}" data-action="goto-jornada" style="--boss:${boss.cor}">
+        <span class="boss-mini">${bossSvg(current.index, { size: 72, hp: current.hp, maxHp: current.maxHp })}</span>
+        <span class="boss-info">
+            <small>${bossLabel(current)} · ${esc(objectiveLabel(j.jornada.objetivo))} ${formatDuration(j.today.goalMs)}/dia</small>
+            <b>${esc(boss.nome)}</b>
+            ${hpBar(current)}
+            ${chargeBar(j)}
+        </span></button>`;
+}
+
+function jornadaForm(j) {
+    const minutos = j?.minutos ?? JORNADA_PADRAO.minutos;
+    return `<form class="form" data-form="jornada">
+        <label>O que conta para o golpe
+            <select name="objetivo">${objectiveOptions(j?.objetivo ?? JORNADA_PADRAO.objetivo)}</select></label>
+        <label>Meta por dia
+            <span class="hm"><input type="number" name="horas" min="0" max="24" value="${Math.floor(minutos / 60)}" aria-label="Horas"> h
+            <input type="number" name="minutos" min="0" max="59" step="5" value="${minutos % 60}" aria-label="Minutos"> min</span></label>
+        <label>Contar a partir de
+            <input type="date" name="inicio" value="${j?.inicio ?? today()}" max="${today()}" required>
+            <small>Uma data passada faz os dias já estudados contarem como golpes. Mudar a data recomeça a jornada dali.</small></label>
+        <button class="btn" type="submit">${j ? 'Salvar objetivo' : '⚔ Começar a jornada'}</button>
+    </form>`;
+}
+
+function renderJornada() {
+    const j = jornadaState(daily(), state.settings.jornada, today());
+    if (!j) {
+        return `<section class="arena intro" style="--boss:${BOSSES.at(-1).cor}">
+            <h2>Jornada dos Bosses</h2>
+            <p>Cada dia em que você cumpre o seu objetivo é um golpe no chefão da vez. Derrote os ${BOSSES.length} vilões do estudo,
+                da Preguiça ao Dragão da Banca.</p>
+            <div class="lineup">${BOSSES.map((_, i) => bossSvg(i, { size: 60, locked: i > 0 })).join('')}</div>
+        </section>
+        <h3>Escolha seu objetivo</h3>
+        ${jornadaForm(null)}`;
+    }
+    state.jornadaMet = j.today.met;
+    const { current, defeated } = j;
+    const boss = BOSSES[current.index];
+    const fx = state.jornadaFx;
+    const lastKo = defeated.at(-1);
+    const victory = lastKo?.day === today() ? `<section class="victory ${fx === 'ko' ? 'fx-ko' : ''}" style="--boss:${BOSSES[lastKo.index].cor}">
+        <span class="victory-boss">${bossSvg(lastKo.index, { size: 88, defeated: true })}</span>
+        <span><b>Vitória!</b> Você derrotou ${esc(BOSSES[lastKo.index].nome)} hoje, com ${lastKo.hits.length} dias de objetivo cumprido.</span>
+    </section>` : '';
+
+    const lastDefeat = (i) => defeated.filter((d) => d.index === i).at(-1);
+    const map = BOSSES.map((b, i) => {
+        const ko = lastDefeat(i);
+        const isCurrent = i === current.index;
+        const known = isCurrent || ko;
+        const status = isCurrent ? `<b>${current.hp}/${current.maxHp} HP</b>` : ko ? `Derrotado ${formatDay(ko.day, { day: '2-digit', month: '2-digit' })}` : `${BOSS_HP[i]} HP`;
+        return `<li class="${isCurrent ? 'current' : ko ? 'defeated' : 'locked'}" style="--boss:${b.cor}">
+            ${bossSvg(i, { size: 64, defeated: !isCurrent && Boolean(ko), locked: !known, hp: isCurrent ? current.hp : null, maxHp: current.maxHp })}
+            <span class="name">${known ? esc(b.nome) : '???'}</span><small>${status}</small></li>`;
+    }).join('');
+
+    return `${victory}
+        <section class="arena ${fx === 'hit' ? 'fx-hit' : ''} ${fx === 'ko' ? 'fx-enter' : ''}" style="--boss:${boss.cor}">
+            <p class="arena-tag">${bossLabel(current)}${current.cycle ? ` · ciclo ${current.cycle + 1}, bosses mais fortes` : ''}</p>
+            <h2>${esc(boss.nome)}</h2>
+            <p class="arena-title">${esc(boss.titulo)}</p>
+            <div class="arena-stage">
+                <p class="taunt">${esc(boss.fala)}</p>
+                <div class="arena-boss">${bossSvg(current.index, { size: 220, hp: current.hp, maxHp: current.maxHp })}</div>
+                ${fx === 'hit' ? '<span class="dmg" aria-hidden="true">−1</span>' : ''}
+            </div>
+            <div class="hp-row"><span>HP</span>${hpBar(current)}<b>${current.hp}/${current.maxHp}</b></div>
+            ${chargeBar(j)}
+            <p class="arena-goal">Objetivo: ${esc(objectiveLabel(j.jornada.objetivo))} ≥ ${formatDuration(j.today.goalMs)} por dia · cada dia cumprido é 1 golpe</p>
+        </section>
+        ${cards([
+            ['Golpes desferidos', String(j.totalHits)],
+            ['Bosses derrotados', String(defeated.length)],
+            ['Combo atual', `${j.combo} ${j.combo === 1 ? 'dia' : 'dias'}`],
+            ['Melhor combo', `${j.bestCombo} ${j.bestCombo === 1 ? 'dia' : 'dias'}`],
+        ])}
+        ${current.hits.length ? `<h3>Golpes em ${esc(boss.nome)}</h3><div class="chips hits">${current.hits
+            .map((d) => `<button type="button" data-action="goto-day" data-day="${d}">⚔ ${formatDay(d)}</button>`).join('')}</div>` : ''}
+        <h3>Mapa da jornada</h3>
+        <ol class="boss-map">${map}</ol>
+        <h3>Objetivo</h3>
+        ${jornadaForm(j.jornada)}`;
+}
+
+// Atualiza a carga do golpe de hoje a cada segundo; ao cumprir o objetivo, toca o golpe (e o nocaute).
+function tickJornada(stats) {
+    const j = normalizeJornada(state.settings.jornada);
+    if (!j || today() < j.inicio) return;
+    const goalMs = j.minutos * 60_000;
+    const progressMs = objectiveProgressMs(stats, j.objetivo);
+    const met = progressMs >= goalMs;
+    root.querySelectorAll('[data-live="jornada-bar"]').forEach((el) => { el.style.width = `${Math.min(100, (progressMs / goalMs) * 100)}%`; });
+    root.querySelectorAll('[data-live="jornada-text"]').forEach((el) => { el.textContent = chargeText(met, goalMs - progressMs); });
+    root.querySelectorAll('[data-live="jornada-charge"]').forEach((el) => el.classList.toggle('full', met));
+    const justHit = state.jornadaMet === false && met;
+    state.jornadaMet = met;
+    if (!justHit) return;
+    const after = jornadaState(daily(), state.settings.jornada, today());
+    const ko = after.defeated.at(-1)?.day === today();
+    state.jornadaFx = ko ? 'ko' : 'hit';
+    if (state.settings.retro_sound) playBossHitSound(ko);
+    // No modo foco a animação espera: toca no próximo render, ao fechar o foco.
+    if (!state.focusOpen && (state.tab === 'timer' || state.tab === 'jornada') && !dialog.open) render();
 }
 
 // ── Diálogos ─────────────────────────────────────────────────────────────────
@@ -1586,6 +1751,7 @@ root.addEventListener('click', async (event) => {
             const dday = state.ddays.find((d) => d.id === id);
             if (confirm(`Excluir "${dday.titulo}"?`)) { await persist('ddays', { ...dday, deleted_at: iso(nowMs()) }); render(); }
         },
+        'goto-jornada': () => { state.tab = 'jornada'; render(); window.scrollTo(0, 0); },
         'sync-now': () => sync.syncNow(),
         'export-backup': () => exportBackup(),
     };
@@ -1631,6 +1797,12 @@ root.addEventListener('submit', async (event) => {
             state.widgetAuto = data.get('widget_auto') === 'on';
             await setMeta('widget_auto', state.widgetAuto);
         }
+    } else if (form.dataset.form === 'jornada') {
+        const minutos = Math.round(Number(data.get('horas') || 0) * 60) + Number(data.get('minutos') || 0);
+        if (minutos < 10 || minutos > 1440) return alert('O objetivo precisa ficar entre 10 minutos e 24 horas.');
+        const inicio = String(data.get('inicio') || '') || state.settings.jornada?.inicio || today();
+        await persist('settings', { ...state.settings, jornada: { inicio, objetivo: String(data.get('objetivo') || 'total'), minutos } });
+        state.jornadaMet = null;
     } else if (form.dataset.form === 'dday') {
         await persist('ddays', { id: uuid(), titulo: String(data.get('titulo')).trim(), data: String(data.get('data')), deleted_at: null, created_at: iso(nowMs()) });
     }
