@@ -274,8 +274,8 @@ export function timelineSlots(stats, settings, slotMinutes = 10) {
 }
 
 /**
- * Linha do tempo vertical (estilo YPT): trechos seguidos da mesma matéria, separados por até mergeGapMs,
- * viram um bloco; as pausas dentro do bloco ficam em `gaps`. Blocos que se cruzam no tempo vão para
+ * Linha do tempo vertical (estilo YPT): trechos seguidos da mesma matéria e do mesmo tipo, separados por
+ * até mergeGapMs, viram um bloco; as pausas dentro do bloco ficam em `gaps`. Blocos que se cruzam no tempo vão para
  * faixas (lane) lado a lado. Retorna { blocks, fromMs, toMs }, com a janela arredondada à hora cheia
  * (relativa ao início do dia de estudo) e 1h de folga antes e depois, dentro do dia.
  */
@@ -285,7 +285,8 @@ export function timelineBlocks(stats, settings, mergeGapMs = 15 * MIN) {
     const blocks = [];
     for (const piece of pieces) {
         const last = blocks[blocks.length - 1];
-        if (last && last.subjectId === piece.session.subject_id && piece.start - last.end <= mergeGapMs) {
+        const type = piece.session.tipo || NO_TYPE;
+        if (last && last.subjectId === piece.session.subject_id && last.type === type && piece.start - last.end <= mergeGapMs) {
             if (piece.start > last.end) last.gaps.push({ start: last.end, end: piece.start });
             last.end = Math.max(last.end, piece.end);
             last.studiedMs += piece.end - piece.start;
@@ -295,6 +296,7 @@ export function timelineBlocks(stats, settings, mergeGapMs = 15 * MIN) {
         }
         blocks.push({
             subjectId: piece.session.subject_id,
+            type,
             start: piece.start,
             end: piece.end,
             studiedMs: piece.end - piece.start,

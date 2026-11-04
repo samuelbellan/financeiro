@@ -36,6 +36,7 @@ const state = {
     settings: null,
     tab: 'timer',
     timelineDay: null,
+    timelineSel: new Set(), // blocos marcados na linha do tempo, para somar; limpa ao trocar de dia
     statsMode: 'week',
     statsAnchor: null,
     trendSubject: null,
@@ -710,22 +711,49 @@ function renderVerticalTimeline(stats, day) {
         hours += `<div class="vtl-hour" style="top:${y(t)}px"><span>${clock(t)}</span></div>`;
     }
     const lanes = Math.max(...blocks.map((b) => b.lane)) + 1;
+    const keys = new Set(blocks.map(blockKey));
+    for (const key of state.timelineSel) if (!keys.has(key)) state.timelineSel.delete(key);
     let labelBottom = -Infinity;
     const items = blocks.map((block) => {
         const subject = subjectById(block.subjectId);
         const name = esc(subject?.nome ?? 'Matéria removida');
+        const type = block.type === NO_TYPE ? '' : esc(studyTypeName(block.type));
+        const key = blockKey(block);
+        const selected = state.timelineSel.has(key);
         const dot = block.end - block.start < VTL_DOT_MS;
         const top = y(block.start);
         const gaps = block.gaps.map((g) => `<i style="top:${y(g.start) - top}px;height:${y(g.end) - y(g.start)}px"></i>`).join('');
-        const classes = ['vtl-pill', dot && 'dot', block.manual && 'manual', block.running && 'running'].filter(Boolean).join(' ');
-        const pill = `<div class="${classes}" style="--c:${esc(subject?.cor ?? '#888')};--lane:${block.lane};top:${top}px;${dot ? '' : `height:${y(block.end) - top}px`}"
-            title="${name} · ${clock(block.start)}–${clock(block.end)} · ${formatDuration(block.studiedMs)}">${gaps}</div>`;
+        const classes = ['vtl-pill', dot && 'dot', block.manual && 'manual', block.running && 'running', selected && 'selected'].filter(Boolean).join(' ');
+        const pick = `data-action="vtl-pick" data-key="${key}" aria-pressed="${selected}"`;
+        const pill = `<button type="button" class="${classes}" ${pick} style="--c:${esc(subject?.cor ?? '#888')};--lane:${block.lane};top:${top}px;${dot ? '' : `height:${y(block.end) - top}px`}"
+            title="${name}${type ? ` (${type})` : ''} · ${clock(block.start)}–${clock(block.end)} · ${formatDuration(block.studiedMs)}">${gaps}</button>`;
         if (dot) return pill;
         const labelTop = Math.max(top, labelBottom);
         labelBottom = labelTop + VTL_LABEL_PX;
-        return pill + `<div class="vtl-label" style="top:${labelTop}px"><b>${name}</b><small>${vtlDuration(block.studiedMs)}</small></div>`;
+        return pill + `<button type="button" class="vtl-label${selected ? ' selected' : ''}" ${pick} tabindex="-1" style="top:${labelTop}px">
+            <b>${name}</b><small>${type ? `${type} · ` : ''}${vtlDuration(block.studiedMs)}</small></button>`;
     }).join('');
-    return `<div class="vtl" style="--lanes:${lanes};--lane-w:${VTL_LANE_PX}px;height:${Math.max(y(endMs), labelBottom) + 12}px">${hours}${items}</div>`;
+    return `<div class="vtl" style="--lanes:${lanes};--lane-w:${VTL_LANE_PX}px;height:${Math.max(y(endMs), labelBottom) + 12}px">${hours}${items}</div>
+        ${renderTimelineSum(blocks)}`;
+}
+
+const blockKey = (block) => `${block.subjectId}|${block.type}|${block.start}`;
+
+/** Somatório dos blocos marcados na linha do tempo (some quando nada está marcado). */
+function renderTimelineSum(blocks) {
+    const picked = blocks.filter((b) => state.timelineSel.has(blockKey(b)));
+    if (!picked.length) return '<p class="vtl-hint muted center">Toque nos blocos para somar o tempo.</p>';
+    const byType = {};
+    for (const b of picked) byType[b.type] = (byType[b.type] ?? 0) + b.studiedMs;
+    const parts = Object.keys(byType).length > 1
+        ? `<small>${Object.entries(byType).sort((a, b) => b[1] - a[1])
+            .map(([t, ms]) => `${esc(studyTypeName(t))} ${formatDuration(ms)}`).join(' · ')}</small>`
+        : '';
+    const total = picked.reduce((sum, b) => sum + b.studiedMs, 0);
+    return `<div class="vtl-sum">
+        <span>${picked.length} ${picked.length === 1 ? 'selecionado' : 'selecionados'} · <b>${vtlDuration(total)}</b>${parts}</span>
+        <button type="button" class="btn ghost" data-action="vtl-clear">Limpar</button>
+    </div>`;
 }
 
 function renderTimeline() {
@@ -1539,9 +1567,15 @@ root.addEventListener('click', async (event) => {
         },
         'new-session': () => openSessionDialog(null, button.dataset.day),
         'edit-session': () => openSessionDialog(state.sessions.find((s) => s.id === id), state.timelineDay ?? today()),
-        'day-prev': () => { state.timelineDay = addDays(state.timelineDay ?? today(), -1); render(); },
-        'day-next': () => { state.timelineDay = addDays(state.timelineDay ?? today(), 1); render(); },
-        'goto-day': () => { state.tab = 'timeline'; state.timelineDay = button.dataset.day; render(); },
+        'day-prev': () => { state.timelineDay = addDays(state.timelineDay ?? today(), -1); state.timelineSel.clear(); render(); },
+        'day-next': () => { state.timelineDay = addDays(state.timelineDay ?? today(), 1); state.timelineSel.clear(); render(); },
+        'goto-day': () => { state.tab = 'timeline'; state.timelineDay = button.dataset.day; state.timelineSel.clear(); render(); },
+        'vtl-pick': () => {
+            const { key } = button.dataset;
+            if (!state.timelineSel.delete(key)) state.timelineSel.add(key);
+            render();
+        },
+        'vtl-clear': () => { state.timelineSel.clear(); render(); },
         'stats-mode': () => { state.statsMode = button.dataset.mode; render(); },
         'stats-prev': () => { shiftStats(-1); render(); },
         'stats-goto': () => { state.statsAnchor = button.dataset.day; render(); },

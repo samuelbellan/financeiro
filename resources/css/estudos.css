@@ -207,14 +207,26 @@ main > .btn { width: 100%; margin-top: 6px; }
 .vtl-hour { position: absolute; left: 0; right: 0; border-top: 1px dashed var(--border); }
 .vtl-hour span { position: absolute; top: -.6em; left: 0; width: 46px; background: var(--bg); font-size: .75rem; color: var(--muted); font-variant-numeric: tabular-nums; }
 .vtl-pill { position: absolute; left: calc(var(--axis) + var(--lane) * var(--lane-w)); width: 16px; min-height: 16px; overflow: hidden;
-    border-radius: 99px; background: var(--c); }
+    border-radius: 99px; background: var(--c); border: 0; padding: 0; cursor: pointer; }
+.vtl-pill.selected { outline: 2px solid var(--text); outline-offset: 2px; }
 .vtl-pill i { position: absolute; left: 0; right: 0; background: rgba(0, 0, 0, .35); }
 .vtl-pill.dot { height: 10px; min-height: 0; margin-top: -5px; }
 .vtl-pill.manual { background: repeating-linear-gradient(-45deg, var(--c) 0 4px, color-mix(in srgb, var(--c) 55%, transparent) 4px 8px); }
 .vtl-pill.running { animation: vtl-pulse 1.6s ease-in-out infinite; }
 @keyframes vtl-pulse { 50% { opacity: .55; } }
 @media (prefers-reduced-motion: reduce) { .vtl-pill.running { animation: none; } }
-.vtl-label { position: absolute; left: calc(var(--axis) + var(--lanes) * var(--lane-w) + 10px); right: 0; line-height: 1.15; }
+.vtl-label { position: absolute; left: calc(var(--axis) + var(--lanes) * var(--lane-w) + 4px); right: 0; line-height: 1.15;
+    border: 1px solid transparent; border-radius: 8px; padding: 2px 6px; background: none; color: inherit; font: inherit; text-align: left; cursor: pointer; }
+.vtl-label.selected { background: var(--card); border-color: var(--primary); }
+.vtl-sum {
+    position: sticky; bottom: 8px; z-index: 2; display: flex; align-items: center; gap: 10px; margin: 10px 0;
+    background: var(--card); border: 1px solid var(--primary); border-radius: 12px; padding: 10px 12px;
+}
+.vtl-sum span { flex: 1; min-width: 0; }
+.vtl-sum b { font-variant-numeric: tabular-nums; }
+.vtl-sum small { display: block; color: var(--muted); font-variant-numeric: tabular-nums; }
+.vtl-sum .btn { padding: 6px 12px; }
+.vtl-hint { font-size: .85rem; margin: 6px 0 0; }
 .vtl-label b { display: block; font-size: 1.05rem; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .vtl-label small { font-size: .9rem; color: var(--muted); font-variant-numeric: tabular-nums; }
 .vtl-empty { margin: 28px 0; }

@@ -237,6 +237,17 @@ describe('linha do tempo vertical (blocos estilo YPT)', () => {
         expect(blocks.map((b) => b.lane)).toEqual([0, 1, 0]);
     });
 
+    it('mesma matéria com tipo diferente vira outro bloco', () => {
+        const daily = buildDaily([
+            session('2026-10-30T10:00', '2026-10-30T10:40', { tipo: 'teoria' }),
+            session('2026-10-30T10:45', '2026-10-30T11:15', { tipo: 'questoes' }), // 5 min depois, mas outro tipo
+            session('2026-10-30T11:20', '2026-10-30T11:30', { tipo: 'questoes' }),
+        ], settings, NOW);
+        const { blocks } = timelineBlocks(dayStats(daily, '2026-10-30'), settings);
+
+        expect(blocks.map((b) => [b.type, b.studiedMs / 60_000])).toEqual([['teoria', 40], ['questoes', 40]]);
+    });
+
     it('dia sem estudo: nenhum bloco', () => {
         const daily = buildDaily([], settings, NOW);
         expect(timelineBlocks(dayStats(daily, '2026-10-30'), settings)).toEqual({ blocks: [], fromMs: null, toMs: null });
