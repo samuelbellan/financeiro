@@ -639,3 +639,65 @@ export function lastStopped(sessions, nowMs, maxGapMs = 6 * HOUR) {
     const sinceMs = nowMs - toMs(last.fim);
     return sinceMs >= 0 && sinceMs <= maxGapMs ? { session: last, sinceMs } : null;
 }
+
+/**
+ * Estatísticas de todo o histórico: do primeiro dia com estudo até `today`.
+ * Retorna null se ainda não houver estudo. A média diária conta todos os dias desde o primeiro
+ * (inclusive os sem estudo); a média por dia estudado conta só os dias com estudo.
+ */
+export function allTimeStats(daily, today) {
+    const studied = [...daily.values()].filter((s) => s.totalMs > 0 && s.day <= today).sort((a, b) => a.day.localeCompare(b.day));
+    if (!studied.length) return null;
+
+    const result = {
+        firstDay: studied[0].day, totalMs: 0, timerMs: 0, daysStudied: studied.length, elapsedDays: 0, sessions: 0,
+        avgPerDayMs: 0, avgPerStudiedDayMs: 0, maxFocusMs: 0, longestStreak: 0,
+        bestDay: null, bestWeek: null, bestMonth: null, bySubject: {}, byType: {}, bySubjectType: {},
+    };
+    const weeks = new Map();
+    const months = new Map();
+    const sessionIds = new Set();
+    let run = 0;
+    let previous = null;
+    for (const stats of studied) {
+        result.totalMs += stats.totalMs;
+        result.timerMs += stats.timerMs;
+        result.maxFocusMs = Math.max(result.maxFocusMs, stats.maxFocusMs);
+        if (!result.bestDay || stats.totalMs > result.bestDay.totalMs) result.bestDay = { day: stats.day, totalMs: stats.totalMs };
+        const week = weekRange(stats.day)[0];
+        weeks.set(week, (weeks.get(week) ?? 0) + stats.totalMs);
+        const month = stats.day.slice(0, 7);
+        months.set(month, (months.get(month) ?? 0) + stats.totalMs);
+        run = previous && addDays(previous, 1) === stats.day ? run + 1 : 1;
+        result.longestStreak = Math.max(result.longestStreak, run);
+        previous = stats.day;
+        for (const piece of stats.pieces) sessionIds.add(piece.session.id);
+        for (const [subjectId, ms] of Object.entries(stats.bySubject)) {
+            result.bySubject[subjectId] = (result.bySubject[subjectId] ?? 0) + ms;
+        }
+        for (const [type, ms] of Object.entries(stats.byType)) {
+            result.byType[type] = (result.byType[type] ?? 0) + ms;
+        }
+        for (const [subjectId, types] of Object.entries(stats.bySubjectType)) {
+            const target = (result.bySubjectType[subjectId] ??= {});
+            for (const [type, ms] of Object.entries(types)) target[type] = (target[type] ?? 0) + ms;
+        }
+    }
+    const best = (map) => [...map].reduce((a, b) => (b[1] > a[1] ? b : a));
+    const [weekFrom, weekMs] = best(weeks);
+    result.bestWeek = { from: weekFrom, to: addDays(weekFrom, 6), totalMs: weekMs };
+    const [month, monthMs] = best(months);
+    result.bestMonth = { month, from: `${month}-01`, totalMs: monthMs };
+    result.sessions = sessionIds.size;
+    result.elapsedDays = daysBetween(result.firstDay, today) + 1;
+    result.avgPerDayMs = result.totalMs / result.elapsedDays;
+    result.avgPerStudiedDayMs = result.totalMs / result.daysStudied;
+    return result;
+}
+
+/** Quantos meses (inclusive) vão do mês de `fromDay` ao de `toDay`. */
+export function monthsBetween(fromDay, toDay) {
+    const [y1, m1] = fromDay.split('-').map(Number);
+    const [y2, m2] = toDay.split('-').map(Number);
+    return (y2 - y1) * 12 + (m2 - m1) + 1;
+}

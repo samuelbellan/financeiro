@@ -239,10 +239,16 @@ main > .btn { width: 100%; margin-top: 6px; }
 .segmented button.active { background: var(--primary); color: var(--on-primary); font-weight: 600; }
 .segmented.four { grid-template-columns: repeat(4, 1fr); }
 .segmented.four button { padding: 7px 2px; font-size: .85rem; }
+.segmented.five { grid-template-columns: repeat(5, 1fr); }
+.segmented.five button { padding: 7px 1px; font-size: .8rem; }
 .cards { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 .card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 12px; }
 .card small { display: block; color: var(--muted); font-size: .75rem; }
 .card b { font-size: 1.25rem; font-variant-numeric: tabular-nums; }
+.cards.three { grid-template-columns: repeat(3, 1fr); }
+.cards.three .card b { font-size: 1.05rem; }
+button.card.link { text-align: left; font: inherit; color: inherit; cursor: pointer; }
+button.card.link:hover { border-color: var(--primary); }
 .chart-box { position: relative; height: 200px; margin-top: 12px; background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 10px; }
 .chart-box.small { height: 180px; }
 .subject-share li span:nth-last-child(2) { font-variant-numeric: tabular-nums; }
