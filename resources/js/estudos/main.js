@@ -1589,7 +1589,9 @@ function openSubjectPicker() {
 
 function openSessionDialog(session = null, day = today(), gap = null) {
     const tz = state.settings.timezone;
-    const subjects = state.subjects.filter((s) => !s.deleted_at && (!s.arquivada_em || s.id === session?.subject_id));
+    const subjects = state.subjects
+        .filter((s) => !s.deleted_at && (!s.arquivada_em || s.id === session?.subject_id))
+        .sort((a, b) => a.nome.localeCompare(b.nome, 'pt-BR', { sensitivity: 'base' }));
     if (!subjects.length) return alert('Crie uma matéria primeiro.');
     const [dayStart] = dayBounds(day, state.settings);
     const defaultStart = session ? toMs(session.inicio) : gap?.start ?? Math.min(dayStart + 6 * 3_600_000, nowMs() - 3_600_000);
