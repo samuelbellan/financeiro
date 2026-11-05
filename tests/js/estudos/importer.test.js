@@ -86,3 +86,42 @@ describe('planImport', () => {
         expect(plan.sessions.every((s) => uuid.test(s.id) && plan.subjects.some((x) => x.id === s.subject_id))).toBe(true);
     });
 });
+
+describe('planImport com substituição de período', () => {
+    const local = {
+        subjects: [{ id: 'local-cont', nome: 'Contabilidade', cor: '#111111', ordem: 0 }],
+        ddays: [],
+        sessions: [
+            { id: 'antes', subject_id: 'local-cont', inicio: '2026-09-30T05:00:00Z', fim: '2026-09-30T06:00:00Z', origem: 'importado' },
+            { id: 'ypt', subject_id: 'local-cont', inicio: '2026-10-01T05:00:00Z', fim: '2026-10-01T06:00:00Z', origem: 'importado' },
+            { id: 'timer', subject_id: 'local-cont', inicio: '2026-10-02T05:00:00Z', fim: '2026-10-02T06:00:00Z', origem: 'timer' },
+            { id: 'hoje', subject_id: 'local-cont', inicio: '2026-10-03T05:00:00Z', fim: '2026-10-03T06:00:00Z', origem: 'timer' },
+            { id: 'rodando', subject_id: 'local-cont', inicio: '2026-10-02T07:00:00Z', fim: null, origem: 'timer' },
+            { id: 'apagada', subject_id: 'local-cont', inicio: '2026-10-02T08:00:00Z', fim: '2026-10-02T09:00:00Z', deleted_at: '2026-10-02T10:00:00Z' },
+        ],
+    };
+    const substituir = { desde: '2026-10-01T04:00:00Z', ate: '2026-10-03T04:00:00Z' };
+
+    it('exclui as sessões encerradas do período, de qualquer origem, e importa as do arquivo', () => {
+        const plan = planImport(backup({ substituir }), local);
+        expect(plan.removals.map((s) => s.id).sort()).toEqual(['timer', 'ypt']);
+        expect(plan.sessions).toHaveLength(2);
+        expect(plan.replace).toEqual({ desde: '2026-10-01T04:00:00.000Z', ate: '2026-10-03T04:00:00.000Z' });
+    });
+
+    it('reimportar o mesmo arquivo não apaga as sessões que vieram dele', () => {
+        const first = planImport(backup({ substituir }), local);
+        const after = {
+            ...local,
+            sessions: [...local.sessions.filter((s) => !first.removals.includes(s)), ...first.sessions],
+        };
+        const second = planImport(backup({ substituir }), after);
+        expect(second.removals).toHaveLength(0);
+        expect(second.sessions).toHaveLength(0);
+    });
+
+    it('recusa período inválido', () => {
+        expect(() => planImport(backup({ substituir: { desde: '2026-10-03T00:00:00Z', ate: '2026-10-01T00:00:00Z' } }), local))
+            .toThrow('substituição');
+    });
+});

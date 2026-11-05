@@ -1718,9 +1718,11 @@ async function importBackup(file) {
         return alert(error instanceof SyntaxError ? 'O arquivo não é um JSON válido.' : error.message);
     }
     const total = plan.subjects.length + plan.sessions.length + plan.ddays.length + plan.removals.length;
+    const day = (at) => new Date(at).toLocaleDateString('pt-BR');
     const details = `${plan.subjects.length} matéria(s), ${plan.sessions.length} sessão(ões), ${plan.ddays.length} D-Day(s)`
-        + (plan.removals.length ? `
-${plan.removals.length} sessão(ões) serão excluídas.` : '')
+        + (plan.replace
+            ? `\nSUBSTITUIÇÃO: ${plan.removals.length} sessão(ões) do aparelho entre ${day(plan.replace.desde)} e ${day(plan.replace.ate)} (YPT, cronômetro e manuais) serão excluídas e trocadas pelas do arquivo. Exporte um backup antes, se quiser poder voltar.`
+            : (plan.removals.length ? `\n${plan.removals.length} sessão(ões) serão excluídas.` : ''))
         + (plan.skipped ? `\n${plan.skipped} já existiam e serão ignoradas.` : '')
         + (plan.invalid ? `\n${plan.invalid} registro(s) inválido(s) serão descartados.` : '');
     if (!total) return alert(`Nada novo para importar.\n${details}`);

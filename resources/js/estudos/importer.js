@@ -8,6 +8,10 @@
 // - Registros excluídos no arquivo não são importados. Preferências do arquivo não são aplicadas.
 // - Sessão excluída no arquivo cujo id existe (ativo) no aparelho é excluída também: assim um arquivo de
 //   correção consegue trocar sessões importadas antes (ex.: estimadas) pelas reais.
+// - Arquivo de substituição: com `substituir: { desde, ate }` (instantes ISO), toda sessão encerrada do aparelho,
+//   de qualquer origem (YPT, cronômetro, manual), com início em [desde, ate) e que não esteja no arquivo é
+//   excluída. Assim um histórico vindo de outra fonte (ex.: Guruja) toma o lugar do período sem somar horas
+//   em dobro. Sessões do arquivo que já existem no aparelho ficam (reimportar não apaga nada).
 
 const MAX_SESSION_MS = 24 * 3_600_000;
 
@@ -49,7 +53,7 @@ export function planImport(backup, local) {
     );
     let nextOrder = Math.max(-1, ...local.subjects.map((s) => s.ordem ?? 0)) + 1;
 
-    const plan = { subjects: [], sessions: [], ddays: [], removals: [], skipped: 0, invalid: 0 };
+    const plan = { subjects: [], sessions: [], ddays: [], removals: [], skipped: 0, invalid: 0, replace: null };
     const localSessions = new Map(local.sessions.map((s) => [s.id, s]));
     const subjectMap = new Map();
 
@@ -111,6 +115,22 @@ export function planImport(backup, local) {
             deleted_at: null,
             created_at: session.created_at ?? new Date().toISOString(),
         });
+    }
+
+    if (backup.substituir) {
+        const desde = Date.parse(backup.substituir.desde);
+        const ate = Date.parse(backup.substituir.ate);
+        if (!Number.isFinite(desde) || !Number.isFinite(ate) || ate <= desde) {
+            throw new Error('Arquivo inválido: período de substituição (substituir.desde/ate) incorreto.');
+        }
+        plan.replace = { desde: new Date(desde).toISOString(), ate: new Date(ate).toISOString() };
+        const inFile = new Set(backup.sessions.filter((s) => s?.id).map((s) => toUuid(s.id)));
+        const removing = new Set(plan.removals.map((s) => s.id));
+        for (const session of local.sessions) {
+            if (session.deleted_at || !session.fim || inFile.has(session.id) || removing.has(session.id)) continue;
+            const inicio = Date.parse(session.inicio);
+            if (inicio >= desde && inicio < ate) plan.removals.push(session);
+        }
     }
 
     for (const dday of backup.ddays ?? []) {
