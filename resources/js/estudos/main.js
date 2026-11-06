@@ -8,7 +8,7 @@ import {
 import { playBossHitSound, playFocusEndSound, playLevelUpSound, playRestDueSound, playRestSoonSound } from './audio.js';
 import { AVATARS, AVATAR_LIMITES_MIN, avatarStage, avatarSvg } from './avatars.js';
 import { BOSSES, bossSvg } from './bosses.js';
-import { ensureUser, getMeta, loadAll, saveLocal, setMeta, uuid } from './db.js';
+import { ensureUser, getMeta, loadAll, saveLocal, saveLocalMany, setMeta, uuid } from './db.js';
 import { planImport } from './importer.js';
 import { BOSS_HP, cycleMark, JORNADA_PADRAO, jornadaState, normalizeJornada, objectiveProgressMs } from './jornada.js';
 import { createRoomsApi, memberTodayMs } from './rooms.js';
@@ -1730,10 +1730,25 @@ async function importBackup(file) {
     if (!total) return alert(`Nada novo para importar.\n${details}`);
     if (!confirm(`Importar ${details}?`)) return;
 
-    for (const subject of plan.subjects) await persist('subjects', subject);
-    for (const dday of plan.ddays) await persist('ddays', dday);
-    for (const session of plan.removals) await persist('sessions', { ...session, deleted_at: iso(nowMs()) });
-    for (const session of plan.sessions) await persist('sessions', session);
+    // Tudo numa transação só: rápido e sem import pela metade (exclusões gravadas sem as sessões novas).
+    const at = iso(nowMs());
+    const entries = [
+        ...plan.subjects.map((record) => ({ type: 'subjects', record })),
+        ...plan.ddays.map((record) => ({ type: 'ddays', record })),
+        ...plan.removals.map((session) => ({ type: 'sessions', record: { ...session, deleted_at: at } })),
+        ...plan.sessions.map((record) => ({ type: 'sessions', record })),
+    ].map(({ type, record }) => ({ type, record: { ...record, updated_at: at } }));
+    try {
+        await saveLocalMany(entries);
+    } catch (error) {
+        return alert(`A importação falhou e nada foi alterado: ${error.message}`);
+    }
+    for (const type of ['subjects', 'ddays', 'sessions']) {
+        const byId = new Map(state[type].map((r) => [r.id, r]));
+        for (const entry of entries) if (entry.type === type) byId.set(entry.record.id, entry.record);
+        state[type] = [...byId.values()];
+    }
+    sync?.schedule();
     render();
     alert(`Importado: ${details}.\nO envio para o servidor acontece em segundo plano.`);
 }
