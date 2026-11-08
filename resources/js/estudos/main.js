@@ -11,6 +11,9 @@ import { BOSSES, bossSvg } from './bosses.js';
 import { ensureUser, getMeta, loadAll, saveLocal, saveLocalMany, setMeta, uuid } from './db.js';
 import { planImport } from './importer.js';
 import { BOSS_HP, cycleMark, JORNADA_PADRAO, jornadaState, normalizeJornada, objectiveProgressMs } from './jornada.js';
+import {
+    averagePace, manualPace, paceWeeklyMs, projectDate, reachedOn, requiredPerDay, totalMs as historyTotalMs, weekdayPace,
+} from './projection.js';
 import { createRoomsApi, memberTodayMs } from './rooms.js';
 import { createSync } from './sync.js';
 import { createWidget, widgetSupported } from './widget.js';
@@ -42,6 +45,8 @@ const state = {
     statsMode: 'week',
     statsAnchor: null,
     trendSubject: null,
+    // Calculadora de projeção: simulação avulsa (não é salva; só o alvo vai para os settings).
+    proj: { mode: 'quando', ritmo: 'semana', janela: 30, manualHoras: 4, folgas: [], inicioHoras: null, alvoHoras: null, dataAlvo: null },
     focusOpen: false,
     focusView: 'classico', // 'classico' ou 'sala' (sala de estudo com os colegas); lembrado neste aparelho
     roomId: null, // sala mostrada na tela "sala" (lembrada neste aparelho)
@@ -831,7 +836,7 @@ function renderTimeline() {
         <button type="button" class="btn ghost" data-action="new-session" data-day="${day}">+ Sessão manual</button>`;
 }
 
-const STATS_MODES = { day: 'Dia', week: 'Semana', month: 'Mês', trend: 'Tendência', total: 'Total' };
+const STATS_MODES = { day: 'Dia', week: 'Semana', month: 'Mês', trend: 'Tendência', total: 'Total', proj: 'Projeção' };
 const WEEKDAYS = ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom'];
 
 function statsRange() {
@@ -856,7 +861,7 @@ function cards(items) {
 }
 
 function segmentedModes() {
-    return `<div class="segmented five">
+    return `<div class="segmented six">
         ${Object.entries(STATS_MODES).map(([m, label]) => `<button type="button" data-action="stats-mode" data-mode="${m}" class="${m === state.statsMode ? 'active' : ''}">${label}</button>`).join('')}
     </div>`;
 }
@@ -864,6 +869,7 @@ function segmentedModes() {
 function renderStats() {
     if (state.statsMode === 'trend') return segmentedModes() + renderTrend();
     if (state.statsMode === 'total') return segmentedModes() + renderAllTime();
+    if (state.statsMode === 'proj') return segmentedModes() + renderProjection();
 
     const d = daily();
     const t = today();
@@ -1066,6 +1072,123 @@ function renderTrend() {
         <h3>Últimas 15 semanas</h3>
         ${renderHeatmap(d, t)}
         <p class="center muted">Sequência atual: <b>${streak(d, t)} dias</b></p>`;
+}
+
+// ── Calculadora de projeção ──────────────────────────────────────────────────
+
+const HOUR_MS = 3_600_000;
+const PROJ_RITMOS = { semana: 'Por dia da semana', media: 'Média simples', manual: 'Manual' };
+
+function formatBigHours(ms) {
+    return `${Math.floor(ms / HOUR_MS).toLocaleString('pt-BR')}h`;
+}
+
+function longDay(day) {
+    return formatDay(day, { day: '2-digit', month: '2-digit', year: 'numeric' });
+}
+
+function projInputs() {
+    const p = state.proj;
+    const d = daily();
+    const historyMs = historyTotalMs(d);
+    const startMs = p.inicioHoras === null ? historyMs : p.inicioHoras * HOUR_MS;
+    const alvo = p.alvoHoras ?? state.settings.alvo_horas ?? null;
+    return { d, historyMs, startMs, targetMs: alvo ? alvo * HOUR_MS : null, alvo };
+}
+
+function folgaPicker() {
+    return `<div class="chips folgas">${WEEKDAYS.map((w, i) => `<button type="button" data-action="proj-folga" data-day="${i}"
+        class="${state.proj.folgas.includes(i) ? 'active' : ''}" aria-pressed="${state.proj.folgas.includes(i)}">${w}</button>`).join('')}</div>
+        <small class="muted">Toque nos dias de folga.</small>`;
+}
+
+function renderProjection() {
+    const p = state.proj;
+    const t = today();
+    const { d, historyMs, startMs, targetMs, alvo } = projInputs();
+    const saved = state.settings.alvo_horas ?? null;
+    const pct = saved ? Math.min(100, (historyMs / (saved * HOUR_MS)) * 100) : 0;
+    const progress = saved ? `<div class="goal proj-goal"><div class="goal-bar"><span style="width:${pct}%"></span></div>
+        <small>${formatBigHours(historyMs)} / ${saved.toLocaleString('pt-BR')}h · ${Math.floor(pct)}%</small></div>` : '';
+
+    const form = `<form class="form proj-form" data-proj>
+        <div class="proj-row">
+            <label>Ponto de partida (h)
+                <input type="number" name="inicioHoras" min="0" step="0.5" value="${p.inicioHoras ?? Math.floor(historyMs / HOUR_MS)}">
+                <small>${p.inicioHoras === null ? 'Seu total histórico' : '<button type="button" class="link" data-action="proj-reset-start">usar meu total</button>'}</small></label>
+            <label>Alvo (h)
+                <input type="number" name="alvoHoras" min="1" max="100000" step="1" value="${alvo ?? ''}" placeholder="Ex.: 2000">
+                <small>${alvo && alvo !== saved ? '<button type="button" class="link" data-action="proj-save-target">salvar como meu alvo</button>' : saved ? 'Seu alvo salvo' : '&nbsp;'}</small></label>
+        </div>
+    </form>`;
+
+    const modes = `<div class="segmented two">${[['quando', 'Quando chego?'], ['quanto', 'Quanto preciso?']].map(([m, label]) =>
+        `<button type="button" data-action="proj-mode" data-mode="${m}" class="${p.mode === m ? 'active' : ''}">${label}</button>`).join('')}</div>`;
+
+    if (!targetMs) {
+        return `${progress}${modes}${form}<p class="center muted">Informe um alvo em horas para simular.</p>`;
+    }
+    if (targetMs <= startMs) {
+        const day = p.inicioHoras === null ? reachedOn(d, targetMs) : null;
+        return `${progress}${modes}${form}<div class="proj-result main"><small>Alvo de ${alvo.toLocaleString('pt-BR')}h</small>
+            <b>${day ? `Atingido em ${longDay(day)}` : 'Já atingido'}</b></div>`;
+    }
+    const body = p.mode === 'quando' ? renderProjWhen(d, t, startMs, targetMs) : renderProjHowMuch(d, t, startMs, targetMs);
+    return `${progress}${modes}${form}<p class="center muted">Faltam <b>${formatDuration(targetMs - startMs)}</b> para ${alvo.toLocaleString('pt-BR')}h</p>${body}`;
+}
+
+function projPaces(d, t) {
+    const p = state.proj;
+    return {
+        semana: weekdayPace(d, t, p.janela),
+        media: averagePace(d, t, p.janela),
+        manual: manualPace(p.manualHoras, p.folgas),
+    };
+}
+
+function renderProjWhen(d, t, startMs, targetMs) {
+    const p = state.proj;
+    const todayDoneMs = dayStats(d, t).totalMs;
+    const paces = projPaces(d, t);
+    const rows = Object.entries(PROJ_RITMOS).map(([id, label]) => {
+        const r = projectDate({ startMs, targetMs, pace: paces[id], today: t, todayDoneMs });
+        const perDay = paceWeeklyMs(paces[id]) / 7;
+        const when = r.status === 'never' ? 'Sem previsão com esse ritmo'
+            : `${longDay(r.day)} <small>(${r.days === 0 ? 'hoje' : `em ${r.days.toLocaleString('pt-BR')} dias`})</small>`;
+        const detail = id === 'manual'
+            ? `${formatDuration(p.manualHoras * HOUR_MS)}/dia${p.folgas.length ? `, folga ${p.folgas.map((i) => WEEKDAYS[i]).join('/')}` : ''}`
+            : `${formatDuration(perDay)}/dia em média · últimos ${p.janela} dias`;
+        return `<button type="button" data-action="proj-ritmo" data-id="${id}" class="proj-result ${p.ritmo === id ? 'main' : ''}">
+            <small>${label}</small><b>${when}</b><small>${detail}</small></button>`;
+    }).join('');
+
+    const controls = p.ritmo === 'manual'
+        ? `<form class="form" data-proj><label>Horas por dia
+            <input type="number" name="manualHoras" min="0" max="24" step="0.25" value="${p.manualHoras}"></label>${folgaPicker()}
+            ${p.folgas.length === 7 ? '<p class="form-error">Todos os dias são folga: escolha ao menos um dia de estudo.</p>' : ''}</form>`
+        : `<form class="form" data-proj><label>Janela do ritmo
+            <select name="janela">${[7, 30, 90].map((n) => `<option value="${n}" ${p.janela === n ? 'selected' : ''}>Últimos ${n} dias</option>`).join('')}</select></label></form>`;
+    return `<div class="proj-results">${rows}</div>${controls}`;
+}
+
+function renderProjHowMuch(d, t, startMs, targetMs) {
+    const p = state.proj;
+    const ddays = state.ddays.filter((x) => !x.deleted_at && x.data >= t).sort((a, b) => a.data.localeCompare(b.data));
+    const chips = ddays.map((x) => `<button type="button" data-action="proj-dday" data-day="${esc(x.data)}"
+        class="${p.dataAlvo === x.data ? 'active' : ''}">${esc(x.titulo)} · ${formatDay(x.data, { day: '2-digit', month: '2-digit' })}</button>`).join('');
+    const form = `<form class="form" data-proj><label>Até quando?
+        <input type="date" name="dataAlvo" min="${t}" value="${p.dataAlvo ?? ''}"></label>
+        ${chips ? `<div class="chips">${chips}</div>` : ''}${folgaPicker()}</form>`;
+    if (!p.dataAlvo) return `${form}<p class="center muted">Escolha uma data ou um D-Day.</p>`;
+
+    const r = requiredPerDay({ startMs, targetMs, today: t, targetDay: p.dataAlvo, offWeekdays: p.folgas });
+    if (r.status === 'invalid') return `${form}<p class="form-error center">Não há dias de estudo até essa data.</p>`;
+    const currentPerDay = paceWeeklyMs(weekdayPace(d, t, p.janela)) / 7;
+    const diff = r.perDayMs - currentPerDay;
+    return `<div class="proj-result main"><small>Para chegar até ${longDay(p.dataAlvo)}</small>
+        <b>${formatDuration(r.perDayMs)} por dia</b>
+        <small>em ${r.studyDays.toLocaleString('pt-BR')} dias de estudo · seu ritmo (${p.janela} dias): ${formatDuration(currentPerDay)}/dia
+        · <span class="${diff > 0 ? 'neg' : 'pos'}">${diff > 0 ? `+${formatDuration(diff)} acima` : 'você já está no ritmo'}</span></small></div>${form}`;
 }
 
 function renderHeatmap(d, t) {
@@ -1842,6 +1965,23 @@ root.addEventListener('click', async (event) => {
         'trend-subject': () => { state.trendSubject = id || null; render(); },
         'gap-session': () => openSessionDialog(null, state.timelineDay ?? today(), { start: Number(button.dataset.start), end: Number(button.dataset.end) }),
         'stats-next': () => { shiftStats(1); render(); },
+        'proj-mode': () => { state.proj.mode = button.dataset.mode; render(); },
+        'proj-ritmo': () => { state.proj.ritmo = id; render(); },
+        'proj-dday': () => { state.proj.dataAlvo = button.dataset.day; render(); },
+        'proj-folga': () => {
+            const day = Number(button.dataset.day);
+            const folgas = state.proj.folgas;
+            state.proj.folgas = folgas.includes(day) ? folgas.filter((x) => x !== day) : [...folgas, day].sort();
+            render();
+        },
+        'proj-reset-start': () => { state.proj.inicioHoras = null; render(); },
+        'proj-save-target': async () => {
+            const alvo = state.proj.alvoHoras;
+            if (!alvo) return;
+            await persist('settings', { ...state.settings, alvo_horas: alvo });
+            state.proj.alvoHoras = null;
+            render();
+        },
         'delete-dday': async () => {
             const dday = state.ddays.find((d) => d.id === id);
             if (confirm(`Excluir "${dday.titulo}"?`)) { await persist('ddays', { ...dday, deleted_at: iso(nowMs()) }); render(); }
@@ -1854,6 +1994,19 @@ root.addEventListener('click', async (event) => {
 });
 
 root.addEventListener('change', async (event) => {
+    const projField = event.target.closest('[data-proj] [name]');
+    if (projField) {
+        const p = state.proj;
+        const raw = projField.value.trim();
+        const num = raw === '' ? null : Number(raw);
+        if (projField.name === 'inicioHoras') p.inicioHoras = num !== null && num >= 0 ? num : null;
+        else if (projField.name === 'alvoHoras') p.alvoHoras = num !== null && num >= 1 ? Math.round(num) : null;
+        else if (projField.name === 'manualHoras') p.manualHoras = Math.min(24, Math.max(0, num ?? 0));
+        else if (projField.name === 'janela') p.janela = Number(raw);
+        else if (projField.name === 'dataAlvo') p.dataAlvo = raw || null;
+        render();
+        return;
+    }
     if (event.target.matches('[data-theme-picker]')) {
         applyTheme(event.target.value); // prévia; o render volta ao tema salvo se não salvar
         return;

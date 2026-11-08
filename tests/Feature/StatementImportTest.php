@@ -80,6 +80,57 @@ class StatementImportTest extends TestCase
         @unlink($tempFile);
     }
 
+    public function test_csv_with_overlapping_period_does_not_duplicate_and_keeps_identical_same_day_entries(): void
+    {
+        $service = new StatementImportService();
+        $importar = function (string $csv, string $nome) use ($service): array {
+            $tmp = tempnam(sys_get_temp_dir(), 'csv_') . '.csv';
+            file_put_contents($tmp, $csv);
+            $result = $service->import(new UploadedFile($tmp, $nome, 'text/csv', null, true), $this->user->id);
+            @unlink($tmp);
+            return $result;
+        };
+
+        // Extrato 1: 23/10 a 26/10, com dois Pix idênticos no mesmo dia (sem coluna de documento)
+        $r1 = $importar(
+            "Data;Descricao;Valor
+" .
+            "26/10/2026;Pix recebido;5865,00
+" .
+            "23/10/2026;Pix enviado;-7,55
+" .
+            "23/10/2026;Pix enviado;-7,55
+",
+            'extrato_a.csv'
+        );
+        $this->assertSame(3, $r1['inseridos']);
+
+        // Extrato 2: período sobreposto, linhas em outras posições + lançamentos novos
+        $r2 = $importar(
+            "Data;Descricao;Valor
+" .
+            "06/11/2026;Pagamento de boleto;-450,00
+" .
+            "04/11/2026;Pix recebido;3200,00
+" .
+            "26/10/2026;Pix recebido;5865,00
+" .
+            "23/10/2026;Pix enviado;-7,55
+" .
+            "23/10/2026;Pix enviado;-7,55
+",
+            'extrato_b.csv'
+        );
+
+        $this->assertSame(2, $r2['inseridos']);
+        $this->assertSame(3, $r2['duplicados']);
+        $this->assertSame(2, Transacao::where('valor', 7.55)->count());
+        $this->assertSame(1, Transacao::where('valor', 5865)->count());
+
+        $saldo = Transacao::selectRaw("SUM(CASE WHEN tipo = 'receita' THEN valor ELSE -valor END) as t")->value('t');
+        $this->assertEqualsWithDelta(5865 - 15.10 + 3200 - 450, (float) $saldo, 0.001);
+    }
+
     public function test_http_endpoint_imports_csv_via_ajax(): void
     {
         $csvContent = "Data,Historico,Valor\n" .
