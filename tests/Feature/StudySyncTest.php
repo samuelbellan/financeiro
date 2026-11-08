@@ -336,6 +336,15 @@ class StudySyncTest extends TestCase
         }
     }
 
+    public function test_settings_store_hours_target(): void
+    {
+        $base = ['virada_hora' => 3, 'limite_suspeita_min' => 180, 'timezone' => 'America/Sao_Paulo'];
+
+        $this->sync(['settings' => $base + ['alvo_horas' => 2000]])->assertOk()->assertJsonPath('changes.settings.alvo_horas', 2000);
+        $this->sync(['settings' => $base])->assertOk()->assertJsonPath('changes.settings.alvo_horas', null);
+        $this->sync(['settings' => $base + ['alvo_horas' => 0]])->assertOk()->assertJsonPath('rejected.0.type', 'settings');
+    }
+
     public function test_large_import_batch_uses_a_bounded_number_of_queries(): void
     {
         $subject = $this->makeSubject();

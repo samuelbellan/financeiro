@@ -241,6 +241,29 @@ main > .btn { width: 100%; margin-top: 6px; }
 .segmented.four button { padding: 7px 2px; font-size: .85rem; }
 .segmented.five { grid-template-columns: repeat(5, 1fr); }
 .segmented.five button { padding: 7px 1px; font-size: .8rem; }
+.segmented.six { grid-template-columns: repeat(6, 1fr); }
+.segmented.six button { padding: 7px 1px; font-size: .78rem; }
+@media (max-width: 480px) { .segmented.six { grid-template-columns: repeat(3, 1fr); row-gap: 3px; } .segmented.six button { font-size: .85rem; } }
+.segmented.two { grid-template-columns: 1fr 1fr; margin-top: 12px; }
+
+/* Calculadora de projeção */
+.proj-goal { margin: 14px auto 4px; max-width: none; text-align: center; }
+.proj-form { margin-top: 12px; }
+.proj-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.proj-form small, .proj-row small { font-size: .75rem; }
+button.link { border: 0; background: none; padding: 0; color: var(--primary); text-decoration: underline; cursor: pointer; font: inherit; }
+.proj-results { display: grid; gap: 8px; margin: 10px 0 12px; }
+.proj-result { display: block; width: 100%; text-align: left; background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 12px; color: var(--text); font: inherit; margin-top: 10px; }
+.proj-results .proj-result { margin-top: 0; }
+button.proj-result { cursor: pointer; }
+.proj-result.main { border-color: var(--primary); box-shadow: 0 0 0 1px var(--primary) inset; }
+.proj-result small { display: block; color: var(--muted); font-size: .75rem; }
+.proj-result b { display: block; font-size: 1.15rem; margin: 2px 0; font-variant-numeric: tabular-nums; }
+.proj-result b small { display: inline; }
+.proj-result .neg { color: var(--danger); }
+.proj-result .pos { color: #1E8E5A; }
+.chips.folgas { flex-wrap: wrap; overflow: visible; padding-top: 4px; }
+.folgas button { min-width: 42px; padding: 6px 8px; }
 .cards { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 .card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 12px; }
 .card small { display: block; color: var(--muted); font-size: .75rem; }
