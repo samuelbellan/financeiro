@@ -226,6 +226,7 @@ class StudySyncService
             'jornada.inicio' => 'required_with:jornada|date_format:Y-m-d',
             'jornada.objetivo' => ['required_with:jornada', 'string', 'max:60', 'regex:/^(total|tipo:([a-z_]+|x:[^<>\x00-\x1F]{1,40})|materia:[0-9a-f-]{36})$/u'],
             'jornada.minutos' => 'required_with:jornada|integer|min:10|max:1440',
+            'alvo_horas' => 'nullable|integer|min:1|max:100000',
         ]);
         if (!$data) {
             return;
@@ -247,6 +248,7 @@ class StudySyncService
                     'objetivo' => $data['jornada']['objetivo'],
                     'minutos' => (int) $data['jornada']['minutos'],
                 ]),
+                'alvo_horas' => $data['alvo_horas'] ?? null,
                 'updated_at' => $this->stamp(),
             ]
         );
@@ -398,7 +400,7 @@ class StudySyncService
                 $row[$col] = $row[$col] === null ? null : Carbon::parse($row[$col], 'UTC')->format('Y-m-d\TH:i:s.v\Z');
             }
         }
-        foreach (['ordem', 'virada_hora', 'limite_suspeita_min', 'meta_diaria_min', 'descanso_min'] as $col) {
+        foreach (['ordem', 'virada_hora', 'limite_suspeita_min', 'meta_diaria_min', 'descanso_min', 'alvo_horas'] as $col) {
             if (isset($row[$col])) {
                 $row[$col] = (int) $row[$col];
             }
