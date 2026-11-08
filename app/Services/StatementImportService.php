@@ -264,7 +264,7 @@ class StatementImportService
                 if ($tCol === null && preg_match('/^(tipo|type|natureza|c\/d|operacao|operacao)$/i', $cell)) {
                     $tCol = $cIdx;
                 }
-                if ($dcCol === null && preg_match('/^(doc|documento|numero documento|num doc|fitid|id)$/i', $cell)) {
+                if ($dcCol === null && preg_match('/^(doc|documento|numero documento|num doc|fitid|id|identificador)$/i', $cell)) {
                     $dcCol = $cIdx;
                 }
             }
@@ -316,6 +316,7 @@ class StatementImportService
 
         $contaId = $this->resolveConta($userId, $forcedContaId, $nomeArquivo);
         $transacoes = [];
+        $fitidSeen = [];
 
         for ($i = $headerIndex + 1; $i < count($rows); $i++) {
             $row = $rows[$i];
@@ -336,7 +337,7 @@ class StatementImportService
             }
 
             $descricao = trim($rawDesc) ?: 'Lançamento ' . $parsedDate;
-            $fitid = $rawDoc ?: hash('crc32b', "{$parsedDate}_{$descricao}_{$parsedAmountInfo['valor']}_{$parsedAmountInfo['tipo']}_{$i}");
+            $fitid = $rawDoc ?: $this->stableFitid($parsedDate, $descricao, (float) $parsedAmountInfo['valor'], $parsedAmountInfo['tipo'], $fitidSeen);
 
             $transacoes[] = [
                 'data'             => $parsedDate,
@@ -488,6 +489,7 @@ Retorne APENAS um JSON estrito (sem markdown, sem explicações adicionais) com 
             $bancoIdentificado = $data['banco'] ?? 'Extrato ' . $formato;
             $contaId = $this->resolveConta($userId, $forcedContaId, $bancoIdentificado);
             $parsedTrx = [];
+            $fitidSeen = [];
 
             foreach ($data['transacoes'] as $idx => $t) {
                 $valor = (float) abs($t['valor'] ?? 0);
@@ -496,7 +498,7 @@ Retorne APENAS um JSON estrito (sem markdown, sem explicações adicionais) com 
                 $tipo = strtolower($t['tipo'] ?? 'despesa') === 'receita' ? 'receita' : 'despesa';
                 $dt = !empty($t['data']) ? Carbon::parse($t['data'])->toDateString() : now()->toDateString();
                 $desc = trim($t['descricao'] ?? 'Lançamento ' . $dt);
-                $fitid = $t['fitid'] ?? hash('crc32b', "{$dt}_{$desc}_{$valor}_{$tipo}_{$idx}");
+                $fitid = $t['fitid'] ?? $this->stableFitid($dt, $desc, $valor, $tipo, $fitidSeen);
 
                 $parsedTrx[] = [
                     'data'             => $dt,
@@ -551,21 +553,34 @@ Retorne APENAS um JSON estrito (sem markdown, sem explicações adicionais) com 
         $entradas = 0.0;
         $saidas = 0.0;
 
+        $ocorrenciaNoArquivo = [];
+        $inseridosPorChave = [];
+
         DB::beginTransaction();
         try {
             foreach ($transacoes as $t) {
+                $chave = null;
                 // Checagem 1: Por conta_id e fitid
                 $exists = Transacao::where('conta_id', $contaId)
                     ->where('fitid', $t['fitid'])
                     ->exists();
 
-                // Checagem 2: Se sem fitid rígido, checa por data + valor + descrição exata no mesmo usuário
+                // Checagem 2: data + valor + tipo + descrição exata no mesmo usuário.
+                // whereDate: a coluna `data` é gravada como "Y-m-d 00:00:00" no SQLite.
+                // Conta ocorrências para não descartar lançamentos idênticos legítimos
+                // no mesmo dia (ex.: dois Pix de mesmo valor) nem reimportar os já existentes.
                 if (!$exists) {
-                    $exists = Transacao::where('user_id', $userId)
-                        ->where('data', $t['data'])
+                    $chave = "{$t['data']}|{$t['valor']}|{$t['tipo']}|{$t['descricao']}";
+                    $ocorrenciaNoArquivo[$chave] = ($ocorrenciaNoArquivo[$chave] ?? 0) + 1;
+
+                    $jaExistentes = Transacao::where('user_id', $userId)
+                        ->whereDate('data', $t['data'])
                         ->where('valor', $t['valor'])
+                        ->where('tipo', $t['tipo'])
                         ->where('descricao', $t['descricao'])
-                        ->exists();
+                        ->count() - ($inseridosPorChave[$chave] ?? 0);
+
+                    $exists = $jaExistentes >= $ocorrenciaNoArquivo[$chave];
                 }
 
                 // Checagem 3: Deduplicação inteligente com lançamento manual pré-existente
@@ -605,6 +620,10 @@ Retorne APENAS um JSON estrito (sem markdown, sem explicações adicionais) com 
                 if ($exists) {
                     $duplicados++;
                     continue;
+                }
+
+                if (isset($chave)) {
+                    $inseridosPorChave[$chave] = ($inseridosPorChave[$chave] ?? 0) + 1;
                 }
 
                 Transacao::create([
@@ -660,6 +679,20 @@ Retorne APENAS um JSON estrito (sem markdown, sem explicações adicionais) com 
                 'erros'    => [$e->getMessage()],
             ];
         }
+    }
+
+    /**
+     * FITID determinístico para extratos sem identificador do banco.
+     * Usa a ocorrência do lançamento no arquivo (1º, 2º Pix idêntico do dia...)
+     * em vez da posição da linha, para que extratos com períodos sobrepostos
+     * gerem o mesmo FITID para o mesmo lançamento.
+     */
+    protected function stableFitid(string $data, string $descricao, float $valor, string $tipo, array &$seen): string
+    {
+        $base = "{$data}_{$descricao}_{$valor}_{$tipo}";
+        $seen[$base] = ($seen[$base] ?? 0) + 1;
+
+        return hash('crc32b', "{$base}_{$seen[$base]}");
     }
 
     /**
@@ -834,6 +867,7 @@ Retorne APENAS um JSON estrito (sem markdown, sem explicações adicionais) com 
     protected function parseTextStatement(string $text): array
     {
         $transacoes = [];
+        $fitidSeen = [];
         $lines = explode("\n", $text);
 
         foreach ($lines as $idx => $line) {
@@ -850,7 +884,7 @@ Retorne APENAS um JSON estrito (sem markdown, sem explicações adicionais) com 
                         'descricao'        => $desc,
                         'valor'            => $amtInfo['valor'],
                         'tipo'             => $amtInfo['tipo'],
-                        'fitid'            => hash('crc32b', "{$dt}_{$desc}_{$amtInfo['valor']}_{$idx}"),
+                        'fitid'            => $this->stableFitid($dt, $desc, (float) $amtInfo['valor'], $amtInfo['tipo'], $fitidSeen),
                         'numero_documento' => null,
                     ];
                 }
