@@ -68,15 +68,27 @@ class EstudosApiController extends Controller
         if (!$userId) {
             return response()->json(['message' => 'Token ausente ou inválido.'], 401);
         }
+        // Data (AAAA-MM-DD) = dia de estudo inteiro; data e hora (AAAA-MM-DDTHH:MM, opcionalmente com
+        // segundos e fuso, ex. -03:00) = corte exato. Sem fuso, a hora é a do fuso do app.
+        $moment = 'regex:/^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2}(:\d{2})?(Z|[+-]\d{2}:?\d{2})?)?$/';
         $request->validate([
-            'desde' => 'required|date_format:Y-m-d',
-            'ate' => 'required|date_format:Y-m-d|after_or_equal:desde',
+            'desde' => ['required', 'string', $moment],
+            'ate' => ['required', 'string', $moment],
             'sessoes' => 'nullable|boolean',
         ]);
 
         $ctx = $this->context($userId);
-        $first = CarbonImmutable::parse($request->query('desde'));
-        $last = CarbonImmutable::parse($request->query('ate'));
+        try {
+            [$windowStart] = $this->moment($request->query('desde'), $ctx);
+            [, $windowEnd] = $this->moment($request->query('ate'), $ctx);
+        } catch (\Throwable) {
+            return response()->json(['message' => 'Data ou hora inválida.', 'errors' => ['desde' => ['Data ou hora inválida.']]], 422);
+        }
+        if ($windowEnd->lte($windowStart)) {
+            return response()->json(['message' => '`ate` precisa ser depois de `desde`.', 'errors' => ['ate' => ['`ate` precisa ser depois de `desde`.']]], 422);
+        }
+        $first = CarbonImmutable::parse($this->studyDayOf($windowStart, $ctx));
+        $last = CarbonImmutable::parse($this->studyDayOf($windowEnd->subMillisecond(), $ctx));
         $count = $first->diffInDays($last) + 1;
         if ($count > self::MAX_PERIOD_DAYS) {
             return response()->json([
@@ -86,9 +98,7 @@ class EstudosApiController extends Controller
         }
         $withSessions = $request->boolean('sessoes');
 
-        [$start] = $this->bounds($first->format('Y-m-d'), $ctx);
-        [, $end] = $this->bounds($last->format('Y-m-d'), $ctx);
-        $rows = $this->sessionRows($userId, $start, $end);
+        $rows = $this->sessionRows($userId, $windowStart, $windowEnd);
         $subjects = DB::table('study_subjects')->where('user_id', $userId)->get()->keyBy('id');
 
         $days = [];
@@ -103,8 +113,11 @@ class EstudosApiController extends Controller
         for ($i = 0; $i < $count; $i++) {
             $day = $first->addDays($i)->format('Y-m-d');
             [$dayStart, $dayEnd] = $this->bounds($day, $ctx);
+            $partial = $windowStart->gt($dayStart) || $windowEnd->lt($dayEnd);
+            $dayStart = $dayStart->max($windowStart);
+            $dayEnd = $dayEnd->min($windowEnd);
             $dayRows = $rows->filter(fn ($row) => $this->overlaps($row, $dayStart, $dayEnd));
-            $data = $this->buildDay($day, $dayRows, $subjects, $ctx);
+            $data = $this->buildDay($day, $dayRows, $subjects, $ctx, $dayStart, $dayEnd);
             $t = $data['totais'];
 
             foreach ($sum as $key => $value) {
@@ -121,7 +134,13 @@ class EstudosApiController extends Controller
             $maxFocus = max($maxFocus, $t['max_foco_min']);
             $elapsed += $day <= $today ? 1 : 0;
 
-            $line = ['data' => $day, 'dia_semana' => $this->weekday($day)] + $t;
+            $line = ['data' => $day, 'dia_semana' => $this->weekday($day), 'dia_parcial' => $partial] + $t;
+            if ($partial) {
+                $line['recorte_local'] = [
+                    'inicio' => $dayStart->setTimezone($ctx['timezone'])->format('Y-m-d H:i'),
+                    'fim' => $dayEnd->setTimezone($ctx['timezone'])->format('Y-m-d H:i'),
+                ];
+            }
             if ($withSessions) {
                 $line['sessoes'] = $data['sessoes'];
                 $line['sessoes_excluidas'] = $data['sessoes_excluidas'];
@@ -136,6 +155,12 @@ class EstudosApiController extends Controller
         return response()->json([
             'desde' => $first->format('Y-m-d'),
             'ate' => $last->format('Y-m-d'),
+            'janela' => [
+                'inicio' => $this->iso($windowStart),
+                'fim' => $this->iso($windowEnd),
+                'inicio_local' => $windowStart->setTimezone($ctx['timezone'])->format('Y-m-d H:i'),
+                'fim_local' => $windowEnd->setTimezone($ctx['timezone'])->format('Y-m-d H:i'),
+            ],
             'fuso' => $ctx['timezone'],
             'virada_hora' => $ctx['virada'],
             'gerado_em' => $this->iso($ctx['now']),
@@ -207,9 +232,30 @@ class EstudosApiController extends Controller
         return $inicio->lt($end) && ($until === null || $until->gt($start));
     }
 
-    protected function buildDay(string $day, $rows, $subjects, array $ctx): array
+    /**
+     * Interpreta `desde`/`ate`: data = dia de estudo inteiro; data e hora = instante exato.
+     * @return array{0: CarbonImmutable, 1: CarbonImmutable} início e fim (UTC) do trecho pedido
+     */
+    protected function moment(string $value, array $ctx): array
+    {
+        if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $value)) {
+            return $this->bounds(CarbonImmutable::createFromFormat('!Y-m-d', $value)->format('Y-m-d'), $ctx);
+        }
+        $at = CarbonImmutable::parse($value, $ctx['timezone'])->utc();
+
+        return [$at, $at];
+    }
+
+    protected function studyDayOf(CarbonImmutable $at, array $ctx): string
+    {
+        return $at->setTimezone($ctx['timezone'])->subHours($ctx['virada'])->format('Y-m-d');
+    }
+
+    protected function buildDay(string $day, $rows, $subjects, array $ctx, ?CarbonImmutable $clipStart = null, ?CarbonImmutable $clipEnd = null): array
     {
         [$start, $end] = $this->bounds($day, $ctx);
+        $start = $clipStart ? $start->max($clipStart) : $start;
+        $end = $clipEnd ? $end->min($clipEnd) : $end;
         $timezone = $ctx['timezone'];
         $now = $ctx['now'];
         $sessions = [];
