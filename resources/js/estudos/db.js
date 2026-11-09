@@ -84,6 +84,23 @@ export async function saveLocal(type, record) {
     await tx.done;
 }
 
+/**
+ * Grava vários registros numa única transação (tudo ou nada) e os enfileira.
+ * Usado na importação: milhares de gravações separadas demoravam e, se a página fosse fechada no meio,
+ * parte do arquivo ficava de fora (as exclusões já tinham sido feitas).
+ */
+export async function saveLocalMany(entries) {
+    if (!entries.length) return;
+    const database = await db();
+    const types = [...new Set(entries.map((e) => e.type))];
+    const tx = database.transaction([...types, 'queue'], 'readwrite');
+    for (const { type, record } of entries) {
+        tx.objectStore(type).put(record);
+        tx.objectStore('queue').put({ type, record }, `${type}:${record.id}`);
+    }
+    await tx.done;
+}
+
 export async function pendingQueue() {
     const database = await db();
     const [keys, values] = await Promise.all([database.getAllKeys('queue'), database.getAll('queue')]);

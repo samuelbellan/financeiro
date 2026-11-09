@@ -8,7 +8,7 @@ import {
 import { playBossHitSound, playFocusEndSound, playLevelUpSound, playRestDueSound, playRestSoonSound } from './audio.js';
 import { AVATARS, AVATAR_LIMITES_MIN, avatarStage, avatarSvg } from './avatars.js';
 import { BOSSES, bossSvg } from './bosses.js';
-import { ensureUser, getMeta, loadAll, saveLocal, setMeta, uuid } from './db.js';
+import { ensureUser, getMeta, loadAll, saveLocal, saveLocalMany, setMeta, uuid } from './db.js';
 import { planImport } from './importer.js';
 import { BOSS_HP, cycleMark, JORNADA_PADRAO, jornadaState, normalizeJornada, objectiveProgressMs } from './jornada.js';
 import {
@@ -1408,6 +1408,13 @@ function renderSettings() {
         ${(st.rejected ?? []).length ? `<p class="warn">${st.rejected.length} item(ns) recusado(s) pelo servidor: ${esc(st.rejected.map((r) => r.motivo).join('; '))}</p>` : ''}
         <button type="button" class="btn ghost" data-action="sync-now">Sincronizar agora</button>
 
+        <h3>API de leitura</h3>
+        <p class="muted">Token pessoal para ler os dados de um dia fora do app (ex.: pelo Claude):
+            <code>GET ${esc(config.apiDiaUrl)}?data=AAAA-MM-DD</code> com o cabeçalho <code>Authorization: Bearer &lt;token&gt;</code>.
+            Só leitura: o token não altera nada.</p>
+        <button type="button" class="btn ghost" data-action="api-token-create">🔑 Gerar token</button>
+        <button type="button" class="btn ghost" data-action="api-token-revoke">Revogar todos os tokens</button>
+
         <h3>Backup</h3>
         <p class="muted">Baixa um arquivo JSON com todas as matérias, sessões, D-Days e preferências deste aparelho.
             ${state.lastExportAt ? `Último backup: ${new Date(state.lastExportAt).toLocaleString('pt-BR')}.` : 'Nenhum backup feito neste aparelho.'}</p>
@@ -1835,6 +1842,43 @@ async function exportBackup() {
     render();
 }
 
+async function apiTokensCall(method) {
+    const send = (token) => fetch(config.apiTokensUrl, {
+        method,
+        credentials: 'same-origin',
+        headers: { Accept: 'application/json', 'Content-Type': 'application/json', 'X-CSRF-TOKEN': token },
+        body: method === 'POST' ? JSON.stringify({ nome: 'Token da API' }) : undefined,
+    });
+    let response = await send(config.csrf);
+    if (response.status === 419) {
+        const fresh = await fetch(config.tokenUrl, { credentials: 'same-origin', headers: { Accept: 'application/json' } });
+        if (fresh.ok) response = await send((await fresh.json()).token);
+    }
+    if (!response.ok) throw new Error(`Erro ${response.status}`);
+    return response.json();
+}
+
+async function createApiToken() {
+    if (!navigator.onLine) return alert('É preciso estar conectado para gerar o token.');
+    if (!confirm('Gerar um token novo para a API de leitura? Ele aparece uma única vez.')) return;
+    try {
+        const { token } = await apiTokensCall('POST');
+        prompt('Copie o token agora (ele não será mostrado de novo):', token);
+    } catch (error) {
+        alert(`Não foi possível gerar o token: ${error.message}`);
+    }
+}
+
+async function revokeApiTokens() {
+    if (!confirm('Revogar todos os tokens da API? Quem usa algum deles perde o acesso na hora.')) return;
+    try {
+        await apiTokensCall('DELETE');
+        alert('Tokens revogados.');
+    } catch (error) {
+        alert(`Não foi possível revogar: ${error.message}`);
+    }
+}
+
 async function importBackup(file) {
     let plan;
     try {
@@ -1853,10 +1897,25 @@ async function importBackup(file) {
     if (!total) return alert(`Nada novo para importar.\n${details}`);
     if (!confirm(`Importar ${details}?`)) return;
 
-    for (const subject of plan.subjects) await persist('subjects', subject);
-    for (const dday of plan.ddays) await persist('ddays', dday);
-    for (const session of plan.removals) await persist('sessions', { ...session, deleted_at: iso(nowMs()) });
-    for (const session of plan.sessions) await persist('sessions', session);
+    // Tudo numa transação só: rápido e sem import pela metade (exclusões gravadas sem as sessões novas).
+    const at = iso(nowMs());
+    const entries = [
+        ...plan.subjects.map((record) => ({ type: 'subjects', record })),
+        ...plan.ddays.map((record) => ({ type: 'ddays', record })),
+        ...plan.removals.map((session) => ({ type: 'sessions', record: { ...session, deleted_at: at } })),
+        ...plan.sessions.map((record) => ({ type: 'sessions', record })),
+    ].map(({ type, record }) => ({ type, record: { ...record, updated_at: at } }));
+    try {
+        await saveLocalMany(entries);
+    } catch (error) {
+        return alert(`A importação falhou e nada foi alterado: ${error.message}`);
+    }
+    for (const type of ['subjects', 'ddays', 'sessions']) {
+        const byId = new Map(state[type].map((r) => [r.id, r]));
+        for (const entry of entries) if (entry.type === type) byId.set(entry.record.id, entry.record);
+        state[type] = [...byId.values()];
+    }
+    sync?.schedule();
     render();
     alert(`Importado: ${details}.\nO envio para o servidor acontece em segundo plano.`);
 }
@@ -1974,6 +2033,8 @@ root.addEventListener('click', async (event) => {
         'goto-jornada': () => { state.tab = 'jornada'; render(); window.scrollTo(0, 0); },
         'sync-now': () => sync.syncNow(),
         'export-backup': () => exportBackup(),
+        'api-token-create': () => createApiToken(),
+        'api-token-revoke': () => revokeApiTokens(),
     };
     await handlers[action]?.();
 });
