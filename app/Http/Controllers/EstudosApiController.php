@@ -20,6 +20,9 @@ class EstudosApiController extends Controller
     protected const DEFAULT_TIMEZONE = 'America/Sao_Paulo';
     protected const DEFAULT_VIRADA = 1;
 
+    /** Período máximo de /periodo, em dias. */
+    protected const MAX_PERIOD_DAYS = 31;
+
     /**
      * Todos os dados de um dia de estudo: sessões (inclusive excluídas, para diagnóstico) e totais
      * calculados como no app — o dia vai da virada (hora local) até a virada seguinte, e sessões que
@@ -31,30 +34,184 @@ class EstudosApiController extends Controller
         if (!$userId) {
             return response()->json(['message' => 'Token ausente ou inválido.'], 401);
         }
-
         $request->validate(['data' => 'nullable|date_format:Y-m-d']);
 
-        $settings = DB::table('study_settings')->where('user_id', $userId)->first();
-        $timezone = $settings->timezone ?? self::DEFAULT_TIMEZONE;
-        $virada = (int) ($settings->virada_hora ?? self::DEFAULT_VIRADA);
-        $now = CarbonImmutable::now('UTC');
-
-        $day = $request->query('data')
-            ?? $now->setTimezone($timezone)->subHours($virada)->format('Y-m-d');
-        $start = CarbonImmutable::parse($day . ' 00:00:00', $timezone)->addHours($virada)->utc();
-        $end = CarbonImmutable::parse($day . ' 00:00:00', $timezone)->addDay()->addHours($virada)->utc();
-
+        $ctx = $this->context($userId);
+        $day = $request->query('data') ?? $this->today($ctx);
+        [$start, $end] = $this->bounds($day, $ctx);
+        $rows = $this->sessionRows($userId, $start, $end);
         $subjects = DB::table('study_subjects')->where('user_id', $userId)->get()->keyBy('id');
-        $rows = DB::table('study_sessions')
+        $data = $this->buildDay($day, $rows, $subjects, $ctx);
+
+        return response()->json([
+            'data' => $day,
+            'fuso' => $ctx['timezone'],
+            'virada_hora' => $ctx['virada'],
+            'periodo' => ['inicio' => $this->iso($start), 'fim' => $this->iso($end)],
+            'gerado_em' => $this->iso($ctx['now']),
+            'totais' => $data['totais'],
+            'por_materia' => $data['por_materia'],
+            'por_tipo' => $data['por_tipo'],
+            'sessoes' => $data['sessoes'],
+            // Apagadas (não contam em nada): só para diagnóstico. Sem fim, o tempo vai até a exclusão.
+            'sessoes_excluidas' => $data['sessoes_excluidas'],
+        ]);
+    }
+
+    /**
+     * Vários dias de estudo (até MAX_PERIOD_DAYS): uma linha por dia (inclusive os sem estudo) e o resumo
+     * do período. Com sessoes=1, cada dia traz também as sessões ativas e as excluídas.
+     */
+    public function periodo(Request $request): JsonResponse
+    {
+        $userId = $this->authenticate($request);
+        if (!$userId) {
+            return response()->json(['message' => 'Token ausente ou inválido.'], 401);
+        }
+        $request->validate([
+            'desde' => 'required|date_format:Y-m-d',
+            'ate' => 'required|date_format:Y-m-d|after_or_equal:desde',
+            'sessoes' => 'nullable|boolean',
+        ]);
+
+        $ctx = $this->context($userId);
+        $first = CarbonImmutable::parse($request->query('desde'));
+        $last = CarbonImmutable::parse($request->query('ate'));
+        $count = $first->diffInDays($last) + 1;
+        if ($count > self::MAX_PERIOD_DAYS) {
+            return response()->json([
+                'message' => 'Período máximo: ' . self::MAX_PERIOD_DAYS . ' dias.',
+                'errors' => ['ate' => ['Período máximo: ' . self::MAX_PERIOD_DAYS . ' dias.']],
+            ], 422);
+        }
+        $withSessions = $request->boolean('sessoes');
+
+        [$start] = $this->bounds($first->format('Y-m-d'), $ctx);
+        [, $end] = $this->bounds($last->format('Y-m-d'), $ctx);
+        $rows = $this->sessionRows($userId, $start, $end);
+        $subjects = DB::table('study_subjects')->where('user_id', $userId)->get()->keyBy('id');
+
+        $days = [];
+        $sum = ['total_min' => 0, 'cronometro_min' => 0, 'manual_min' => 0, 'importado_min' => 0];
+        $bySubject = [];
+        $byType = [];
+        $studied = 0;
+        $metaHits = 0;
+        $maxFocus = 0;
+        $elapsed = 0;
+        $today = $this->today($ctx);
+        for ($i = 0; $i < $count; $i++) {
+            $day = $first->addDays($i)->format('Y-m-d');
+            [$dayStart, $dayEnd] = $this->bounds($day, $ctx);
+            $dayRows = $rows->filter(fn ($row) => $this->overlaps($row, $dayStart, $dayEnd));
+            $data = $this->buildDay($day, $dayRows, $subjects, $ctx);
+            $t = $data['totais'];
+
+            foreach ($sum as $key => $value) {
+                $sum[$key] = $value + $t[$key];
+            }
+            foreach ($data['por_materia'] as $name => $minutes) {
+                $bySubject[$name] = ($bySubject[$name] ?? 0) + $minutes;
+            }
+            foreach ($data['por_tipo'] as $type => $minutes) {
+                $byType[$type] = ($byType[$type] ?? 0) + $minutes;
+            }
+            $studied += $t['total_min'] > 0 ? 1 : 0;
+            $metaHits += $t['meta_atingida'] ? 1 : 0;
+            $maxFocus = max($maxFocus, $t['max_foco_min']);
+            $elapsed += $day <= $today ? 1 : 0;
+
+            $line = ['data' => $day, 'dia_semana' => $this->weekday($day)] + $t;
+            if ($withSessions) {
+                $line['sessoes'] = $data['sessoes'];
+                $line['sessoes_excluidas'] = $data['sessoes_excluidas'];
+            }
+            $days[] = $line;
+        }
+
+        arsort($bySubject);
+        arsort($byType);
+        $round = fn (array $values) => array_map(fn ($v) => round($v, 1), $values);
+
+        return response()->json([
+            'desde' => $first->format('Y-m-d'),
+            'ate' => $last->format('Y-m-d'),
+            'fuso' => $ctx['timezone'],
+            'virada_hora' => $ctx['virada'],
+            'gerado_em' => $this->iso($ctx['now']),
+            'resumo' => $round($sum) + [
+                'total_horas' => $this->hours($sum['total_min']),
+                'dias' => $count,
+                'dias_decorridos' => $elapsed,
+                'dias_estudados' => $studied,
+                'dias_sem_estudo' => $elapsed - $studied,
+                'media_por_dia_min' => $elapsed ? round($sum['total_min'] / $elapsed, 1) : 0,
+                'media_por_dia_estudado_min' => $studied ? round($sum['total_min'] / $studied, 1) : 0,
+                'meta_diaria_min' => $ctx['meta'],
+                'dias_meta_atingida' => $ctx['meta'] ? $metaHits : null,
+                'max_foco_min' => $maxFocus,
+            ],
+            'por_materia' => $round($bySubject),
+            'por_tipo' => $round($byType),
+            'dias' => $days,
+        ]);
+    }
+
+    /** @return array{timezone: string, virada: int, meta: ?int, now: CarbonImmutable} */
+    protected function context(int $userId): array
+    {
+        $settings = DB::table('study_settings')->where('user_id', $userId)->first();
+
+        return [
+            'timezone' => $settings->timezone ?? self::DEFAULT_TIMEZONE,
+            'virada' => (int) ($settings->virada_hora ?? self::DEFAULT_VIRADA),
+            'meta' => isset($settings->meta_diaria_min) ? (int) $settings->meta_diaria_min : null,
+            'now' => CarbonImmutable::now('UTC'),
+        ];
+    }
+
+    protected function today(array $ctx): string
+    {
+        return $ctx['now']->setTimezone($ctx['timezone'])->subHours($ctx['virada'])->format('Y-m-d');
+    }
+
+    /** @return array{0: CarbonImmutable, 1: CarbonImmutable} início e fim (UTC) do dia de estudo */
+    protected function bounds(string $day, array $ctx): array
+    {
+        $midnight = CarbonImmutable::parse($day . ' 00:00:00', $ctx['timezone']);
+
+        return [$midnight->addHours($ctx['virada'])->utc(), $midnight->addDay()->addHours($ctx['virada'])->utc()];
+    }
+
+    protected function sessionRows(int $userId, CarbonImmutable $start, CarbonImmutable $end)
+    {
+        $from = $start->format('Y-m-d H:i:s.v');
+
+        return DB::table('study_sessions')
             ->where('user_id', $userId)
             ->where('inicio', '<', $end->format('Y-m-d H:i:s.v'))
             // Sem fim: em andamento vai até agora; excluída vai até a exclusão (não aparece nos dias seguintes).
-            ->where(fn ($q) => $q->where('fim', '>', $start->format('Y-m-d H:i:s.v'))
+            ->where(fn ($q) => $q->where('fim', '>', $from)
                 ->orWhere(fn ($q) => $q->whereNull('fim')->where(fn ($q) => $q->whereNull('deleted_at')
-                    ->orWhere('deleted_at', '>', $start->format('Y-m-d H:i:s.v')))))
+                    ->orWhere('deleted_at', '>', $from))))
             ->orderBy('inicio')
             ->get();
+    }
 
+    protected function overlaps(object $row, CarbonImmutable $start, CarbonImmutable $end): bool
+    {
+        $inicio = CarbonImmutable::parse($row->inicio, 'UTC');
+        $until = $row->fim ?? $row->deleted_at;
+        $until = $until ? CarbonImmutable::parse($until, 'UTC') : null;
+
+        return $inicio->lt($end) && ($until === null || $until->gt($start));
+    }
+
+    protected function buildDay(string $day, $rows, $subjects, array $ctx): array
+    {
+        [$start, $end] = $this->bounds($day, $ctx);
+        $timezone = $ctx['timezone'];
+        $now = $ctx['now'];
         $sessions = [];
         $totals = ['total_min' => 0, 'cronometro_min' => 0, 'manual_min' => 0, 'importado_min' => 0, 'max_foco_min' => 0];
         $bySubject = [];
@@ -117,14 +274,9 @@ class EstudosApiController extends Controller
         arsort($bySubject);
         arsort($byType);
         $round = fn (array $values) => array_map(fn ($v) => round($v, 1), $values);
-        $meta = $settings->meta_diaria_min ?? null;
+        $meta = $ctx['meta'];
 
-        return response()->json([
-            'data' => $day,
-            'fuso' => $timezone,
-            'virada_hora' => $virada,
-            'periodo' => ['inicio' => $this->iso($start), 'fim' => $this->iso($end)],
-            'gerado_em' => $this->iso($now),
+        return [
             'totais' => $round($totals) + [
                 'total_horas' => $this->hours($totals['total_min']),
                 'meta_diaria_min' => $meta,
@@ -137,9 +289,13 @@ class EstudosApiController extends Controller
             'por_materia' => $round($bySubject),
             'por_tipo' => $round($byType),
             'sessoes' => $active,
-            // Apagadas (não contam em nada): só para diagnóstico. Sem fim, o tempo vai até a exclusão.
             'sessoes_excluidas' => $deleted,
-        ]);
+        ];
+    }
+
+    protected function weekday(string $day): string
+    {
+        return ['dom', 'seg', 'ter', 'qua', 'qui', 'sex', 'sáb'][(int) CarbonImmutable::parse($day)->format('w')];
     }
 
     /** Gera um token novo (mostrado uma única vez). Rota web, com login. */

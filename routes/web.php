@@ -39,6 +39,9 @@ Route::post('/webhook/telegram/register-local', [TelegramWebhookController::clas
 Route::get('/api/estudos/dia', [EstudosApiController::class, 'dia'])
     ->middleware('throttle:60,1')
     ->name('api.estudos.dia');
+Route::get('/api/estudos/periodo', [EstudosApiController::class, 'periodo'])
+    ->middleware('throttle:60,1')
+    ->name('api.estudos.periodo');
 
 // ── TV Launcher Widget & Controle Remoto (Rede Local) ─────────────────
 Route::get('/api/tv/widget-resumo', [TvWidgetController::class, 'resumo'])->name('api.tv.widget-resumo');
