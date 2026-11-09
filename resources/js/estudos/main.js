@@ -1408,6 +1408,13 @@ function renderSettings() {
         ${(st.rejected ?? []).length ? `<p class="warn">${st.rejected.length} item(ns) recusado(s) pelo servidor: ${esc(st.rejected.map((r) => r.motivo).join('; '))}</p>` : ''}
         <button type="button" class="btn ghost" data-action="sync-now">Sincronizar agora</button>
 
+        <h3>API de leitura</h3>
+        <p class="muted">Token pessoal para ler os dados de um dia fora do app (ex.: pelo Claude):
+            <code>GET ${esc(config.apiDiaUrl)}?data=AAAA-MM-DD</code> com o cabeçalho <code>Authorization: Bearer &lt;token&gt;</code>.
+            Só leitura: o token não altera nada.</p>
+        <button type="button" class="btn ghost" data-action="api-token-create">🔑 Gerar token</button>
+        <button type="button" class="btn ghost" data-action="api-token-revoke">Revogar todos os tokens</button>
+
         <h3>Backup</h3>
         <p class="muted">Baixa um arquivo JSON com todas as matérias, sessões, D-Days e preferências deste aparelho.
             ${state.lastExportAt ? `Último backup: ${new Date(state.lastExportAt).toLocaleString('pt-BR')}.` : 'Nenhum backup feito neste aparelho.'}</p>
@@ -1835,6 +1842,43 @@ async function exportBackup() {
     render();
 }
 
+async function apiTokensCall(method) {
+    const send = (token) => fetch(config.apiTokensUrl, {
+        method,
+        credentials: 'same-origin',
+        headers: { Accept: 'application/json', 'Content-Type': 'application/json', 'X-CSRF-TOKEN': token },
+        body: method === 'POST' ? JSON.stringify({ nome: 'Token da API' }) : undefined,
+    });
+    let response = await send(config.csrf);
+    if (response.status === 419) {
+        const fresh = await fetch(config.tokenUrl, { credentials: 'same-origin', headers: { Accept: 'application/json' } });
+        if (fresh.ok) response = await send((await fresh.json()).token);
+    }
+    if (!response.ok) throw new Error(`Erro ${response.status}`);
+    return response.json();
+}
+
+async function createApiToken() {
+    if (!navigator.onLine) return alert('É preciso estar conectado para gerar o token.');
+    if (!confirm('Gerar um token novo para a API de leitura? Ele aparece uma única vez.')) return;
+    try {
+        const { token } = await apiTokensCall('POST');
+        prompt('Copie o token agora (ele não será mostrado de novo):', token);
+    } catch (error) {
+        alert(`Não foi possível gerar o token: ${error.message}`);
+    }
+}
+
+async function revokeApiTokens() {
+    if (!confirm('Revogar todos os tokens da API? Quem usa algum deles perde o acesso na hora.')) return;
+    try {
+        await apiTokensCall('DELETE');
+        alert('Tokens revogados.');
+    } catch (error) {
+        alert(`Não foi possível revogar: ${error.message}`);
+    }
+}
+
 async function importBackup(file) {
     let plan;
     try {
@@ -1989,6 +2033,8 @@ root.addEventListener('click', async (event) => {
         'goto-jornada': () => { state.tab = 'jornada'; render(); window.scrollTo(0, 0); },
         'sync-now': () => sync.syncNow(),
         'export-backup': () => exportBackup(),
+        'api-token-create': () => createApiToken(),
+        'api-token-revoke': () => revokeApiTokens(),
     };
     await handlers[action]?.();
 });

@@ -27,6 +27,8 @@
          data-sync-url="{{ route('estudos.sync', [], false) }}"
          data-token-url="{{ route('estudos.token', [], false) }}"
          data-rooms-url="{{ route('estudos.salas', [], false) }}"
+         data-api-tokens-url="{{ route('estudos.api-tokens', [], false) }}"
+         data-api-dia-url="{{ route('api.estudos.dia') }}"
          data-login-url="{{ route('login', [], false) }}"
          data-home-url="{{ route('home', [], false) }}"
          data-sw-url="{{ $useServiceWorker ? '/estudos-sw.js?v=' . $swVersion : '' }}"

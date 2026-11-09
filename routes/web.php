@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\EstudosApiController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\FinancasController;
 use App\Http\Controllers\CartoesController;
@@ -33,6 +34,11 @@ Route::get('/webhook/telegram/ping', [TelegramWebhookController::class, 'ping'])
 Route::post('/webhook/telegram/register-local', [TelegramWebhookController::class, 'registerLocalUrl'])
     ->name('webhook.telegram.register-local');
 
+
+// ── API de leitura do módulo de estudos (token pessoal, sem sessão) ─────────
+Route::get('/api/estudos/dia', [EstudosApiController::class, 'dia'])
+    ->middleware('throttle:60,1')
+    ->name('api.estudos.dia');
 
 // ── TV Launcher Widget & Controle Remoto (Rede Local) ─────────────────
 Route::get('/api/tv/widget-resumo', [TvWidgetController::class, 'resumo'])->name('api.tv.widget-resumo');
@@ -130,6 +136,9 @@ Route::middleware('auth')->group(function () {
     Route::post('/estudos/salas/{room}/sair', [StudyRoomsController::class, 'leave'])->whereUuid('room')->name('estudos.salas.leave');
     Route::post('/estudos/salas/{room}/remover/{user}', [StudyRoomsController::class, 'removeMember'])->whereUuid('room')->whereNumber('user')->name('estudos.salas.remove');
     Route::delete('/estudos/salas/{room}', [StudyRoomsController::class, 'destroy'])->whereUuid('room')->name('estudos.salas.destroy');
+    Route::get('/estudos/api-tokens', [EstudosApiController::class, 'listTokens'])->name('estudos.api-tokens');
+    Route::post('/estudos/api-tokens', [EstudosApiController::class, 'createToken'])->name('estudos.api-tokens.store');
+    Route::delete('/estudos/api-tokens', [EstudosApiController::class, 'revokeTokens'])->name('estudos.api-tokens.destroy');
 
 
 
