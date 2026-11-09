@@ -151,4 +151,60 @@ class EstudosApiTest extends TestCase
         $dia6 = $this->getJson('/api/estudos/dia?data=2026-11-06', ['Authorization' => 'Bearer ' . $token])->json();
         $this->assertEquals(154, $dia6['sessoes_excluidas'][0]['minutos_no_dia']); // 05:00Z até 07:34Z
     }
+
+    public function test_periodo_traz_um_resumo_e_uma_linha_por_dia(): void
+    {
+        $outra = $this->subject($this->user, 'D. Tributário');
+        $this->addSession('2026-11-03 08:00:00', '2026-11-03 14:00:00'); // 360 min: bate a meta (300)
+        $this->addSession('2026-11-05 07:37:00', '2026-11-05 08:22:00', ['tipo' => 'questoes'], null, $outra); // 45
+        $this->addSession('2026-11-06 04:30:00', '2026-11-06 05:30:00'); // cruza a virada: 30 em 05/11, 30 em 06/11
+        $this->addSession('2026-11-04 10:00:00', '2026-11-04 11:00:00', ['deleted_at' => '2026-11-04 12:00:00']); // excluída
+
+        $json = $this->getJson('/api/estudos/periodo?desde=2026-11-03&ate=2026-11-06', ['Authorization' => 'Bearer ' . $this->token()])
+            ->assertOk()->json();
+
+        $this->assertCount(4, $json['dias']);
+        $this->assertSame(['2026-11-03', '2026-11-04', '2026-11-05', '2026-11-06'], array_column($json['dias'], 'data'));
+        $this->assertSame('ter', $json['dias'][0]['dia_semana']);
+        $this->assertEquals([360, 0, 75, 30], array_column($json['dias'], 'total_min'));
+        $this->assertSame(1, $json['dias'][1]['sessoes_excluidas']);
+        $this->assertArrayNotHasKey('sessoes', $json['dias'][0]);
+
+        $r = $json['resumo'];
+        $this->assertEquals(465, $r['total_min']);
+        $this->assertSame('7h45', $r['total_horas']);
+        $this->assertSame(3, $r['dias_estudados']);
+        $this->assertSame(1, $r['dias_sem_estudo']);
+        $this->assertEquals(116.3, $r['media_por_dia_min']);
+        $this->assertSame(1, $r['dias_meta_atingida']);
+        $this->assertEquals(360, $r['max_foco_min']);
+        $this->assertEquals(['D. Civil' => 420, 'D. Tributário' => 45], $json['por_materia']);
+    }
+
+    public function test_periodo_com_sessoes_e_limite_de_31_dias(): void
+    {
+        $this->addSession('2026-11-05 07:37:00', '2026-11-05 08:22:00');
+        $token = $this->token();
+
+        $json = $this->getJson('/api/estudos/periodo?desde=2026-11-05&ate=2026-11-05&sessoes=1', ['Authorization' => 'Bearer ' . $token])
+            ->assertOk()->json();
+        $this->assertCount(1, $json['dias'][0]['sessoes']);
+        $this->assertSame([], $json['dias'][0]['sessoes_excluidas']);
+
+        $this->getJson('/api/estudos/periodo?desde=2026-10-01&ate=2026-10-31', ['Authorization' => 'Bearer ' . $token])->assertOk();
+        $this->getJson('/api/estudos/periodo?desde=2026-10-01&ate=2026-11-01', ['Authorization' => 'Bearer ' . $token])->assertStatus(422);
+        $this->getJson('/api/estudos/periodo?desde=2026-11-05&ate=2026-11-01', ['Authorization' => 'Bearer ' . $token])->assertStatus(422);
+        $this->getJson('/api/estudos/periodo?desde=2026-11-01&ate=2026-11-05')->assertUnauthorized();
+    }
+
+    public function test_periodo_conta_so_dias_ja_decorridos_na_media(): void
+    {
+        // Agora é 08/11; o período vai até 10/11: só 06, 07 e 08 contam para a média.
+        $this->addSession('2026-11-07 08:00:00', '2026-11-07 09:30:00'); // 90
+        $json = $this->getJson('/api/estudos/periodo?desde=2026-11-06&ate=2026-11-10', ['Authorization' => 'Bearer ' . $this->token()])->json();
+        $this->assertSame(5, $json['resumo']['dias']);
+        $this->assertSame(3, $json['resumo']['dias_decorridos']);
+        $this->assertSame(2, $json['resumo']['dias_sem_estudo']);
+        $this->assertEquals(30, $json['resumo']['media_por_dia_min']);
+    }
 }
