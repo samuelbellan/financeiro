@@ -88,7 +88,10 @@ class EstudosApiTest extends TestCase
         $this->assertSame('03:37', $json['totais']['primeiro_inicio_local']);
         $this->assertFalse($json['totais']['meta_atingida']);
         $this->assertSame(1, $json['totais']['sessoes_excluidas']);
-        $this->assertCount(5, $json['sessoes']);
+        $this->assertCount(4, $json['sessoes']);
+        $this->assertCount(1, $json['sessoes_excluidas']);
+        $this->assertTrue($json['sessoes_excluidas'][0]['excluida']);
+        $this->assertFalse(collect($json['sessoes'])->contains('excluida', true));
         $this->assertEquals(['D. Civil' => 100], $json['por_materia']);
         $this->assertEquals(['teoria' => 75, 'revisao' => 25], $json['por_tipo']);
     }
@@ -129,5 +132,23 @@ class EstudosApiTest extends TestCase
             ->assertOk()
             ->assertSee('data-api-tokens-url="/estudos/api-tokens"', false)
             ->assertSee('/api/estudos/dia', false);
+    }
+
+    public function test_excluida_sem_fim_conta_ate_a_exclusao_e_nao_aparece_nos_dias_seguintes(): void
+    {
+        // Cronômetro esquecido em 05/11 18:37 (Cuiabá) e descartado em 06/11 03:34.
+        $this->addSession('2026-11-05 22:37:00', null, ['status' => 'suspeita', 'deleted_at' => '2026-11-06 07:34:00']);
+        // Outro esquecido em 02/11 e descartado no mesmo dia: não pode aparecer em 05/11.
+        $this->addSession('2026-11-02 23:53:00', null, ['deleted_at' => '2026-11-03 01:00:00']);
+        $token = $this->token();
+
+        $dia5 = $this->getJson('/api/estudos/dia?data=2026-11-05', ['Authorization' => 'Bearer ' . $token])->json();
+        $this->assertCount(1, $dia5['sessoes_excluidas']);
+        $this->assertEquals(383, $dia5['sessoes_excluidas'][0]['minutos_no_dia']); // até a virada (06/11 05:00Z)
+        $this->assertFalse($dia5['sessoes_excluidas'][0]['em_andamento']);
+        $this->assertEquals(0, $dia5['totais']['total_min']);
+
+        $dia6 = $this->getJson('/api/estudos/dia?data=2026-11-06', ['Authorization' => 'Bearer ' . $token])->json();
+        $this->assertEquals(154, $dia6['sessoes_excluidas'][0]['minutos_no_dia']); // 05:00Z até 07:34Z
     }
 }
