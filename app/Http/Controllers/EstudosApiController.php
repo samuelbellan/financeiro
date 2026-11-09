@@ -48,7 +48,10 @@ class EstudosApiController extends Controller
         $rows = DB::table('study_sessions')
             ->where('user_id', $userId)
             ->where('inicio', '<', $end->format('Y-m-d H:i:s.v'))
-            ->where(fn ($q) => $q->whereNull('fim')->orWhere('fim', '>', $start->format('Y-m-d H:i:s.v')))
+            // Sem fim: em andamento vai até agora; excluída vai até a exclusão (não aparece nos dias seguintes).
+            ->where(fn ($q) => $q->where('fim', '>', $start->format('Y-m-d H:i:s.v'))
+                ->orWhere(fn ($q) => $q->whereNull('fim')->where(fn ($q) => $q->whereNull('deleted_at')
+                    ->orWhere('deleted_at', '>', $start->format('Y-m-d H:i:s.v')))))
             ->orderBy('inicio')
             ->get();
 
@@ -63,13 +66,15 @@ class EstudosApiController extends Controller
             $inicio = CarbonImmutable::parse($row->inicio, 'UTC');
             $fim = $row->fim ? CarbonImmutable::parse($row->fim, 'UTC') : null;
             $pieceStart = $inicio->max($start);
-            $pieceEnd = ($fim ?? $now)->min($end);
+            $deletedAt = $row->deleted_at ? CarbonImmutable::parse($row->deleted_at, 'UTC') : null;
+            $pieceEnd = ($fim ?? $deletedAt ?? $now)->min($end);
             $minutes = max(0, round(($pieceEnd->getTimestampMs() - $pieceStart->getTimestampMs()) / 60000, 1));
             $subject = $subjects->get($row->subject_id);
             $countable = $row->deleted_at === null && $row->status === 'ok';
 
             $sessions[] = [
                 'id' => $row->id,
+                'excluida' => $deletedAt !== null,
                 'materia' => $subject->nome ?? null,
                 'materia_id' => $row->subject_id,
                 'inicio' => $this->iso($inicio),
@@ -83,7 +88,7 @@ class EstudosApiController extends Controller
                 'em_andamento' => $fim === null && $row->deleted_at === null,
                 'observacao' => $row->observacao ?? null,
                 'conta_no_total' => $countable,
-                'excluida_em' => $row->deleted_at ? $this->iso(CarbonImmutable::parse($row->deleted_at, 'UTC')) : null,
+                'excluida_em' => $deletedAt ? $this->iso($deletedAt) : null,
                 'criada_em' => $row->created_at ? $this->iso(CarbonImmutable::parse($row->created_at, 'UTC')) : null,
                 'atualizada_em' => $row->updated_at ? $this->iso(CarbonImmutable::parse($row->updated_at, 'UTC')) : null,
             ];
@@ -107,6 +112,8 @@ class EstudosApiController extends Controller
             }
         }
 
+        $active = array_values(array_filter($sessions, fn ($s) => !$s['excluida']));
+        $deleted = array_values(array_filter($sessions, fn ($s) => $s['excluida']));
         arsort($bySubject);
         arsort($byType);
         $round = fn (array $values) => array_map(fn ($v) => round($v, 1), $values);
@@ -124,12 +131,14 @@ class EstudosApiController extends Controller
                 'meta_atingida' => $meta ? $totals['total_min'] >= $meta : null,
                 'primeiro_inicio_local' => $timerStart?->setTimezone($timezone)->format('H:i'),
                 'ultimo_fim_local' => $timerEnd?->setTimezone($timezone)->format('H:i'),
-                'sessoes_ativas' => count(array_filter($sessions, fn ($s) => $s['excluida_em'] === null)),
-                'sessoes_excluidas' => count(array_filter($sessions, fn ($s) => $s['excluida_em'] !== null)),
+                'sessoes_ativas' => count($active),
+                'sessoes_excluidas' => count($deleted),
             ],
             'por_materia' => $round($bySubject),
             'por_tipo' => $round($byType),
-            'sessoes' => $sessions,
+            'sessoes' => $active,
+            // Apagadas (não contam em nada): só para diagnóstico. Sem fim, o tempo vai até a exclusão.
+            'sessoes_excluidas' => $deleted,
         ]);
     }
 
