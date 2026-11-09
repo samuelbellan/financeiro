@@ -207,4 +207,33 @@ class EstudosApiTest extends TestCase
         $this->assertSame(2, $json['resumo']['dias_sem_estudo']);
         $this->assertEquals(30, $json['resumo']['media_por_dia_min']);
     }
+
+    public function test_periodo_com_hora_corta_no_instante_exato(): void
+    {
+        // 02/11 em Cuiabá: sessão 06:00–08:00 local (10:00Z–12:00Z). Meta começou 08:01 de Brasília = 07:01 Cuiabá.
+        $this->addSession('2026-11-02 10:00:00', '2026-11-02 12:00:00');
+        $this->addSession('2026-11-03 10:00:00', '2026-11-03 11:00:00'); // 60 min, dia inteiro
+        $this->addSession('2026-11-04 10:00:00', '2026-11-04 11:00:00'); // 06:00–07:00 Cuiabá, depois do fim
+        $token = $this->token();
+
+        $json = $this->getJson('/api/estudos/periodo?desde=2026-11-02T08:01-03:00&ate=2026-11-04T05:30', ['Authorization' => 'Bearer ' . $token])
+            ->assertOk()->json();
+
+        $this->assertSame('2026-11-02T11:01:00.000Z', $json['janela']['inicio']);
+        $this->assertSame('2026-11-02 07:01', $json['janela']['inicio_local']);
+        $this->assertSame('2026-11-04T09:30:00.000Z', $json['janela']['fim']); // 05:30 no fuso do app (Cuiabá)
+        $this->assertSame(['2026-11-02', '2026-11-03', '2026-11-04'], array_column($json['dias'], 'data'));
+        $this->assertEquals([59, 60, 0], array_column($json['dias'], 'total_min'));
+        $this->assertSame([true, false, true], array_column($json['dias'], 'dia_parcial'));
+        $this->assertSame('2026-11-02 07:01', $json['dias'][0]['recorte_local']['inicio']);
+        $this->assertEquals(119, $json['resumo']['total_min']);
+
+        // Só data continua pegando o dia inteiro.
+        $dia = $this->getJson('/api/estudos/periodo?desde=2026-11-02&ate=2026-11-02', ['Authorization' => 'Bearer ' . $token])->json();
+        $this->assertEquals(120, $dia['dias'][0]['total_min']);
+        $this->assertFalse($dia['dias'][0]['dia_parcial']);
+
+        $this->getJson('/api/estudos/periodo?desde=2026-11-04T05:30&ate=2026-11-04T05:00', ['Authorization' => 'Bearer ' . $token])->assertStatus(422);
+        $this->getJson('/api/estudos/periodo?desde=ontem&ate=2026-11-04', ['Authorization' => 'Bearer ' . $token])->assertStatus(422);
+    }
 }
