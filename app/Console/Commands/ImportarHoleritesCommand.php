@@ -43,20 +43,23 @@ class ImportarHoleritesCommand extends Command
                 continue;
             }
 
+            $dados = [
+                'total_bruto' => $h['total_bruto'],
+                'total_descontos' => $h['total_descontos'],
+                'total_liquido' => $h['total_liquido'],
+                'base_rpps' => $h['base_rpps'] ?? null,
+                'base_irrf' => $h['base_irrf'] ?? null,
+                'pagamentos' => $h['pagamentos'] ?? [],
+                'descontos' => $h['descontos'] ?? [],
+                'observacao' => $h['observacao'] ?? null,
+            ];
+            // Só mexe na marcação de outlier se o arquivo trouxer o campo: preserva o que foi marcado na tela
+            if (array_key_exists('outlier', $h)) {
+                $dados['outlier'] = (bool) $h['outlier'];
+            }
+
             // Reimportar o mesmo mês substitui o registro, sem duplicar
-            SalaryPayslip::updateOrCreate(
-                ['user_id' => $user->id, 'mes_ano' => $h['mes_ano']],
-                [
-                    'total_bruto' => $h['total_bruto'],
-                    'total_descontos' => $h['total_descontos'],
-                    'total_liquido' => $h['total_liquido'],
-                    'base_rpps' => $h['base_rpps'] ?? null,
-                    'base_irrf' => $h['base_irrf'] ?? null,
-                    'pagamentos' => $h['pagamentos'] ?? [],
-                    'descontos' => $h['descontos'] ?? [],
-                    'observacao' => $h['observacao'] ?? null,
-                ]
-            );
+            SalaryPayslip::updateOrCreate(['user_id' => $user->id, 'mes_ano' => $h['mes_ano']], $dados);
             $gravados++;
         }
 

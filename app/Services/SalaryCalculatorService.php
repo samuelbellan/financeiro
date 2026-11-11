@@ -19,6 +19,19 @@ class SalaryCalculatorService
     /** Última referência da carreira (Lei 3.687, Anexo III). */
     private const REFERENCIA_FINAL = 19;
 
+    /**
+     * Premissas de cada cenário (sabatina de 11/2026). Reajuste anual a partir de 2027,
+     * ações educacionais de 1% renovadas por ano e correção anual da tabela do IRRF.
+     */
+    public const CENARIOS = [
+        'conservador' => ['reajuste_padrao_pct' => 3.0, 'aq_temp_renovacao_qtd' => 3, 'irrf_correcao_pct' => 0.0],
+        'base' => ['reajuste_padrao_pct' => 4.0, 'aq_temp_renovacao_qtd' => 5, 'irrf_correcao_pct' => 0.0],
+        'otimista' => ['reajuste_padrao_pct' => 5.0, 'aq_temp_renovacao_qtd' => 5, 'irrf_correcao_pct' => 3.9],
+    ];
+
+    /** Dedução mensal por dependente no IRRF. */
+    private const DEDUCAO_DEPENDENTE_IRRF = 189.59;
+
     private array $salaryStructures = [];
 
     public function __construct()
@@ -139,9 +152,10 @@ class SalaryCalculatorService
     }
 
     /**
-     * Resolve RGPS/INSS pension ceiling.
+     * Teto do RGPS: valores oficiais até 2026; depois, reajuste anual estimado (INPC).
+     * O de 2026 (8.475,55) ficou 3,9% acima do de 2025 (8.157,41).
      */
-    public function getRgpsCeiling(int $year): float
+    public function getRgpsCeiling(int $year, float $reajustePct = 3.9): float
     {
         if ($year <= 2025) {
             return 8157.41;
@@ -150,7 +164,7 @@ class SalaryCalculatorService
         $baseCeiling = 8475.55; // 2026 ceiling
         if ($year > 2026) {
             for ($y = 2027; $y <= $year; $y++) {
-                $baseCeiling *= 1.045; // 4.5% annual compound reajuste
+                $baseCeiling *= 1.0 + ($reajustePct / 100.0);
             }
         }
         return round($baseCeiling, 2);
@@ -174,10 +188,16 @@ class SalaryCalculatorService
     /**
      * Calculate IRRF using progressive tax brackets.
      */
-    public function calculateIrrf(float $base, int $year, int $month = 12): float
+    public function calculateIrrf(float $base, int $year, int $month = 12, float $correcaoPct = 0.0): float
     {
         if ($base <= 0.0) {
             return 0.0;
+        }
+
+        // Corrigir todas as faixas e deduções por um fator f equivale a tributar base/f e multiplicar por f
+        $fator = $this->fatorCorrecaoIrrf($year, $correcaoPct);
+        if ($fator !== 1.0) {
+            return round($this->calculateIrrf($base / $fator, $year, $month) * $fator, 2);
         }
 
         // A tabela com parcela a deduzir de 908,73 vale desde maio/2025 (conferido nos holerites de 05/2025 em diante)
@@ -206,6 +226,35 @@ class SalaryCalculatorService
                 return round(($base * 0.275) - 908.73, 2);
             }
         }
+    }
+
+    /**
+     * Fator de correção acumulada da tabela do IRRF (1.0 até 2026 ou sem correção).
+     */
+    public function fatorCorrecaoIrrf(int $year, float $correcaoPct): float
+    {
+        if ($correcaoPct <= 0.0 || $year <= 2026) {
+            return 1.0;
+        }
+
+        return (1.0 + $correcaoPct / 100.0) ** ($year - 2026);
+    }
+
+    /**
+     * Dedução de dependentes do IRRF no ano, acompanhando a correção da tabela.
+     */
+    public function deducaoDependentesIrrf(int $dependentes, int $year, float $correcaoPct = 0.0): float
+    {
+        return round($dependentes * self::DEDUCAO_DEPENDENTE_IRRF * $this->fatorCorrecaoIrrf($year, $correcaoPct), 2);
+    }
+
+    /**
+     * Meses entre dois YYYY-MM (positivo quando $fim é posterior).
+     */
+    private function mesesEntre(string $inicio, string $fim): int
+    {
+        return ((int) substr($fim, 0, 4) - (int) substr($inicio, 0, 4)) * 12
+            + ((int) substr($fim, 5, 2) - (int) substr($inicio, 5, 2));
     }
 
     /**
@@ -263,8 +312,9 @@ class SalaryCalculatorService
         $fracao = $avos / 12;
         $funcao = $holerite['proventos']['funcao_comissao'];
 
-        $comPrevidencia = round($holerite['cassems_base'] * $fracao, 2);
-        $teto = $servidor->teto_rgps ? $this->getRgpsCeiling($year) : INF;
+        // Base sem retroativos: eles não integram o 13º
+        $comPrevidencia = round(($holerite['base_permanente'] ?? $holerite['cassems_base']) * $fracao, 2);
+        $teto = $servidor->teto_rgps ? $this->getRgpsCeiling($year, $servidor->teto_rgps_reajuste_pct) : INF;
 
         if ($parcela === 1) {
             // Metade de cada curso, truncada no centavo como na folha
@@ -292,8 +342,9 @@ class SalaryCalculatorService
         $totalBruto = round($comPrevidencia + $semPrevidencia, 2);
         $totalMsprev = round(min($comPrevidencia, $teto) * 0.14, 2);
 
-        $irrfBase = max(0.0, round($totalBruto - $totalMsprev - ($servidor->dependentes_irrf * 189.59), 2));
-        $irrf = $this->calculateIrrf($irrfBase, $year, 11);
+        $deducao = $this->deducaoDependentesIrrf($servidor->dependentes_irrf, $year, $servidor->irrf_correcao_pct);
+        $irrfBase = max(0.0, round($totalBruto - $totalMsprev - $deducao, 2));
+        $irrf = $this->calculateIrrf($irrfBase, $year, 11, $servidor->irrf_correcao_pct);
 
         $jaPagoComPrev = $adiantamento['com_previdencia'] ?? 0.0;
         $jaPagoSemPrev = $adiantamento['sem_previdencia'] ?? 0.0;
@@ -320,16 +371,16 @@ class SalaryCalculatorService
      * rubricas 249 (vencimento + adicionais permanentes) e 296 (cargo/função/atividade).
      * Sem contribuição previdenciária; o IRRF é o acréscimo sobre o imposto do mês.
      */
-    public function calcularAdicionalFerias(array $holerite, int $year, int $month = 12): array
+    public function calcularAdicionalFerias(array $holerite, int $year, int $month = 12, float $correcaoIrrf = 0.0): array
     {
-        $tercoPermanente = round($holerite['cassems_base'] / 3, 2);
+        $tercoPermanente = round(($holerite['base_permanente'] ?? $holerite['cassems_base']) / 3, 2);
         $tercoAtividade = round($holerite['proventos']['funcao_comissao'] / 3, 2);
         foreach ($holerite['aq_temp_details'] as $aq) {
             $tercoAtividade += round($aq['valor'] / 3, 2);
         }
         $bruto = round($tercoPermanente + $tercoAtividade, 2);
 
-        $irrfComFerias = $this->calculateIrrf(round($holerite['irrf_base'] + $bruto, 2), $year, $month);
+        $irrfComFerias = $this->calculateIrrf(round($holerite['irrf_base'] + $bruto, 2), $year, $month, $correcaoIrrf);
         $irrf = round(max(0.0, $irrfComFerias - $holerite['descontos']['irrf']), 2);
 
         return [
@@ -465,38 +516,47 @@ class SalaryCalculatorService
         $outrosAdicionais = round($baseSalary * ($servidor->outros_adicionais_pct / 100.0), 2);
         $funcaoComissao = $servidor->funcao_comissao_valor;
 
+        $aqPermanenteRetroativo = round($servidor->aq_permanente_retroativo, 2);
+
         $totalTributavel = round(
-            $vencimento + $substituicao + $ats + $aqPermanente + $aqTemporario + $tempoIntegral + $outrosAdicionais + $funcaoComissao,
+            $vencimento + $substituicao + $ats + $aqPermanente + $aqPermanenteRetroativo + $aqTemporario
+            + $tempoIntegral + $outrosAdicionais + $funcaoComissao,
             2
         );
 
         // 4. Descontos Compulsórios
-        // MS-PREV base = Vencimento Básico + ATS + AQ Permanente + Tempo Integral + Outros Adicionais (Excludes Substitution and Temp Qualification)
-        $msprevBase = round($vencimento + $ats + $aqPermanente + $tempoIntegral + $outrosAdicionais, 2);
+        // Remuneração permanente: base do 13º e das férias. MS-PREV e CASSEMS incidem também sobre o
+        // retroativo de AQ permanente (holerite de 10/2025); substituição e AQ temporário ficam de fora.
+        $basePermanente = round($vencimento + $ats + $aqPermanente + $tempoIntegral + $outrosAdicionais, 2);
+        $msprevBase = round($basePermanente + $aqPermanenteRetroativo, 2);
         if ($servidor->teto_rgps) {
-            $ceiling = $this->getRgpsCeiling($year);
+            $ceiling = $this->getRgpsCeiling($year, $servidor->teto_rgps_reajuste_pct);
             if ($msprevBase > $ceiling) {
                 $msprevBase = $ceiling;
             }
         }
         $msprev = round($msprevBase * 0.14, 2);
 
-        // CASSEMS base = same as uncapped pension base
-        $cassemsBase = round($vencimento + $ats + $aqPermanente + $tempoIntegral + $outrosAdicionais, 2);
-        $cassemsRate = $this->getCassemsRate($servidor->dependentes_cassems);
+        // CASSEMS: base previdenciária sem teto. Alíquota e parte fixa vêm do evento do mês, se houver;
+        // senão, da regra pelo número de dependentes.
+        $cassemsBase = round($basePermanente + $aqPermanenteRetroativo, 2);
+        $cassemsRate = $servidor->cassems_aliquota !== null
+            ? $servidor->cassems_aliquota / 100.0
+            : $this->getCassemsRate($servidor->dependentes_cassems);
         $cassemsPct = round($cassemsBase * $cassemsRate, 2);
-        
+
         $fixedSpouse = $servidor->tem_conjuge ? 450.00 : 0.00;
-        $fixedDeps = $servidor->dependentes_cassems * 35.00;
+        $fixedDeps = $servidor->cassems_fixo ?? ($servidor->dependentes_cassems * 35.00);
         $cassemsFixo = round($fixedSpouse + $fixedDeps, 2);
         $cassemsTotal = round($cassemsPct + $cassemsFixo, 2);
 
-        // IRRF base = Gross (Total Tributável) - MS-PREV - Dependents Deduction (R$ 189.59 each)
-        $irrfBase = round($totalTributavel - $msprev - ($servidor->dependentes_irrf * 189.59), 2);
+        // IRRF base = Total Tributável - MS-PREV - dedução por dependente
+        $deducaoDependentes = $this->deducaoDependentesIrrf($servidor->dependentes_irrf, $year, $servidor->irrf_correcao_pct);
+        $irrfBase = round($totalTributavel - $msprev - $deducaoDependentes, 2);
         if ($irrfBase < 0.0) {
             $irrfBase = 0.0;
         }
-        $irrf = $this->calculateIrrf($irrfBase, $year, (int) substr($mesAno, 5, 2));
+        $irrf = $this->calculateIrrf($irrfBase, $year, (int) substr($mesAno, 5, 2), $servidor->irrf_correcao_pct);
 
         // Deduções particulares
         $consignados = $servidor->consignados;
@@ -523,6 +583,7 @@ class SalaryCalculatorService
                 'substituicao' => $substituicao,
                 'ats' => $ats,
                 'aq_permanente' => $aqPermanente,
+                'aq_permanente_retroativo' => $aqPermanenteRetroativo,
                 'aq_temporario' => $aqTemporario,
                 'tempo_integral' => $tempoIntegral,
                 'outros_adicionais' => $outrosAdicionais,
@@ -543,9 +604,79 @@ class SalaryCalculatorService
             'salario_liquido' => $salarioLiquido,
             'msprev_base' => $msprevBase,
             'cassems_base' => $cassemsBase,
+            'base_permanente' => $basePermanente,
             'irrf_base' => $irrfBase,
             'aq_temp_details' => $aqTempDetails
         ];
+    }
+
+    /**
+     * AQ permanente do mês: percentual em folha e, se algum curso entra neste mês com
+     * vigência anterior, os pontos percentuais acumulados a pagar como retroativo.
+     *
+     * @return array{0: float, 1: float}
+     */
+    private function resolverAqPermanente(float $basePct, array $cursos, string $mesAno): array
+    {
+        $teto = 20.0;
+        usort($cursos, fn ($a, $b) => strcmp($a->mes_inicio, $b->mes_inicio));
+
+        $pct = min($teto, $basePct);
+        $retroPct = 0.0;
+        foreach ($cursos as $curso) {
+            $entraEm = $curso->mes_pagamento ?? $curso->mes_inicio;
+            if ($curso->mes_inicio > $mesAno || $entraEm > $mesAno) {
+                continue;
+            }
+            $incremento = min($teto, $pct + $curso->percentual) - $pct;
+            $pct += $incremento;
+            if ($entraEm === $mesAno && $curso->mes_pagamento !== null) {
+                $retroPct += $incremento * $this->mesesEntre($curso->mes_inicio, $curso->mes_pagamento);
+            }
+        }
+
+        return [$pct, $retroPct];
+    }
+
+    /**
+     * Ações educacionais renovadas automaticamente: N cursos por ano, no mês escolhido,
+     * cada um valendo 12 meses. Começa no ano seguinte ao último curso informado.
+     *
+     * @return QualificacaoTemporariaDTO[]
+     */
+    public function gerarRenovacoesAqTemporario(ServidorDTO $servidor, array $aqTempList, string $primeiroMes, string $ultimoMes): array
+    {
+        if ($servidor->aq_temp_renovacao_qtd <= 0 || $servidor->aq_temp_renovacao_pct <= 0.0) {
+            return [];
+        }
+
+        $anoInicial = $servidor->aq_temp_renovacao_ano;
+        if ($anoInicial <= 0) {
+            $anos = array_map(fn ($aq) => (int) substr($aq->mes_inicio, 0, 4), $aqTempList);
+            $anoInicial = $anos ? max($anos) + 1 : (int) substr($primeiroMes, 0, 4);
+        }
+
+        $renovacoes = [];
+        $ultimoAno = (int) substr($ultimoMes, 0, 4);
+        for ($ano = $anoInicial; $ano <= $ultimoAno; $ano++) {
+            $inicio = new \DateTime(sprintf('%04d-%02d-01', $ano, $servidor->aq_temp_renovacao_mes));
+            $mesInicio = $inicio->format('Y-m');
+            if ($mesInicio > $ultimoMes) {
+                break;
+            }
+            $mesFim = (clone $inicio)->modify('+11 months')->format('Y-m');
+            $nome = sprintf(
+                'Renovação AQ %d (%d × %s%%)',
+                $ano,
+                $servidor->aq_temp_renovacao_qtd,
+                rtrim(rtrim(number_format($servidor->aq_temp_renovacao_pct, 1, '.', ''), '0'), '.')
+            );
+            for ($i = 0; $i < $servidor->aq_temp_renovacao_qtd; $i++) {
+                $renovacoes[] = new QualificacaoTemporariaDTO($nome, $servidor->aq_temp_renovacao_pct, $mesInicio, $mesFim);
+            }
+        }
+
+        return $renovacoes;
     }
 
     /**
@@ -561,7 +692,9 @@ class SalaryCalculatorService
         array $consignadosList = [],
         array $aqPermanenteList = [],
         array $filhosList = [],
-        float $valorUnitarioCreche = 558.78
+        float $valorUnitarioCreche = 558.78,
+        array $cassemsEventos = [],
+        array $despesasForaFolha = []
     ): array {
         // Start month defaults to current month or entry month
         if ($startMesAno === null) {
@@ -571,6 +704,11 @@ class SalaryCalculatorService
         $startDate = new \DateTime($startMesAno . '-01');
         $totalMonths = $anos * 12;
         $projection = [];
+
+        $ultimoMes = (clone $startDate)->modify('+' . ($totalMonths - 1) . ' months')->format('Y-m');
+        $aqTempList = array_merge($aqTempList, $this->gerarRenovacoesAqTemporario($servidor, $aqTempList, $startMesAno, $ultimoMes));
+
+        usort($cassemsEventos, fn ($a, $b) => strcmp($a->mes_inicio, $b->mes_inicio));
 
         $prevLevel = null;
         $prevAtsPct = null;
@@ -652,15 +790,22 @@ class SalaryCalculatorService
                 }
             }
 
-            // Resolve Active AQ Permanente percentage
-            $aqPermPct = $servidor->aq_permanente_pct;
-            foreach ($aqPermanenteList as $aq) {
-                if ($aq->mes_inicio <= $mesAnoStr) {
-                    $aqPermPct += $aq->percentual;
-                }
+            // AQ permanente: só conta a partir do mês em que entra na folha; no mês de entrada
+            // paga também os meses desde a vigência. O teto de 20% vale só para o permanente.
+            [$aqPermPct, $aqPermRetroPct] = $this->resolverAqPermanente($servidor->aq_permanente_pct, $aqPermanenteList, $mesAnoStr);
+            $aqPermRetroativo = 0.0;
+            if ($aqPermRetroPct > 0.0) {
+                $nivelMes = $this->getProgressionLevel($servidor->dt_exercicio, $servidor->referencia_inicial, $mesAnoStr);
+                $baseMes = $this->getBaseSalary($servidor->cargo, $nivelMes, $mesAnoStr, $reajustes, $servidor->reajuste_mes, $servidor->reajuste_padrao_pct);
+                $aqPermRetroativo = round($baseMes * $aqPermRetroPct / 100.0, 2);
             }
-            if ($aqPermPct > 20.0) {
-                $aqPermPct = 20.0;
+
+            // CASSEMS datada: vale o último evento iniciado até este mês
+            $cassemsEvento = null;
+            foreach ($cassemsEventos as $evento) {
+                if ($evento->mes_inicio <= $mesAnoStr) {
+                    $cassemsEvento = $evento;
+                }
             }
 
             // Resolve Active Consignados
@@ -681,6 +826,11 @@ class SalaryCalculatorService
             $servidorClone = clone $servidor;
             $servidorClone->aq_permanente_pct = $aqPermPct;
             $servidorClone->consignados = $monthlyConsignados;
+            $servidorClone->aq_permanente_retroativo = $aqPermRetroativo;
+            if ($cassemsEvento !== null) {
+                $servidorClone->cassems_aliquota = $cassemsEvento->aliquota_pct;
+                $servidorClone->cassems_fixo = $cassemsEvento->fixo;
+            }
 
             // 3. Compute single month holerite
             $holerite = $this->calcularHolerite(
@@ -722,6 +872,13 @@ class SalaryCalculatorService
                     'cor' => 'indigo'
                 ];
             }
+            if ($aqPermRetroativo > 0.0) {
+                $monthlyEvents[] = [
+                    'tipo' => 'aq_permanente_retroativo',
+                    'descricao' => "💰 Retroativo AQ permanente: +R$ " . number_format($aqPermRetroativo, 2, ',', '.'),
+                    'cor' => 'indigo'
+                ];
+            }
 
             // Children Entry/Exit check
             foreach ($activeChildrenNames as $childName) {
@@ -744,7 +901,8 @@ class SalaryCalculatorService
             }
 
             // AQ Temporario check
-            $currActiveAqNames = array_map(fn($aq) => $aq->nome, $activeAqTemp);
+            // Renovações automáticas compartilham o nome do ano: um evento por lote, não por curso
+            $currActiveAqNames = array_values(array_unique(array_map(fn($aq) => $aq->nome, $activeAqTemp)));
             foreach ($currActiveAqNames as $aqName) {
                 if (!in_array($aqName, $prevActiveAqTemps)) {
                     $monthlyEvents[] = [
@@ -819,9 +977,11 @@ class SalaryCalculatorService
             }
 
             // O terço sai na folha anterior ao gozo; por isso já aparece com onze meses de exercício
-            if ($servidor->mes_ferias > 0 && $monthVal === $servidor->mes_ferias
+            // Férias já marcadas num ano valem no lugar do mês padrão daquele ano
+            $mesFeriasAno = $servidor->ferias_excecoes[$year] ?? $servidor->mes_ferias;
+            if ($mesFeriasAno > 0 && $monthVal === $mesFeriasAno
                 && $this->getMesesDeExercicio($servidor->dt_exercicio, $mesAnoStr) >= 11) {
-                $ferias = $this->calcularAdicionalFerias($holerite, $year, $monthVal);
+                $ferias = $this->calcularAdicionalFerias($holerite, $year, $monthVal, $servidor->irrf_correcao_pct);
                 $extras['adicional_ferias'] = $ferias;
                 $liquidoExtras += $ferias['liquido'];
                 $monthlyEvents[] = [
@@ -834,6 +994,17 @@ class SalaryCalculatorService
             $holerite['extras'] = $extras;
             $holerite['liquido_extras'] = round($liquidoExtras, 2);
             $holerite['liquido_total'] = round($holerite['salario_liquido'] + $liquidoExtras, 2);
+
+            // Despesas pagas fora da folha (ex.: boleto da CASSEMS do cônjuge)
+            $despesasMes = [];
+            foreach ($despesasForaFolha as $despesa) {
+                if ($despesa->mes_inicio <= $mesAnoStr && ($despesa->mes_fim === null || $despesa->mes_fim >= $mesAnoStr)) {
+                    $despesasMes[] = ['descricao' => $despesa->descricao, 'valor' => $despesa->valor];
+                }
+            }
+            $holerite['despesas_fora_folha'] = $despesasMes;
+            $holerite['total_despesas_fora_folha'] = round(array_sum(array_column($despesasMes, 'valor')), 2);
+            $holerite['liquido_disponivel'] = round($holerite['liquido_total'] - $holerite['total_despesas_fora_folha'], 2);
 
             // Store values for next month comparison
             $prevLevel = $currLevel;
