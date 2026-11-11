@@ -531,6 +531,12 @@ class FinancasController extends Controller
             'subcategoria' => 'nullable|string|max:255',
         ]);
 
+        $novaData = \Carbon\Carbon::parse($validated['data'])->toDateString();
+        if ($transacao->data_hora && optional($transacao->data)->toDateString() !== $novaData) {
+            // Mantém o horário e acompanha a nova data, para data e data_hora não divergirem.
+            $validated['data_hora'] = $novaData . ' ' . $transacao->data_hora->format('H:i:s');
+        }
+
         $transacao->update($validated);
 
         return redirect()->route('financas.index')->with('success', 'Transação atualizada com sucesso!');
