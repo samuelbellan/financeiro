@@ -1,0 +1,42 @@
+[
+ {
+  "mes_ano": "2030-01",
+  "total_bruto": 5000.00,
+  "total_descontos": 1200.00,
+  "total_liquido": 3800.00,
+  "base_rpps": 4000.00,
+  "base_irrf": 4000.00,
+  "observacao": "Holerite fictício para os testes.",
+  "pagamentos": [
+   {"cod": 3, "rubrica": "VENCIMENTO EFETIVO", "valor": 4000.00},
+   {"cod": 200, "rubrica": "AUXÍLIO ALIMENTAÇÃO", "valor": 1000.00}
+  ],
+  "descontos": [
+   {"cod": 940, "rubrica": "MS-PREV", "valor": 560.00},
+   {"cod": 941, "rubrica": "IRRF", "valor": 640.00}
+  ]
+ },
+ {
+  "mes_ano": "2030-02",
+  "total_bruto": 5100.00,
+  "total_descontos": 1200.00,
+  "total_liquido": 3900.00,
+  "base_rpps": 4100.00,
+  "base_irrf": 4100.00,
+  "observacao": null,
+  "pagamentos": [
+   {"cod": 3, "rubrica": "VENCIMENTO EFETIVO", "valor": 4100.00},
+   {"cod": 200, "rubrica": "AUXÍLIO ALIMENTAÇÃO", "valor": 1000.00}
+  ],
+  "descontos": [
+   {"cod": 940, "rubrica": "MS-PREV", "valor": 560.00},
+   {"cod": 941, "rubrica": "IRRF", "valor": 640.00}
+  ]
+ },
+ {
+  "mes_ano": "invalido",
+  "total_bruto": 1.00,
+  "total_descontos": 0.00,
+  "total_liquido": 1.00
+ }
+]

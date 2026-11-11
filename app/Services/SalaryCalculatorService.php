@@ -13,6 +13,12 @@ use App\DTOs\FilhoDTO;
 
 class SalaryCalculatorService
 {
+    /** Tabela de vencimento-base mais recente publicada (Res. CNJ 102, Anexo III-a, vigência 01/04/2026). */
+    private const TABELA_VIGENTE = '2026-04';
+
+    /** Última referência da carreira (Lei 3.687, Anexo III). */
+    private const REFERENCIA_FINAL = 19;
+
     private array $salaryStructures = [];
 
     public function __construct()
@@ -26,7 +32,7 @@ class SalaryCalculatorService
     /**
      * Look up base salary from CNJ structure tables or apply custom reajustes.
      */
-    public function getBaseSalary(string $cargo, string $ref, string $mesAno, array $reajustes = [], int $reajusteMes = 5): float
+    public function getBaseSalary(string $cargo, string $ref, string $mesAno, array $reajustes = [], int $reajusteMes = 5, float $reajustePadrao = 0.0): float
     {
         $simulatedDate = $mesAno . '-01'; // YYYY-MM-DD
         
@@ -56,7 +62,8 @@ class SalaryCalculatorService
         if ($lastAppliedYear >= 2027) {
             $multiplier = 1.0;
             for ($year = 2027; $year <= $lastAppliedYear; $year++) {
-                $pct = $reajustes[$year] ?? 0.0;
+                // Ano sem percentual informado usa a estimativa padrão da data-base (Lei 3.687, art. 37-A)
+                $pct = $reajustes[$year] ?? $reajustePadrao;
                 $multiplier *= (1.0 + ($pct / 100.0));
             }
             $baseSalary *= $multiplier;
@@ -167,13 +174,14 @@ class SalaryCalculatorService
     /**
      * Calculate IRRF using progressive tax brackets.
      */
-    public function calculateIrrf(float $base, int $year): float
+    public function calculateIrrf(float $base, int $year, int $month = 12): float
     {
         if ($base <= 0.0) {
             return 0.0;
         }
 
-        if ($year <= 2025) {
+        // A tabela com parcela a deduzir de 908,73 vale desde maio/2025 (conferido nos holerites de 05/2025 em diante)
+        if ($year < 2025 || ($year === 2025 && $month < 5)) {
             if ($base <= 2259.20) {
                 return 0.0;
             } elseif ($base <= 2828.65) {
@@ -201,6 +209,221 @@ class SalaryCalculatorService
     }
 
     /**
+     * Meses completos de exercício até o mês simulado.
+     */
+    public function getMesesDeExercicio(string $dtExercicio, string $mesAno): int
+    {
+        $start = new \DateTime($dtExercicio);
+        $sim = new \DateTime($mesAno . '-01');
+
+        return ((int) $sim->format('Y') - (int) $start->format('Y')) * 12
+            + ((int) $sim->format('m') - (int) $start->format('m'));
+    }
+
+    /**
+     * Avos da gratificação natalina no ano (Lei 3.310, arts. 89 e 90):
+     * 1/12 por mês de exercício; fração de 15 dias ou mais conta como mês integral.
+     * $ateMes limita a contagem (6 = avos adquiridos até junho, usados no adiantamento).
+     */
+    public function getAvosGratificacaoNatalina(string $dtExercicio, int $year, int $ateMes = 12): int
+    {
+        $start = new \DateTime($dtExercicio);
+        $startYear = (int) $start->format('Y');
+
+        if ($year < $startYear) {
+            return 0;
+        }
+        if ($year > $startYear) {
+            return $ateMes;
+        }
+
+        $startMonth = (int) $start->format('m');
+        $diasNoMesDeEntrada = (int) $start->format('t') - (int) $start->format('d') + 1;
+
+        return max(0, ($ateMes - $startMonth) + ($diasNoMesDeEntrada >= 15 ? 1 : 0));
+    }
+
+    /**
+     * Gratificação natalina como o TJMS paga (conferido nos holerites de 2025 e 2026):
+     *  - 1ª parcela em junho: avos adquiridos até junho sobre vencimento + adicionais permanentes
+     *    (rubrica 406, com MS-PREV) e metade do AQ temporário (rubrica 460), sem IRRF;
+     *  - 2ª parcela em novembro: o restante, com MS-PREV sobre a diferença e o IRRF
+     *    de tributação exclusiva sobre o 13º inteiro.
+     * O AQ temporário entra pelo valor cheio do mês, sem proporção de avos. A substituição
+     * fica de fora por ser eventual. Não há desconto de CASSEMS sobre o 13º.
+     */
+    public function calcularGratificacaoNatalina(
+        array $holerite,
+        ServidorDTO $servidor,
+        int $avos,
+        int $year,
+        int $parcela = 2,
+        ?array $adiantamento = null
+    ): array {
+        $fracao = $avos / 12;
+        $funcao = $holerite['proventos']['funcao_comissao'];
+
+        $comPrevidencia = round($holerite['cassems_base'] * $fracao, 2);
+        $teto = $servidor->teto_rgps ? $this->getRgpsCeiling($year) : INF;
+
+        if ($parcela === 1) {
+            // Metade de cada curso, truncada no centavo como na folha
+            $semPrevidencia = round($funcao * $fracao, 2);
+            foreach ($holerite['aq_temp_details'] as $aq) {
+                $semPrevidencia += floor($aq['valor'] * 50) / 100;
+            }
+            $semPrevidencia = round($semPrevidencia, 2);
+            $bruto = round($comPrevidencia + $semPrevidencia, 2);
+            $msprev = round(min($comPrevidencia, $teto) * 0.14, 2);
+
+            return [
+                'parcela' => 1,
+                'avos' => $avos,
+                'com_previdencia' => $comPrevidencia,
+                'sem_previdencia' => $semPrevidencia,
+                'bruto' => $bruto,
+                'msprev' => $msprev,
+                'irrf' => 0.0,
+                'liquido' => round($bruto - $msprev, 2),
+            ];
+        }
+
+        $semPrevidencia = round($holerite['proventos']['aq_temporario'] + $funcao * $fracao, 2);
+        $totalBruto = round($comPrevidencia + $semPrevidencia, 2);
+        $totalMsprev = round(min($comPrevidencia, $teto) * 0.14, 2);
+
+        $irrfBase = max(0.0, round($totalBruto - $totalMsprev - ($servidor->dependentes_irrf * 189.59), 2));
+        $irrf = $this->calculateIrrf($irrfBase, $year, 11);
+
+        $jaPagoComPrev = $adiantamento['com_previdencia'] ?? 0.0;
+        $jaPagoSemPrev = $adiantamento['sem_previdencia'] ?? 0.0;
+        $jaPagoMsprev = $adiantamento['msprev'] ?? 0.0;
+
+        $bruto = round($totalBruto - $jaPagoComPrev - $jaPagoSemPrev, 2);
+        $msprev = round(max(0.0, $totalMsprev - $jaPagoMsprev), 2);
+
+        return [
+            'parcela' => 2,
+            'avos' => $avos,
+            'com_previdencia' => round($comPrevidencia - $jaPagoComPrev, 2),
+            'sem_previdencia' => round($semPrevidencia - $jaPagoSemPrev, 2),
+            'bruto' => $bruto,
+            'msprev' => $msprev,
+            'irrf' => $irrf,
+            'liquido' => round($bruto - $msprev - $irrf, 2),
+            'total_bruto' => $totalBruto,
+        ];
+    }
+
+    /**
+     * Adicional de férias: um terço da remuneração do mês (Lei 3.310, art. 101), nas
+     * rubricas 249 (vencimento + adicionais permanentes) e 296 (cargo/função/atividade).
+     * Sem contribuição previdenciária; o IRRF é o acréscimo sobre o imposto do mês.
+     */
+    public function calcularAdicionalFerias(array $holerite, int $year, int $month = 12): array
+    {
+        $tercoPermanente = round($holerite['cassems_base'] / 3, 2);
+        $tercoAtividade = round($holerite['proventos']['funcao_comissao'] / 3, 2);
+        foreach ($holerite['aq_temp_details'] as $aq) {
+            $tercoAtividade += round($aq['valor'] / 3, 2);
+        }
+        $bruto = round($tercoPermanente + $tercoAtividade, 2);
+
+        $irrfComFerias = $this->calculateIrrf(round($holerite['irrf_base'] + $bruto, 2), $year, $month);
+        $irrf = round(max(0.0, $irrfComFerias - $holerite['descontos']['irrf']), 2);
+
+        return [
+            'bruto' => $bruto,
+            'irrf' => $irrf,
+            'liquido' => round($bruto - $irrf, 2),
+        ];
+    }
+
+    /**
+     * Mapa da carreira: data em que cada referência e cada quinquênio são atingidos
+     * (Lei 3.687, arts. 23 e 24; Lei 3.310, art. 95), com valores da tabela vigente.
+     */
+    public function gerarMapaCarreira(ServidorDTO $servidor, ?string $hojeMesAno = null): array
+    {
+        $hojeMesAno ??= date('Y-m');
+        $tabela = $this->salaryStructures[self::TABELA_VIGENTE] ?? [];
+        $refInicial = max(1, min(self::REFERENCIA_FINAL, (int) $servidor->referencia_inicial));
+        $refAtual = (int) $this->getProgressionLevel($servidor->dt_exercicio, (string) $refInicial, $hojeMesAno);
+        $baseInicial = (float) ($tabela[$servidor->cargo . '-' . $refInicial] ?? 0.0);
+
+        $referencias = [];
+        $anterior = null;
+        for ($ref = $refInicial; $ref <= self::REFERENCIA_FINAL; $ref++) {
+            $valor = (float) ($tabela[$servidor->cargo . '-' . $ref] ?? 0.0);
+            $data = (new \DateTime($servidor->dt_exercicio))->modify('+' . (2 * ($ref - $refInicial)) . ' years');
+            $referencias[] = [
+                'ref' => $ref,
+                'codigo' => $servidor->cargo . '-' . $ref,
+                'data' => $data->format('Y-m-d'),
+                'anos_de_casa' => 2 * ($ref - $refInicial),
+                'vencimento' => $valor,
+                'degrau_pct' => $anterior ? round(($valor / $anterior - 1) * 100, 2) : 0.0,
+                'acumulado_pct' => $baseInicial > 0 ? round(($valor / $baseInicial - 1) * 100, 2) : 0.0,
+                'status' => $ref < $refAtual ? 'atingida' : ($ref === $refAtual ? 'atual' : 'futura'),
+            ];
+            $anterior = $valor > 0 ? $valor : null;
+        }
+
+        $atsAtual = $this->getAtsPercentage($servidor->dt_exercicio, $hojeMesAno);
+        $ats = [];
+        for ($quinquenio = 1; $quinquenio <= 7; $quinquenio++) {
+            $pct = 10.0 + 5.0 * ($quinquenio - 1);
+            $data = (new \DateTime($servidor->dt_exercicio))->modify('+' . (5 * $quinquenio) . ' years');
+            $ats[] = [
+                'quinquenio' => $quinquenio,
+                'pct' => $pct,
+                'data' => $data->format('Y-m-d'),
+                'status' => $pct <= $atsAtual ? 'atingida' : 'futura',
+            ];
+        }
+
+        $proximaRef = null;
+        foreach ($referencias as $r) {
+            if ($r['status'] === 'futura') {
+                $proximaRef = $r;
+                break;
+            }
+        }
+        $proximoAts = null;
+        foreach ($ats as $a) {
+            if ($a['status'] === 'futura') {
+                $proximoAts = $a;
+                break;
+            }
+        }
+
+        $vencimentoAtual = (float) ($tabela[$servidor->cargo . '-' . $refAtual] ?? 0.0);
+        $mesesAte = fn (string $data): int => max(0, $this->getMesesDeExercicio($hojeMesAno . '-01', substr($data, 0, 7)));
+
+        return [
+            'cargo' => $servidor->cargo,
+            'tabela_vigente' => self::TABELA_VIGENTE,
+            'referencia_atual' => $refAtual,
+            'vencimento_atual' => $vencimentoAtual,
+            'ats_atual_pct' => $atsAtual,
+            'proxima_progressao' => $proximaRef ? [
+                'codigo' => $proximaRef['codigo'],
+                'data' => $proximaRef['data'],
+                'meses_restantes' => $mesesAte($proximaRef['data']),
+                'ganho' => round($proximaRef['vencimento'] - $vencimentoAtual, 2),
+            ] : null,
+            'proximo_ats' => $proximoAts ? [
+                'pct' => $proximoAts['pct'],
+                'data' => $proximoAts['data'],
+                'meses_restantes' => $mesesAte($proximoAts['data']),
+            ] : null,
+            'topo' => $referencias[count($referencias) - 1],
+            'referencias' => $referencias,
+            'ats' => $ats,
+        ];
+    }
+
+    /**
      * Compute a single-month holerite/payslip.
      */
     public function calcularHolerite(
@@ -217,7 +440,7 @@ class SalaryCalculatorService
         $atsPct = $this->getAtsPercentage($servidor->dt_exercicio, $mesAno);
 
         // 2. Base Salary Lookup
-        $baseSalary = $this->getBaseSalary($servidor->cargo, $level, $mesAno, $reajustes, $servidor->reajuste_mes);
+        $baseSalary = $this->getBaseSalary($servidor->cargo, $level, $mesAno, $reajustes, $servidor->reajuste_mes, $servidor->reajuste_padrao_pct);
 
         // 3. Proventos (Tributáveis)
         $vencimento = $baseSalary;
@@ -273,7 +496,7 @@ class SalaryCalculatorService
         if ($irrfBase < 0.0) {
             $irrfBase = 0.0;
         }
-        $irrf = $this->calculateIrrf($irrfBase, $year);
+        $irrf = $this->calculateIrrf($irrfBase, $year, (int) substr($mesAno, 5, 2));
 
         // Deduções particulares
         $consignados = $servidor->consignados;
@@ -334,7 +557,7 @@ class SalaryCalculatorService
         array $eventosAuxilios,
         array $reajustes,
         int $anos = 10,
-        string $startMesAno = null,
+        ?string $startMesAno = null,
         array $consignadosList = [],
         array $aqPermanenteList = [],
         array $filhosList = [],
@@ -355,6 +578,7 @@ class SalaryCalculatorService
         $prevActiveChildren = [];
         $prevActiveAqTemps = [];
         $prevYear = null;
+        $adiantamentos13 = [];
 
         for ($m = 0; $m < $totalMonths; $m++) {
             $currentDate = clone $startDate;
@@ -542,8 +766,8 @@ class SalaryCalculatorService
 
             // Reajuste check
             $monthVal = (int) $currentDate->format('m');
-            if ($monthVal === $servidor->reajuste_mes) {
-                $reajustePct = $reajustes[$year] ?? 0.0;
+            if ($monthVal === $servidor->reajuste_mes && $year >= 2027) {
+                $reajustePct = $reajustes[$year] ?? $servidor->reajuste_padrao_pct;
                 if ($reajustePct > 0) {
                     $monthlyEvents[] = [
                         'tipo' => 'reajuste',
@@ -563,6 +787,53 @@ class SalaryCalculatorService
                     ];
                 }
             }
+
+            // Gratificação natalina (junho e novembro) e adicional de férias (mês escolhido)
+            $extras = ['gratificacao_natalina' => null, 'adicional_ferias' => null];
+            $liquidoExtras = 0.0;
+
+            if ($servidor->incluir_13 && ($monthVal === 6 || $monthVal === 11)) {
+                $avosAno = $this->getAvosGratificacaoNatalina($servidor->dt_exercicio, $year);
+                $avosJunho = $this->getAvosGratificacaoNatalina($servidor->dt_exercicio, $year, 6);
+                $decimo = null;
+
+                if ($monthVal === 6 && $avosJunho > 0) {
+                    $decimo = $this->calcularGratificacaoNatalina($holerite, $servidorClone, $avosJunho, $year, 1);
+                    $adiantamentos13[$year] = $decimo;
+                } elseif ($monthVal === 11 && $avosAno > 0) {
+                    // Projeção iniciada depois de junho: estima o adiantamento com os valores de novembro
+                    $adiantamento = $adiantamentos13[$year]
+                        ?? ($avosJunho > 0 ? $this->calcularGratificacaoNatalina($holerite, $servidorClone, $avosJunho, $year, 1) : null);
+                    $decimo = $this->calcularGratificacaoNatalina($holerite, $servidorClone, $avosAno, $year, 2, $adiantamento);
+                }
+
+                if ($decimo !== null) {
+                    $extras['gratificacao_natalina'] = $decimo;
+                    $liquidoExtras += $decimo['liquido'];
+                    $monthlyEvents[] = [
+                        'tipo' => 'decimo_terceiro',
+                        'descricao' => "🎄 13º " . $decimo['parcela'] . "ª parcela (" . $decimo['avos'] . "/12): +R$ " . number_format($decimo['liquido'], 2, ',', '.') . " líq.",
+                        'cor' => 'green'
+                    ];
+                }
+            }
+
+            // O terço sai na folha anterior ao gozo; por isso já aparece com onze meses de exercício
+            if ($servidor->mes_ferias > 0 && $monthVal === $servidor->mes_ferias
+                && $this->getMesesDeExercicio($servidor->dt_exercicio, $mesAnoStr) >= 11) {
+                $ferias = $this->calcularAdicionalFerias($holerite, $year, $monthVal);
+                $extras['adicional_ferias'] = $ferias;
+                $liquidoExtras += $ferias['liquido'];
+                $monthlyEvents[] = [
+                    'tipo' => 'ferias',
+                    'descricao' => "🏖️ 1/3 de férias: +R$ " . number_format($ferias['liquido'], 2, ',', '.') . " líq.",
+                    'cor' => 'emerald'
+                ];
+            }
+
+            $holerite['extras'] = $extras;
+            $holerite['liquido_extras'] = round($liquidoExtras, 2);
+            $holerite['liquido_total'] = round($holerite['salario_liquido'] + $liquidoExtras, 2);
 
             // Store values for next month comparison
             $prevLevel = $currLevel;

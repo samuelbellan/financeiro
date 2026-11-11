@@ -38,6 +38,7 @@ class ExportProductionDataCommand extends Command
         'cartao_parcelas',
         'cartao_previsoes',
         'salary_profiles',
+        'salary_payslips',
         'fiscal_concursos',
         'fiscal_noticias',
         'fiscal_telegram_configs',

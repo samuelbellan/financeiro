@@ -21,7 +21,10 @@ class ServidorDTO
         public float $salario_substituicao = 0.0,
         public float $funcao_comissao_valor = 0.0,
         public float $reajuste_auxilio_pct = 0.0,
-        public int $reajuste_mes = 5
+        public int $reajuste_mes = 5,
+        public float $reajuste_padrao_pct = 0.0,
+        public int $mes_ferias = 0,
+        public bool $incluir_13 = true
     ) {}
 
     public static function fromRequest(array $data): self
@@ -41,7 +44,10 @@ class ServidorDTO
             salario_substituicao: (float) ($data['salario_substituicao'] ?? 0.0),
             funcao_comissao_valor: (float) ($data['funcao_comissao_valor'] ?? 0.0),
             reajuste_auxilio_pct: (float) ($data['reajuste_auxilio_pct'] ?? 0.0),
-            reajuste_mes: (int) ($data['reajuste_mes'] ?? 5)
+            reajuste_mes: (int) ($data['reajuste_mes'] ?? 5),
+            reajuste_padrao_pct: (float) ($data['reajuste_padrao_pct'] ?? 0.0),
+            mes_ferias: max(0, min(12, (int) ($data['mes_ferias'] ?? 0))),
+            incluir_13: isset($data['incluir_13']) ? (bool) $data['incluir_13'] : true
         );
     }
 }

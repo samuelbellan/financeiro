@@ -25,39 +25,48 @@ class SalaryController extends Controller
 
     public function index(Request $request)
     {
-        // Define default mock values for Samuel's scenario
+        // Cenário padrão conferido com os holerites de 05/2025 a 10/2026 (matrícula do Samuel)
         $defaultConfig = [
             'dt_exercicio' => '2025-05-05',
             'cargo' => 'TNSU',
             'referencia_inicial' => '1',
-            'aq_permanente_pct' => 8.0,
+            'aq_permanente_pct' => 0.0,
             'regime_integral' => false,
             'outros_adicionais_pct' => 0.0,
             'dependentes_irrf' => 1,
             'dependentes_cassems' => 3,
             'tem_conjuge' => false,
-            'consignados' => 697.00,
-            'salario_substituicao' => 1634.81,
+            'consignados' => 0.0,
+            'salario_substituicao' => 0.0,
             'funcao_comissao_valor' => 0.0,
             'teto_rgps' => true,
             'anos_projecao' => 10,
             'start_mes_ano' => '2025-05', // Default starting from entry month
-            'reajuste_auxilio_pct' => 3.0,
+            'reajuste_auxilio_pct' => 0.0,
             'reajuste_mes' => 5,
+            'reajuste_padrao_pct' => 0.0,
+            'mes_ferias' => 7,
+            'incluir_13' => true,
         ];
 
+        // Cada ação educacional vale 1% por cerca de um ano; depois de meados de 2027 é preciso lançar as novas
         $defaultAqTemp = [
-            ['nome' => 'Capacitação A (1%)', 'percentual' => 1.0, 'mes_inicio' => '2025-06', 'mes_fim' => '2029-05'],
-            ['nome' => 'Capacitação B (1%)', 'percentual' => 1.0, 'mes_inicio' => '2025-08', 'mes_fim' => '2029-07'],
-            ['nome' => 'Capacitação C (1%)', 'percentual' => 1.0, 'mes_inicio' => '2025-10', 'mes_fim' => '2029-09'],
-            ['nome' => 'Capacitação D (1%)', 'percentual' => 1.0, 'mes_inicio' => '2025-12', 'mes_fim' => '2029-11'],
-            ['nome' => 'Capacitação E (1%)', 'percentual' => 1.0, 'mes_inicio' => '2026-06', 'mes_fim' => '2030-05'],
+            ['nome' => 'Ação educacional 2025 A', 'percentual' => 1.0, 'mes_inicio' => '2025-06', 'mes_fim' => '2026-05'],
+            ['nome' => 'Ação educacional 2025 B', 'percentual' => 1.0, 'mes_inicio' => '2025-06', 'mes_fim' => '2026-05'],
+            ['nome' => 'Ação educacional 2025 C', 'percentual' => 1.0, 'mes_inicio' => '2025-06', 'mes_fim' => '2026-05'],
+            ['nome' => 'Ação educacional 2025 D', 'percentual' => 1.0, 'mes_inicio' => '2025-07', 'mes_fim' => '2026-06'],
+            ['nome' => 'Ação educacional 2025 E', 'percentual' => 1.0, 'mes_inicio' => '2025-07', 'mes_fim' => '2026-06'],
+            ['nome' => 'Ação educacional 2026 A', 'percentual' => 1.0, 'mes_inicio' => '2026-06', 'mes_fim' => '2027-04'],
+            ['nome' => 'Ação educacional 2026 B', 'percentual' => 1.0, 'mes_inicio' => '2026-06', 'mes_fim' => '2027-04'],
+            ['nome' => 'Ação educacional 2026 C', 'percentual' => 1.0, 'mes_inicio' => '2026-06', 'mes_fim' => '2027-05'],
+            ['nome' => 'Ação educacional 2026 D', 'percentual' => 1.0, 'mes_inicio' => '2026-07', 'mes_fim' => '2027-05'],
+            ['nome' => 'Ação educacional 2026 E', 'percentual' => 1.0, 'mes_inicio' => '2026-07', 'mes_fim' => '2027-06'],
         ];
 
         $defaultEvents = [
             ['mes_ano_inicio' => '2025-05', 'mes_ano_fim' => null, 'tipo_auxilio' => 'AUXILIO_ALIMENTACAO', 'valor' => 2200.00, 'acao' => 'CRIAR'],
-            ['mes_ano_inicio' => '2025-05', 'mes_ano_fim' => null, 'tipo_auxilio' => 'AUXILIO_CRECHE', 'valor' => 558.78, 'acao' => 'CRIAR'],
-            ['mes_ano_inicio' => '2025-05', 'mes_ano_fim' => null, 'tipo_auxilio' => 'AUXILIO_TRANSPORTE', 'valor' => 1000.00, 'acao' => 'CRIAR'],
+            ['mes_ano_inicio' => '2025-05', 'mes_ano_fim' => null, 'tipo_auxilio' => 'AUXILIO_TRANSPORTE', 'valor' => 500.00, 'acao' => 'CRIAR'],
+            ['mes_ano_inicio' => '2026-03', 'mes_ano_fim' => null, 'tipo_auxilio' => 'AUXILIO_TRANSPORTE', 'valor' => 1000.00, 'acao' => 'ALTERAR_VALOR'],
         ];
 
         $defaultReajustes = [
@@ -67,15 +76,18 @@ class SalaryController extends Controller
         ];
 
         $defaultConsignados = [
-            ['valor' => 697.00, 'mes_inicio' => '2025-05', 'mes_fim' => '2029-04']
+            ['descricao' => 'C.E.F. EMPRESTIMO', 'valor' => 137.00, 'mes_inicio' => '2025-08', 'mes_fim' => '2029-04'],
+            ['descricao' => 'C.E.F. EMPRESTIMO', 'valor' => 560.00, 'mes_inicio' => '2025-10', 'mes_fim' => '2029-04'],
         ];
 
         $defaultAqPermanenteCursos = [
-            ['nome' => '1º Curso AQ Permanente', 'percentual' => 2.0, 'mes_inicio' => '2025-09']
+            ['nome' => 'AQ Permanente (8%)', 'percentual' => 8.0, 'mes_inicio' => '2025-10']
         ];
 
+        // Data fictícia: só serve para o auxílio-educação infantil aparecer desde o início.
+        // As datas reais ficam no perfil salvo de cada usuário.
         $defaultFilhos = [
-            ['nome' => 'Filho 1', 'dt_nascimento' => '2023-05-05', 'idade_escola' => 2]
+            ['nome' => 'Filho 1', 'dt_nascimento' => '2022-07-01', 'idade_escola' => 2],
         ];
 
         // Load profiles for current user
@@ -105,7 +117,12 @@ class SalaryController extends Controller
             $defaultFilhos = $config['filhos'] ?? $defaultFilhos;
         }
 
+        $holerites = auth()->user()->salaryPayslips()->orderBy('mes_ano')->get([
+            'mes_ano', 'total_bruto', 'total_descontos', 'total_liquido', 'pagamentos', 'descontos', 'observacao',
+        ]);
+
         return view('salary.index', compact(
+            'holerites',
             'defaultConfig', 
             'defaultAqTemp', 
             'defaultEvents', 
@@ -197,7 +214,8 @@ class SalaryController extends Controller
 
         return response()->json([
             'success' => true,
-            'projection' => $projection
+            'projection' => $projection,
+            'carreira' => $this->calculatorService->gerarMapaCarreira($servidor),
         ]);
     }
 

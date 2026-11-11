@@ -43,6 +43,11 @@
             }
         }
 
+        /* Sem isto, gráficos e tabelas largos esticam a coluna em vez de rolar dentro dela */
+        .settings-column, .results-column {
+            min-width: 0;
+        }
+
         /* Glassmorphic Cards */
         .glass-card {
             background: var(--bg-glass);
@@ -666,6 +671,28 @@
         .badge-event-emerald { background: rgba(52, 211, 153, 0.2); color: #6ee7b7; border: 1px solid rgba(52, 211, 153, 0.3); }
         .badge-event-orange { background: rgba(249, 115, 22, 0.2); color: #fdba74; border: 1px solid rgba(249, 115, 22, 0.3); }
         .badge-event-yellow { background: rgba(234, 179, 8, 0.2); color: #fde047; border: 1px solid rgba(234, 179, 8, 0.3); }
+
+        /* Aba Carreira TJMS */
+        .career-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+        }
+        .career-card {
+            background: rgba(30, 41, 59, 0.6);
+            border: 1px solid var(--border-glass);
+            border-radius: 12px;
+            padding: 0.9rem 1rem;
+        }
+        .career-card .lbl { font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.04em; margin: 0 0 0.3rem; }
+        .career-card .val { font-family: var(--font-outfit); font-size: 1.3rem; font-weight: 600; color: #f1f5f9; margin: 0; }
+        .career-card .sub { font-size: 0.72rem; color: #cbd5e1; margin: 0.25rem 0 0; }
+        .career-row-atual td { background: rgba(99, 102, 241, 0.14); font-weight: 600; }
+        .career-row-atingida td { color: var(--text-muted); }
+        .career-table tbody tr { cursor: default; }
+        .career-note { font-size: 0.72rem; color: var(--text-muted); line-height: 1.5; margin: 0.75rem 0 0; }
+        .extra-liquido { display: block; font-size: 0.68rem; font-weight: 500; color: #6ee7b7; white-space: nowrap; }
     </style>
 </head>
 <body>
@@ -862,7 +889,7 @@
                                             <option value="ASSJ" {{ $defaultConfig['cargo'] === 'ASSJ' ? 'selected' : '' }}>Analista Judiciário (ASSJ)</option>
                                             <option value="ESCR" {{ $defaultConfig['cargo'] === 'ESCR' ? 'selected' : '' }}>Escrivão (ESCR)</option>
                                             <option value="ASTI" {{ $defaultConfig['cargo'] === 'ASTI' ? 'selected' : '' }}>Assistente Informática (ASTI)</option>
-                                            <option value="AGOP" {{ $defaultConfig['cargo'] === 'AGOP' ? 'selected' : '' }}>Agente de Operações (AGOP)</option>
+                                            <option value="AGOP" {{ $defaultConfig['cargo'] === 'AGOP' ? 'selected' : '' }}>Auxiliar Judiciário I (AGOP)</option>
                                             <option value="TAGE" {{ $defaultConfig['cargo'] === 'TAGE' ? 'selected' : '' }}>Auxiliar Judiciário II (TAGE)</option>
                                             <option value="ARAT" {{ $defaultConfig['cargo'] === 'ARAT' ? 'selected' : '' }}>Artífice (ARAT)</option>
                                             <option value="AGSG" {{ $defaultConfig['cargo'] === 'AGSG' ? 'selected' : '' }}>Serviços Gerais (AGSG)</option>
@@ -906,6 +933,7 @@
                                 </div>
 
                                 <div class="checkbox-group">
+                                    <input type="hidden" name="servidor[teto_rgps]" value="0">
                                     <input type="checkbox" id="teto_rgps" name="servidor[teto_rgps]" value="1" {{ $defaultConfig['teto_rgps'] ? 'checked' : '' }}>
                                     <label for="teto_rgps" class="form-label" style="margin:0;">Limitar previdência ao Teto do RGPS</label>
                                 </div>
@@ -991,6 +1019,28 @@
                                     </div>
                                 </div>
 
+                                <div class="row-group" style="margin-bottom: 0.5rem;">
+                                    <div class="form-group">
+                                        <label class="form-label" for="reajuste_padrao_pct">Reajuste Padrão da Data-Base (%)</label>
+                                        <input type="number" id="reajuste_padrao_pct" name="servidor[reajuste_padrao_pct]" step="0.1" min="0" class="form-control" value="{{ $defaultConfig['reajuste_padrao_pct'] ?? 0.0 }}" title="Usado nos anos sem percentual informado em AQs & Reajustes (INPC + ganho real estimados)">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label" for="mes_ferias">Mês das Férias (1/3)</label>
+                                        <select id="mes_ferias" name="servidor[mes_ferias]" class="form-control">
+                                            <option value="0" {{ ($defaultConfig['mes_ferias'] ?? 7) == 0 ? 'selected' : '' }}>Não projetar</option>
+                                            @foreach (['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'] as $i => $nomeMes)
+                                                <option value="{{ $i + 1 }}" {{ ($defaultConfig['mes_ferias'] ?? 7) == $i + 1 ? 'selected' : '' }}>{{ $nomeMes }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="checkbox-group" style="margin-top: 0;">
+                                    <input type="hidden" name="servidor[incluir_13]" value="0">
+                                    <input type="checkbox" id="incluir_13" name="servidor[incluir_13]" value="1" {{ ($defaultConfig['incluir_13'] ?? true) ? 'checked' : '' }}>
+                                    <label for="incluir_13" class="form-label" style="margin:0;">Projetar gratificação natalina (13º) em junho e novembro</label>
+                                </div>
+
                                 <button type="submit" class="btn-submit" style="margin-top: 1rem;">
                                     Gerar Projeção
                                 </button>
@@ -1004,6 +1054,8 @@
                             <div class="tabs-header">
                                 <button type="button" class="tab-btn active" onclick="switchTab('tab-charts', this)">Gráficos de Projeção</button>
                                 <button type="button" class="tab-btn" onclick="switchTab('tab-table', this)">Tabela de Projeção</button>
+                                <button type="button" class="tab-btn" onclick="switchTab('tab-carreira', this)">🏛️ Carreira TJMS</button>
+                                <button type="button" class="tab-btn" onclick="switchTab('tab-real', this)">🧾 Real × Projetado</button>
                                 <button type="button" class="tab-btn" onclick="switchTab('tab-aq-reajustes', this)">AQs & Reajustes</button>
                                 <button type="button" class="tab-btn" onclick="switchTab('tab-consignados', this)">Consignados</button>
                                 <button type="button" class="tab-btn" onclick="switchTab('tab-filhos', this)">Filhos (Aux. Creche)</button>
@@ -1063,6 +1115,109 @@
                                                  </tr>
                                              </tbody>
                                          </table>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Tab: Real × Projetado -->
+                            <div id="tab-real" class="tab-content">
+                                <div class="glass-card">
+                                    <h3 class="glass-card-title">Holerites Reais × Projeção</h3>
+                                    <div class="career-cards" id="real-cards"></div>
+                                    <div class="chart-scroll-container">
+                                        <div class="chart-canvas-wrapper" id="wrapper-realChart" style="height: 260px;">
+                                            <canvas id="realChart"></canvas>
+                                        </div>
+                                    </div>
+                                    <p class="career-note">
+                                        O projetado é o líquido do mês somado ao 13º e ao terço de férias, com as opções que estão no formulário.
+                                        Diferenças pequenas vêm de retroativos e de mudanças da CASSEMS; as grandes, de meses atípicos (entrada, férias, substituição).
+                                    </p>
+                                </div>
+
+                                <div class="glass-card">
+                                    <h3 class="glass-card-title">Mês a Mês</h3>
+                                    <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: -0.75rem; margin-bottom: 1rem;">
+                                        Clique em um mês para ver as rubricas do holerite.
+                                    </p>
+                                    <div class="table-responsive" style="max-height: 640px;">
+                                        <table class="data-table" id="real-table-el">
+                                            <thead>
+                                                <tr>
+                                                    <th>Mês</th>
+                                                    <th>Bruto real</th>
+                                                    <th>Descontos reais</th>
+                                                    <th>Líquido real</th>
+                                                    <th>Líquido projetado</th>
+                                                    <th>Diferença</th>
+                                                    <th>Observação</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody></tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Tab: Carreira TJMS -->
+                            <div id="tab-carreira" class="tab-content">
+                                <div class="glass-card">
+                                    <h3 class="glass-card-title">Onde você está na carreira</h3>
+                                    <div class="career-cards" id="career-cards">
+                                        <p style="color: var(--text-muted); font-size: 0.8rem;">Clique em "Gerar Projeção".</p>
+                                    </div>
+                                    <p class="career-note">
+                                        Progressão funcional automática a cada dois anos de efetivo exercício (Lei 3.687/2009, art. 23), com degraus de 3% até o décimo biênio e 3,5% nos seguintes (art. 24).
+                                        Adicional por tempo de serviço de 10% no primeiro quinquênio e 5% em cada um dos demais, até 40% (Lei 3.310/2006, art. 95).
+                                        Afastamentos que não contam como efetivo exercício adiam essas datas.
+                                    </p>
+                                </div>
+
+                                <div class="glass-card">
+                                    <h3 class="glass-card-title">Mapa das Referências</h3>
+                                    <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: -0.75rem; margin-bottom: 1rem;">
+                                        Valores da tabela de vencimento-base vigente desde 01/04/2026, sem reajustes futuros.
+                                    </p>
+                                    <div class="table-responsive">
+                                        <table class="data-table career-table" id="career-table-el">
+                                            <thead>
+                                                <tr>
+                                                    <th>Referência</th>
+                                                    <th>Data</th>
+                                                    <th>Anos de casa</th>
+                                                    <th>Vencimento-base</th>
+                                                    <th>Degrau</th>
+                                                    <th>Acumulado</th>
+                                                    <th>ATS na data</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody></tbody>
+                                        </table>
+                                    </div>
+                                </div>
+
+                                <div class="glass-card">
+                                    <h3 class="glass-card-title">Resumo Anual da Projeção</h3>
+                                    <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: -0.75rem; margin-bottom: 1rem;">
+                                        Soma dos meses projetados em cada ano. O 13º segue os avos de exercício no ano (Lei 3.310/2006, arts. 89 e 90), pago em junho e novembro como nos seus holerites, e o terço de férias entra no mês escolhido (arts. 101 e 109).
+                                    </p>
+                                    <div class="table-responsive">
+                                        <table class="data-table career-table" id="annual-table-el">
+                                            <thead>
+                                                <tr>
+                                                    <th>Ano</th>
+                                                    <th>Meses</th>
+                                                    <th>Referência</th>
+                                                    <th>Bruto no ano</th>
+                                                    <th>Líquido mensal</th>
+                                                    <th>13º líquido</th>
+                                                    <th>1/3 férias líquido</th>
+                                                    <th>Total líquido</th>
+                                                    <th>Média mensal</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody></tbody>
+                                        </table>
                                     </div>
                                 </div>
                             </div>
@@ -1322,7 +1477,7 @@
                                     <div class="glass-card">
                                         <h3 class="glass-card-title">Patrimônio Acumulado (Líquido)</h3>
                                         <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: -0.75rem; margin-bottom: 1rem;">
-                                            Soma acumulada do salário líquido recebido desde o início do exercício até o fim da projeção.
+                                            Soma acumulada do líquido recebido (salário, 13º e terço de férias) desde o início do exercício até o fim da projeção.
                                         </p>
                                         <div class="chart-scroll-container">
                                             <div class="chart-canvas-wrapper" id="wrapper-acumuladoChart">
@@ -1586,6 +1741,8 @@
                     renderCharts(projectionData);
                 } else if (tabId === 'tab-analise') {
                     renderAdvancedCharts(projectionData);
+                } else if (tabId === 'tab-real') {
+                    renderRealVsProjetado(projectionData);
                 }
             }
         }
@@ -1741,11 +1898,200 @@
                 if (data.success) {
                     projectionData = data.projection;
                     updateProjectionTable(projectionData);
+                    renderCareer(data.carreira);
+                    renderAnnualSummary(projectionData);
+                    renderRealVsProjetado(projectionData);
                     renderCharts(projectionData);
                     renderAdvancedCharts(projectionData);
                 }
             })
             .catch(err => console.error("Erro na simulação:", err));
+        }
+
+        // ── Aba Real × Projetado ──────────────────────────────────────────────────
+        const holeritesReais = @json($holerites);
+        let realChartObj = null;
+
+        function renderRealVsProjetado(data) {
+            const cards = document.getElementById('real-cards');
+            const tbody = document.querySelector('#real-table-el tbody');
+            if (!cards || !tbody) return;
+
+            if (!holeritesReais.length) {
+                cards.innerHTML = '<p style="color: var(--text-muted); font-size: 0.8rem;">Nenhum holerite gravado para este usuário. Importe com <code>php artisan salary:importar-holerites</code>.</p>';
+                tbody.innerHTML = '';
+                return;
+            }
+
+            const projetado = new Map(data.map(m => [m.mesAno, m.liquido_total ?? m.salario_liquido]));
+            let somaReal = 0, somaProj = 0, comparados = 0;
+
+            tbody.innerHTML = '';
+            holeritesReais.forEach((h, idx) => {
+                const proj = projetado.get(h.mes_ano);
+                const temProj = proj !== undefined;
+                const dif = temProj ? proj - h.total_liquido : null;
+                if (temProj) { somaReal += h.total_liquido; somaProj += proj; comparados++; }
+
+                const corDif = dif === null ? 'var(--text-muted)' : (Math.abs(dif) < 0.005 ? '#34d399' : (Math.abs(dif) <= 100 ? '#fde047' : '#f87171'));
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${formatMonthYear(h.mes_ano)}</td>
+                    <td>${formatBrl(h.total_bruto)}</td>
+                    <td style="color:#f87171;">${formatBrl(h.total_descontos)}</td>
+                    <td style="font-weight:bold; color:#10b981;">${formatBrl(h.total_liquido)}</td>
+                    <td>${temProj ? formatBrl(proj) : '—'}</td>
+                    <td style="font-weight:600; color:${corDif}; white-space:nowrap;">${dif === null ? '—' : (dif > 0 ? '+' : '') + formatBrl(dif)}</td>
+                    <td style="font-size:0.72rem; color:var(--text-muted); min-width:220px;">${h.observacao ?? ''}</td>
+                `;
+
+                const detalhe = document.createElement('tr');
+                detalhe.style.display = 'none';
+                detalhe.style.cursor = 'default';
+                const lista = (itens) => itens.map(i => `<div style="display:flex; justify-content:space-between; gap:1rem;"><span>${i.cod} · ${i.rubrica}</span><span>${formatPlainBrl(i.valor)}</span></div>`).join('');
+                detalhe.innerHTML = `
+                    <td colspan="7" style="background: rgba(15,23,42,0.6);">
+                        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap:1.5rem; font-size:0.74rem;">
+                            <div><p style="margin:0 0 0.4rem; font-weight:600; color:#34d399;">Pagamentos</p>${lista(h.pagamentos)}</div>
+                            <div><p style="margin:0 0 0.4rem; font-weight:600; color:#f87171;">Descontos</p>${lista(h.descontos)}</div>
+                        </div>
+                    </td>`;
+                tr.onclick = () => { detalhe.style.display = detalhe.style.display === 'none' ? 'table-row' : 'none'; };
+
+                tbody.appendChild(tr);
+                tbody.appendChild(detalhe);
+            });
+
+            const card = (lbl, val, sub) => `<div class="career-card"><p class="lbl">${lbl}</p><p class="val">${val}</p><p class="sub">${sub}</p></div>`;
+            const difTotal = somaProj - somaReal;
+            const pct = somaReal > 0 ? (difTotal / somaReal * 100) : 0;
+            cards.innerHTML = [
+                card('Holerites gravados', holeritesReais.length, `${formatMonthYear(holeritesReais[0].mes_ano)} a ${formatMonthYear(holeritesReais[holeritesReais.length - 1].mes_ano)}`),
+                card('Líquido real', formatBrl(somaReal), `${comparados} meses dentro da projeção`),
+                card('Líquido projetado', formatBrl(somaProj), 'mesmos meses, com 13º e férias'),
+                card('Diferença', (difTotal > 0 ? '+' : '') + formatBrl(difTotal), `${pct.toLocaleString('pt-BR', { maximumFractionDigits: 2 })}% sobre o real`),
+            ].join('');
+
+            const wrapper = document.getElementById('wrapper-realChart');
+            if (wrapper) wrapper.style.width = Math.max(600, holeritesReais.length * 44) + 'px';
+            if (realChartObj) realChartObj.destroy();
+            const el = document.getElementById('realChart');
+            if (!el) return;
+            realChartObj = new Chart(el.getContext('2d'), {
+                type: 'line',
+                data: {
+                    labels: holeritesReais.map(h => formatMonthYear(h.mes_ano)),
+                    datasets: [
+                        { label: 'Líquido real', data: holeritesReais.map(h => h.total_liquido), borderColor: '#10b981', backgroundColor: 'rgba(16,185,129,0.08)', fill: true, tension: 0.25, borderWidth: 2.5 },
+                        { label: 'Líquido projetado', data: holeritesReais.map(h => projetado.get(h.mes_ano) ?? null), borderColor: '#6366f1', backgroundColor: 'transparent', borderDash: [5, 5], tension: 0.25, borderWidth: 2 },
+                    ]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    interaction: { mode: 'index', intersect: false },
+                    scales: {
+                        y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#cbd5e1' } },
+                        x: { grid: { display: false }, ticks: { color: '#cbd5e1' } }
+                    },
+                    plugins: { legend: { labels: { color: '#f1f5f9' } }, tooltip: { callbacks: { label: ctx => ` ${ctx.dataset.label}: ${formatBrl(ctx.parsed.y)}` } } }
+                }
+            });
+        }
+
+        // ── Aba Carreira TJMS ─────────────────────────────────────────────────────
+        function formatDataBr(dateStr) {
+            const p = dateStr.split('-');
+            return `${p[2]}/${p[1]}/${p[0]}`;
+        }
+
+        function formatPrazo(meses) {
+            if (meses <= 0) return 'neste mês';
+            const anos = Math.floor(meses / 12);
+            const resto = meses % 12;
+            const partes = [];
+            if (anos > 0) partes.push(anos + (anos === 1 ? ' ano' : ' anos'));
+            if (resto > 0) partes.push(resto + (resto === 1 ? ' mês' : ' meses'));
+            return 'em ' + partes.join(' e ');
+        }
+
+        function renderCareer(carreira) {
+            const cards = document.getElementById('career-cards');
+            const tbody = document.querySelector('#career-table-el tbody');
+            if (!cards || !tbody || !carreira) return;
+
+            const prox = carreira.proxima_progressao;
+            const ats = carreira.proximo_ats;
+            const topo = carreira.topo;
+            const card = (lbl, val, sub) => `<div class="career-card"><p class="lbl">${lbl}</p><p class="val">${val}</p><p class="sub">${sub}</p></div>`;
+
+            cards.innerHTML = [
+                card('Referência atual', `${carreira.cargo}-${carreira.referencia_atual}`, `${formatBrl(carreira.vencimento_atual)} de vencimento-base`),
+                prox
+                    ? card('Próxima progressão', formatDataBr(prox.data), `${prox.codigo} ${formatPrazo(prox.meses_restantes)} · +${formatBrl(prox.ganho)}`)
+                    : card('Próxima progressão', '—', 'Você já está na última referência'),
+                ats
+                    ? card('Próximo quinquênio', formatDataBr(ats.data), `ATS vai a ${ats.pct}% ${formatPrazo(ats.meses_restantes)}`)
+                    : card('Próximo quinquênio', '—', 'ATS já está no limite de 40%'),
+                card('Topo da carreira', topo.codigo, `${formatDataBr(topo.data)} · ${formatBrl(topo.vencimento)} (+${topo.acumulado_pct.toLocaleString('pt-BR')}%)`),
+            ].join('');
+
+            const atsNaData = (data) => {
+                let pct = 0;
+                carreira.ats.forEach(a => { if (a.data <= data) pct = a.pct; });
+                return pct;
+            };
+
+            tbody.innerHTML = carreira.referencias.map(r => {
+                const pctAts = atsNaData(r.data);
+                const marca = r.status === 'atual' ? ' <span class="badge-info">você está aqui</span>' : '';
+                return `
+                    <tr class="career-row-${r.status}">
+                        <td>${r.codigo}${marca}</td>
+                        <td>${formatDataBr(r.data)}</td>
+                        <td>${r.anos_de_casa}</td>
+                        <td>${formatBrl(r.vencimento)}</td>
+                        <td>${r.degrau_pct > 0 ? '+' + r.degrau_pct.toLocaleString('pt-BR') + '%' : '—'}</td>
+                        <td>${r.acumulado_pct > 0 ? '+' + r.acumulado_pct.toLocaleString('pt-BR') + '%' : '—'}</td>
+                        <td>${pctAts > 0 ? pctAts + '%' : '—'}</td>
+                    </tr>`;
+            }).join('');
+        }
+
+        function renderAnnualSummary(data) {
+            const tbody = document.querySelector('#annual-table-el tbody');
+            if (!tbody) return;
+
+            const anos = new Map();
+            data.forEach(m => {
+                const ano = m.mesAno.substring(0, 4);
+                if (!anos.has(ano)) anos.set(ano, { meses: 0, bruto: 0, liquido: 0, decimo: 0, ferias: 0, refIni: m.level, refFim: m.level });
+                const a = anos.get(ano);
+                const d = m.extras && m.extras.gratificacao_natalina;
+                const f = m.extras && m.extras.adicional_ferias;
+                a.meses++;
+                a.bruto += m.proventos.total_tributavel + (d ? d.bruto : 0) + (f ? f.bruto : 0);
+                a.liquido += m.salario_liquido;
+                a.decimo += d ? d.liquido : 0;
+                a.ferias += f ? f.liquido : 0;
+                a.refFim = m.level;
+            });
+
+            tbody.innerHTML = Array.from(anos.entries()).map(([ano, a]) => {
+                const total = a.liquido + a.decimo + a.ferias;
+                const ref = a.refIni === a.refFim ? a.refIni : `${a.refIni} → ${a.refFim}`;
+                return `
+                    <tr>
+                        <td>${ano}</td>
+                        <td>${a.meses}</td>
+                        <td><span class="badge-info">${ref}</span></td>
+                        <td>${formatBrl(a.bruto)}</td>
+                        <td>${formatBrl(a.liquido)}</td>
+                        <td>${a.decimo > 0 ? formatBrl(a.decimo) : '—'}</td>
+                        <td>${a.ferias > 0 ? formatBrl(a.ferias) : '—'}</td>
+                        <td style="font-weight:bold; color:#10b981;">${formatBrl(total)}</td>
+                        <td>${formatBrl(total / a.meses)}</td>
+                    </tr>`;
+            }).join('');
         }
 
         // Formata Moeda Brasileira
@@ -1780,7 +2126,7 @@
                     <td style="color:#f87171;">${formatBrl(month.descontos.irrf)}</td>
                     <td style="color:#34d399;">${formatBrl(month.total_isento)}</td>
                     <td style="text-align:left;">${eventBadgesHtml}</td>
-                    <td style="font-weight:bold; color:#10b981;">${formatBrl(month.salario_liquido)}</td>
+                    <td style="font-weight:bold; color:#10b981;">${formatBrl(month.salario_liquido)}${month.liquido_extras > 0 ? `<span class="extra-liquido">+ ${formatBrl(month.liquido_extras)}</span>` : ''}</td>
                 `;
                 tbody.appendChild(tr);
             });
@@ -1969,7 +2315,7 @@
                 const el = document.getElementById('acumuladoChart');
                 if (el) {
                     let running = 0;
-                    const acumulado = data.map(m => { running += m.salario_liquido; return Math.round(running); });
+                    const acumulado = data.map(m => { running += (m.liquido_total ?? m.salario_liquido); return Math.round(running); });
                     acumuladoChartObj = new Chart(el.getContext('2d'), {
                         type: 'line',
                         data: {
@@ -2075,6 +2421,8 @@
                 'aq_temp_fim': { bg: '#9333ea', label: '📉' },
                 'filho_nasce': { bg: '#db2777', label: '👶' },
                 'filho_sai': { bg: '#991b1b', label: '🏫' },
+                'decimo_terceiro': { bg: '#15803d', label: '🎄' },
+                'ferias': { bg: '#0d9488', label: '🏖️' },
             };
 
             const allEvents = [];
@@ -2394,6 +2742,22 @@
                 hasObs = true;
                 const p = document.createElement('p');
                 p.innerText = `- ADICIONAL DE DIFÍCIL PROVIMENTO ATIVO (10% SOBRE O BÁSICO).`;
+                obsList.appendChild(p);
+            }
+
+            const decimo = month.extras && month.extras.gratificacao_natalina;
+            if (decimo) {
+                hasObs = true;
+                const p = document.createElement('p');
+                p.innerText = `- 13º SALÁRIO, ${decimo.parcela}ª PARCELA (${decimo.avos}/12), NÃO SOMADO ACIMA: BRUTO ${formatPlainBrl(decimo.bruto)} | MS-PREV ${formatPlainBrl(decimo.msprev)} | IRRF ${formatPlainBrl(decimo.irrf)} | LÍQUIDO ${formatPlainBrl(decimo.liquido)}.`;
+                obsList.appendChild(p);
+            }
+
+            const terco = month.extras && month.extras.adicional_ferias;
+            if (terco) {
+                hasObs = true;
+                const p = document.createElement('p');
+                p.innerText = `- ADICIONAL DE FÉRIAS (1/3), NÃO SOMADO ACIMA: BRUTO ${formatPlainBrl(terco.bruto)} | IRRF ${formatPlainBrl(terco.irrf)} | LÍQUIDO ${formatPlainBrl(terco.liquido)}.`;
                 obsList.appendChild(p);
             }
 

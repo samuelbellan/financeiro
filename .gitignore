@@ -31,3 +31,5 @@ Thumbs.db
 /.obsidian/
 check_db*.php
 /.claude/settings.local.json
+# Holerites reais: dados pessoais, só na máquina local
+/database/dumps/holerites_tjms.json
