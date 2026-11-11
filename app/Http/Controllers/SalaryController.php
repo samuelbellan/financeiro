@@ -83,9 +83,10 @@ class SalaryController extends Controller
         // Sem percentuais por ano: o cenário define o reajuste; informe um ano só quando houver notícia concreta
         $defaultReajustes = [];
 
+        // Contratos da CEF: fim = primeiro desconto + número de parcelas − 1 (contagem de pagas confere com os holerites)
         $defaultConsignados = [
-            ['descricao' => 'C.E.F. EMPRESTIMO', 'valor' => 137.00, 'mes_inicio' => '2025-08', 'mes_fim' => '2029-04'],
-            ['descricao' => 'C.E.F. EMPRESTIMO', 'valor' => 560.00, 'mes_inicio' => '2025-10', 'mes_fim' => '2029-04'],
+            ['descricao' => 'C.E.F. EMPRESTIMO (24x)', 'valor' => 137.00, 'mes_inicio' => '2025-08', 'mes_fim' => '2027-07'],
+            ['descricao' => 'C.E.F. EMPRESTIMO (60x)', 'valor' => 560.00, 'mes_inicio' => '2025-10', 'mes_fim' => '2030-09'],
         ];
 
         // 8% desde 10/2025; depois um curso de +2 pontos por setembro, pago em novembro com retroativo, até 20%

@@ -802,6 +802,8 @@ class SalaryProjectionTest extends TestCase
         $this->assertSame([], $view->viewData('defaultReajustes'));
         $this->assertCount(3, $view->viewData('defaultCassemsEventos'));
         $this->assertEquals('2026-11', $view->viewData('defaultAqPermanenteCursos')[1]['mes_pagamento']);
+        // Consignados da CEF: 24 parcelas desde 08/2025 e 60 desde 10/2025
+        $this->assertSame(['2027-07', '2030-09'], array_column($view->viewData('defaultConsignados'), 'mes_fim'));
 
         $response = $this->actingAs($user)->postJson(route('salary.project'), [
             'servidor' => [
