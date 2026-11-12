@@ -20,8 +20,8 @@
     "semantic_hash": ""
   },
   "app/DTOs/QualificacaoPermanenteDTO.php": {
-    "mtime": 1786469294.5045538,
-    "ast_hash": "6f735b6c563a72e9e428e5c1ad9d9ab5",
+    "mtime": 1794389555.3738835,
+    "ast_hash": "87fd7547cd1a7cb18506ab858070feee",
     "semantic_hash": ""
   },
   "app/DTOs/QualificacaoTemporariaDTO.php": {
@@ -30,8 +30,8 @@
     "semantic_hash": ""
   },
   "app/DTOs/ServidorDTO.php": {
-    "mtime": 1786473754.6847584,
-    "ast_hash": "5f1435e5eeaa1db3f20daa8008bb3578",
+    "mtime": 1794389555.3738835,
+    "ast_hash": "e0ced1048e276ae2c9e9bb3343e9ea67",
     "semantic_hash": ""
   },
   "app/Http/Controllers/AuthController.php": {
@@ -65,8 +65,8 @@
     "semantic_hash": ""
   },
   "app/Http/Controllers/FinancasController.php": {
-    "mtime": 1793466144.6264315,
-    "ast_hash": "ae574299cfab24d05437e3c6a4861296",
+    "mtime": 1794164694.6733878,
+    "ast_hash": "3fbcf46d70ea24a00fd65c9277504b63",
     "semantic_hash": ""
   },
   "app/Http/Controllers/HomeController.php": {
@@ -75,8 +75,8 @@
     "semantic_hash": ""
   },
   "app/Http/Controllers/SalaryController.php": {
-    "mtime": 1786473855.1070626,
-    "ast_hash": "e5448dd51eb3a1122c9f9ff6da997ec4",
+    "mtime": 1794389865.4088686,
+    "ast_hash": "bd0256e410dbe7a2dae3bf1a99c76c4c",
     "semantic_hash": ""
   },
   "app/Http/Controllers/TelegramWebhookController.php": {
@@ -135,8 +135,8 @@
     "semantic_hash": ""
   },
   "app/Models/User.php": {
-    "mtime": 1793524368.1890743,
-    "ast_hash": "f9fdd668dd40e0a9f06b4045d84add3c",
+    "mtime": 1794386319.6280584,
+    "ast_hash": "c69ae48132397204f21a01b5ed6f78b7",
     "semantic_hash": ""
   },
   "app/Models/WhatsappLog.php": {
@@ -165,8 +165,8 @@
     "semantic_hash": ""
   },
   "app/Services/SalaryCalculatorService.php": {
-    "mtime": 1786474345.2644405,
-    "ast_hash": "7f7222cd25f89548278a4b7a5ea09767",
+    "mtime": 1794389555.3768816,
+    "ast_hash": "02e24b803c9291793d444f7c5dbe94ac",
     "semantic_hash": ""
   },
   "app/Services/TelegramService.php": {
@@ -400,8 +400,8 @@
     "semantic_hash": ""
   },
   "docker/entrypoint.sh": {
-    "mtime": 1788362752.453779,
-    "ast_hash": "c8382c1772db00be55a6c613a8d82f5e",
+    "mtime": 1793528625.7513335,
+    "ast_hash": "e21248c62a20fe3bc9d25012c13964d0",
     "semantic_hash": ""
   },
   "package.json": {
@@ -415,8 +415,8 @@
     "semantic_hash": ""
   },
   "public/js/sidebar.js": {
-    "mtime": 1791556810.1642282,
-    "ast_hash": "353b4e5d8e4fc14bd136e6253880f13e",
+    "mtime": 1794471142.3730032,
+    "ast_hash": "137e078bd9de480d2a1c74ab68f8bea6",
     "semantic_hash": ""
   },
   "resources/js/app.js": {
@@ -450,8 +450,8 @@
     "semantic_hash": ""
   },
   "resources/views/financas/index.blade.php": {
-    "mtime": 1793466296.230821,
-    "ast_hash": "7b068306365f73ff8792c2fd5263d58f",
+    "mtime": 1794164694.6073923,
+    "ast_hash": "0f4d5d2971838fcd5c31c20cec1bacb9",
     "semantic_hash": ""
   },
   "resources/views/home.blade.php": {
@@ -460,8 +460,8 @@
     "semantic_hash": ""
   },
   "resources/views/salary/index.blade.php": {
-    "mtime": 1792889223.6141255,
-    "ast_hash": "002141654ef97eee00666417ca6b39f0",
+    "mtime": 1794389555.379884,
+    "ast_hash": "626b53f9614b0cedf51a8a1bba07ffb4",
     "semantic_hash": ""
   },
   "resources/views/welcome.blade.php": {
@@ -475,8 +475,8 @@
     "semantic_hash": ""
   },
   "routes/web.php": {
-    "mtime": 1793524446.212536,
-    "ast_hash": "e96a767fc195433c27bd3770ba432334",
+    "mtime": 1794389555.3808842,
+    "ast_hash": "341f0de9131143247015e246b2e958df",
     "semantic_hash": ""
   },
   "tests/Feature/ExampleTest.php": {
@@ -485,8 +485,8 @@
     "semantic_hash": ""
   },
   "tests/Feature/SalaryProjectionTest.php": {
-    "mtime": 1786473968.401078,
-    "ast_hash": "8f73489f5281fbfa00bd3871b11fe081",
+    "mtime": 1794389865.489426,
+    "ast_hash": "3106c1036997ba9c8a4fc5759638a8be",
     "semantic_hash": ""
   },
   "tests/TestCase.php": {
@@ -500,8 +500,8 @@
     "semantic_hash": ""
   },
   "vite.config.js": {
-    "mtime": 1793473136.2673092,
-    "ast_hash": "8a0bfd64ecd5ea57becbfcb104e08435",
+    "mtime": 1793639275.4696088,
+    "ast_hash": "21870672fe128bbe2d51613eff20b18e",
     "semantic_hash": ""
   },
   ".agents/rules/graphify.md": {
@@ -675,8 +675,8 @@
     "semantic_hash": ""
   },
   "app/Console/Commands/ExportProductionDataCommand.php": {
-    "mtime": 1793472295.7570164,
-    "ast_hash": "027a55bf51791e52fcafc4f2613b68f8",
+    "mtime": 1794386319.6290588,
+    "ast_hash": "78dc468f6cd328a2c0eb88342747e48c",
     "semantic_hash": ""
   },
   "database/seeders/ProductionDataSeeder.php": {
@@ -810,18 +810,18 @@
     "semantic_hash": ""
   },
   "app/Http/Controllers/DatabaseSyncController.php": {
-    "mtime": 1789564035.7043927,
-    "ast_hash": "e6843f4c6fedcb75148ca803a169d406",
+    "mtime": 1794469538.338304,
+    "ast_hash": "25d887a1e06bd784e9fc49bc8503658e",
     "semantic_hash": ""
   },
   "app/Services/DatabaseSyncService.php": {
-    "mtime": 1793472295.7560134,
-    "ast_hash": "1c0737a4c65dfff284a9cbb4a28d95e9",
+    "mtime": 1794469541.178653,
+    "ast_hash": "ca7a092d17aa01d9ab464df384895363",
     "semantic_hash": ""
   },
   "resources/views/components/sync-modal.blade.php": {
-    "mtime": 1789564129.1152403,
-    "ast_hash": "9ce450d407341b5d6db5456551f80e08",
+    "mtime": 1794471125.7883298,
+    "ast_hash": "7709b03d37680b5ecdc93c35f4c460e3",
     "semantic_hash": ""
   },
   "tests/Feature/DatabaseSyncTest.php": {
@@ -995,8 +995,8 @@
     "semantic_hash": ""
   },
   "resources/views/photos/index.blade.php": {
-    "mtime": 1793094391.0826035,
-    "ast_hash": "fe1f71aaf223ae736072f9426c78c713",
+    "mtime": 1794471108.8255453,
+    "ast_hash": "c3da937f6476f7b97ce16b4c79d50757",
     "semantic_hash": ""
   },
   "resources/views/photos/login.blade.php": {
@@ -1090,8 +1090,8 @@
     "semantic_hash": ""
   },
   "app/Services/StatementImportService.php": {
-    "mtime": 1793466056.9356737,
-    "ast_hash": "8c95951241664108c71a4981d940bc2e",
+    "mtime": 1794127759.8185537,
+    "ast_hash": "e33a2fee23d49ea1604e1b1ee504b1d2",
     "semantic_hash": ""
   },
   "resources/views/components/import-extrato-modal.blade.php": {
@@ -1100,8 +1100,8 @@
     "semantic_hash": ""
   },
   "tests/Feature/StatementImportTest.php": {
-    "mtime": 1793107143.1887555,
-    "ast_hash": "1d8721a13c9cfe864f29d5709ebba4e4",
+    "mtime": 1794127759.819553,
+    "ast_hash": "95cab0d4dd478a0c0c77b604a2d33101",
     "semantic_hash": ""
   },
   "app/Services/CreditCardReconciliationService.php": {
@@ -1175,8 +1175,8 @@
     "semantic_hash": ""
   },
   "app/Services/StudySyncService.php": {
-    "mtime": 1793523881.840093,
-    "ast_hash": "cd611ceb99fcb50c4ec076b81cf27e32",
+    "mtime": 1794127595.1822696,
+    "ast_hash": "6061862154eb404da9a06541b7651ffd",
     "semantic_hash": ""
   },
   "database/migrations/2026_10_31_140000_drop_legacy_study_tables.php": {
@@ -1200,13 +1200,13 @@
     "semantic_hash": ""
   },
   "resources/js/estudos/audio.js": {
-    "mtime": 1793479895.6942832,
-    "ast_hash": "3f67254530cc674bd43fe829b85ca07c",
+    "mtime": 1794126633.1482072,
+    "ast_hash": "49e0974e78d83e544e3b157f576d5245",
     "semantic_hash": ""
   },
   "resources/js/estudos/avatars.js": {
-    "mtime": 1793480553.201722,
-    "ast_hash": "5d32cf0272149a5d3640ed1c6ae71bd1",
+    "mtime": 1793639244.3398044,
+    "ast_hash": "cbbd5afdac17e473b5827f91c8419380",
     "semantic_hash": ""
   },
   "resources/js/estudos/db.js": {
@@ -1215,28 +1215,28 @@
     "semantic_hash": ""
   },
   "resources/js/estudos/importer.js": {
-    "mtime": 1793524016.9099715,
-    "ast_hash": "af26e65c7bdd1f7aa35bd49da7378efb",
+    "mtime": 1794126633.151208,
+    "ast_hash": "b99c751b230783066b7a5de904817c78",
     "semantic_hash": ""
   },
   "resources/js/estudos/main.js": {
-    "mtime": 1793524062.9992623,
-    "ast_hash": "6ffb285875d9171ad2908984da420afe",
+    "mtime": 1794127595.1862686,
+    "ast_hash": "993121f9b8aae0ce8b5f3f3a36deaab9",
     "semantic_hash": ""
   },
   "resources/js/estudos/metrics.js": {
-    "mtime": 1793479908.080492,
-    "ast_hash": "e4e0b88f79c444efcdd2fb8938915148",
+    "mtime": 1794127595.1872697,
+    "ast_hash": "0ac10042853899bfb246d7e196a2179e",
     "semantic_hash": ""
   },
   "resources/js/estudos/sync.js": {
-    "mtime": 1793477132.6311333,
-    "ast_hash": "6b74deac52694124b385835fbb53d72a",
+    "mtime": 1793530417.3794868,
+    "ast_hash": "f3924d97d4de7b55f7a3842e6a0b45d3",
     "semantic_hash": ""
   },
   "resources/views/estudos/app.blade.php": {
-    "mtime": 1793478582.161483,
-    "ast_hash": "aeca9d55331b111e075f2efffe6aa520",
+    "mtime": 1794126633.1572063,
+    "ast_hash": "94b3125b58a18c15a22ace8c14f5d127",
     "semantic_hash": ""
   },
   "tests/Feature/BackupEstudosCommandTest.php": {
@@ -1245,23 +1245,23 @@
     "semantic_hash": ""
   },
   "tests/Feature/StudySyncTest.php": {
-    "mtime": 1793523917.7229176,
-    "ast_hash": "06855e9aae3a556cb4d6b2a816eb5a97",
+    "mtime": 1794127595.1913712,
+    "ast_hash": "81b1b0949ad80e970fa63bf80d0c814e",
     "semantic_hash": ""
   },
   "tests/js/estudos/avatars.test.js": {
-    "mtime": 1793479100.258569,
-    "ast_hash": "121e0318bf03345f2a8148f2efd7d2e1",
+    "mtime": 1793637967.8815384,
+    "ast_hash": "47448ba87852c7b7a25db7f1d8bae7e5",
     "semantic_hash": ""
   },
   "tests/js/estudos/importer.test.js": {
-    "mtime": 1793483730.481514,
-    "ast_hash": "1ad196797c952ccd8f281c938cb7fc71",
+    "mtime": 1794126633.1607144,
+    "ast_hash": "896bcaad805685382cd6d350214fa873",
     "semantic_hash": ""
   },
   "tests/js/estudos/metrics.test.js": {
-    "mtime": 1793476955.1392891,
-    "ast_hash": "4ef778b4e00f71f88611a91981b2294b",
+    "mtime": 1793790400.2968235,
+    "ast_hash": "6ad12abc4c3fb65601ee27f7996f6ee6",
     "semantic_hash": ""
   },
   "tests/js/estudos/trends.test.js": {
@@ -1270,8 +1270,8 @@
     "semantic_hash": ""
   },
   "docs/estudos-ypt-plano.md": {
-    "mtime": 1793480553.000878,
-    "ast_hash": "b70eced451ebbbb1bd4d1e536b7426dd",
+    "mtime": 1794126633.1451998,
+    "ast_hash": "c1cd7dd2d073ad77782892235bf2d8a6",
     "semantic_hash": ""
   },
   "public/img/estudos/icon-192.png": {
@@ -1285,8 +1285,8 @@
     "semantic_hash": ""
   },
   "app/Http/Controllers/Admin/AllowedEmailController.php": {
-    "mtime": 1793524419.478424,
-    "ast_hash": "94d7eab7ecbc789f97f224a4cb5f71f3",
+    "mtime": 1793561053.8218844,
+    "ast_hash": "8ad7a978a6747b70447de9f72b8a8a49",
     "semantic_hash": ""
   },
   "app/Models/AllowedGoogleEmail.php": {
@@ -1310,13 +1310,313 @@
     "semantic_hash": ""
   },
   "resources/views/admin/convites.blade.php": {
-    "mtime": 1793524553.7593324,
-    "ast_hash": "c977cfea1c70b865ee02ed12a22ca140",
+    "mtime": 1793561081.6252913,
+    "ast_hash": "8f4c27b008ea5dbfdead1cee736a26c6",
     "semantic_hash": ""
   },
   "tests/Feature/GoogleAuthAndWhitelistTest.php": {
     "mtime": 1793524654.0801623,
     "ast_hash": "c2a9d89642b771e0afb0d4bf0b16a726",
+    "semantic_hash": ""
+  },
+  "app/Console/Commands/ImportarHoleritesCommand.php": {
+    "mtime": 1794389555.3728826,
+    "ast_hash": "73442db538f3967bdde21942ae95e294",
+    "semantic_hash": ""
+  },
+  "app/Console/Commands/MidiaEstudosCommand.php": {
+    "mtime": 1794127595.1802623,
+    "ast_hash": "93fef4d4aac829b7dc8263044a191b28",
+    "semantic_hash": ""
+  },
+  "app/Console/Commands/ResumoEstudosCommand.php": {
+    "mtime": 1794127595.1802623,
+    "ast_hash": "fa9be50722904f6fbabb850647aa456f",
+    "semantic_hash": ""
+  },
+  "app/DTOs/CassemsEventoDTO.php": {
+    "mtime": 1794389555.4390328,
+    "ast_hash": "aa8b071336e09d601f976cc0f085deff",
+    "semantic_hash": ""
+  },
+  "app/DTOs/DespesaForaFolhaDTO.php": {
+    "mtime": 1794389555.4400327,
+    "ast_hash": "604da90162fbe86c75f69dc45c83ff20",
+    "semantic_hash": ""
+  },
+  "app/Http/Controllers/StudyRoomsController.php": {
+    "mtime": 1793561065.2388568,
+    "ast_hash": "850e2c4e54715cf2916dac434cc9a07f",
+    "semantic_hash": ""
+  },
+  "app/Models/SalaryPayslip.php": {
+    "mtime": 1794389555.375883,
+    "ast_hash": "1aa0e32a22788b90990cb96e261d257f",
+    "semantic_hash": ""
+  },
+  "app/Services/StudyRoomService.php": {
+    "mtime": 1793561068.955094,
+    "ast_hash": "bdb2c3f3c45b6903f37df5f1b3e60da6",
+    "semantic_hash": ""
+  },
+  "app/Services/StudySummaryService.php": {
+    "mtime": 1794127595.1812687,
+    "ast_hash": "5556c8a8076cd837e88c823feff8cba2",
+    "semantic_hash": ""
+  },
+  "database/migrations/2026_11_01_080000_add_descanso_min_to_study_settings.php": {
+    "mtime": 1793533216.3089755,
+    "ast_hash": "dabf3c9d329bc47e353cd0c969372765",
+    "semantic_hash": ""
+  },
+  "database/migrations/2026_11_01_090000_add_tipo_to_study_sessions.php": {
+    "mtime": 1793534278.3737378,
+    "ast_hash": "f06e97b8226fcce65a3e5e58e165f887",
+    "semantic_hash": ""
+  },
+  "database/migrations/2026_11_01_150000_add_tema_to_study_settings.php": {
+    "mtime": 1793558566.9327378,
+    "ast_hash": "10ba12825b9bc43365374d3297b5bb56",
+    "semantic_hash": ""
+  },
+  "database/migrations/2026_11_01_160000_create_study_rooms_tables.php": {
+    "mtime": 1793560598.8529985,
+    "ast_hash": "661d6dbd8a41fba28f1f9dbc5d1721cf",
+    "semantic_hash": ""
+  },
+  "database/migrations/2026_11_01_170000_add_is_owner_to_users_table.php": {
+    "mtime": 1793561020.3163686,
+    "ast_hash": "2e89d214eb52cae1ffa47d2a04bc6c3b",
+    "semantic_hash": ""
+  },
+  "database/migrations/2026_11_04_120000_add_jornada_to_study_settings.php": {
+    "mtime": 1794126633.1431997,
+    "ast_hash": "a3188d62d5327c7321d6e1c4c09a1b63",
+    "semantic_hash": ""
+  },
+  "database/migrations/2026_11_04_200000_widen_tipo_on_study_sessions.php": {
+    "mtime": 1794126633.144198,
+    "ast_hash": "68c4f3e734f046c7819883cfea3f991f",
+    "semantic_hash": ""
+  },
+  "database/migrations/2026_11_08_090000_add_alvo_horas_to_study_settings.php": {
+    "mtime": 1794127595.1822696,
+    "ast_hash": "0dcc25c8f69da74f6f058b48a5c84fce",
+    "semantic_hash": ""
+  },
+  "database/migrations/2026_11_11_090000_create_salary_payslips_table.php": {
+    "mtime": 1794386318.919576,
+    "ast_hash": "325a623f2fe8fbc234c90b3b626c4052",
+    "semantic_hash": ""
+  },
+  "database/migrations/2026_11_11_120000_add_outlier_to_salary_payslips.php": {
+    "mtime": 1794389555.441036,
+    "ast_hash": "b99800afee466a15ab406a118678320a",
+    "semantic_hash": ""
+  },
+  "resources/js/estudos/avatars-imagem.js": {
+    "mtime": 1793639353.0715635,
+    "ast_hash": "9398aa7885bb3967f12b8d1d60011fa8",
+    "semantic_hash": ""
+  },
+  "resources/js/estudos/avatars-vetor.js": {
+    "mtime": 1793639244.0716019,
+    "ast_hash": "afefadf484d3a792af23afef1bab00c9",
+    "semantic_hash": ""
+  },
+  "resources/js/estudos/bosses.js": {
+    "mtime": 1794126633.1502068,
+    "ast_hash": "037ef2f43db59b9b59f96a42182ea447",
+    "semantic_hash": ""
+  },
+  "resources/js/estudos/jornada.js": {
+    "mtime": 1794126633.152205,
+    "ast_hash": "dc4f183d16f69323cd3a4a42b3c6aec1",
+    "semantic_hash": ""
+  },
+  "resources/js/estudos/projection.js": {
+    "mtime": 1794127595.1882696,
+    "ast_hash": "318aeafd52f01d4dfc72cde4399aff50",
+    "semantic_hash": ""
+  },
+  "resources/js/estudos/rooms.js": {
+    "mtime": 1793561103.4274392,
+    "ast_hash": "f150bac8ac8a0cde48ea5c747981950a",
+    "semantic_hash": ""
+  },
+  "resources/js/estudos/widget.js": {
+    "mtime": 1793558566.8977206,
+    "ast_hash": "6c4f049abb755a7be51b3ba2c903f2db",
+    "semantic_hash": ""
+  },
+  "resources/views/estudos/midia/slide.blade.php": {
+    "mtime": 1794127595.1892688,
+    "ast_hash": "78a41e88ba5c0d053c4827d223624ff9",
+    "semantic_hash": ""
+  },
+  "tests/Feature/ManagersTest.php": {
+    "mtime": 1793561129.6017568,
+    "ast_hash": "665b1007756b03c2850ce9df2e572799",
+    "semantic_hash": ""
+  },
+  "tests/Feature/MidiaEstudosCommandTest.php": {
+    "mtime": 1794127595.1892688,
+    "ast_hash": "e502cb28c9221172c2bcec57a1404d8d",
+    "semantic_hash": ""
+  },
+  "tests/Feature/ResumoEstudosCommandTest.php": {
+    "mtime": 1794127595.1902678,
+    "ast_hash": "01e2a8f438c05545ad58fc5ee258e267",
+    "semantic_hash": ""
+  },
+  "tests/Feature/StudyRoomsTest.php": {
+    "mtime": 1793561129.5657392,
+    "ast_hash": "a88a9fee86ba64c7c8f188d09b2b13eb",
+    "semantic_hash": ""
+  },
+  "tests/Feature/TransacaoUpdateDateTest.php": {
+    "mtime": 1794164719.2119782,
+    "ast_hash": "db7bdf0aa62e9d118787e88f6bafed8b",
+    "semantic_hash": ""
+  },
+  "tests/js/estudos/alltime.test.js": {
+    "mtime": 1794126633.1592054,
+    "ast_hash": "23ee7b65a93336ef767c74ff6ff532ac",
+    "semantic_hash": ""
+  },
+  "tests/js/estudos/jornada.test.js": {
+    "mtime": 1794126633.1607144,
+    "ast_hash": "5b1b3ace604f318ac4017d5bce9f1ab0",
+    "semantic_hash": ""
+  },
+  "tests/js/estudos/projection.test.js": {
+    "mtime": 1794127595.1913712,
+    "ast_hash": "418d6b9273f27e16b7d23a025a16dc8e",
+    "semantic_hash": ""
+  },
+  "tests/js/estudos/rooms.test.js": {
+    "mtime": 1793560676.7317114,
+    "ast_hash": "5f3b668f80ea39e762aeb1213cdacbb5",
+    "semantic_hash": ""
+  },
+  "tests/js/estudos/types.test.js": {
+    "mtime": 1794126633.1622646,
+    "ast_hash": "210514f97090daa2a9a082bb8c689fca",
+    "semantic_hash": ""
+  },
+  "tests/js/estudos/widget.test.js": {
+    "mtime": 1793538905.6735198,
+    "ast_hash": "2c55d560eb8fd5658b678d206eac828b",
+    "semantic_hash": ""
+  },
+  ".claude/skills/post-estudos/SKILL.md": {
+    "mtime": 1794127595.1786845,
+    "ast_hash": "3540d0f823672f4e6d4d882e0f133f1e",
+    "semantic_hash": ""
+  },
+  "docs/convite-reddit/banner.html": {
+    "mtime": 1793565975.0586276,
+    "ast_hash": "14445afdf30a2c8022a452d691fb9ab5",
+    "semantic_hash": ""
+  },
+  "docs/convite-reddit/convite.md": {
+    "mtime": 1793561526.1823866,
+    "ast_hash": "aabdcd77ae9094b188585a3655c5835d",
+    "semantic_hash": ""
+  },
+  "docs/sabatina-2026-11-01-sync-e-latencia.md": {
+    "mtime": 1793528607.5790951,
+    "ast_hash": "dbfa6787c3d7d5f6224a86dd680b6b2d",
+    "semantic_hash": ""
+  },
+  "docs/sabatina-2026-11-01-widget-flutuante.md": {
+    "mtime": 1793530902.5485706,
+    "ast_hash": "ef64429624943a082be73baa229e300c",
+    "semantic_hash": ""
+  },
+  "docs/sabatina-2026-11-08-projecao-e-midias.md": {
+    "mtime": 1794127595.1832693,
+    "ast_hash": "ef26542099984cc3229eda9702577454",
+    "semantic_hash": ""
+  },
+  "docs/convite-reddit/1-cronometro.jpg": {
+    "mtime": 1793561403.5902607,
+    "ast_hash": "cc6e13198b432caedeb03de46108d4d3",
+    "semantic_hash": ""
+  },
+  "docs/convite-reddit/2-modo-foco.jpg": {
+    "mtime": 1793561423.4380414,
+    "ast_hash": "8b33081252da58f6e9790e309b8a2883",
+    "semantic_hash": ""
+  },
+  "docs/convite-reddit/3-sala-de-estudo.jpg": {
+    "mtime": 1793561423.4630945,
+    "ast_hash": "8a172851002756a857f83d03623c6119",
+    "semantic_hash": ""
+  },
+  "docs/convite-reddit/4-linha-do-tempo.jpg": {
+    "mtime": 1793561436.13481,
+    "ast_hash": "81b7fe40702e36a3aa6185101974f92e",
+    "semantic_hash": ""
+  },
+  "docs/convite-reddit/5-estatisticas.jpg": {
+    "mtime": 1793561445.7870352,
+    "ast_hash": "18f24985fc620b754a00a00201439fbd",
+    "semantic_hash": ""
+  },
+  "docs/convite-reddit/6-temas-e-avatares.jpg": {
+    "mtime": 1793561481.3321815,
+    "ast_hash": "0aba01f747e221c0207c0cf4f848dcc4",
+    "semantic_hash": ""
+  },
+  "docs/convite-reddit/7-no-computador.jpg": {
+    "mtime": 1793561498.6029866,
+    "ast_hash": "3b3cd05e35f0edea8c089ccf96a8ff8d",
+    "semantic_hash": ""
+  },
+  "docs/convite-reddit/banner-en.png": {
+    "mtime": 1793565985.5657983,
+    "ast_hash": "d261d7aa6e4848286a880a05e672dea2",
+    "semantic_hash": ""
+  },
+  "docs/convite-reddit/banner-pt.png": {
+    "mtime": 1793565984.461155,
+    "ast_hash": "86217407bef5a41558a7710ef67092cd",
+    "semantic_hash": ""
+  },
+  "resources/images/estudos/familia/0.webp": {
+    "mtime": 1793639211.9618053,
+    "ast_hash": "eb134333e01b244934921acbcfb6527b",
+    "semantic_hash": ""
+  },
+  "resources/images/estudos/familia/1.webp": {
+    "mtime": 1793639212.076903,
+    "ast_hash": "6e1796c5dc1cd4be72d8f56e892039bc",
+    "semantic_hash": ""
+  },
+  "resources/images/estudos/familia/2.webp": {
+    "mtime": 1793639212.30367,
+    "ast_hash": "924cd746ec5948ef28c6e069bc2d1c82",
+    "semantic_hash": ""
+  },
+  "resources/images/estudos/familia/3.webp": {
+    "mtime": 1793639212.417447,
+    "ast_hash": "9276d4f57ab0c6d06196ad1d74ad8415",
+    "semantic_hash": ""
+  },
+  "resources/images/estudos/familia/4.webp": {
+    "mtime": 1793639212.5358288,
+    "ast_hash": "c52b2b898bdbe9309ea8fff762f41fce",
+    "semantic_hash": ""
+  },
+  "resources/images/estudos/familia/5.webp": {
+    "mtime": 1793639212.7611206,
+    "ast_hash": "7ba57972c86bf3f323c1e22defb8bc80",
+    "semantic_hash": ""
+  },
+  "resources/images/estudos/familia/6.webp": {
+    "mtime": 1793639212.8877604,
+    "ast_hash": "5ca2638655e10a6ac63eb11f6f3c595b",
     "semantic_hash": ""
   }
 }
