@@ -819,3 +819,25 @@ body.rest-over [data-live="rest"], body.rest-over [data-w-time] { color: var(--d
 @media (prefers-reduced-motion: reduce) {
     .boss-art *, .arena *, .arena::after, .boss-card *, .victory { animation: none !important; }
 }
+
+/* ── Meta atual da Guruja (cronômetro) ── */
+.guruja { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 12px 14px; margin-top: 12px; text-align: left; }
+.guruja header { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 8px; }
+.guruja header small { display: block; color: var(--muted); font-size: .72rem; }
+.guruja header b { font-size: 1rem; }
+.guruja .gj-pct { font-weight: 700; color: var(--primary); }
+.guruja .gj-late { color: var(--warn); }
+.guruja h4 { margin: 12px 0 4px; font-size: .8rem; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: .03em; }
+.gj-list { list-style: none; margin: 0; padding: 0; }
+.gj-list li { display: flex; gap: 10px; align-items: flex-start; padding: 7px 0; border-top: 1px solid var(--border); }
+.gj-list li:first-child { border-top: 0; }
+.gj-list li div { min-width: 0; }
+.gj-list b { display: block; font-size: .88rem; font-weight: 600; overflow-wrap: anywhere; }
+.gj-list small { display: block; color: var(--muted); font-size: .74rem; margin-top: 1px; }
+.gj-check { flex: none; width: 18px; height: 18px; margin-top: 1px; border: 2px solid var(--border); border-radius: 50%; display: grid; place-items: center; font-size: .7rem; line-height: 1; }
+.gj-list li.done .gj-check { background: var(--primary); border-color: var(--primary); color: var(--on-primary, #fff); }
+.gj-list li.done b { color: var(--muted); text-decoration: line-through; font-weight: 500; }
+.gj-list li.skipped .gj-check { background: var(--border); color: var(--muted); }
+.gj-toggle { background: none; border: 0; color: var(--muted); font: inherit; font-size: .8rem; font-weight: 600; padding: 10px 0 4px; cursor: pointer; text-transform: uppercase; letter-spacing: .03em; }
+.gj-empty { color: var(--muted); font-size: .85rem; margin: 4px 0; }
+.gj-updated { color: var(--muted); font-size: .7rem; margin: 8px 0 0; text-align: right; }

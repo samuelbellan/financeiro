@@ -383,6 +383,57 @@ class EstudosApiController extends Controller
             ->all();
     }
 
+    /**
+     * Recebe a foto da meta atual da Guruja (enviada por uma rotina que lê a plataforma) e substitui a
+     * anterior. Única rota de escrita da API: não toca nas sessões de estudo.
+     */
+    public function gurujaStore(Request $request): JsonResponse
+    {
+        $userId = $this->authenticate($request);
+        if (!$userId) {
+            return response()->json(['message' => 'Token ausente ou inválido.'], 401);
+        }
+        $data = $request->validate([
+            'lido_em' => 'nullable|date',
+            'meta' => 'required|array',
+            'meta.target_id' => 'required|integer',
+            'meta.ordem' => 'nullable|integer',
+            'meta.status' => 'nullable|string|max:30',
+            'meta.data_inicio' => 'nullable|string|max:40',
+            'meta.dias_atraso' => 'nullable|integer',
+            'meta.questoes_resolvidas' => 'nullable|integer',
+            'meta.acertos' => 'nullable|integer',
+            'meta.minutos_estudados' => 'nullable|integer',
+            'meta.atividades' => 'required|array|max:200',
+            'meta.atividades.*.target_activity_id' => 'nullable|integer',
+            'meta.atividades.*.titulo' => 'required|string|max:300',
+            'meta.atividades.*.disciplina' => 'nullable|string|max:150',
+            'meta.atividades.*.tipo' => 'nullable|string|max:60',
+            'meta.atividades.*.concluida' => 'required|boolean',
+            'meta.atividades.*.ignorada' => 'nullable|boolean',
+            'meta.atividades.*.questoes' => 'nullable|integer',
+            'meta.atividades.*.acertos' => 'nullable|integer',
+            'meta.atividades.*.minutos' => 'nullable|integer',
+            'meta.atividades.*.relevancia' => 'nullable|integer',
+            'meta.reforcos' => 'nullable|array|max:100',
+            'meta.reforcos.*.titulo' => 'required|string|max:300',
+            'meta.reforcos.*.disciplina' => 'nullable|string|max:150',
+            'meta.reforcos.*.concluido' => 'required|boolean',
+            'meta.reforcos.*.ignorado' => 'nullable|boolean',
+            'meta.reforcos.*.questoes_resolvidas' => 'nullable|integer',
+            'meta.reforcos.*.acertos' => 'nullable|integer',
+            'meta.reforcos.*.minutos' => 'nullable|integer',
+        ]);
+
+        $lidoEm = isset($data['lido_em']) ? Carbon::parse($data['lido_em']) : now();
+        DB::table('study_guruja_metas')->updateOrInsert(
+            ['user_id' => $userId],
+            ['payload' => json_encode($data['meta'], JSON_UNESCAPED_UNICODE), 'lido_em' => $lidoEm, 'updated_at' => now(), 'created_at' => now()],
+        );
+
+        return response()->json(['ok' => true, 'lido_em' => $lidoEm->utc()->format('Y-m-d\TH:i:s\Z')]);
+    }
+
     protected function authenticate(Request $request): ?int
     {
         $plain = $request->bearerToken();

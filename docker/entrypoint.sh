@@ -22,13 +22,17 @@ if [ "$DB_CONNECTION" = "sqlite" ] && [ -n "$DB_DATABASE" ] && [ "$DB_DATABASE" 
     chmod 775 "$DB_DATABASE"
 fi
 
+# Conexão ao Postgres desiste em 15 s (libpq): um banco que não responde vira erro visível no log,
+# em vez de travar o boot até o Render desistir por falta de porta aberta (15 min, sem mensagem).
+export PGCONNECT_TIMEOUT="${PGCONNECT_TIMEOUT:-15}"
+
 # Executa as migrações no banco de dados se não desativado
 if [ "$SKIP_MIGRATIONS" != "true" ]; then
     echo "Executando migrações do banco de dados..."
     # Até 3 tentativas (o banco pode estar acordando). Se todas falharem, o container não sobe:
     # assim o Render mantém a versão anterior no ar em vez de rodar código novo sem as colunas novas.
     attempt=1
-    until php artisan migrate --force; do
+    until timeout 180 php artisan migrate --force; do
         if [ "$attempt" -ge 3 ]; then
             echo "Erro: migrações falharam após $attempt tentativas. Abortando o deploy."
             exit 1
@@ -47,16 +51,16 @@ fi
 
 # Otimizações de cache do Laravel para ambiente de produção
 echo "Gerando caches de configuração e rotas..."
-php artisan config:cache
-php artisan route:cache
-php artisan view:cache
+timeout 120 php artisan config:cache
+timeout 120 php artisan route:cache
+timeout 120 php artisan view:cache
 php artisan storage:link --force || true
 
 # Configura automaticamente o webhook do Telegram se solicitado e APP_URL for HTTPS
 if [ "$AUTO_SET_TELEGRAM_WEBHOOK" = "true" ]; then
     if [ -n "$APP_URL" ] && [ -n "$TELEGRAM_BOT_TOKEN" ]; then
         echo "Configurando Webhook do Telegram para: $APP_URL/webhook/telegram..."
-        php artisan telegram:set-webhook "$APP_URL/webhook/telegram" || echo "Aviso: Falha ao registrar webhook do Telegram."
+        timeout 30 php artisan telegram:set-webhook "$APP_URL/webhook/telegram" || echo "Aviso: Falha ao registrar webhook do Telegram."
     else
         echo "Aviso: AUTO_SET_TELEGRAM_WEBHOOK está ativo, mas TELEGRAM_BOT_TOKEN ou APP_URL não foram configurados nas variáveis de ambiente."
     fi
