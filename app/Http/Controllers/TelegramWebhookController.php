@@ -30,6 +30,12 @@ use Barryvdh\DomPDF\Facade\Pdf;
 
 class TelegramWebhookController extends Controller
 {
+    /**
+     * Por que o último encaminhamento ao projeto local falhou: 'offline' (sem URL
+     * ou ping sem resposta) ou 'error' (timeout/erro no meio, o local pode ter salvo).
+     */
+    protected ?string $localForwardFailure = null;
+
     public function __construct(
         protected WhatsappMessageParser $parser,
         protected TelegramService $telegram,
@@ -115,9 +121,26 @@ class TelegramWebhookController extends Controller
         }
 
         // ── 3.1. Roteamento Local-First (Tentar Projeto Local antes da Nuvem) ────
-        $forwardedResponse = $this->attemptForwardToLocal($request);
+        if ($photos) {
+            // O OCR no local pode levar bem mais que o padrão de 30 s do PHP.
+            @set_time_limit(200);
+        }
+        $forwardedResponse = $this->attemptForwardToLocal($request, $photos ? 150 : 60);
         if ($forwardedResponse !== null) {
             return $forwardedResponse;
+        }
+
+        // ── 3.2. Notas fiscais ficam só no projeto local ─────────────────────
+        // A Nuvem nunca processa nem guarda foto de NF: sem o local, avisa e para.
+        if ($photos && $this->isCloudInstance($request)) {
+            $aviso = $this->localForwardFailure === 'error'
+                ? "⚠️ *Nota fiscal não confirmada*\n\nO projeto local não respondeu a tempo (ele pode ainda estar processando). Confira em Mercado no projeto local antes de reenviar. Nada foi salvo na nuvem."
+                : "🔌 *Projeto local offline*\n\nA nota fiscal *não* foi salva: notas de mercado ficam só no projeto local. Ligue o PC e o túnel (ngrok) e reenvie a foto.";
+            $this->telegram->sendMessage($chatId, $aviso);
+            Log::warning('[Telegram Webhook] Foto de NF recusada na Nuvem (somente local).', [
+                'motivo' => $this->localForwardFailure,
+            ]);
+            return response()->json(['ok' => true, 'skipped' => 'nota_fiscal_local_only']);
         }
 
         // ── 4. Encontrar usuário dono do sistema ──────────────────────────────
@@ -1038,8 +1061,10 @@ class TelegramWebhookController extends Controller
      * Tenta encaminhar a requisição para o projeto local se estiver online (Local-First).
      * Retorna a resposta JSON se processado com sucesso pelo local, ou null se offline/não aplicável.
      */
-    protected function attemptForwardToLocal(Request $request): ?\Illuminate\Http\JsonResponse
+    protected function attemptForwardToLocal(Request $request, int $timeoutSeconds = 60): ?\Illuminate\Http\JsonResponse
     {
+        $this->localForwardFailure = null;
+
         // 1. Evitar loops: se a requisição já veio encaminhada pela Nuvem, processa aqui no local
         if ($request->header('X-Forwarded-From-Cloud') === 'true') {
             return null;
@@ -1049,6 +1074,7 @@ class TelegramWebhookController extends Controller
         $localWebhookUrl = Cache::get('telegram_dynamic_local_url') ?: config('telegram.local_webhook_url');
 
         if (empty($localWebhookUrl)) {
+            $this->localForwardFailure = 'offline';
             return null;
         }
 
@@ -1084,6 +1110,7 @@ class TelegramWebhookController extends Controller
         }
 
         if (!$isOnline) {
+            $this->localForwardFailure = 'offline';
             Log::warning('[Telegram Webhook] Projeto LOCAL está OFFLINE. Executando processamento no projeto da NUVEM.');
             return null;
         }
@@ -1104,8 +1131,8 @@ class TelegramWebhookController extends Controller
                 $forwardHeaders['X-Telegram-Bot-Api-Secret-Token'] = $secret;
             }
 
-            // Timeout de até 60s para OCR/Gemini ser concluído pelo local
-            $forward = Http::timeout(60)
+            // Timeout para o OCR/Gemini ser concluído pelo local
+            $forward = Http::timeout($timeoutSeconds)
                 ->withHeaders($forwardHeaders)
                 ->post($localWebhookUrl, $request->all());
 
@@ -1123,7 +1150,21 @@ class TelegramWebhookController extends Controller
             Log::warning('[Telegram Webhook] Falha ao enviar para o projeto local (' . $e->getMessage() . '). Fazendo fallback para a Nuvem.');
         }
 
+        $this->localForwardFailure = 'error';
         return null;
+    }
+
+    /**
+     * Esta instância é a Nuvem (Render)? Requisições repassadas pela Nuvem
+     * nunca são, nem o projeto local (APP_ENV=local).
+     */
+    protected function isCloudInstance(Request $request): bool
+    {
+        if ($request->header('X-Forwarded-From-Cloud') === 'true') {
+            return false;
+        }
+
+        return app()->environment('production');
     }
 
 

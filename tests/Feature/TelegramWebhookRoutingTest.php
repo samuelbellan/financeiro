@@ -162,4 +162,69 @@ class TelegramWebhookRoutingTest extends TestCase
         $response->assertStatus(200);
         $this->assertEquals(1, Transacao::count());
     }
+
+    private function nfPhotoPayload(int $updateId): array
+    {
+        return [
+            'update_id' => $updateId,
+            'message' => [
+                'chat' => ['id' => 12345678],
+                'photo' => [['file_id' => 'abc', 'width' => 800, 'height' => 1200]],
+            ],
+        ];
+    }
+
+    private function configCloud(): void
+    {
+        $this->app['env'] = 'production';
+        config([
+            'telegram.webhook_secret' => 'secret123',
+            'telegram.allowed_chat_id' => '12345678',
+            'telegram.local_webhook_url' => 'https://remote-local-pc.ngrok-free.dev/webhook/telegram',
+            'app.url' => 'https://financeiro-app.onrender.com',
+        ]);
+    }
+
+    public function test_cloud_refuses_nf_photo_when_local_is_offline(): void
+    {
+        $this->configCloud();
+        Http::fake([
+            'https://remote-local-pc.ngrok-free.dev/webhook/telegram/ping' => Http::response('Offline', 502),
+        ]);
+
+        $this->mock(TelegramService::class, function (MockInterface $mock) {
+            $mock->shouldReceive('sendMessage')->once()
+                ->withArgs(fn ($chat, $msg) => str_contains($msg, 'Projeto local offline'))
+                ->andReturn(true);
+            $mock->shouldNotReceive('getFile');
+        });
+
+        $this->withHeaders(['X-Telegram-Bot-Api-Secret-Token' => 'secret123'])
+            ->postJson(route('webhook.telegram'), $this->nfPhotoPayload(20010))
+            ->assertStatus(200)
+            ->assertJson(['skipped' => 'nota_fiscal_local_only']);
+
+        $this->assertEquals(0, \App\Models\NotaFiscal::count());
+    }
+
+    public function test_cloud_does_not_fall_back_when_local_forward_fails(): void
+    {
+        $this->configCloud();
+        Http::fake([
+            'https://remote-local-pc.ngrok-free.dev/webhook/telegram/ping' => Http::response(['ok' => true], 200),
+            'https://remote-local-pc.ngrok-free.dev/webhook/telegram' => Http::response('Gateway Timeout', 504),
+        ]);
+
+        $this->mock(TelegramService::class, function (MockInterface $mock) {
+            $mock->shouldReceive('sendMessage')->once()
+                ->withArgs(fn ($chat, $msg) => str_contains($msg, 'não confirmada'))
+                ->andReturn(true);
+            $mock->shouldNotReceive('getFile');
+        });
+
+        $this->withHeaders(['X-Telegram-Bot-Api-Secret-Token' => 'secret123'])
+            ->postJson(route('webhook.telegram'), $this->nfPhotoPayload(20011))
+            ->assertStatus(200)
+            ->assertJson(['skipped' => 'nota_fiscal_local_only']);
+    }
 }
