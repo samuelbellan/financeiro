@@ -555,6 +555,14 @@ Retorne APENAS um JSON estrito (sem markdown, sem explicações adicionais) com 
 
         $ocorrenciaNoArquivo = [];
         $inseridosPorChave = [];
+        $fitidsDoArquivo = array_values(array_filter(array_column($transacoes, 'fitid')));
+        $idsConciliados = [];
+        $chavesDoArquivo = [];
+        foreach ($transacoes as $t) {
+            $chavesDoArquivo[\App\Services\TransactionDeduplicationService::chaveImportacao(
+                (string) $t['data'], (float) $t['valor'], $t['tipo'], (string) $t['descricao']
+            )] = true;
+        }
 
         DB::beginTransaction();
         try {
@@ -590,15 +598,21 @@ Retorne APENAS um JSON estrito (sem markdown, sem explicações adicionais) com 
                         valor: (float) $t['valor'],
                         tipo: $t['tipo'],
                         dataStr: (string) $t['data'],
-                        descricao: (string) $t['descricao']
+                        descricao: (string) $t['descricao'],
+                        fitidsDoArquivo: $fitidsDoArquivo,
+                        idsJaConciliados: $idsConciliados,
+                        chavesDoArquivo: $chavesDoArquivo
                     );
 
                     if ($matchManual) {
+                        $idsConciliados[] = $matchManual->id;
                         // Vincula e enriquece a transação existente com dados do extrato bancário
                         if (!$matchManual->conta_id && $contaId) {
                             $matchManual->conta_id = $contaId;
                         }
-                        if (empty($matchManual->fitid) && !empty($t['fitid'])) {
+                        // O candidato nunca tem fitid presente no arquivo: adota o fitid atual
+                        // para que próximas importações já casem pela checagem 1.
+                        if (!empty($t['fitid'])) {
                             $matchManual->fitid = $t['fitid'];
                         }
                         if (empty($matchManual->numero_documento) && !empty($t['numero_documento'])) {

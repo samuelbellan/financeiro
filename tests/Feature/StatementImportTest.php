@@ -131,6 +131,42 @@ class StatementImportTest extends TestCase
         $this->assertEqualsWithDelta(5865 - 15.10 + 3200 - 450, (float) $saldo, 0.001);
     }
 
+    public function test_csv_reconcilia_lancamento_mesclado_com_fitid_legado(): void
+    {
+        $conta = Conta::create(['user_id' => $this->user->id, 'nome' => 'Corrente', 'tipo' => 'corrente', 'moeda' => 'BRL', 'saldo_atual' => 0, 'ativo' => true]);
+
+        // Lançamentos já conciliados/mesclados antes: descrição editada, data um pouco
+        // diferente e fitid gerado por uma versão antiga do importador.
+        $legados = [
+            ['2026-10-16', 75.00, 'despesa', 'Josefa', 'legado01'],
+            ['2026-10-17', 56.00, 'receita', 'PIX ZAMILDA', 'legado02'],
+            ['2026-10-18', 100.00, 'despesa', 'Pix Marcelo (Missoes)', 'legado03'],
+        ];
+        foreach ($legados as [$data, $valor, $tipo, $desc, $fitid]) {
+            Transacao::create(['user_id' => $this->user->id, 'conta_id' => $conta->id, 'data' => $data, 'valor' => $valor, 'tipo' => $tipo, 'descricao' => $desc, 'fitid' => $fitid, 'categoria' => 'Outros']);
+        }
+
+        $tmp = tempnam(sys_get_temp_dir(), 'csv_') . '.csv';
+        file_put_contents($tmp, "Data;Descrição;Detalhe;Valor;Saldo\n" .
+            "20/10/2026;Pix enviado;Fulano;-75,00;R$ 0,00\n" .   // outro Pix de 75: novo
+            "19/10/2026;Pix enviado;Marcelo;-100,00;R$ 0,00\n" .
+            "19/10/2026;Pix recebido;Zamilda;56,00;R$ 0,00\n" .
+            "16/10/2026;Pix enviado;Josefa;-75,00;R$ 0,00\n");
+
+        $service = new StatementImportService();
+        $r = $service->import(new UploadedFile($tmp, 'extrato.csv', 'text/csv', null, true), $this->user->id, $conta->id);
+        $this->assertSame(1, $r['inseridos']);
+        $this->assertSame(3, $r['duplicados']);
+        $this->assertSame(4, Transacao::count());
+
+        // Os mesclados adotam o fitid atual: reimportar casa direto pelo fitid
+        $this->assertSame(0, Transacao::where('fitid', 'like', 'legado%')->count());
+        $r2 = $service->import(new UploadedFile($tmp, 'extrato.csv', 'text/csv', null, true), $this->user->id, $conta->id);
+        $this->assertSame(0, $r2['inseridos']);
+        $this->assertSame(4, Transacao::count());
+        @unlink($tmp);
+    }
+
     public function test_http_endpoint_imports_csv_via_ajax(): void
     {
         $csvContent = "Data,Historico,Valor\n" .

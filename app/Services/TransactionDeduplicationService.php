@@ -104,7 +104,10 @@ class TransactionDeduplicationService
         string $tipo,
         string $dataStr,
         string $descricao,
-        int $maxDays = 3
+        int $maxDays = 3,
+        array $fitidsDoArquivo = [],
+        array $idsJaConciliados = [],
+        array $chavesDoArquivo = []
     ): ?Transacao {
         $targetDate = Carbon::parse($dataStr);
         $startDate = $targetDate->copy()->subDays($maxDays)->toDateString();
@@ -113,14 +116,21 @@ class TransactionDeduplicationService
         $valMin = round($valor, 2) - 0.009;
         $valMax = round($valor, 2) + 0.009;
 
-        // Candidatos do usuário com mesmo tipo e valor exato dentro do intervalo de dias
-        // Prioriza transações manuais (sem fitid)
+        // Candidatos do usuário com mesmo tipo e valor exato dentro do intervalo de dias:
+        // manuais (sem fitid) ou com fitid que não corresponde a nenhuma linha do arquivo
+        // (ex.: fitid legado gerado por versão antiga do importador, ou lançamento mesclado).
+        // whereDate: a coluna `data` pode estar como "Y-m-d" ou "Y-m-d 00:00:00".
         $candidates = Transacao::where('user_id', $userId)
             ->where('tipo', $tipo)
             ->whereBetween('valor', [$valMin, $valMax])
-            ->whereBetween('data', [$startDate, $endDate])
-            ->where(function ($q) {
+            ->whereDate('data', '>=', $startDate)
+            ->whereDate('data', '<=', $endDate)
+            ->when(!empty($idsJaConciliados), fn($q) => $q->whereNotIn('id', $idsJaConciliados))
+            ->where(function ($q) use ($fitidsDoArquivo) {
                 $q->whereNull('fitid')->orWhere('fitid', '');
+                if (!empty($fitidsDoArquivo)) {
+                    $q->orWhereNotIn('fitid', $fitidsDoArquivo);
+                }
             })
             ->get();
 
@@ -134,6 +144,12 @@ class TransactionDeduplicationService
         foreach ($candidates as $cand) {
             $candDate = Carbon::parse($cand->data);
             $diffDays = abs($targetDate->diffInDays($candDate, false));
+
+            // Já é a cópia exata de outra linha do arquivo: pertence àquela linha
+            $chaveCand = self::chaveImportacao($candDate->toDateString(), (float) $cand->valor, $cand->tipo, (string) $cand->descricao);
+            if (isset($chavesDoArquivo[$chaveCand])) {
+                continue;
+            }
 
             if (!self::areDescriptionsCompatible($descricao, $cand->descricao)) {
                 // Se as descrições não têm nada a ver e nenhuma é genérica, ignora
@@ -162,6 +178,14 @@ class TransactionDeduplicationService
         }
 
         return $bestCandidate;
+    }
+
+    /**
+     * Chave de correspondência exata entre um lançamento e uma linha de extrato.
+     */
+    public static function chaveImportacao(string $data, float $valor, string $tipo, string $descricao): string
+    {
+        return $data . '|' . number_format($valor, 2, '.', '') . '|' . $tipo . '|' . trim($descricao);
     }
 
     /**
