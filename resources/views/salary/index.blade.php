@@ -43,6 +43,11 @@
             }
         }
 
+        /* Sem isto, gráficos e tabelas largos esticam a coluna em vez de rolar dentro dela */
+        .settings-column, .results-column {
+            min-width: 0;
+        }
+
         /* Glassmorphic Cards */
         .glass-card {
             background: var(--bg-glass);
@@ -642,7 +647,7 @@
 
         .dynamic-row-aq-perm {
             display: grid;
-            grid-template-columns: 2fr 1fr 1.25fr 30px;
+            grid-template-columns: 2fr 0.8fr 1.2fr 1.2fr 30px;
             gap: 0.5rem;
             align-items: center;
             margin-bottom: 0.5rem;
@@ -666,6 +671,54 @@
         .badge-event-emerald { background: rgba(52, 211, 153, 0.2); color: #6ee7b7; border: 1px solid rgba(52, 211, 153, 0.3); }
         .badge-event-orange { background: rgba(249, 115, 22, 0.2); color: #fdba74; border: 1px solid rgba(249, 115, 22, 0.3); }
         .badge-event-yellow { background: rgba(234, 179, 8, 0.2); color: #fde047; border: 1px solid rgba(234, 179, 8, 0.3); }
+
+        /* Aba Carreira TJMS */
+        .career-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+        }
+        .career-card {
+            background: rgba(30, 41, 59, 0.6);
+            border: 1px solid var(--border-glass);
+            border-radius: 12px;
+            padding: 0.9rem 1rem;
+        }
+        .career-card .lbl { font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.04em; margin: 0 0 0.3rem; }
+        .career-card .val { font-family: var(--font-outfit); font-size: 1.3rem; font-weight: 600; color: #f1f5f9; margin: 0; }
+        .career-card .sub { font-size: 0.72rem; color: #cbd5e1; margin: 0.25rem 0 0; }
+        .career-row-atual td { background: rgba(99, 102, 241, 0.14); font-weight: 600; }
+        .career-row-atingida td { color: var(--text-muted); }
+        .career-table tbody tr { cursor: default; }
+        .career-note { font-size: 0.72rem; color: var(--text-muted); line-height: 1.5; margin: 0.75rem 0 0; }
+        .extra-liquido { display: block; font-size: 0.68rem; font-weight: 500; color: #6ee7b7; white-space: nowrap; }
+
+        .dynamic-row-cassems {
+            display: grid;
+            grid-template-columns: 1.3fr 1fr 1fr 30px;
+            gap: 0.5rem;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+        .dynamic-row-despesas {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1.25fr 1.25fr 30px;
+            gap: 0.5rem;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+        .field-hint { font-size: 0.7rem; color: var(--text-muted); margin: 0.3rem 0 0; line-height: 1.4; }
+        .career-card.erro-ok { border-color: rgba(52, 211, 153, 0.55); }
+        .career-card.erro-ok .val { color: #34d399; }
+        .career-card.erro-alto { border-color: rgba(248, 113, 113, 0.6); }
+        .career-card.erro-alto .val { color: #f87171; }
+        .real-row-outlier td { opacity: 0.55; }
+        .real-row-outlier td:last-child, .real-row-outlier td:nth-last-child(2) { opacity: 1; }
+        .rubrica-table { width: 100%; border-collapse: collapse; font-size: 0.74rem; }
+        .rubrica-table th, .rubrica-table td { padding: 0.3rem 0.5rem; border-bottom: 1px solid var(--border-glass); text-align: right; }
+        .rubrica-table th:first-child, .rubrica-table td:first-child { text-align: left; }
+        .rubrica-table th { position: static; background: transparent; font-size: 0.7rem; }
     </style>
 </head>
 <body>
@@ -862,7 +915,7 @@
                                             <option value="ASSJ" {{ $defaultConfig['cargo'] === 'ASSJ' ? 'selected' : '' }}>Analista Judiciário (ASSJ)</option>
                                             <option value="ESCR" {{ $defaultConfig['cargo'] === 'ESCR' ? 'selected' : '' }}>Escrivão (ESCR)</option>
                                             <option value="ASTI" {{ $defaultConfig['cargo'] === 'ASTI' ? 'selected' : '' }}>Assistente Informática (ASTI)</option>
-                                            <option value="AGOP" {{ $defaultConfig['cargo'] === 'AGOP' ? 'selected' : '' }}>Agente de Operações (AGOP)</option>
+                                            <option value="AGOP" {{ $defaultConfig['cargo'] === 'AGOP' ? 'selected' : '' }}>Auxiliar Judiciário I (AGOP)</option>
                                             <option value="TAGE" {{ $defaultConfig['cargo'] === 'TAGE' ? 'selected' : '' }}>Auxiliar Judiciário II (TAGE)</option>
                                             <option value="ARAT" {{ $defaultConfig['cargo'] === 'ARAT' ? 'selected' : '' }}>Artífice (ARAT)</option>
                                             <option value="AGSG" {{ $defaultConfig['cargo'] === 'AGSG' ? 'selected' : '' }}>Serviços Gerais (AGSG)</option>
@@ -906,6 +959,7 @@
                                 </div>
 
                                 <div class="checkbox-group">
+                                    <input type="hidden" name="servidor[teto_rgps]" value="0">
                                     <input type="checkbox" id="teto_rgps" name="servidor[teto_rgps]" value="1" {{ $defaultConfig['teto_rgps'] ? 'checked' : '' }}>
                                     <label for="teto_rgps" class="form-label" style="margin:0;">Limitar previdência ao Teto do RGPS</label>
                                 </div>
@@ -991,6 +1045,60 @@
                                     </div>
                                 </div>
 
+                                <div class="form-group" style="margin-top: 0.5rem;">
+                                    <label class="form-label" for="cenario">Cenário</label>
+                                    <select id="cenario" name="servidor[cenario]" class="form-control">
+                                        @foreach (['conservador' => 'Conservador', 'base' => 'Base', 'otimista' => 'Otimista', 'personalizado' => 'Personalizado'] as $valorCenario => $rotuloCenario)
+                                            <option value="{{ $valorCenario }}" {{ ($defaultConfig['cenario'] ?? 'base') === $valorCenario ? 'selected' : '' }}>{{ $rotuloCenario }}</option>
+                                        @endforeach
+                                    </select>
+                                    <p class="field-hint">Preenche as três premissas abaixo. Alterar qualquer uma vira "Personalizado". A aba Carreira compara os três cenários.</p>
+                                </div>
+
+                                <div class="row-group">
+                                    <div class="form-group">
+                                        <label class="form-label" for="reajuste_padrao_pct">Reajuste anual (%)</label>
+                                        <input type="number" id="reajuste_padrao_pct" name="servidor[reajuste_padrao_pct]" step="0.1" min="0" class="form-control premissa-cenario" value="{{ $defaultConfig['reajuste_padrao_pct'] ?? 0.0 }}" title="Vale de 2027 em diante nos anos sem percentual informado em AQs & Reajustes">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label" for="aq_temp_renovacao_qtd">Ações de AQ por ano</label>
+                                        <input type="number" id="aq_temp_renovacao_qtd" name="servidor[aq_temp_renovacao_qtd]" step="1" min="0" max="20" class="form-control premissa-cenario" value="{{ $defaultConfig['aq_temp_renovacao_qtd'] ?? 0 }}" title="Ações educacionais de AQ temporário renovadas a cada ano">
+                                    </div>
+                                </div>
+
+                                <div class="row-group">
+                                    <div class="form-group">
+                                        <label class="form-label" for="irrf_correcao_pct">Correção do IRRF (%/ano)</label>
+                                        <input type="number" id="irrf_correcao_pct" name="servidor[irrf_correcao_pct]" step="0.1" min="0" class="form-control premissa-cenario" value="{{ $defaultConfig['irrf_correcao_pct'] ?? 0.0 }}" title="Correção das faixas e deduções do IRRF a partir de 2027">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label" for="teto_rgps_reajuste_pct">Teto do RGPS (%/ano)</label>
+                                        <input type="number" id="teto_rgps_reajuste_pct" name="servidor[teto_rgps_reajuste_pct]" step="0.1" min="0" class="form-control" value="{{ $defaultConfig['teto_rgps_reajuste_pct'] ?? 3.9 }}" title="Reajuste do teto pelo INPC, a partir de 2027 (2026: +3,9%)">
+                                    </div>
+                                </div>
+
+                                <div class="row-group" style="margin-bottom: 0.5rem;">
+                                    <div class="form-group">
+                                        <label class="form-label" for="mes_ferias">Mês das Férias (1/3)</label>
+                                        <select id="mes_ferias" name="servidor[mes_ferias]" class="form-control">
+                                            <option value="0" {{ ($defaultConfig['mes_ferias'] ?? 7) == 0 ? 'selected' : '' }}>Não projetar</option>
+                                            @foreach (['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'] as $i => $nomeMes)
+                                                <option value="{{ $i + 1 }}" {{ ($defaultConfig['mes_ferias'] ?? 7) == $i + 1 ? 'selected' : '' }}>{{ $nomeMes }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label" for="ferias_excecoes">Férias já marcadas</label>
+                                        <input type="text" id="ferias_excecoes" name="servidor[ferias_excecoes]" class="form-control" placeholder="2026-04, 2027-01" value="{{ $defaultConfig['ferias_excecoes'] ?? '' }}" title="AAAA-MM separados por vírgula: nesses anos o terço sai no mês informado, não no padrão">
+                                    </div>
+                                </div>
+
+                                <div class="checkbox-group" style="margin-top: 0;">
+                                    <input type="hidden" name="servidor[incluir_13]" value="0">
+                                    <input type="checkbox" id="incluir_13" name="servidor[incluir_13]" value="1" {{ ($defaultConfig['incluir_13'] ?? true) ? 'checked' : '' }}>
+                                    <label for="incluir_13" class="form-label" style="margin:0;">Projetar gratificação natalina (13º) em junho e novembro</label>
+                                </div>
+
                                 <button type="submit" class="btn-submit" style="margin-top: 1rem;">
                                     Gerar Projeção
                                 </button>
@@ -1004,8 +1112,10 @@
                             <div class="tabs-header">
                                 <button type="button" class="tab-btn active" onclick="switchTab('tab-charts', this)">Gráficos de Projeção</button>
                                 <button type="button" class="tab-btn" onclick="switchTab('tab-table', this)">Tabela de Projeção</button>
+                                <button type="button" class="tab-btn" onclick="switchTab('tab-carreira', this)">🏛️ Carreira TJMS</button>
+                                <button type="button" class="tab-btn" onclick="switchTab('tab-real', this)">🧾 Real × Projetado</button>
                                 <button type="button" class="tab-btn" onclick="switchTab('tab-aq-reajustes', this)">AQs & Reajustes</button>
-                                <button type="button" class="tab-btn" onclick="switchTab('tab-consignados', this)">Consignados</button>
+                                <button type="button" class="tab-btn" onclick="switchTab('tab-consignados', this)">Consignados & CASSEMS</button>
                                 <button type="button" class="tab-btn" onclick="switchTab('tab-filhos', this)">Filhos (Aux. Creche)</button>
                                 <button type="button" class="tab-btn" onclick="switchTab('tab-timeline', this)">Timeline de Auxílios</button>
                                 <button type="button" class="tab-btn" onclick="switchTab('tab-analise', this)">📊 Análise Avançada</button>
@@ -1053,16 +1163,150 @@
                                                      <th>Auxílios</th>
                                                      <th>Eventos / Impactos</th>
                                                      <th>Líquido</th>
+                                                     <th>Disponível</th>
                                                  </tr>
                                              </thead>
                                              <tbody>
                                                  <tr>
-                                                     <td colspan="10" style="text-align: center; color: var(--text-muted); padding: 2rem;">
+                                                     <td colspan="11" style="text-align: center; color: var(--text-muted); padding: 2rem;">
                                                          Nenhum cálculo efetuado. Clique em "Gerar Projeção".
                                                      </td>
                                                  </tr>
                                              </tbody>
                                          </table>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Tab: Real × Projetado -->
+                            <div id="tab-real" class="tab-content">
+                                <div class="glass-card">
+                                    <h3 class="glass-card-title">Holerites Reais × Projeção</h3>
+                                    <div class="career-cards" id="real-cards"></div>
+                                    <div class="chart-scroll-container">
+                                        <div class="chart-canvas-wrapper" id="wrapper-realChart" style="height: 260px;">
+                                            <canvas id="realChart"></canvas>
+                                        </div>
+                                    </div>
+                                    <p class="career-note">
+                                        O projetado é o líquido do mês somado ao 13º e ao terço de férias, com as opções que estão no formulário.
+                                        O erro acumulado usa os 12 últimos meses comparáveis, sem outliers; a meta é ficar dentro de ±2%.
+                                    </p>
+                                </div>
+
+                                <div class="glass-card">
+                                    <h3 class="glass-card-title">Mês a Mês</h3>
+                                    <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: -0.75rem; margin-bottom: 1rem;">
+                                        Clique em um mês para ver a diferença por rubrica. Marque como outlier os meses atípicos: eles saem das métricas de erro.
+                                    </p>
+                                    <div class="table-responsive" style="max-height: 640px;">
+                                        <table class="data-table" id="real-table-el">
+                                            <thead>
+                                                <tr>
+                                                    <th>Mês</th>
+                                                    <th>Bruto real</th>
+                                                    <th>Descontos reais</th>
+                                                    <th>Líquido real</th>
+                                                    <th>Líquido projetado</th>
+                                                    <th>Diferença</th>
+                                                    <th>Outlier</th>
+                                                    <th>Observação</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody></tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Tab: Carreira TJMS -->
+                            <div id="tab-carreira" class="tab-content">
+                                <div class="glass-card">
+                                    <h3 class="glass-card-title">Onde você está na carreira</h3>
+                                    <div class="career-cards" id="career-cards">
+                                        <p style="color: var(--text-muted); font-size: 0.8rem;">Clique em "Gerar Projeção".</p>
+                                    </div>
+                                    <p class="career-note">
+                                        Progressão funcional automática a cada dois anos de efetivo exercício (Lei 3.687/2009, art. 23), com degraus de 3% até o décimo biênio e 3,5% nos seguintes (art. 24).
+                                        Adicional por tempo de serviço de 10% no primeiro quinquênio e 5% em cada um dos demais, até 40% (Lei 3.310/2006, art. 95).
+                                        Afastamentos que não contam como efetivo exercício adiam essas datas.
+                                    </p>
+                                </div>
+
+                                <div class="glass-card">
+                                    <h3 class="glass-card-title">Mapa das Referências</h3>
+                                    <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: -0.75rem; margin-bottom: 1rem;">
+                                        Valores da tabela de vencimento-base vigente desde 01/04/2026, sem reajustes futuros.
+                                    </p>
+                                    <div class="table-responsive">
+                                        <table class="data-table career-table" id="career-table-el">
+                                            <thead>
+                                                <tr>
+                                                    <th>Referência</th>
+                                                    <th>Data</th>
+                                                    <th>Anos de casa</th>
+                                                    <th>Vencimento-base</th>
+                                                    <th>Degrau</th>
+                                                    <th>Acumulado</th>
+                                                    <th>ATS na data</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody></tbody>
+                                        </table>
+                                    </div>
+                                </div>
+
+                                <div class="glass-card">
+                                    <h3 class="glass-card-title">Resumo Anual da Projeção</h3>
+                                    <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: -0.75rem; margin-bottom: 1rem;">
+                                        Soma dos meses projetados em cada ano. O 13º segue os avos de exercício no ano (Lei 3.310/2006, arts. 89 e 90), pago em junho e novembro como nos seus holerites, e o terço de férias entra no mês escolhido (arts. 101 e 109).
+                                    </p>
+                                    <div class="table-responsive">
+                                        <table class="data-table career-table" id="annual-table-el">
+                                            <thead>
+                                                <tr>
+                                                    <th>Ano</th>
+                                                    <th>Meses</th>
+                                                    <th>Referência</th>
+                                                    <th>Bruto no ano</th>
+                                                    <th>Líquido mensal</th>
+                                                    <th>13º líquido</th>
+                                                    <th>1/3 férias líquido</th>
+                                                    <th>Total líquido</th>
+                                                    <th>Média mensal</th>
+                                                    <th>Disponível no ano</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody></tbody>
+                                        </table>
+                                    </div>
+                                </div>
+
+                                <div class="glass-card">
+                                    <h3 class="glass-card-title">Cenários lado a lado</h3>
+                                    <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: -0.75rem; margin-bottom: 1rem;">
+                                        Mesmos dados do formulário, trocando só as premissas. Conservador: reajuste de 3% e 3 ações de AQ por ano.
+                                        Base: 4% e 5 ações. Otimista: 5%, 5 ações e tabela do IRRF corrigida em 3,9% ao ano. Líquido do ano com 13º e férias.
+                                    </p>
+                                    <div class="chart-scroll-container">
+                                        <div class="chart-canvas-wrapper" id="wrapper-cenariosChart" style="height: 260px;">
+                                            <canvas id="cenariosChart"></canvas>
+                                        </div>
+                                    </div>
+                                    <div class="table-responsive" style="margin-top: 1rem;">
+                                        <table class="data-table career-table" id="cenarios-table-el">
+                                            <thead>
+                                                <tr>
+                                                    <th>Ano</th>
+                                                    <th>Conservador</th>
+                                                    <th>Base</th>
+                                                    <th>Otimista</th>
+                                                    <th>Média mensal (base)</th>
+                                                    <th>Faixa (otimista − conservador)</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody></tbody>
+                                        </table>
                                     </div>
                                 </div>
                             </div>
@@ -1100,16 +1344,44 @@
                                  </div>
 
                                  <div class="glass-card" style="margin-top: 1.5rem;">
+                                     <h3 class="glass-card-title">Renovação Automática do AQ Temporário</h3>
+                                     <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: -0.75rem; margin-bottom: 1rem;">
+                                         Depois do último curso informado, a projeção repete a cada ano as ações educacionais definidas no campo "Ações de AQ por ano" do painel ao lado, cada uma valendo 12 meses.
+                                     </p>
+                                     <div class="row-group" style="grid-template-columns: repeat(3, 1fr);">
+                                         <div class="form-group">
+                                             <label class="form-label" for="aq_temp_renovacao_pct">Adicional por ação (%)</label>
+                                             <input type="number" id="aq_temp_renovacao_pct" name="servidor[aq_temp_renovacao_pct]" step="0.1" min="0" class="form-control" value="{{ $defaultConfig['aq_temp_renovacao_pct'] ?? 1.0 }}">
+                                         </div>
+                                         <div class="form-group">
+                                             <label class="form-label" for="aq_temp_renovacao_mes">Mês de início</label>
+                                             <select id="aq_temp_renovacao_mes" name="servidor[aq_temp_renovacao_mes]" class="form-control">
+                                                 @foreach (['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'] as $i => $nomeMes)
+                                                     <option value="{{ $i + 1 }}" {{ ($defaultConfig['aq_temp_renovacao_mes'] ?? 6) == $i + 1 ? 'selected' : '' }}>{{ $nomeMes }}</option>
+                                                 @endforeach
+                                             </select>
+                                         </div>
+                                         <div class="form-group">
+                                             <label class="form-label" for="aq_temp_renovacao_ano">A partir de (ano)</label>
+                                             <input type="number" id="aq_temp_renovacao_ano" name="servidor[aq_temp_renovacao_ano]" step="1" min="0" class="form-control" value="{{ $defaultConfig['aq_temp_renovacao_ano'] ?? 0 }}" title="0 = ano seguinte ao último curso informado">
+                                         </div>
+                                     </div>
+                                     <p class="field-hint">Ano 0 significa: começar no ano seguinte ao último curso da lista acima.</p>
+                                 </div>
+
+                                 <div class="glass-card" style="margin-top: 1.5rem;">
                                      <h3 class="glass-card-title">Cursos de Qualificação Permanente</h3>
                                      <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: -0.75rem; margin-bottom: 1rem;">
-                                         Indique cursos permanentes que adicionam +2% ao Adicional de Qualificação, com teto de 20% (soma do AQ Permanente Base + cursos).
+                                         Cada curso permanente soma pontos ao Adicional de Qualificação, com teto de 20% só para o permanente (o AQ temporário é à parte).
+                                         Se o curso só entra na folha meses depois da vigência, informe esse mês: ele é pago com o retroativo desde a vigência.
                                      </p>
                                      <div class="dynamic-list" id="aq-perm-list">
                                          <!-- Row Header -->
                                          <div class="dynamic-row-aq-perm" style="font-weight: bold; font-size: 0.75rem; color: var(--text-muted); border-bottom: 1px solid var(--border-glass); padding-bottom: 0.25rem; margin-bottom: 0.5rem;">
                                              <div>Nome do Curso</div>
                                              <div>Adicional (%)</div>
-                                             <div>Mês de Inclusão</div>
+                                             <div>Vigência</div>
+                                             <div>Entra na folha em</div>
                                              <div></div>
                                          </div>
                                          
@@ -1118,6 +1390,7 @@
                                                  <input type="text" name="aq_permanente_cursos[{{ $index }}][nome]" class="form-control" value="{{ $aq['nome'] }}" required>
                                                   <input type="number" name="aq_permanente_cursos[{{ $index }}][percentual]" step="0.1" class="form-control" value="{{ $aq['percentual'] }}" required>
                                                   <input type="month" name="aq_permanente_cursos[{{ $index }}][mes_inicio]" class="form-control" value="{{ $aq['mes_inicio'] }}" required>
+                                                  <input type="month" name="aq_permanente_cursos[{{ $index }}][mes_pagamento]" class="form-control" value="{{ $aq['mes_pagamento'] ?? '' }}" title="Opcional: folha em que entra, com retroativo">
                                                   <button type="button" class="btn-icon" onclick="removeRow('aq-perm-row-{{ $index }}')">
                                                       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
                                                   </button>
@@ -1171,6 +1444,64 @@
                                     </div>
                                     <button type="button" class="btn-add" onclick="addConsignadoRow()" style="margin-top: 0.5rem;">
                                         + Adicionar Empréstimo
+                                    </button>
+                                </div>
+
+                                <div class="glass-card">
+                                    <h3 class="glass-card-title">CASSEMS em Folha</h3>
+                                    <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: -0.75rem; margin-bottom: 1rem;">
+                                        Alíquota sobre a base e parte fixa a partir de cada mês. Com a lista preenchida, ela substitui a regra pelo número de dependentes.
+                                    </p>
+                                    <div class="dynamic-list" id="cassems-list-el">
+                                        <div class="dynamic-row-cassems" style="font-weight: bold; font-size: 0.75rem; color: var(--text-muted); border-bottom: 1px solid var(--border-glass); padding-bottom: 0.25rem; margin-bottom: 0.5rem;">
+                                            <div>A partir de</div>
+                                            <div>Alíquota (%)</div>
+                                            <div>Parte fixa (R$)</div>
+                                            <div></div>
+                                        </div>
+                                        @foreach ($defaultCassemsEventos as $index => $evento)
+                                            <div class="dynamic-row-cassems" id="cassems-row-{{ $index }}">
+                                                <input type="month" name="cassems_eventos[{{ $index }}][mes_inicio]" class="form-control" value="{{ $evento['mes_inicio'] }}" required>
+                                                <input type="number" name="cassems_eventos[{{ $index }}][aliquota_pct]" step="0.01" min="0" class="form-control" value="{{ $evento['aliquota_pct'] }}" required>
+                                                <input type="number" name="cassems_eventos[{{ $index }}][fixo]" step="0.01" min="0" class="form-control" value="{{ $evento['fixo'] }}" required>
+                                                <button type="button" class="btn-icon" onclick="removeRow('cassems-row-{{ $index }}')">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                                                </button>
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                    <button type="button" class="btn-add" onclick="addCassemsRow()" style="margin-top: 0.5rem;">
+                                        + Adicionar Mudança da CASSEMS
+                                    </button>
+                                </div>
+
+                                <div class="glass-card">
+                                    <h3 class="glass-card-title">Despesas Fora da Folha</h3>
+                                    <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: -0.75rem; margin-bottom: 1rem;">
+                                        Contas fixas pagas à parte, como o boleto da CASSEMS do cônjuge. Não mudam o líquido do holerite, só o líquido disponível.
+                                    </p>
+                                    <div class="dynamic-list" id="despesas-list-el">
+                                        <div class="dynamic-row-despesas" style="font-weight: bold; font-size: 0.75rem; color: var(--text-muted); border-bottom: 1px solid var(--border-glass); padding-bottom: 0.25rem; margin-bottom: 0.5rem;">
+                                            <div>Descrição</div>
+                                            <div>Valor (R$)</div>
+                                            <div>Mês Início</div>
+                                            <div>Mês Fim (Opcional)</div>
+                                            <div></div>
+                                        </div>
+                                        @foreach ($defaultDespesas as $index => $despesa)
+                                            <div class="dynamic-row-despesas" id="despesa-row-{{ $index }}">
+                                                <input type="text" name="despesas_fora_folha[{{ $index }}][descricao]" class="form-control" value="{{ $despesa['descricao'] }}" required>
+                                                <input type="number" name="despesas_fora_folha[{{ $index }}][valor]" step="0.01" min="0" class="form-control" value="{{ $despesa['valor'] }}" required>
+                                                <input type="month" name="despesas_fora_folha[{{ $index }}][mes_inicio]" class="form-control" value="{{ $despesa['mes_inicio'] }}" required>
+                                                <input type="month" name="despesas_fora_folha[{{ $index }}][mes_fim]" class="form-control" value="{{ $despesa['mes_fim'] ?? '' }}">
+                                                <button type="button" class="btn-icon" onclick="removeRow('despesa-row-{{ $index }}')">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                                                </button>
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                    <button type="button" class="btn-add" onclick="addDespesaRow()" style="margin-top: 0.5rem;">
+                                        + Adicionar Despesa
                                     </button>
                                 </div>
                             </div>
@@ -1322,7 +1653,7 @@
                                     <div class="glass-card">
                                         <h3 class="glass-card-title">Patrimônio Acumulado (Líquido)</h3>
                                         <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: -0.75rem; margin-bottom: 1rem;">
-                                            Soma acumulada do salário líquido recebido desde o início do exercício até o fim da projeção.
+                                            Soma acumulada do líquido recebido (salário, 13º e terço de férias) desde o início do exercício até o fim da projeção.
                                         </p>
                                         <div class="chart-scroll-container">
                                             <div class="chart-canvas-wrapper" id="wrapper-acumuladoChart">
@@ -1586,6 +1917,8 @@
                     renderCharts(projectionData);
                 } else if (tabId === 'tab-analise') {
                     renderAdvancedCharts(projectionData);
+                } else if (tabId === 'tab-real') {
+                    renderRealVsProjetado(projectionData);
                 }
             }
         }
@@ -1618,6 +1951,7 @@
                     <input type="text" name="aq_permanente_cursos[${aqPermIndex}][nome]" class="form-control" placeholder="Curso Permanente" required>
                     <input type="number" name="aq_permanente_cursos[${aqPermIndex}][percentual]" step="0.1" class="form-control" value="2.0" required>
                     <input type="month" name="aq_permanente_cursos[${aqPermIndex}][mes_inicio]" class="form-control" required>
+                    <input type="month" name="aq_permanente_cursos[${aqPermIndex}][mes_pagamento]" class="form-control" title="Opcional: folha em que entra, com retroativo">
                     <button type="button" class="btn-icon" onclick="removeRow('aq-perm-row-${aqPermIndex}')">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
                     </button>
@@ -1643,6 +1977,54 @@
             `;
             document.getElementById('consignados-list-el').insertAdjacentHTML('beforeend', html);
             consIndex++;
+        }
+
+        let cassemsIndex = {{ count($defaultCassemsEventos) }};
+        function addCassemsRow() {
+            const html = `
+                <div class="dynamic-row-cassems" id="cassems-row-${cassemsIndex}">
+                    <input type="month" name="cassems_eventos[${cassemsIndex}][mes_inicio]" class="form-control" required>
+                    <input type="number" name="cassems_eventos[${cassemsIndex}][aliquota_pct]" step="0.01" min="0" class="form-control" value="7.5" required>
+                    <input type="number" name="cassems_eventos[${cassemsIndex}][fixo]" step="0.01" min="0" class="form-control" value="105.00" required>
+                    <button type="button" class="btn-icon" onclick="removeRow('cassems-row-${cassemsIndex}')"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>
+                </div>
+            `;
+            document.getElementById('cassems-list-el').insertAdjacentHTML('beforeend', html);
+            cassemsIndex++;
+        }
+
+        let despesaIndex = {{ count($defaultDespesas) }};
+        function addDespesaRow() {
+            const html = `
+                <div class="dynamic-row-despesas" id="despesa-row-${despesaIndex}">
+                    <input type="text" name="despesas_fora_folha[${despesaIndex}][descricao]" class="form-control" placeholder="Descrição" required>
+                    <input type="number" name="despesas_fora_folha[${despesaIndex}][valor]" step="0.01" min="0" class="form-control" placeholder="Valor" required>
+                    <input type="month" name="despesas_fora_folha[${despesaIndex}][mes_inicio]" class="form-control" required>
+                    <input type="month" name="despesas_fora_folha[${despesaIndex}][mes_fim]" class="form-control">
+                    <button type="button" class="btn-icon" onclick="removeRow('despesa-row-${despesaIndex}')"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>
+                </div>
+            `;
+            document.getElementById('despesas-list-el').insertAdjacentHTML('beforeend', html);
+            despesaIndex++;
+        }
+
+        // ── Seletor de cenário ────────────────────────────────────────────────────
+        const CENARIOS = @json($cenarios);
+        const CAMPOS_CENARIO = ['reajuste_padrao_pct', 'aq_temp_renovacao_qtd', 'irrf_correcao_pct'];
+
+        function aplicarCenario(nome) {
+            const premissas = CENARIOS[nome];
+            if (!premissas) return;
+            CAMPOS_CENARIO.forEach(campo => {
+                const el = document.getElementById(campo);
+                if (el) el.value = premissas[campo];
+            });
+        }
+
+        function detectarCenario() {
+            const valores = Object.fromEntries(CAMPOS_CENARIO.map(c => [c, parseFloat(document.getElementById(c)?.value || '0')]));
+            const achado = Object.entries(CENARIOS).find(([, p]) => CAMPOS_CENARIO.every(c => Math.abs(p[c] - valores[c]) < 1e-9));
+            return achado ? achado[0] : 'personalizado';
         }
 
         // Add Dynamic Filhos
@@ -1741,11 +2123,345 @@
                 if (data.success) {
                     projectionData = data.projection;
                     updateProjectionTable(projectionData);
+                    renderCareer(data.carreira);
+                    renderAnnualSummary(projectionData);
+                    renderRealVsProjetado(projectionData);
+                    renderCenarios(data.cenarios);
                     renderCharts(projectionData);
                     renderAdvancedCharts(projectionData);
                 }
             })
             .catch(err => console.error("Erro na simulação:", err));
+        }
+
+        // ── Aba Real × Projetado ──────────────────────────────────────────────────
+        const holeritesReais = @json($holerites);
+        let realChartObj = null;
+        const LIMITE_ERRO_PCT = 2;
+
+        // Agrupa rubricas reais (por código) e os valores projetados correspondentes
+        const GRUPOS_RUBRICA = [
+            { nome: 'Vencimento', cods: [3], proj: m => m.proventos.vencimento },
+            { nome: 'Substituição', cods: [22], proj: m => m.proventos.substituicao },
+            { nome: 'AQ permanente', cods: [277], proj: m => m.proventos.aq_permanente + (m.proventos.aq_permanente_retroativo || 0) },
+            { nome: 'AQ temporário', cods: [489], proj: m => m.proventos.aq_temporario },
+            { nome: '13º salário', cods: [406, 460], proj: m => m.extras?.gratificacao_natalina?.bruto || 0 },
+            { nome: '1/3 de férias', cods: [249, 296], proj: m => m.extras?.adicional_ferias?.bruto || 0 },
+            { nome: 'Auxílios', cods: [200, 324, 494], proj: m => m.total_isento },
+            { nome: 'MS-PREV', cods: [940, 949], proj: m => m.descontos.msprev + (m.extras?.gratificacao_natalina?.msprev || 0), desconto: true },
+            { nome: 'IRRF', cods: [941, 948], proj: m => m.descontos.irrf + (m.extras?.gratificacao_natalina?.irrf || 0) + (m.extras?.adicional_ferias?.irrf || 0), desconto: true },
+            { nome: 'CASSEMS', cods: [944, 974], proj: m => m.descontos.cassems_total, desconto: true },
+            { nome: 'Consignados', cods: [361], proj: m => m.descontos.consignados, desconto: true },
+        ];
+
+        function compararRubricas(h, m) {
+            const soma = (itens, cods) => itens.filter(i => cods.includes(Number(i.cod))).reduce((t, i) => t + Number(i.valor), 0);
+            const mapeados = new Set(GRUPOS_RUBRICA.flatMap(g => g.cods));
+            const linhas = GRUPOS_RUBRICA.map(g => {
+                const real = soma(g.desconto ? h.descontos : h.pagamentos, g.cods);
+                const proj = m ? g.proj(m) : null;
+                return { nome: g.nome, desconto: !!g.desconto, real, proj };
+            });
+            const outrosPag = h.pagamentos.filter(i => !mapeados.has(Number(i.cod))).reduce((t, i) => t + Number(i.valor), 0);
+            const outrosDesc = h.descontos.filter(i => !mapeados.has(Number(i.cod))).reduce((t, i) => t + Number(i.valor), 0);
+            if (outrosPag) linhas.push({ nome: 'Outros pagamentos', desconto: false, real: outrosPag, proj: m ? 0 : null });
+            if (outrosDesc) linhas.push({ nome: 'Outros descontos', desconto: true, real: outrosDesc, proj: m ? 0 : null });
+            return linhas.filter(l => Math.abs(l.real) > 0.004 || (l.proj !== null && Math.abs(l.proj) > 0.004));
+        }
+
+        function erroAcumulado12(projetado) {
+            const validos = holeritesReais.filter(h => !h.outlier && projetado.has(h.mes_ano)).slice(-12);
+            const real = validos.reduce((t, h) => t + h.total_liquido, 0);
+            const proj = validos.reduce((t, h) => t + projetado.get(h.mes_ano).liquido_total, 0);
+            return { meses: validos.length, real, proj, pct: real > 0 ? (proj - real) / real * 100 : 0 };
+        }
+
+        async function alternarOutlier(idx, marcado) {
+            const h = holeritesReais[idx];
+            try {
+                const resp = await fetch(`{{ url('/salario/holerites') }}/${h.mes_ano}/outlier`, {
+                    method: 'PATCH',
+                    headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                    body: JSON.stringify({ outlier: marcado })
+                });
+                const json = await resp.json();
+                if (!resp.ok || !json.success) throw new Error('falha ao salvar');
+                h.outlier = json.outlier;
+            } catch (err) {
+                console.error('Erro ao marcar outlier:', err);
+                alert('Não foi possível salvar a marcação de outlier.');
+            }
+            renderRealVsProjetado(projectionData);
+        }
+
+        function renderRealVsProjetado(data) {
+            const cards = document.getElementById('real-cards');
+            const tbody = document.querySelector('#real-table-el tbody');
+            if (!cards || !tbody) return;
+
+            if (!holeritesReais.length) {
+                cards.innerHTML = '<p style="color: var(--text-muted); font-size: 0.8rem;">Nenhum holerite gravado para este usuário. Importe com <code>php artisan salary:importar-holerites</code>.</p>';
+                tbody.innerHTML = '';
+                return;
+            }
+
+            const projetado = new Map(data.map(m => [m.mesAno, { ...m, liquido_total: m.liquido_total ?? m.salario_liquido }]));
+            let somaReal = 0, somaProj = 0, comparados = 0;
+
+            tbody.innerHTML = '';
+            holeritesReais.forEach((h, idx) => {
+                const m = projetado.get(h.mes_ano);
+                const proj = m ? m.liquido_total : undefined;
+                const temProj = proj !== undefined;
+                const dif = temProj ? proj - h.total_liquido : null;
+                if (temProj && !h.outlier) { somaReal += h.total_liquido; somaProj += proj; comparados++; }
+
+                const pctMes = dif === null || !h.total_liquido ? null : Math.abs(dif) / h.total_liquido * 100;
+                const corDif = dif === null || h.outlier ? 'var(--text-muted)' : (pctMes < 0.05 ? '#34d399' : (pctMes <= LIMITE_ERRO_PCT ? '#fde047' : '#f87171'));
+                const tr = document.createElement('tr');
+                if (h.outlier) tr.classList.add('real-row-outlier');
+                tr.innerHTML = `
+                    <td>${formatMonthYear(h.mes_ano)}</td>
+                    <td>${formatBrl(h.total_bruto)}</td>
+                    <td style="color:#f87171;">${formatBrl(h.total_descontos)}</td>
+                    <td style="font-weight:bold; color:#10b981;">${formatBrl(h.total_liquido)}</td>
+                    <td>${temProj ? formatBrl(proj) : '—'}</td>
+                    <td style="font-weight:600; color:${corDif}; white-space:nowrap;">${dif === null ? '—' : (dif > 0 ? '+' : '') + formatBrl(dif)}</td>
+                    <td style="text-align:center;"><input type="checkbox" class="outlier-toggle" ${h.outlier ? 'checked' : ''} title="Fora das métricas de erro"></td>
+                    <td style="font-size:0.72rem; color:var(--text-muted); min-width:220px;">${h.observacao ?? ''}</td>
+                `;
+                const toggle = tr.querySelector('.outlier-toggle');
+                toggle.addEventListener('click', ev => ev.stopPropagation());
+                toggle.addEventListener('change', () => alternarOutlier(idx, toggle.checked));
+
+                const detalhe = document.createElement('tr');
+                detalhe.style.display = 'none';
+                detalhe.style.cursor = 'default';
+                const linhas = compararRubricas(h, m);
+                const linhaHtml = l => {
+                    const d = l.proj === null ? null : l.proj - l.real;
+                    const cor = d === null || Math.abs(d) < 0.005 ? 'var(--text-muted)' : '#fde047';
+                    return `<tr><td>${l.desconto ? '− ' : ''}${l.nome}</td><td>${formatPlainBrl(l.real)}</td><td>${l.proj === null ? '—' : formatPlainBrl(l.proj)}</td><td style="color:${cor};">${d === null ? '—' : (d > 0 ? '+' : '') + formatPlainBrl(d)}</td></tr>`;
+                };
+                const lista = (itens) => itens.map(i => `<div style="display:flex; justify-content:space-between; gap:1rem;"><span>${i.cod} · ${i.rubrica}</span><span>${formatPlainBrl(i.valor)}</span></div>`).join('');
+                detalhe.innerHTML = `
+                    <td colspan="8" style="background: rgba(15,23,42,0.6);">
+                        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap:1.5rem; font-size:0.74rem;">
+                            <div>
+                                <p style="margin:0 0 0.4rem; font-weight:600; color:#a5b4fc;">Diferença por rubrica</p>
+                                <table class="rubrica-table">
+                                    <thead><tr><th>Rubrica</th><th>Real</th><th>Projetado</th><th>Diferença</th></tr></thead>
+                                    <tbody>${linhas.map(linhaHtml).join('')}</tbody>
+                                </table>
+                            </div>
+                            <div><p style="margin:0 0 0.4rem; font-weight:600; color:#34d399;">Pagamentos</p>${lista(h.pagamentos)}</div>
+                            <div><p style="margin:0 0 0.4rem; font-weight:600; color:#f87171;">Descontos</p>${lista(h.descontos)}</div>
+                        </div>
+                    </td>`;
+                tr.onclick = () => { detalhe.style.display = detalhe.style.display === 'none' ? 'table-row' : 'none'; };
+
+                tbody.appendChild(tr);
+                tbody.appendChild(detalhe);
+            });
+
+            const card = (lbl, val, sub, extra = '') => `<div class="career-card ${extra}"><p class="lbl">${lbl}</p><p class="val">${val}</p><p class="sub">${sub}</p></div>`;
+            const fmtPct = v => (v > 0 ? '+' : '') + v.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + '%';
+            const outliers = holeritesReais.filter(h => h.outlier).length;
+            const e12 = erroAcumulado12(projetado);
+            const difTotal = somaProj - somaReal;
+            const pctTotal = somaReal > 0 ? difTotal / somaReal * 100 : 0;
+            cards.innerHTML = [
+                card('Holerites gravados', holeritesReais.length,
+                    `${formatMonthYear(holeritesReais[0].mes_ano)} a ${formatMonthYear(holeritesReais[holeritesReais.length - 1].mes_ano)} · ${outliers} outlier(s)`),
+                e12.meses
+                    ? card('Erro acumulado 12 meses', fmtPct(e12.pct), `${e12.meses} meses sem outliers · limite ±${LIMITE_ERRO_PCT}%`,
+                        Math.abs(e12.pct) <= LIMITE_ERRO_PCT ? 'erro-ok' : 'erro-alto')
+                    : card('Erro acumulado 12 meses', '—', 'sem meses comparáveis na projeção'),
+                card('Diferença no período', (difTotal > 0 ? '+' : '') + formatBrl(difTotal), `${comparados} meses comparados · ${fmtPct(pctTotal)}`),
+                card('Líquido real × projetado', formatBrl(somaReal), `projetado ${formatBrl(somaProj)}, com 13º e férias`),
+            ].join('');
+
+            const wrapper = document.getElementById('wrapper-realChart');
+            if (wrapper) wrapper.style.width = Math.max(600, holeritesReais.length * 44) + 'px';
+            if (realChartObj) realChartObj.destroy();
+            const el = document.getElementById('realChart');
+            if (!el) return;
+            realChartObj = new Chart(el.getContext('2d'), {
+                type: 'line',
+                data: {
+                    labels: holeritesReais.map(h => formatMonthYear(h.mes_ano)),
+                    datasets: [
+                        {
+                            label: 'Líquido real', data: holeritesReais.map(h => h.total_liquido),
+                            borderColor: '#10b981', backgroundColor: 'rgba(16,185,129,0.08)', fill: true, tension: 0.25, borderWidth: 2.5,
+                            pointBackgroundColor: holeritesReais.map(h => h.outlier ? '#f87171' : '#10b981'),
+                            pointRadius: holeritesReais.map(h => h.outlier ? 5 : 3)
+                        },
+                        { label: 'Líquido projetado', data: holeritesReais.map(h => projetado.get(h.mes_ano)?.liquido_total ?? null), borderColor: '#6366f1', backgroundColor: 'transparent', borderDash: [5, 5], tension: 0.25, borderWidth: 2 },
+                    ]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    interaction: { mode: 'index', intersect: false },
+                    scales: {
+                        y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#cbd5e1' } },
+                        x: { grid: { display: false }, ticks: { color: '#cbd5e1' } }
+                    },
+                    plugins: { legend: { labels: { color: '#f1f5f9' } }, tooltip: { callbacks: { label: ctx => ` ${ctx.dataset.label}: ${formatBrl(ctx.parsed.y)}` } } }
+                }
+            });
+        }
+
+        // ── Cenários lado a lado ──────────────────────────────────────────────────
+        let cenariosChartObj = null;
+        function renderCenarios(cenarios) {
+            const tbody = document.querySelector('#cenarios-table-el tbody');
+            if (!tbody || !cenarios) return;
+
+            const anos = Object.keys(cenarios.base || {});
+            const val = (nome, ano) => cenarios[nome]?.[ano]?.liquido_total ?? 0;
+            tbody.innerHTML = anos.map(ano => {
+                const meses = cenarios.base[ano].meses || 1;
+                const faixa = val('otimista', ano) - val('conservador', ano);
+                const rotulo = meses < 12 ? `${ano} <span style="font-size:0.7rem; color:var(--text-muted);">(${meses} meses)</span>` : ano;
+                return `
+                    <tr>
+                        <td>${rotulo}</td>
+                        <td>${formatBrl(val('conservador', ano))}</td>
+                        <td style="font-weight:bold; color:#10b981;">${formatBrl(val('base', ano))}</td>
+                        <td>${formatBrl(val('otimista', ano))}</td>
+                        <td>${formatBrl(val('base', ano) / meses)}</td>
+                        <td>${formatBrl(faixa)}</td>
+                    </tr>`;
+            }).join('');
+
+            if (cenariosChartObj) cenariosChartObj.destroy();
+            const el = document.getElementById('cenariosChart');
+            if (!el) return;
+            // Só anos completos: um ano parcial sem 13º ou férias puxaria a média mensal para baixo
+            const anosCompletos = anos.filter(ano => (cenarios.base[ano].meses || 0) === 12);
+            const media = nome => anosCompletos.map(ano => val(nome, ano) / 12);
+            cenariosChartObj = new Chart(el.getContext('2d'), {
+                type: 'line',
+                data: {
+                    labels: anosCompletos,
+                    datasets: [
+                        { label: 'Otimista', data: media('otimista'), borderColor: '#818cf8', backgroundColor: 'transparent', borderWidth: 2, tension: 0.25 },
+                        { label: 'Base', data: media('base'), borderColor: '#10b981', backgroundColor: 'rgba(16,185,129,0.08)', fill: false, borderWidth: 3, tension: 0.25 },
+                        { label: 'Conservador', data: media('conservador'), borderColor: '#f59e0b', backgroundColor: 'transparent', borderWidth: 2, tension: 0.25 },
+                    ]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    interaction: { mode: 'index', intersect: false },
+                    scales: {
+                        y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#cbd5e1', callback: v => 'R$ ' + Math.round(v).toLocaleString('pt-BR') } },
+                        x: { grid: { display: false }, ticks: { color: '#cbd5e1' } }
+                    },
+                    plugins: {
+                        legend: { labels: { color: '#f1f5f9' } },
+                        tooltip: { callbacks: { label: ctx => ` ${ctx.dataset.label}: ${formatBrl(ctx.parsed.y)} por mês` } }
+                    }
+                }
+            });
+        }
+
+        // ── Aba Carreira TJMS ─────────────────────────────────────────────────────
+        function formatDataBr(dateStr) {
+            const p = dateStr.split('-');
+            return `${p[2]}/${p[1]}/${p[0]}`;
+        }
+
+        function formatPrazo(meses) {
+            if (meses <= 0) return 'neste mês';
+            const anos = Math.floor(meses / 12);
+            const resto = meses % 12;
+            const partes = [];
+            if (anos > 0) partes.push(anos + (anos === 1 ? ' ano' : ' anos'));
+            if (resto > 0) partes.push(resto + (resto === 1 ? ' mês' : ' meses'));
+            return 'em ' + partes.join(' e ');
+        }
+
+        function renderCareer(carreira) {
+            const cards = document.getElementById('career-cards');
+            const tbody = document.querySelector('#career-table-el tbody');
+            if (!cards || !tbody || !carreira) return;
+
+            const prox = carreira.proxima_progressao;
+            const ats = carreira.proximo_ats;
+            const topo = carreira.topo;
+            const card = (lbl, val, sub) => `<div class="career-card"><p class="lbl">${lbl}</p><p class="val">${val}</p><p class="sub">${sub}</p></div>`;
+
+            cards.innerHTML = [
+                card('Referência atual', `${carreira.cargo}-${carreira.referencia_atual}`, `${formatBrl(carreira.vencimento_atual)} de vencimento-base`),
+                prox
+                    ? card('Próxima progressão', formatDataBr(prox.data), `${prox.codigo} ${formatPrazo(prox.meses_restantes)} · +${formatBrl(prox.ganho)}`)
+                    : card('Próxima progressão', '—', 'Você já está na última referência'),
+                ats
+                    ? card('Próximo quinquênio', formatDataBr(ats.data), `ATS vai a ${ats.pct}% ${formatPrazo(ats.meses_restantes)}`)
+                    : card('Próximo quinquênio', '—', 'ATS já está no limite de 40%'),
+                card('Topo da carreira', topo.codigo, `${formatDataBr(topo.data)} · ${formatBrl(topo.vencimento)} (+${topo.acumulado_pct.toLocaleString('pt-BR')}%)`),
+            ].join('');
+
+            const atsNaData = (data) => {
+                let pct = 0;
+                carreira.ats.forEach(a => { if (a.data <= data) pct = a.pct; });
+                return pct;
+            };
+
+            tbody.innerHTML = carreira.referencias.map(r => {
+                const pctAts = atsNaData(r.data);
+                const marca = r.status === 'atual' ? ' <span class="badge-info">você está aqui</span>' : '';
+                return `
+                    <tr class="career-row-${r.status}">
+                        <td>${r.codigo}${marca}</td>
+                        <td>${formatDataBr(r.data)}</td>
+                        <td>${r.anos_de_casa}</td>
+                        <td>${formatBrl(r.vencimento)}</td>
+                        <td>${r.degrau_pct > 0 ? '+' + r.degrau_pct.toLocaleString('pt-BR') + '%' : '—'}</td>
+                        <td>${r.acumulado_pct > 0 ? '+' + r.acumulado_pct.toLocaleString('pt-BR') + '%' : '—'}</td>
+                        <td>${pctAts > 0 ? pctAts + '%' : '—'}</td>
+                    </tr>`;
+            }).join('');
+        }
+
+        function renderAnnualSummary(data) {
+            const tbody = document.querySelector('#annual-table-el tbody');
+            if (!tbody) return;
+
+            const anos = new Map();
+            data.forEach(m => {
+                const ano = m.mesAno.substring(0, 4);
+                if (!anos.has(ano)) anos.set(ano, { meses: 0, bruto: 0, liquido: 0, decimo: 0, ferias: 0, disponivel: 0, refIni: m.level, refFim: m.level });
+                const a = anos.get(ano);
+                const d = m.extras && m.extras.gratificacao_natalina;
+                const f = m.extras && m.extras.adicional_ferias;
+                a.meses++;
+                a.bruto += m.proventos.total_tributavel + (d ? d.bruto : 0) + (f ? f.bruto : 0);
+                a.liquido += m.salario_liquido;
+                a.decimo += d ? d.liquido : 0;
+                a.ferias += f ? f.liquido : 0;
+                a.disponivel += m.liquido_disponivel ?? m.liquido_total ?? m.salario_liquido;
+                a.refFim = m.level;
+            });
+
+            tbody.innerHTML = Array.from(anos.entries()).map(([ano, a]) => {
+                const total = a.liquido + a.decimo + a.ferias;
+                const ref = a.refIni === a.refFim ? a.refIni : `${a.refIni} → ${a.refFim}`;
+                return `
+                    <tr>
+                        <td>${ano}</td>
+                        <td>${a.meses}</td>
+                        <td><span class="badge-info">${ref}</span></td>
+                        <td>${formatBrl(a.bruto)}</td>
+                        <td>${formatBrl(a.liquido)}</td>
+                        <td>${a.decimo > 0 ? formatBrl(a.decimo) : '—'}</td>
+                        <td>${a.ferias > 0 ? formatBrl(a.ferias) : '—'}</td>
+                        <td style="font-weight:bold; color:#10b981;">${formatBrl(total)}</td>
+                        <td>${formatBrl(total / a.meses)}</td>
+                        <td>${formatBrl(a.disponivel)}</td>
+                    </tr>`;
+            }).join('');
         }
 
         // Formata Moeda Brasileira
@@ -1780,7 +2496,8 @@
                     <td style="color:#f87171;">${formatBrl(month.descontos.irrf)}</td>
                     <td style="color:#34d399;">${formatBrl(month.total_isento)}</td>
                     <td style="text-align:left;">${eventBadgesHtml}</td>
-                    <td style="font-weight:bold; color:#10b981;">${formatBrl(month.salario_liquido)}</td>
+                    <td style="font-weight:bold; color:#10b981;">${formatBrl(month.salario_liquido)}${month.liquido_extras > 0 ? `<span class="extra-liquido">+ ${formatBrl(month.liquido_extras)}</span>` : ''}</td>
+                    <td title="Líquido com 13º e férias, menos despesas fora da folha">${formatBrl(month.liquido_disponivel ?? month.liquido_total ?? month.salario_liquido)}</td>
                 `;
                 tbody.appendChild(tr);
             });
@@ -1915,7 +2632,7 @@
                 const el = document.getElementById('stackedAreaChart');
                 if (el) {
                     const vencimentos = data.map(m => m.proventos.vencimento || m.baseSalary);
-                    const aqPerms = data.map(m => (m.proventos.aq_permanente || 0) + (m.proventos.aq_temporario || 0));
+                    const aqPerms = data.map(m => (m.proventos.aq_permanente || 0) + (m.proventos.aq_permanente_retroativo || 0) + (m.proventos.aq_temporario || 0));
                     const atsVals = data.map(m => m.proventos.ats || 0);
                     const subVals = data.map(m => m.proventos.substituicao || 0);
                     const funcVals = data.map(m => m.proventos.funcao_comissao || 0);
@@ -1969,7 +2686,7 @@
                 const el = document.getElementById('acumuladoChart');
                 if (el) {
                     let running = 0;
-                    const acumulado = data.map(m => { running += m.salario_liquido; return Math.round(running); });
+                    const acumulado = data.map(m => { running += (m.liquido_total ?? m.salario_liquido); return Math.round(running); });
                     acumuladoChartObj = new Chart(el.getContext('2d'), {
                         type: 'line',
                         data: {
@@ -2075,6 +2792,8 @@
                 'aq_temp_fim': { bg: '#9333ea', label: '📉' },
                 'filho_nasce': { bg: '#db2777', label: '👶' },
                 'filho_sai': { bg: '#991b1b', label: '🏫' },
+                'decimo_terceiro': { bg: '#15803d', label: '🎄' },
+                'ferias': { bg: '#0d9488', label: '🏖️' },
             };
 
             const allEvents = [];
@@ -2327,6 +3046,9 @@
             if (month.proventos.aq_permanente > 0) {
                 addFacsimileRow(vRows, '277', 'ADICIONAL DE QUALIFICAÇÃO', month.proventos.aq_permanente);
             }
+            if (month.proventos.aq_permanente_retroativo > 0) {
+                addFacsimileRow(vRows, '277', 'ADICIONAL DE QUALIFICAÇÃO (RETROATIVO)', month.proventos.aq_permanente_retroativo);
+            }
 
             // 108: Função comissao
             if (month.proventos.funcao_comissao > 0) {
@@ -2396,6 +3118,29 @@
                 p.innerText = `- ADICIONAL DE DIFÍCIL PROVIMENTO ATIVO (10% SOBRE O BÁSICO).`;
                 obsList.appendChild(p);
             }
+
+            const decimo = month.extras && month.extras.gratificacao_natalina;
+            if (decimo) {
+                hasObs = true;
+                const p = document.createElement('p');
+                p.innerText = `- 13º SALÁRIO, ${decimo.parcela}ª PARCELA (${decimo.avos}/12), NÃO SOMADO ACIMA: BRUTO ${formatPlainBrl(decimo.bruto)} | MS-PREV ${formatPlainBrl(decimo.msprev)} | IRRF ${formatPlainBrl(decimo.irrf)} | LÍQUIDO ${formatPlainBrl(decimo.liquido)}.`;
+                obsList.appendChild(p);
+            }
+
+            const terco = month.extras && month.extras.adicional_ferias;
+            if (terco) {
+                hasObs = true;
+                const p = document.createElement('p');
+                p.innerText = `- ADICIONAL DE FÉRIAS (1/3), NÃO SOMADO ACIMA: BRUTO ${formatPlainBrl(terco.bruto)} | IRRF ${formatPlainBrl(terco.irrf)} | LÍQUIDO ${formatPlainBrl(terco.liquido)}.`;
+                obsList.appendChild(p);
+            }
+
+            (month.despesas_fora_folha || []).forEach(d => {
+                hasObs = true;
+                const p = document.createElement('p');
+                p.innerText = `- FORA DA FOLHA: ${d.descricao.toUpperCase()} ${formatPlainBrl(d.valor)} (LÍQUIDO DISPONÍVEL ${formatPlainBrl(month.liquido_disponivel)}).`;
+                obsList.appendChild(p);
+            });
 
             document.getElementById('h-observacoes-box').style.display = hasObs ? 'block' : 'none';
 
@@ -2681,6 +3426,15 @@
             if (selector) {
                 selector.addEventListener('change', updateProfileButtons);
                 updateProfileButtons();
+            }
+
+            const cenarioSelect = document.getElementById('cenario');
+            if (cenarioSelect) {
+                cenarioSelect.value = detectarCenario();
+                cenarioSelect.addEventListener('change', () => aplicarCenario(cenarioSelect.value));
+                document.querySelectorAll('.premissa-cenario').forEach(el => {
+                    el.addEventListener('input', () => { cenarioSelect.value = detectarCenario(); });
+                });
             }
 
             // Initial call to sync custom auxílio name fields

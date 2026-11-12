@@ -43,6 +43,14 @@ class User extends Authenticatable
     }
 
     /**
+     * Holerites reais gravados para a aba Real × Projetado.
+     */
+    public function salaryPayslips(): HasMany
+    {
+        return $this->hasMany(SalaryPayslip::class);
+    }
+
+    /**
      * Relacionamentos do Módulo de Exercícios Físicos
      */
     public function workoutSessions(): HasMany

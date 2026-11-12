@@ -11,6 +11,8 @@ use App\DTOs\EventoAuxilioDTO;
 use App\DTOs\ConsignadoDTO;
 use App\DTOs\QualificacaoPermanenteDTO;
 use App\DTOs\FilhoDTO;
+use App\DTOs\CassemsEventoDTO;
+use App\DTOs\DespesaForaFolhaDTO;
 use App\Services\SalaryCalculatorService;
 use App\Models\SalaryProfile;
 
@@ -25,57 +27,97 @@ class SalaryController extends Controller
 
     public function index(Request $request)
     {
-        // Define default mock values for Samuel's scenario
+        // Cenário padrão conferido com os holerites de 05/2025 a 10/2026 (matrícula do Samuel)
         $defaultConfig = [
             'dt_exercicio' => '2025-05-05',
             'cargo' => 'TNSU',
             'referencia_inicial' => '1',
-            'aq_permanente_pct' => 8.0,
+            'aq_permanente_pct' => 0.0,
             'regime_integral' => false,
             'outros_adicionais_pct' => 0.0,
             'dependentes_irrf' => 1,
             'dependentes_cassems' => 3,
             'tem_conjuge' => false,
-            'consignados' => 697.00,
-            'salario_substituicao' => 1634.81,
+            'consignados' => 0.0,
+            'salario_substituicao' => 0.0,
             'funcao_comissao_valor' => 0.0,
             'teto_rgps' => true,
             'anos_projecao' => 10,
             'start_mes_ano' => '2025-05', // Default starting from entry month
-            'reajuste_auxilio_pct' => 3.0,
+            'reajuste_auxilio_pct' => 0.0,
             'reajuste_mes' => 5,
+            'mes_ferias' => 7,
+            'ferias_excecoes' => '2026-04', // em 2026 as férias foram em abril (holerite de 04/2026)
+            'incluir_13' => true,
+            // Cenário base (sabatina de 11/2026); o seletor do formulário troca as três premissas juntas
+            'cenario' => 'base',
+            'reajuste_padrao_pct' => SalaryCalculatorService::CENARIOS['base']['reajuste_padrao_pct'],
+            'aq_temp_renovacao_qtd' => SalaryCalculatorService::CENARIOS['base']['aq_temp_renovacao_qtd'],
+            'irrf_correcao_pct' => SalaryCalculatorService::CENARIOS['base']['irrf_correcao_pct'],
+            'aq_temp_renovacao_pct' => 1.0,
+            'aq_temp_renovacao_mes' => 6,
+            'aq_temp_renovacao_ano' => 0,
+            'teto_rgps_reajuste_pct' => 3.9,
         ];
 
+        // Cada ação educacional vale 1% por cerca de um ano; de 2027 em diante a renovação é automática
         $defaultAqTemp = [
-            ['nome' => 'Capacitação A (1%)', 'percentual' => 1.0, 'mes_inicio' => '2025-06', 'mes_fim' => '2029-05'],
-            ['nome' => 'Capacitação B (1%)', 'percentual' => 1.0, 'mes_inicio' => '2025-08', 'mes_fim' => '2029-07'],
-            ['nome' => 'Capacitação C (1%)', 'percentual' => 1.0, 'mes_inicio' => '2025-10', 'mes_fim' => '2029-09'],
-            ['nome' => 'Capacitação D (1%)', 'percentual' => 1.0, 'mes_inicio' => '2025-12', 'mes_fim' => '2029-11'],
-            ['nome' => 'Capacitação E (1%)', 'percentual' => 1.0, 'mes_inicio' => '2026-06', 'mes_fim' => '2030-05'],
+            ['nome' => 'Ação educacional 2025 A', 'percentual' => 1.0, 'mes_inicio' => '2025-06', 'mes_fim' => '2026-05'],
+            ['nome' => 'Ação educacional 2025 B', 'percentual' => 1.0, 'mes_inicio' => '2025-06', 'mes_fim' => '2026-05'],
+            ['nome' => 'Ação educacional 2025 C', 'percentual' => 1.0, 'mes_inicio' => '2025-06', 'mes_fim' => '2026-05'],
+            ['nome' => 'Ação educacional 2025 D', 'percentual' => 1.0, 'mes_inicio' => '2025-07', 'mes_fim' => '2026-06'],
+            ['nome' => 'Ação educacional 2025 E', 'percentual' => 1.0, 'mes_inicio' => '2025-07', 'mes_fim' => '2026-06'],
+            ['nome' => 'Ação educacional 2026 A', 'percentual' => 1.0, 'mes_inicio' => '2026-06', 'mes_fim' => '2027-04'],
+            ['nome' => 'Ação educacional 2026 B', 'percentual' => 1.0, 'mes_inicio' => '2026-06', 'mes_fim' => '2027-04'],
+            ['nome' => 'Ação educacional 2026 C', 'percentual' => 1.0, 'mes_inicio' => '2026-06', 'mes_fim' => '2027-05'],
+            ['nome' => 'Ação educacional 2026 D', 'percentual' => 1.0, 'mes_inicio' => '2026-07', 'mes_fim' => '2027-05'],
+            ['nome' => 'Ação educacional 2026 E', 'percentual' => 1.0, 'mes_inicio' => '2026-07', 'mes_fim' => '2027-06'],
         ];
 
         $defaultEvents = [
             ['mes_ano_inicio' => '2025-05', 'mes_ano_fim' => null, 'tipo_auxilio' => 'AUXILIO_ALIMENTACAO', 'valor' => 2200.00, 'acao' => 'CRIAR'],
-            ['mes_ano_inicio' => '2025-05', 'mes_ano_fim' => null, 'tipo_auxilio' => 'AUXILIO_CRECHE', 'valor' => 558.78, 'acao' => 'CRIAR'],
-            ['mes_ano_inicio' => '2025-05', 'mes_ano_fim' => null, 'tipo_auxilio' => 'AUXILIO_TRANSPORTE', 'valor' => 1000.00, 'acao' => 'CRIAR'],
+            ['mes_ano_inicio' => '2025-05', 'mes_ano_fim' => null, 'tipo_auxilio' => 'AUXILIO_TRANSPORTE', 'valor' => 500.00, 'acao' => 'CRIAR'],
+            ['mes_ano_inicio' => '2026-03', 'mes_ano_fim' => null, 'tipo_auxilio' => 'AUXILIO_TRANSPORTE', 'valor' => 1000.00, 'acao' => 'ALTERAR_VALOR'],
         ];
 
-        $defaultReajustes = [
-            2027 => 4.5,
-            2028 => 3.0,
-            2030 => 5.0,
-        ];
+        // Sem percentuais por ano: o cenário define o reajuste; informe um ano só quando houver notícia concreta
+        $defaultReajustes = [];
 
+        // Contratos da CEF: fim = primeiro desconto + número de parcelas − 1 (contagem de pagas confere com os holerites)
         $defaultConsignados = [
-            ['valor' => 697.00, 'mes_inicio' => '2025-05', 'mes_fim' => '2029-04']
+            ['descricao' => 'C.E.F. EMPRESTIMO (24x)', 'valor' => 137.00, 'mes_inicio' => '2025-08', 'mes_fim' => '2027-07'],
+            ['descricao' => 'C.E.F. EMPRESTIMO (60x)', 'valor' => 560.00, 'mes_inicio' => '2025-10', 'mes_fim' => '2030-09'],
         ];
 
+        // 8% desde 10/2025; depois um curso de +2 pontos por setembro, pago em novembro com retroativo, até 20%
         $defaultAqPermanenteCursos = [
-            ['nome' => '1º Curso AQ Permanente', 'percentual' => 2.0, 'mes_inicio' => '2025-09']
+            ['nome' => 'AQ Permanente (8%)', 'percentual' => 8.0, 'mes_inicio' => '2025-10', 'mes_pagamento' => null],
+        ];
+        foreach (range(2026, 2031) as $ano) {
+            $defaultAqPermanenteCursos[] = [
+                'nome' => "Curso permanente {$ano}",
+                'percentual' => 2.0,
+                'mes_inicio' => "{$ano}-09",
+                'mes_pagamento' => "{$ano}-11",
+            ];
+        }
+
+        // Mensalidade da CASSEMS em folha, conferida nos holerites
+        $defaultCassemsEventos = [
+            ['mes_inicio' => '2025-05', 'aliquota_pct' => 7.25, 'fixo' => 105.00],
+            ['mes_inicio' => '2025-12', 'aliquota_pct' => 7.5, 'fixo' => 140.00],
+            ['mes_inicio' => '2026-06', 'aliquota_pct' => 7.5, 'fixo' => 105.00],
         ];
 
+        // O cônjuge saiu do desconto em folha e passou a pagar boleto à parte
+        $defaultDespesas = [
+            ['descricao' => 'Boleto CASSEMS cônjuge', 'valor' => 450.00, 'mes_inicio' => '2026-06', 'mes_fim' => null],
+        ];
+
+        // Data fictícia: só serve para o auxílio-educação infantil aparecer desde o início.
+        // As datas reais ficam no perfil salvo de cada usuário.
         $defaultFilhos = [
-            ['nome' => 'Filho 1', 'dt_nascimento' => '2023-05-05', 'idade_escola' => 2]
+            ['nome' => 'Filho 1', 'dt_nascimento' => '2022-07-01', 'idade_escola' => 2],
         ];
 
         // Load profiles for current user
@@ -103,9 +145,18 @@ class SalaryController extends Controller
             $defaultConsignados = $config['consignados_list'] ?? $defaultConsignados;
             $defaultAqPermanenteCursos = $config['aq_permanente_cursos'] ?? $defaultAqPermanenteCursos;
             $defaultFilhos = $config['filhos'] ?? $defaultFilhos;
+            $defaultCassemsEventos = $config['cassems_eventos'] ?? $defaultCassemsEventos;
+            $defaultDespesas = $config['despesas_fora_folha'] ?? $defaultDespesas;
         }
 
+        $cenarios = SalaryCalculatorService::CENARIOS;
+
+        $holerites = auth()->user()->salaryPayslips()->orderBy('mes_ano')->get([
+            'mes_ano', 'total_bruto', 'total_descontos', 'total_liquido', 'outlier', 'pagamentos', 'descontos', 'observacao',
+        ]);
+
         return view('salary.index', compact(
+            'holerites',
             'defaultConfig', 
             'defaultAqTemp', 
             'defaultEvents', 
@@ -113,6 +164,9 @@ class SalaryController extends Controller
             'defaultConsignados',
             'defaultAqPermanenteCursos',
             'defaultFilhos',
+            'defaultCassemsEventos',
+            'defaultDespesas',
+            'cenarios',
             'profiles',
             'activeProfileId'
         ));
@@ -179,11 +233,25 @@ class SalaryController extends Controller
 
         $valorUnitarioCreche = (float) ($request->input('valor_unitario_creche', 558.78));
 
-        $anosProjecao = (int) ($serverData['anos_projecao'] ?? 10);
+        $cassemsEventos = [];
+        foreach ($request->input('cassems_eventos', []) as $evento) {
+            if (!empty($evento['mes_inicio']) && isset($evento['aliquota_pct']) && $evento['aliquota_pct'] !== '') {
+                $cassemsEventos[] = CassemsEventoDTO::fromArray($evento);
+            }
+        }
+
+        $despesasForaFolha = [];
+        foreach ($request->input('despesas_fora_folha', []) as $despesa) {
+            if (!empty($despesa['mes_inicio']) && !empty($despesa['valor'])) {
+                $despesasForaFolha[] = DespesaForaFolhaDTO::fromArray($despesa);
+            }
+        }
+
+        $anosProjecao = max(1, min(40, (int) ($serverData['anos_projecao'] ?? 10)));
         $startMesAno = $serverData['start_mes_ano'] ?? date('Y-m');
 
-        $projection = $this->calculatorService->gerarProjecao(
-            $servidor,
+        $projetar = fn (ServidorDTO $s) => $this->calculatorService->gerarProjecao(
+            $s,
             $aqTempList,
             $eventosAuxilios,
             $reajustes,
@@ -192,12 +260,64 @@ class SalaryController extends Controller
             $consignadosList,
             $aqPermanenteCursosList,
             $filhosList,
-            $valorUnitarioCreche
+            $valorUnitarioCreche,
+            $cassemsEventos,
+            $despesasForaFolha
         );
+
+        $projection = $projetar($servidor);
+
+        // Os três cenários com os mesmos dados, trocando só as premissas de cada um
+        $cenarios = [];
+        foreach (SalaryCalculatorService::CENARIOS as $nome => $premissas) {
+            $variante = clone $servidor;
+            foreach ($premissas as $campo => $valor) {
+                $variante->{$campo} = $valor;
+            }
+            $cenarios[$nome] = $this->resumirPorAno($projetar($variante));
+        }
 
         return response()->json([
             'success' => true,
-            'projection' => $projection
+            'projection' => $projection,
+            'carreira' => $this->calculatorService->gerarMapaCarreira($servidor),
+            'cenarios' => $cenarios,
+        ]);
+    }
+
+    /**
+     * Totais anuais da projeção (líquido com 13º e férias, e líquido disponível).
+     */
+    private function resumirPorAno(array $projection): array
+    {
+        $anos = [];
+        foreach ($projection as $mes) {
+            $ano = substr($mes['mesAno'], 0, 4);
+            $anos[$ano] ??= ['meses' => 0, 'liquido_total' => 0.0, 'liquido_disponivel' => 0.0];
+            $anos[$ano]['meses']++;
+            $anos[$ano]['liquido_total'] += $mes['liquido_total'];
+            $anos[$ano]['liquido_disponivel'] += $mes['liquido_disponivel'];
+        }
+
+        return array_map(fn ($a) => [
+            'meses' => $a['meses'],
+            'liquido_total' => round($a['liquido_total'], 2),
+            'liquido_disponivel' => round($a['liquido_disponivel'], 2),
+        ], $anos);
+    }
+
+    /**
+     * Marca ou desmarca um holerite real como outlier (fora das métricas de erro).
+     */
+    public function toggleOutlier(Request $request, string $mesAno)
+    {
+        $holerite = auth()->user()->salaryPayslips()->where('mes_ano', $mesAno)->firstOrFail();
+        $holerite->update(['outlier' => $request->boolean('outlier', !$holerite->outlier)]);
+
+        return response()->json([
+            'success' => true,
+            'mes_ano' => $holerite->mes_ano,
+            'outlier' => $holerite->outlier,
         ]);
     }
 
@@ -216,6 +336,8 @@ class SalaryController extends Controller
             'aq_permanente_cursos' => $request->input('aq_permanente_cursos', []),
             'filhos' => $request->input('filhos', []),
             'valor_unitario_creche' => $request->input('valor_unitario_creche', 558.78),
+            'cassems_eventos' => $request->input('cassems_eventos', []),
+            'despesas_fora_folha' => $request->input('despesas_fora_folha', []),
         ];
 
         $profile = auth()->user()->salaryProfiles()->create([
@@ -244,6 +366,8 @@ class SalaryController extends Controller
             'aq_permanente_cursos' => $request->input('aq_permanente_cursos', []),
             'filhos' => $request->input('filhos', []),
             'valor_unitario_creche' => $request->input('valor_unitario_creche', 558.78),
+            'cassems_eventos' => $request->input('cassems_eventos', []),
+            'despesas_fora_folha' => $request->input('despesas_fora_folha', []),
         ];
 
         $profile->update([

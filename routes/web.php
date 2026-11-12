@@ -179,6 +179,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/salario/perfis/{id}', [SalaryController::class, 'loadProfile'])->name('salary.profiles.load');
     Route::delete('/salario/perfis/{id}', [SalaryController::class, 'deleteProfile'])->name('salary.profiles.delete');
     Route::post('/salario/perfis/{id}/ativar', [SalaryController::class, 'activateProfile'])->name('salary.profiles.activate');
+    Route::patch('/salario/holerites/{mesAno}/outlier', [SalaryController::class, 'toggleOutlier'])
+        ->where('mesAno', '\d{4}-\d{2}')
+        ->name('salary.payslips.outlier');
 
     // Sistema 9 - Radar de Concursos Fiscais & Remunerações com Alertas Telegram
     Route::get('/concursos-fiscais', [FiscalConcursosController::class, 'index'])->name('fiscal.index');

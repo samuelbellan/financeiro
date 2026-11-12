@@ -1165,7 +1165,9 @@
             const transVal = parseFloat(t.valor) || 0;
             document.getElementById('inputValorDisplay').value = transVal.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
             document.getElementById('inputTipo').value = t.tipo;
-            document.getElementById('inputData').value = t.data;
+            // t.data chega serializado em ISO ("2026-11-04T00:00:00.000000Z"); o input
+            // type=date só aceita "Y-m-d" e ficaria vazio, forçando escolher outra data.
+            document.getElementById('inputData').value = (t.data || '').substring(0, 10);
             filterCategoriesByTipo(t.tipo);
             document.getElementById('selectCategoria').value = t.categoria || '';
             updateSubcategories(t.categoria, 'selectSubcategoria');
