@@ -42,6 +42,9 @@ Route::get('/api/estudos/dia', [EstudosApiController::class, 'dia'])
 Route::get('/api/estudos/periodo', [EstudosApiController::class, 'periodo'])
     ->middleware('throttle:60,1')
     ->name('api.estudos.periodo');
+Route::post('/api/estudos/guruja/meta', [EstudosApiController::class, 'gurujaStore'])
+    ->middleware('throttle:30,1')
+    ->name('api.estudos.guruja');
 
 // ── TV Launcher Widget & Controle Remoto (Rede Local) ─────────────────
 Route::get('/api/tv/widget-resumo', [TvWidgetController::class, 'resumo'])->name('api.tv.widget-resumo');
@@ -132,6 +135,7 @@ Route::middleware('auth')->group(function () {
     // Sistema 2 - Horas de Estudo (PWA offline estilo YPT)
     Route::get('/estudos', [EstudosController::class, 'index'])->name('estudos.index');
     Route::post('/estudos/sync', [EstudosController::class, 'sync'])->name('estudos.sync');
+    Route::get('/estudos/guruja', [EstudosController::class, 'guruja'])->name('estudos.guruja');
     Route::get('/estudos/token', [EstudosController::class, 'token'])->name('estudos.token');
     Route::get('/estudos/salas', [StudyRoomsController::class, 'index'])->name('estudos.salas');
     Route::post('/estudos/salas', [StudyRoomsController::class, 'store'])->name('estudos.salas.store');

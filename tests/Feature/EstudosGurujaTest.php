@@ -1,0 +1,79 @@
+<?php
+
+namespace Tests\Feature;
+
+use App\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
+use Tests\TestCase;
+
+class EstudosGurujaTest extends TestCase
+{
+    use RefreshDatabase;
+
+    protected function token(User $user): string
+    {
+        $plain = Str::random(40);
+        DB::table('study_api_tokens')->insert([
+            'user_id' => $user->id, 'nome' => 'teste', 'token_hash' => hash('sha256', $plain),
+            'created_at' => now(), 'updated_at' => now(),
+        ]);
+
+        return $plain;
+    }
+
+    protected function payload(int $ordem = 61): array
+    {
+        return [
+            'lido_em' => '2026-11-12T10:00:00Z',
+            'meta' => [
+                'target_id' => 1069184, 'ordem' => $ordem, 'status' => 'ontime', 'data_inicio' => '2026-11-09T04:44:36',
+                'dias_atraso' => 0,
+                'atividades' => [
+                    ['titulo' => 'IBS e CBS', 'disciplina' => 'Direito Tributário', 'tipo' => 'Questões', 'concluida' => true, 'questoes' => 25, 'acertos' => 17, 'minutos' => 85],
+                    ['titulo' => 'Arts. 37 a 42 da CF/88', 'disciplina' => 'Direito Constitucional', 'tipo' => 'Lei Seca', 'concluida' => false],
+                ],
+                'reforcos' => [['titulo' => 'CPC 46', 'concluido' => true]],
+            ],
+        ];
+    }
+
+    public function test_envio_exige_token(): void
+    {
+        $this->postJson('/api/estudos/guruja/meta', $this->payload())->assertUnauthorized();
+        $this->postJson('/api/estudos/guruja/meta', $this->payload(), ['Authorization' => 'Bearer x'])->assertUnauthorized();
+    }
+
+    public function test_envio_substitui_a_foto_e_o_app_le_a_ultima(): void
+    {
+        $user = User::factory()->create();
+        $headers = ['Authorization' => 'Bearer ' . $this->token($user)];
+
+        $this->postJson('/api/estudos/guruja/meta', $this->payload(60), $headers)->assertOk();
+        $this->postJson('/api/estudos/guruja/meta', $this->payload(61), $headers)->assertOk();
+        $this->assertSame(1, DB::table('study_guruja_metas')->count());
+
+        $json = $this->actingAs($user)->getJson('/estudos/guruja')->assertOk()->json();
+        $this->assertSame(61, $json['meta']['ordem']);
+        $this->assertCount(2, $json['meta']['atividades']);
+        $this->assertSame('2026-11-12T10:00:00Z', $json['lido_em']);
+    }
+
+    public function test_sem_foto_retorna_meta_nula_e_nao_vaza_entre_usuarios(): void
+    {
+        $dono = User::factory()->create();
+        $outro = User::factory()->create();
+        $this->postJson('/api/estudos/guruja/meta', $this->payload(), ['Authorization' => 'Bearer ' . $this->token($dono)])->assertOk();
+
+        $this->actingAs($outro)->getJson('/estudos/guruja')->assertOk()->assertJson(['meta' => null]);
+    }
+
+    public function test_valida_atividades(): void
+    {
+        $user = User::factory()->create();
+        $bad = $this->payload();
+        unset($bad['meta']['atividades'][0]['concluida']);
+        $this->postJson('/api/estudos/guruja/meta', $bad, ['Authorization' => 'Bearer ' . $this->token($user)])->assertUnprocessable();
+    }
+}

@@ -5,7 +5,9 @@ namespace App\Http\Controllers;
 use App\Services\StudySyncService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 /**
  * Módulo de estudos estilo YPT (PWA offline-first).
@@ -28,6 +30,22 @@ class EstudosController extends Controller
     public function token(): JsonResponse
     {
         return response()->json(['token' => csrf_token(), 'user_id' => Auth::id()]);
+    }
+
+    /**
+     * Última foto da meta atual da Guruja (ou null se nunca foi enviada).
+     */
+    public function guruja(): JsonResponse
+    {
+        $row = DB::table('study_guruja_metas')->where('user_id', Auth::id())->first();
+        if (!$row) {
+            return response()->json(['meta' => null, 'lido_em' => null]);
+        }
+
+        return response()->json([
+            'meta' => json_decode($row->payload, true),
+            'lido_em' => $row->lido_em ? Carbon::parse($row->lido_em)->utc()->format('Y-m-d\TH:i:s\Z') : null,
+        ]);
     }
 
     public function sync(Request $request, StudySyncService $service): JsonResponse

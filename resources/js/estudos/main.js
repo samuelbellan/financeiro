@@ -699,7 +699,83 @@ function renderTimer() {
         ${hasSubjects
             ? `<button type="button" class="btn start-study" data-action="pick-subject">${running ? '⇆ Trocar matéria' : '▶ Iniciar estudo'}</button>`
             : '<ul class="subjects"><li class="empty">Crie sua primeira matéria para começar.</li></ul>'}
-        <button type="button" class="btn ghost" data-action="new-subject">+ Matéria</button>`;
+        <button type="button" class="btn ghost" data-action="new-subject">+ Matéria</button>
+        ${renderGuruja()}`;
+}
+
+// ── Meta atual da Guruja ─────────────────────────────────────────────────────
+// O servidor guarda a última foto da meta em andamento (enviada por uma rotina que lê a Guruja).
+// O app busca ao abrir, a cada 5 min e ao voltar para a aba; sem rede, mostra a última foto salva.
+const GURUJA_REFRESH_MS = 5 * 60_000;
+const guruja = { data: null, fetchedAt: 0, loading: false, showDone: false };
+
+async function refreshGuruja(force = false) {
+    if (!config.gurujaUrl || guruja.loading) return;
+    if (!force && nowMs() - guruja.fetchedAt < 60_000) return;
+    guruja.loading = true;
+    try {
+        const response = await fetch(config.gurujaUrl, { credentials: 'same-origin', headers: { Accept: 'application/json' } });
+        if (!response.ok) return;
+        const data = await response.json();
+        guruja.fetchedAt = nowMs();
+        const changed = JSON.stringify(data) !== JSON.stringify(guruja.data);
+        guruja.data = data;
+        if (changed) {
+            await setMeta('guruja', data);
+            if (state.tab === 'timer' && !dialog.open) render();
+        }
+    } catch { /* offline: fica a última foto */ } finally {
+        guruja.loading = false;
+    }
+}
+
+function gurujaAgo(isoText) {
+    if (!isoText) return '';
+    const min = Math.max(0, Math.round((nowMs() - Date.parse(isoText)) / 60_000));
+    if (min < 1) return 'agora';
+    if (min < 60) return `há ${min} min`;
+    const h = Math.floor(min / 60);
+    return h < 24 ? `há ${h}h` : `há ${Math.floor(h / 24)}d`;
+}
+
+function gurujaItem(a, done) {
+    const score = done && a.questoes ? `${a.acertos ?? 0}/${a.questoes} · ${Math.round(((a.acertos ?? 0) / a.questoes) * 100)}%` : '';
+    const extra = done ? [score, a.minutos ? formatDuration(a.minutos * 60_000) : ''].filter(Boolean).join(' · ') : '';
+    return `<li class="${done ? 'done' : ''}${a.ignorada || a.ignorado ? ' skipped' : ''}">
+        <span class="gj-check" aria-hidden="true">${done ? '✓' : ''}</span>
+        <div><b>${esc(a.titulo)}</b>
+            <small>${esc(a.disciplina ?? '')}${a.tipo ? ` · ${esc(a.tipo)}` : ''}${extra ? ` · ${esc(extra)}` : ''}</small></div>
+    </li>`;
+}
+
+function renderGuruja() {
+    const meta = guruja.data?.meta;
+    if (!meta) return '';
+    const acts = meta.atividades ?? [];
+    const isDone = (a) => a.concluida || a.ignorada;
+    const pending = acts.filter((a) => !isDone(a));
+    const done = acts.filter(isDone);
+    const refPending = (meta.reforcos ?? []).filter((r) => !r.concluido && !r.ignorado);
+    const refDone = (meta.reforcos ?? []).filter((r) => r.concluido || r.ignorado);
+    const pct = acts.length ? Math.round((done.length / acts.length) * 100) : 0;
+    const startDay = meta.data_inicio ? Math.floor((nowMs() - Date.parse(meta.data_inicio)) / 86_400_000) + 1 : null;
+    const late = meta.dias_atraso > 0 ? ` · <span class="gj-late">${meta.dias_atraso}d de atraso</span>` : '';
+    return `<section class="guruja">
+        <header>
+            <div><small>Guruja${meta.ordem ? ` · Meta ${meta.ordem}` : ''}${startDay ? ` · dia ${startDay}` : ''}${late}</small>
+                <b>${done.length}/${acts.length} atividades</b></div>
+            <span class="gj-pct">${pct}%</span>
+        </header>
+        <div class="goal-bar"><span style="width:${pct}%"></span></div>
+        <h4>Pendentes (${pending.length + refPending.length})</h4>
+        ${pending.length || refPending.length
+            ? `<ul class="gj-list">${pending.map((a) => gurujaItem(a, false)).join('')}${refPending.map((r) => gurujaItem({ ...r, tipo: 'Reforço' }, false)).join('')}</ul>`
+            : '<p class="gj-empty">Tudo feito nesta meta 🎉</p>'}
+        ${done.length || refDone.length ? `<button type="button" class="gj-toggle" data-action="guruja-done">
+            ${guruja.showDone ? '▾' : '▸'} Concluídas (${done.length + refDone.length})</button>
+            ${guruja.showDone ? `<ul class="gj-list">${done.map((a) => gurujaItem(a, true)).join('')}${refDone.map((r) => gurujaItem({ ...r, tipo: 'Reforço', questoes: r.questoes_resolvidas }, true)).join('')}</ul>` : ''}` : ''}
+        <p class="gj-updated">Atualizado ${esc(gurujaAgo(guruja.data.lido_em))}</p>
+    </section>`;
 }
 
 function renderRestBanner() {
@@ -1948,6 +2024,7 @@ root.addEventListener('click', async (event) => {
     const { action, id } = button.dataset;
     const handlers = {
         toggle: () => toggleSubject(id),
+        'guruja-done': () => { guruja.showDone = !guruja.showDone; render(); },
         'focus-open': () => openFocus(),
         'room-create': () => openRoomDialog('create'),
         'room-join': () => openRoomDialog('join'),
@@ -2113,6 +2190,7 @@ document.addEventListener('visibilitychange', async () => {
     } else {
         render();
         checkSuspicious();
+        refreshGuruja();
         if (state.focusOpen) keepScreenOn(true);
     }
 });
@@ -2132,6 +2210,7 @@ async function boot() {
     state.focusView = (await getMeta('focus_view')) ?? 'classico';
     state.roomId = (await getMeta('room_id')) ?? null;
     restAlert.notified = (await getMeta('rest_alert')) ?? null;
+    guruja.data = (await getMeta('guruja')) ?? null;
 
     sync = createSync({
         syncUrl: config.syncUrl,
@@ -2149,6 +2228,8 @@ async function boot() {
     setInterval(tick, 1000);
     await checkSuspicious();
     sync.start();
+    refreshGuruja(true);
+    setInterval(() => refreshGuruja(true), GURUJA_REFRESH_MS);
 
     if ('serviceWorker' in navigator && config.swUrl) {
         navigator.serviceWorker.register(config.swUrl, { scope: config.swScope }).catch((error) => console.warn('SW:', error));
