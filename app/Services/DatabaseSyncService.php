@@ -208,13 +208,34 @@ class DatabaseSyncService
             ];
         }
 
+        // Uma única consulta lista as tabelas do destino: se o destino estiver com
+        // migrations atrasadas, falha logo com uma mensagem clara em vez de quebrar
+        // no meio da transferência (cada ida e volta à Neon custa ~0,7 s).
+        $localDb = ($sourceConnection === config('database.default')) ? $sourceDb : $destDb;
+        $destTables = $destDb->getSchemaBuilder()->getTableListing(schemaQualified: false);
+        $missing = array_values(array_filter(
+            $this->tables,
+            fn ($t) => !in_array($t, $destTables, true) && $localDb->getSchemaBuilder()->hasTable($t)
+        ));
+        if ($missing !== []) {
+            $hint = $destinationConnection === 'pgsql_cloud'
+                ? 'php artisan migrate --database=pgsql_cloud'
+                : 'php artisan migrate';
+            return [
+                'success' => false,
+                'total_rows' => 0,
+                'tables' => [],
+                'message' => "Erro em {$directionName}: o destino não tem as tabelas "
+                    . implode(', ', $missing) . ". Rode as migrations no destino ({$hint}) e tente de novo.",
+            ];
+        }
+
         $totalRows = 0;
         $tableCounts = [];
 
         try {
             foreach ($this->tables as $table) {
                 // Checa se a tabela existe na base local (que é rápida)
-                $localDb = ($sourceConnection === config('database.default')) ? $sourceDb : $destDb;
                 if (!$localDb->getSchemaBuilder()->hasTable($table)) {
                     continue;
                 }

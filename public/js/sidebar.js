@@ -323,17 +323,6 @@ window.TAB_ID = window.TAB_ID || (Math.random().toString(36).substring(2) + Date
                     <div style="padding: 1.25rem 1.5rem;">
                         <div id="syncAlertGlobal" class="sync-status-alert" style="display: none;"></div>
                         <div style="display: flex; flex-direction: column; gap: 0.75rem;">
-                            <button type="button" class="js-sync-action" data-direction="both" style="display: flex; align-items: center; gap: 0.85rem; padding: 0.85rem 1rem; border-radius: 10px; border: 1px solid rgba(56, 189, 248, 0.4); background: linear-gradient(135deg, rgba(14, 165, 233, 0.18), rgba(99, 102, 241, 0.18)); color: #f8fafc; cursor: pointer; text-align: left; transition: all 0.15s ease;">
-                                <div style="color: #38bdf8;">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                        <path d="m3 16 4 4 4-4"/><path d="M7 20V4"/><path d="m21 8-4-4-4 4"/><path d="M17 4v16"/>
-                                    </svg>
-                                </div>
-                                <div>
-                                    <div style="font-size: 0.875rem; font-weight: 600;">Sincronização Completa (2 Vias)</div>
-                                    <div style="font-size: 0.75rem; color: #94a3b8;">Puxa novidades do Bot/Nuvem e envia alterações locais</div>
-                                </div>
-                            </button>
                             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
                                 <button type="button" class="js-sync-action" data-direction="pull" style="display: flex; align-items: center; gap: 0.65rem; padding: 0.75rem; border-radius: 10px; border: 1px solid #1e293b; background: #1e293b; color: #f8fafc; cursor: pointer; text-align: left;">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>

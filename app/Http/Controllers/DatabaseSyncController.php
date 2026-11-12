@@ -38,6 +38,11 @@ class DatabaseSyncController extends Controller
             ], 422);
         }
 
+        // A transferência faz dezenas de idas e voltas à Neon (~0,7 s cada) e
+        // passa facilmente dos 30 s padrão do PHP, matando a requisição no meio.
+        set_time_limit(0);
+        ignore_user_abort(true);
+
         if ($direction === 'pull') {
             $result = $this->syncService->pull();
         } elseif ($direction === 'push') {
