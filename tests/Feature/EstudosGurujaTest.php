@@ -115,4 +115,24 @@ class EstudosGurujaTest extends TestCase
         $this->assertNull($json['resumo']);
         $this->assertSame('Faça o teste das aulas 00 a 02', $json['texto']);
     }
+
+    public function test_estimativas_e_instrucao_dos_reforcos_persistem_entre_envios(): void
+    {
+        $user = User::factory()->create();
+        $headers = ['Authorization' => 'Bearer ' . $this->token($user)];
+        $comEstimativas = $this->payload();
+        $comEstimativas['meta']['estimativas'] = ['Teoria' => 46, 'Questões' => 50];
+        $comEstimativas['meta']['prazo'] = '2026-11-16';
+        $comEstimativas['meta']['reforcos'][0]['instrucao'] = 'Refaça as questões incorretas.';
+
+        $this->postJson('/api/estudos/guruja/meta', $comEstimativas, $headers)->assertOk();
+        $this->postJson('/api/estudos/guruja/meta', $this->payload(), $headers)->assertOk();
+
+        $meta = $this->actingAs($user)->getJson('/estudos/guruja')->json('meta');
+        $this->assertSame(['Teoria' => 46, 'Questões' => 50], $meta['estimativas']);
+
+        $ruim = $this->payload();
+        $ruim['meta']['estimativas'] = ['Teoria' => 0];
+        $this->postJson('/api/estudos/guruja/meta', $ruim, $headers)->assertUnprocessable();
+    }
 }

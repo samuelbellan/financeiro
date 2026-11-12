@@ -707,7 +707,7 @@ function renderTimer() {
 // O servidor guarda a última foto da meta em andamento (enviada por uma rotina que lê a Guruja).
 // O app busca ao abrir, a cada 5 min e ao voltar para a aba; sem rede, mostra a última foto salva.
 const GURUJA_REFRESH_MS = 5 * 60_000;
-const guruja = { data: null, fetchedAt: 0, loading: false, showDone: false, open: new Set(), summarizing: new Set(), resumindo: null };
+const guruja = { data: null, fetchedAt: 0, loading: false, showDone: false, open: new Set(), summarizing: new Set(), resumindo: null, subjectMap: {} };
 
 async function refreshGuruja(force = false) {
     if (!config.gurujaUrl || guruja.loading) return;
@@ -741,24 +741,123 @@ function gurujaAgo(isoText) {
 function gurujaItem(a, done) {
     const score = done && a.questoes ? `${a.acertos ?? 0}/${a.questoes} · ${Math.round(((a.acertos ?? 0) / a.questoes) * 100)}%` : '';
     const extra = done ? [score, a.minutos ? formatDuration(a.minutos * 60_000) : ''].filter(Boolean).join(' · ') : '';
-    const code = a.codigo_atividade ?? '';
-    const raw = code ? guruja.data?.comandos?.[code] : null;
+    const est = !done && a.estMin ? `~${formatDuration(a.estMin * 60_000)}` : '';
+    const isRef = a.tipo === 'Reforço';
+    const code = isRef ? (a.target_activity_id ? `R:${a.target_activity_id}` : '') : (a.codigo_atividade ?? '');
+    const raw = !isRef && code ? guruja.data?.comandos?.[code] : null;
     const comando = typeof raw === 'string' ? { texto: raw, resumo: null } : raw;
+    const hasDetail = isRef ? Boolean(a.instrucao) : Boolean(comando);
     const isOpen = code && guruja.open.has(code);
+    let body = '';
+    if (isOpen) {
+        if (isRef) {
+            body = a.instrucao ? `<p>${esc(a.instrucao)}</p>` : '<p class="gj-cmd-empty">Sem instrução para este reforço.</p>';
+        } else if (comando?.resumo) {
+            body = `<p class="gj-resumo">${esc(comando.resumo)}</p>
+                <details><summary>Comando completo</summary><p>${esc(comando.texto)}</p></details>`;
+        } else if (comando) {
+            body = `${guruja.resumindo === code ? '<p class="gj-cmd-empty">Resumindo com o Gemini…</p>' : ''}<p>${esc(comando.texto)}</p>`;
+        } else {
+            body = '<p class="gj-cmd-empty">Sem comando salvo. No portal, abra esta atividade na aba <b>Comandos</b> e clique no favorito <b>Enviar comando</b>.</p>';
+        }
+        if (!done) body += `<button type="button" class="gj-study" data-action="guruja-study" data-id="${esc(a.disciplina ?? '')}">▶ Estudar ${esc(a.disciplina ?? '')}</button>`;
+        if (!isRef) body += `<small>${esc(code)}</small>`;
+    }
     return `<li class="${done ? 'done' : ''}${a.ignorada || a.ignorado ? ' skipped' : ''}${code ? ' gj-clickable' : ''}"
         ${code ? `data-action="guruja-item" data-id="${esc(code)}"` : ''}>
         <span class="gj-check" aria-hidden="true">${done ? '✓' : ''}</span>
         <div><b>${esc(a.titulo)}</b>
-            <small>${esc(a.disciplina ?? '')}${a.tipo ? ` · ${esc(a.tipo)}` : ''}${extra ? ` · ${esc(extra)}` : ''}${comando && !isOpen ? ' · <span class="gj-has-cmd">comando ▸</span>' : ''}</small>
-            ${isOpen ? `<div class="gj-cmd">${comando
-                ? (comando.resumo
-                    ? `<p class="gj-resumo">${esc(comando.resumo)}</p>
-                       <details><summary>Comando completo</summary><p>${esc(comando.texto)}</p></details>`
-                    : `${guruja.resumindo === code ? '<p class="gj-cmd-empty">Resumindo com o Gemini…</p>' : ''}<p>${esc(comando.texto)}</p>`)
-                : '<p class="gj-cmd-empty">Sem comando salvo. No portal, abra esta atividade na aba <b>Comandos</b> e clique no favorito <b>Enviar comando</b>.</p>'}
-                <small>${esc(code)}</small></div>` : ''}
+            <small>${esc(a.disciplina ?? '')}${a.tipo ? ` · ${esc(a.tipo)}` : ''}${extra ? ` · ${esc(extra)}` : ''}${est ? ` · ${est}` : ''}${hasDetail && !isOpen ? ` · <span class="gj-has-cmd">${isRef ? 'instrução' : 'comando'} ▸</span>` : ''}</small>
+            ${isOpen ? `<div class="gj-cmd">${body}</div>` : ''}
         </div>
     </li>`;
+}
+
+// ── Plano do dia e ritmo ──
+// Distribui as pendentes (na ordem da Guruja) pelos dias até o prazo da meta, usando o tempo típico de cada
+// tipo de atividade (mediana das últimas metas, enviada pela sincronização; sem ela, valores padrão).
+const GJ_EST_PADRAO = { 'Questões': 50, 'Teoria': 46, 'Revisão': 33, 'Teste': 56, 'Mapeamento': 66, 'Lei Seca': 45, 'Reforço': 36 };
+const GJ_DIA_MS = 86_400_000;
+
+function gurujaPrazo(meta) {
+    if (meta.prazo) return meta.prazo.slice(0, 10);
+    if (!meta.data_inicio) return null;
+    return new Date(Date.parse(meta.data_inicio) + 7 * GJ_DIA_MS).toISOString().slice(0, 10);
+}
+
+function dayDiff(from, to) {
+    return Math.round((Date.parse(`${to}T00:00:00Z`) - Date.parse(`${from}T00:00:00Z`)) / GJ_DIA_MS);
+}
+
+function gurujaPlan(meta, pendentes) {
+    const est = { ...GJ_EST_PADRAO, ...(meta.estimativas ?? {}) };
+    const items = pendentes.map((a) => ({ ...a, estMin: est[a.tipo] ?? 50 }));
+    const total = items.reduce((sum, a) => sum + a.estMin, 0);
+    const hoje = today();
+    const prazo = gurujaPrazo(meta);
+    const dias = prazo ? Math.max(1, dayDiff(hoje, prazo)) : 1;
+    const porDia = total / dias;
+    let acc = 0;
+    const days = Array.from({ length: dias }, (_, i) => ({ i, items: [], min: 0 }));
+    for (const a of items) {
+        const idx = Math.min(dias - 1, porDia ? Math.floor((acc + a.estMin / 2) / porDia) : 0);
+        days.at(idx).items.push(a);
+        days.at(idx).min += a.estMin;
+        acc += a.estMin;
+    }
+    return { total, dias, porDia, prazo, hoje, days: days.filter((d) => d.items.length) };
+}
+
+function gurujaDayLabel(hoje, i) {
+    if (i === 0) return 'Hoje';
+    if (i === 1) return 'Amanhã';
+    const d = new Date(Date.parse(`${hoje}T12:00:00Z`) + i * GJ_DIA_MS);
+    return d.toLocaleDateString('pt-BR', { weekday: 'short', day: '2-digit', month: '2-digit', timeZone: 'UTC' });
+}
+
+// ── ▶ Estudar: disciplina da Guruja → matéria do app ──
+const gjNorm = (text) => String(text ?? '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase()
+    .replace(/\bd\.\s*/g, 'direito ').replace(/[^a-z0-9 ]+/g, ' ')
+    .split(/\s+/).filter((w) => w && !['de', 'da', 'do', 'das', 'dos', 'e', 'i', 'ii'].includes(w));
+
+function gurujaSubjectFor(disciplina) {
+    const mapped = guruja.subjectMap?.[disciplina];
+    if (mapped && activeSubjects().some((x) => x.id === mapped)) return mapped;
+    const want = new Set(gjNorm(disciplina));
+    let best = null;
+    let bestScore = 0;
+    for (const subject of activeSubjects()) {
+        const have = gjNorm(subject.nome);
+        const hits = have.filter((w) => want.has(w) || [...want].some((x) => x.length >= 4 && w.length >= 4 && (x.startsWith(w) || w.startsWith(x)))).length;
+        const score = hits / Math.max(want.size, have.length, 1);
+        if (score > bestScore) { bestScore = score; best = subject.id; }
+    }
+    return bestScore >= 0.5 ? best : null;
+}
+
+async function gurujaStudy(disciplina) {
+    const subjectId = gurujaSubjectFor(disciplina);
+    const start = async (id) => {
+        if (runningSession()?.subject_id === id) return openFocus();
+        await toggleSubject(id);
+    };
+    if (subjectId) return start(subjectId);
+    const subjects = [...activeSubjects()].sort((a, b) => a.nome.localeCompare(b.nome, 'pt-BR', { sensitivity: 'base' }));
+    if (!subjects.length) return alert('Crie uma matéria primeiro.');
+    openDialog(`
+        <h3>Qual matéria é "${esc(disciplina)}"?</h3>
+        <p class="hint">Escolha uma vez; o app lembra neste aparelho.</p>
+        <div class="subject-picker">
+            ${subjects.map((x) => `<button class="subject-pick" value="${x.id}" style="--c:${esc(x.cor)}" formnovalidate><span class="dot"></span><span class="pick-main"><span class="name">${esc(x.nome)}</span></span></button>`).join('')}
+        </div>
+        <p class="form-error"></p>
+        <div class="actions"><button class="btn ghost" value="cancel" formnovalidate>Cancelar</button></div>`,
+    async (id) => {
+        guruja.subjectMap = { ...(guruja.subjectMap ?? {}), [disciplina]: id };
+        await setMeta('guruja_materias', guruja.subjectMap);
+        await start(id);
+        return null;
+    });
 }
 
 // Favorito (bookmarklet) para o portal da Guruja: com a atividade aberta na aba "Comandos", lê o texto do
@@ -853,27 +952,34 @@ function renderGuruja() {
     if (!meta) return '';
     const acts = meta.atividades ?? [];
     const isDone = (a) => a.concluida || a.ignorada;
-    const pending = acts.filter((a) => !isDone(a));
-    const done = acts.filter(isDone);
-    const refPending = (meta.reforcos ?? []).filter((r) => !r.concluido && !r.ignorado);
-    const refDone = (meta.reforcos ?? []).filter((r) => r.concluido || r.ignorado);
-    const pct = acts.length ? Math.round((done.length / acts.length) * 100) : 0;
-    const startDay = meta.data_inicio ? Math.floor((nowMs() - Date.parse(meta.data_inicio)) / 86_400_000) + 1 : null;
+    const refs = (meta.reforcos ?? []).map((r) => ({ ...r, tipo: 'Reforço', questoes: r.questoes_resolvidas }));
+    const pending = [...acts.filter((a) => !isDone(a)), ...refs.filter((r) => !r.concluido && !r.ignorado)];
+    const done = [...acts.filter(isDone), ...refs.filter((r) => r.concluido || r.ignorado)];
+    const pct = acts.length ? Math.round((acts.filter(isDone).length / acts.length) * 100) : 0;
+    const startDay = meta.data_inicio ? Math.floor((nowMs() - Date.parse(meta.data_inicio)) / GJ_DIA_MS) + 1 : null;
     const late = meta.dias_atraso > 0 ? ` · <span class="gj-late">${meta.dias_atraso}d de atraso</span>` : '';
+    const plan = gurujaPlan(meta, pending);
+    const metaDia = state.settings?.meta_diaria_min ?? 0;
+    const apertado = metaDia && plan.porDia > metaDia;
+    const ritmo = pending.length ? `<p class="gj-ritmo${apertado ? ' warn' : ''}">
+        Faltam <b>${pending.length}</b> (~${formatDuration(plan.total * 60_000)}) em <b>${plan.dias} ${plan.dias === 1 ? 'dia' : 'dias'}</b>
+        · ~${formatDuration(plan.porDia * 60_000)}/dia${apertado ? ` <span>acima da sua meta diária (${formatDuration(metaDia * 60_000)})</span>` : ''}
+        ${plan.prazo ? `<small>Prazo: ${formatDay(plan.prazo, { weekday: 'short', day: '2-digit', month: '2-digit' })}</small>` : ''}</p>` : '';
     return `<section class="guruja">
         <header>
             <div><small>Guruja${meta.ordem ? ` · Meta ${meta.ordem}` : ''}${startDay ? ` · dia ${startDay}` : ''}${late}</small>
-                <b>${done.length}/${acts.length} atividades</b></div>
+                <b>${acts.filter(isDone).length}/${acts.length} atividades</b></div>
             <span class="gj-pct">${pct}%</span>
         </header>
         <div class="goal-bar"><span style="width:${pct}%"></span></div>
-        <h4>Pendentes (${pending.length + refPending.length})</h4>
-        ${pending.length || refPending.length
-            ? `<ul class="gj-list">${pending.map((a) => gurujaItem(a, false)).join('')}${refPending.map((r) => gurujaItem({ ...r, tipo: 'Reforço' }, false)).join('')}</ul>`
+        ${ritmo}
+        ${pending.length
+            ? plan.days.map((d) => `<h4>${gurujaDayLabel(plan.hoje, d.i)} <span class="gj-h4-time">· ~${formatDuration(d.min * 60_000)}</span></h4>
+                <ul class="gj-list">${d.items.map((a) => gurujaItem(a, false)).join('')}</ul>`).join('')
             : '<p class="gj-empty">Tudo feito nesta meta 🎉</p>'}
-        ${done.length || refDone.length ? `<button type="button" class="gj-toggle" data-action="guruja-done">
-            ${guruja.showDone ? '▾' : '▸'} Concluídas (${done.length + refDone.length})</button>
-            ${guruja.showDone ? `<ul class="gj-list">${done.map((a) => gurujaItem(a, true)).join('')}${refDone.map((r) => gurujaItem({ ...r, tipo: 'Reforço', questoes: r.questoes_resolvidas }, true)).join('')}</ul>` : ''}` : ''}
+        ${done.length ? `<button type="button" class="gj-toggle" data-action="guruja-done">
+            ${guruja.showDone ? '▾' : '▸'} Concluídas (${done.length})</button>
+            ${guruja.showDone ? `<ul class="gj-list">${done.map((a) => gurujaItem(a, true)).join('')}</ul>` : ''}` : ''}
         <p class="gj-updated"><button type="button" data-action="guruja-help">⚑ Comandos</button>Atualizado ${esc(gurujaAgo(guruja.data.lido_em))}</p>
     </section>`;
 }
@@ -2133,6 +2239,7 @@ root.addEventListener('click', async (event) => {
             if (opening) summarizeGurujaCommand(id);
         },
         'guruja-help': () => openGurujaHelp(),
+        'guruja-study': () => gurujaStudy(id),
         'focus-open': () => openFocus(),
         'room-create': () => openRoomDialog('create'),
         'room-join': () => openRoomDialog('join'),
@@ -2319,6 +2426,7 @@ async function boot() {
     state.roomId = (await getMeta('room_id')) ?? null;
     restAlert.notified = (await getMeta('rest_alert')) ?? null;
     guruja.data = (await getMeta('guruja')) ?? null;
+    guruja.subjectMap = (await getMeta('guruja_materias')) ?? {};
 
     sync = createSync({
         syncUrl: config.syncUrl,
