@@ -707,7 +707,7 @@ function renderTimer() {
 // O servidor guarda a última foto da meta em andamento (enviada por uma rotina que lê a Guruja).
 // O app busca ao abrir, a cada 5 min e ao voltar para a aba; sem rede, mostra a última foto salva.
 const GURUJA_REFRESH_MS = 5 * 60_000;
-const guruja = { data: null, fetchedAt: 0, loading: false, showDone: false, open: new Set() };
+const guruja = { data: null, fetchedAt: 0, loading: false, showDone: false, open: new Set(), summarizing: new Set(), resumindo: null };
 
 async function refreshGuruja(force = false) {
     if (!config.gurujaUrl || guruja.loading) return;
@@ -754,7 +754,7 @@ function gurujaItem(a, done) {
                 ? (comando.resumo
                     ? `<p class="gj-resumo">${esc(comando.resumo)}</p>
                        <details><summary>Comando completo</summary><p>${esc(comando.texto)}</p></details>`
-                    : `<p>${esc(comando.texto)}</p>`)
+                    : `${guruja.resumindo === code ? '<p class="gj-cmd-empty">Resumindo com o Gemini…</p>' : ''}<p>${esc(comando.texto)}</p>`)
                 : '<p class="gj-cmd-empty">Sem comando salvo. No portal, abra esta atividade na aba <b>Comandos</b> e clique no favorito <b>Enviar comando</b>.</p>'}
                 <small>${esc(code)}</small></div>` : ''}
         </div>
@@ -793,32 +793,52 @@ function openGurujaHelp() {
 }
 
 /** Chegou de um clique no favorito (#gj-cmd=...): salva o comando no servidor e limpa o endereço. */
+/** Salva o comando de uma atividade; o servidor devolve o texto e o resumo do Gemini (ou null). */
+async function postGurujaCommand(codigo, texto) {
+    const send = (token) => fetch(config.gurujaComandoUrl, {
+        method: 'POST',
+        credentials: 'same-origin',
+        headers: { Accept: 'application/json', 'Content-Type': 'application/json', 'X-CSRF-TOKEN': token },
+        body: JSON.stringify({
+            codigo,
+            texto,
+            titulo: guruja.data?.meta?.atividades?.find((a) => a.codigo_atividade === codigo)?.titulo ?? null,
+        }),
+    });
+    let response = await send(config.csrf);
+    if (response.status === 419) {
+        const fresh = await fetch(config.tokenUrl, { credentials: 'same-origin', headers: { Accept: 'application/json' } });
+        if (fresh.ok) response = await send((await fresh.json()).token);
+    }
+    if (!response.ok) throw new Error(`Erro ${response.status}`);
+    const saved = await response.json();
+    if (guruja.data) guruja.data.comandos = { ...(guruja.data.comandos ?? {}), [codigo]: { texto: saved.texto, resumo: saved.resumo } };
+    return saved;
+}
+
+/** Comando salvo antes do resumo existir: ao abrir a atividade, pede o resumo (uma vez por sessão). */
+async function summarizeGurujaCommand(codigo) {
+    const raw = guruja.data?.comandos?.[codigo];
+    const texto = typeof raw === 'string' ? raw : raw?.texto;
+    if (!texto || (typeof raw === 'object' && raw?.resumo) || guruja.summarizing.has(codigo)) return;
+    guruja.summarizing.add(codigo);
+    guruja.resumindo = codigo;
+    render();
+    try { await postGurujaCommand(codigo, texto); } catch { /* fica o comando completo */ }
+    guruja.resumindo = null;
+    render();
+}
+
+/** Chegou de um clique no favorito (#gj-cmd=...): salva o comando no servidor e limpa o endereço. */
 async function receiveGurujaCommand() {
     if (!location.hash.startsWith('#gj-cmd=')) return;
     let payload;
     try { payload = JSON.parse(decodeURIComponent(location.hash.slice(8))); } catch { payload = null; }
     history.replaceState(null, '', location.pathname + location.search);
     if (!payload?.c || !payload?.t) return;
-    const send = (token) => fetch(config.gurujaComandoUrl, {
-        method: 'POST',
-        credentials: 'same-origin',
-        headers: { Accept: 'application/json', 'Content-Type': 'application/json', 'X-CSRF-TOKEN': token },
-        body: JSON.stringify({
-            codigo: payload.c,
-            texto: payload.t,
-            titulo: guruja.data?.meta?.atividades?.find((a) => a.codigo_atividade === payload.c)?.titulo ?? null,
-        }),
-    });
     try {
-        let response = await send(config.csrf);
-        if (response.status === 419) {
-            const fresh = await fetch(config.tokenUrl, { credentials: 'same-origin', headers: { Accept: 'application/json' } });
-            if (fresh.ok) response = await send((await fresh.json()).token);
-        }
-        if (!response.ok) throw new Error(`Erro ${response.status}`);
-        const saved = await response.json();
+        await postGurujaCommand(payload.c, payload.t);
         guruja.open.add(payload.c);
-        if (guruja.data) guruja.data.comandos = { ...(guruja.data.comandos ?? {}), [payload.c]: { texto: saved.texto, resumo: saved.resumo } };
         state.tab = 'timer';
         await refreshGuruja(true);
         render();
@@ -2107,8 +2127,10 @@ root.addEventListener('click', async (event) => {
         'guruja-done': () => { guruja.showDone = !guruja.showDone; render(); },
         'guruja-item': () => {
             if (event.target.closest('.gj-cmd')) return; // clique dentro do comando (ex.: "Comando completo") não fecha
-            guruja.open.has(id) ? guruja.open.delete(id) : guruja.open.add(id);
+            const opening = !guruja.open.has(id);
+            opening ? guruja.open.add(id) : guruja.open.delete(id);
             render();
+            if (opening) summarizeGurujaCommand(id);
         },
         'guruja-help': () => openGurujaHelp(),
         'focus-open': () => openFocus(),
