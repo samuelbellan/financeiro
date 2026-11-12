@@ -40,6 +40,10 @@ return [
     ],
 
     // Módulo de estudos (PWA): a nuvem é a fonte única da verdade; fora dela, /estudos redireciona para cá.
+    'gemini' => [
+        'key' => env('GEMINI_API_KEY'),
+    ],
+
     'estudos' => [
         'cloud_url' => env('CLOUD_APP_URL', 'https://financeiro-app-mrik.onrender.com'),
     ],

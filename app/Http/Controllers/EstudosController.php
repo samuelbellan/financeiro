@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\GurujaComandoResumoService;
 use App\Services\StudySyncService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -39,7 +40,8 @@ class EstudosController extends Controller
     {
         $row = DB::table('study_guruja_metas')->where('user_id', Auth::id())->first();
         $comandos = DB::table('study_guruja_comandos')->where('user_id', Auth::id())
-            ->get(['codigo', 'texto'])->pluck('texto', 'codigo');
+            ->get(['codigo', 'texto', 'resumo'])
+            ->mapWithKeys(fn ($c) => [$c->codigo => ['texto' => $c->texto, 'resumo' => $c->resumo]]);
 
         return response()->json([
             'meta' => $row ? json_decode($row->payload, true) : null,
@@ -51,18 +53,23 @@ class EstudosController extends Controller
     /**
      * Salva o comando de uma atividade, copiado do portal da Guruja pelo favorito (via /estudos#gj-cmd=...).
      */
-    public function gurujaComando(Request $request): JsonResponse
+    public function gurujaComando(Request $request, GurujaComandoResumoService $resumos): JsonResponse
     {
         $data = $request->validate([
             'codigo' => ['required', 'string', 'max:40', 'regex:/^[A-Z]{2,10}\.\d{1,6}\.\d{1,9}$/'],
             'texto' => 'required|string|max:10000',
+            'titulo' => 'nullable|string|max:300',
         ]);
+        $texto = trim($data['texto']);
+        $atual = DB::table('study_guruja_comandos')->where('user_id', Auth::id())->where('codigo', $data['codigo'])->first();
+        // Mesmo texto já resumido: não chama a IA de novo.
+        $resumo = ($atual && $atual->texto === $texto && $atual->resumo) ? $atual->resumo : $resumos->resumir($texto, $data['titulo'] ?? null);
         DB::table('study_guruja_comandos')->updateOrInsert(
             ['user_id' => Auth::id(), 'codigo' => $data['codigo']],
-            ['texto' => trim($data['texto']), 'updated_at' => now(), 'created_at' => now()],
+            ['texto' => $texto, 'resumo' => $resumo, 'updated_at' => now(), 'created_at' => $atual->created_at ?? now()],
         );
 
-        return response()->json(['ok' => true]);
+        return response()->json(['ok' => true, 'texto' => $texto, 'resumo' => $resumo]);
     }
 
     public function sync(Request $request, StudySyncService $service): JsonResponse
