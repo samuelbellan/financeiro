@@ -742,7 +742,8 @@ function gurujaItem(a, done) {
     const score = done && a.questoes ? `${a.acertos ?? 0}/${a.questoes} · ${Math.round(((a.acertos ?? 0) / a.questoes) * 100)}%` : '';
     const extra = done ? [score, a.minutos ? formatDuration(a.minutos * 60_000) : ''].filter(Boolean).join(' · ') : '';
     const code = a.codigo_atividade ?? '';
-    const comando = code ? guruja.data?.comandos?.[code] : null;
+    const raw = code ? guruja.data?.comandos?.[code] : null;
+    const comando = typeof raw === 'string' ? { texto: raw, resumo: null } : raw;
     const isOpen = code && guruja.open.has(code);
     return `<li class="${done ? 'done' : ''}${a.ignorada || a.ignorado ? ' skipped' : ''}${code ? ' gj-clickable' : ''}"
         ${code ? `data-action="guruja-item" data-id="${esc(code)}"` : ''}>
@@ -750,7 +751,10 @@ function gurujaItem(a, done) {
         <div><b>${esc(a.titulo)}</b>
             <small>${esc(a.disciplina ?? '')}${a.tipo ? ` · ${esc(a.tipo)}` : ''}${extra ? ` · ${esc(extra)}` : ''}${comando && !isOpen ? ' · <span class="gj-has-cmd">comando ▸</span>' : ''}</small>
             ${isOpen ? `<div class="gj-cmd">${comando
-                ? `<p>${esc(comando)}</p>`
+                ? (comando.resumo
+                    ? `<p class="gj-resumo">${esc(comando.resumo)}</p>
+                       <details><summary>Comando completo</summary><p>${esc(comando.texto)}</p></details>`
+                    : `<p>${esc(comando.texto)}</p>`)
                 : '<p class="gj-cmd-empty">Sem comando salvo. No portal, abra esta atividade na aba <b>Comandos</b> e clique no favorito <b>Enviar comando</b>.</p>'}
                 <small>${esc(code)}</small></div>` : ''}
         </div>
@@ -799,7 +803,11 @@ async function receiveGurujaCommand() {
         method: 'POST',
         credentials: 'same-origin',
         headers: { Accept: 'application/json', 'Content-Type': 'application/json', 'X-CSRF-TOKEN': token },
-        body: JSON.stringify({ codigo: payload.c, texto: payload.t }),
+        body: JSON.stringify({
+            codigo: payload.c,
+            texto: payload.t,
+            titulo: guruja.data?.meta?.atividades?.find((a) => a.codigo_atividade === payload.c)?.titulo ?? null,
+        }),
     });
     try {
         let response = await send(config.csrf);
@@ -808,8 +816,9 @@ async function receiveGurujaCommand() {
             if (fresh.ok) response = await send((await fresh.json()).token);
         }
         if (!response.ok) throw new Error(`Erro ${response.status}`);
+        const saved = await response.json();
         guruja.open.add(payload.c);
-        if (guruja.data) guruja.data.comandos = { ...(guruja.data.comandos ?? {}), [payload.c]: payload.t.trim() };
+        if (guruja.data) guruja.data.comandos = { ...(guruja.data.comandos ?? {}), [payload.c]: { texto: saved.texto, resumo: saved.resumo } };
         state.tab = 'timer';
         await refreshGuruja(true);
         render();
@@ -2096,7 +2105,11 @@ root.addEventListener('click', async (event) => {
     const handlers = {
         toggle: () => toggleSubject(id),
         'guruja-done': () => { guruja.showDone = !guruja.showDone; render(); },
-        'guruja-item': () => { guruja.open.has(id) ? guruja.open.delete(id) : guruja.open.add(id); render(); },
+        'guruja-item': () => {
+            if (event.target.closest('.gj-cmd')) return; // clique dentro do comando (ex.: "Comando completo") não fecha
+            guruja.open.has(id) ? guruja.open.delete(id) : guruja.open.add(id);
+            render();
+        },
         'guruja-help': () => openGurujaHelp(),
         'focus-open': () => openFocus(),
         'room-create': () => openRoomDialog('create'),

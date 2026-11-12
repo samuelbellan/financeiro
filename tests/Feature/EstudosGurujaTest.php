@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
 use Tests\TestCase;
 
@@ -77,21 +78,41 @@ class EstudosGurujaTest extends TestCase
         $this->postJson('/api/estudos/guruja/meta', $bad, ['Authorization' => 'Bearer ' . $this->token($user)])->assertUnprocessable();
     }
 
-    public function test_comando_salvo_pelo_favorito_volta_no_card(): void
+    public function test_comando_salvo_pelo_favorito_volta_no_card_com_resumo_do_gemini(): void
     {
+        config(['services.gemini.key' => 'chave-teste']);
+        Http::fake(['generativelanguage.googleapis.com/*' => Http::response([
+            'candidates' => [['content' => ['parts' => [['text' => "• Aula 19 (versão original): págs. 149 a 169\n• Pare antes de **Resumo dos Assuntos**"]]]]],
+        ])]);
         $user = User::factory()->create();
         $this->actingAs($user);
         $texto = 'Aula 19 - Versão ORIGINAL - Estude da pág. 149 até a pág. 169';
 
+        $json = $this->postJson('/estudos/guruja/comando', ['codigo' => 'DTRIB.3886.115658', 'texto' => "  $texto  ", 'titulo' => 'Simples Nacional'])
+            ->assertOk()->json();
+        $this->assertSame("• Aula 19 (versão original): págs. 149 a 169\n• Pare antes de Resumo dos Assuntos", $json['resumo']);
+        // Mesmo texto de novo: reaproveita o resumo, sem chamar a IA.
         $this->postJson('/estudos/guruja/comando', ['codigo' => 'DTRIB.3886.115658', 'texto' => $texto])->assertOk();
-        $this->postJson('/estudos/guruja/comando', ['codigo' => 'DTRIB.3886.115658', 'texto' => "  $texto (rev)  "])->assertOk();
+        Http::assertSentCount(1);
         $this->postJson('/estudos/guruja/comando', ['codigo' => 'x; drop', 'texto' => 'a'])->assertUnprocessable();
 
-        $json = $this->getJson('/estudos/guruja')->assertOk()->json();
-        $this->assertSame("$texto (rev)", $json['comandos']['DTRIB.3886.115658']);
+        $cmd = $this->getJson('/estudos/guruja')->assertOk()->json('comandos')['DTRIB.3886.115658'];
+        $this->assertSame($texto, $cmd['texto']);
+        $this->assertStringStartsWith('• Aula 19', $cmd['resumo']);
         $this->assertSame(1, DB::table('study_guruja_comandos')->count());
 
         $outro = User::factory()->create();
         $this->actingAs($outro)->getJson('/estudos/guruja')->assertOk()->assertExactJson(['meta' => null, 'lido_em' => null, 'comandos' => []]);
+    }
+
+    public function test_sem_resposta_do_gemini_salva_so_o_comando(): void
+    {
+        config(['services.gemini.key' => 'chave-teste']);
+        Http::fake(['generativelanguage.googleapis.com/*' => Http::response('erro', 500)]);
+        $this->actingAs(User::factory()->create());
+
+        $json = $this->postJson('/estudos/guruja/comando', ['codigo' => 'AUD.3709.112600', 'texto' => 'Faça o teste das aulas 00 a 02'])->assertOk()->json();
+        $this->assertNull($json['resumo']);
+        $this->assertSame('Faça o teste das aulas 00 a 02', $json['texto']);
     }
 }
