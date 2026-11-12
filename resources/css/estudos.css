@@ -841,3 +841,15 @@ body.rest-over [data-live="rest"], body.rest-over [data-w-time] { color: var(--d
 .gj-toggle { background: none; border: 0; color: var(--muted); font: inherit; font-size: .8rem; font-weight: 600; padding: 10px 0 4px; cursor: pointer; text-transform: uppercase; letter-spacing: .03em; }
 .gj-empty { color: var(--muted); font-size: .85rem; margin: 4px 0; }
 .gj-updated { color: var(--muted); font-size: .7rem; margin: 8px 0 0; text-align: right; }
+.gj-list li.gj-clickable { cursor: pointer; }
+.gj-has-cmd { color: var(--primary); font-weight: 600; }
+.gj-cmd { margin-top: 6px; padding: 8px 10px; background: var(--bg); border: 1px solid var(--border); border-radius: 10px; cursor: auto; }
+.gj-cmd p { margin: 0; font-size: .84rem; line-height: 1.4; white-space: pre-wrap; overflow-wrap: anywhere; }
+.gj-cmd small { margin-top: 6px; }
+.gj-list li.done .gj-cmd p { text-decoration: none; }
+.gj-cmd-empty { color: var(--muted); }
+.gj-updated { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.gj-updated button { background: none; border: 0; padding: 0; color: var(--primary); font: inherit; font-size: .74rem; font-weight: 600; cursor: pointer; }
+.gj-bm-wrap { text-align: center; }
+.gj-bm { display: inline-block; width: auto; padding: 8px 16px; text-decoration: none; cursor: grab; }
+#estudos-dialog .hint { color: var(--muted); font-size: .8rem; }

@@ -406,6 +406,7 @@ class EstudosApiController extends Controller
             'meta.minutos_estudados' => 'nullable|integer',
             'meta.atividades' => 'required|array|max:200',
             'meta.atividades.*.target_activity_id' => 'nullable|integer',
+            'meta.atividades.*.codigo_atividade' => 'nullable|string|max:40',
             'meta.atividades.*.titulo' => 'required|string|max:300',
             'meta.atividades.*.disciplina' => 'nullable|string|max:150',
             'meta.atividades.*.tipo' => 'nullable|string|max:60',

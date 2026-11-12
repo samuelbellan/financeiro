@@ -76,4 +76,22 @@ class EstudosGurujaTest extends TestCase
         unset($bad['meta']['atividades'][0]['concluida']);
         $this->postJson('/api/estudos/guruja/meta', $bad, ['Authorization' => 'Bearer ' . $this->token($user)])->assertUnprocessable();
     }
+
+    public function test_comando_salvo_pelo_favorito_volta_no_card(): void
+    {
+        $user = User::factory()->create();
+        $this->actingAs($user);
+        $texto = 'Aula 19 - Versão ORIGINAL - Estude da pág. 149 até a pág. 169';
+
+        $this->postJson('/estudos/guruja/comando', ['codigo' => 'DTRIB.3886.115658', 'texto' => $texto])->assertOk();
+        $this->postJson('/estudos/guruja/comando', ['codigo' => 'DTRIB.3886.115658', 'texto' => "  $texto (rev)  "])->assertOk();
+        $this->postJson('/estudos/guruja/comando', ['codigo' => 'x; drop', 'texto' => 'a'])->assertUnprocessable();
+
+        $json = $this->getJson('/estudos/guruja')->assertOk()->json();
+        $this->assertSame("$texto (rev)", $json['comandos']['DTRIB.3886.115658']);
+        $this->assertSame(1, DB::table('study_guruja_comandos')->count());
+
+        $outro = User::factory()->create();
+        $this->actingAs($outro)->getJson('/estudos/guruja')->assertOk()->assertExactJson(['meta' => null, 'lido_em' => null, 'comandos' => []]);
+    }
 }
