@@ -417,6 +417,11 @@ class EstudosApiController extends Controller
             'meta.atividades.*.minutos' => 'nullable|integer',
             'meta.atividades.*.relevancia' => 'nullable|integer',
             'meta.reforcos' => 'nullable|array|max:100',
+            'meta.prazo' => 'nullable|date_format:Y-m-d',
+            'meta.estimativas' => 'nullable|array|max:30',
+            'meta.estimativas.*' => 'integer|min:1|max:600',
+            'meta.reforcos.*.target_activity_id' => 'nullable|integer',
+            'meta.reforcos.*.instrucao' => 'nullable|string|max:2000',
             'meta.reforcos.*.titulo' => 'required|string|max:300',
             'meta.reforcos.*.disciplina' => 'nullable|string|max:150',
             'meta.reforcos.*.concluido' => 'required|boolean',
@@ -427,6 +432,14 @@ class EstudosApiController extends Controller
         ]);
 
         $lidoEm = isset($data['lido_em']) ? Carbon::parse($data['lido_em']) : now();
+        // Estimativas de tempo por tipo são recalculadas só de vez em quando: sem elas no envio, mantém as anteriores.
+        if (!isset($data['meta']['estimativas'])) {
+            $anterior = DB::table('study_guruja_metas')->where('user_id', $userId)->value('payload');
+            $estimativas = $anterior ? (json_decode($anterior, true)['estimativas'] ?? null) : null;
+            if ($estimativas) {
+                $data['meta']['estimativas'] = $estimativas;
+            }
+        }
         DB::table('study_guruja_metas')->updateOrInsert(
             ['user_id' => $userId],
             ['payload' => json_encode($data['meta'], JSON_UNESCAPED_UNICODE), 'lido_em' => $lidoEm, 'updated_at' => now(), 'created_at' => now()],

@@ -857,3 +857,8 @@ body.rest-over [data-live="rest"], body.rest-over [data-w-time] { color: var(--d
 .gj-cmd details { margin-top: 8px; }
 .gj-cmd summary { cursor: pointer; color: var(--muted); font-size: .76rem; font-weight: 600; }
 .gj-cmd details p { margin-top: 6px; color: var(--muted); font-size: .8rem; }
+.gj-ritmo { margin: 10px 0 0; font-size: .82rem; line-height: 1.45; color: var(--text); }
+.gj-ritmo small { display: block; color: var(--muted); font-size: .72rem; }
+.gj-ritmo.warn span { color: var(--warn); font-weight: 600; }
+.gj-study { margin-top: 8px; width: 100%; padding: 8px 10px; border: 0; border-radius: 10px; background: var(--primary); color: var(--on-primary, #fff); font: inherit; font-size: .84rem; font-weight: 600; cursor: pointer; }
+.guruja h4 .gj-h4-time { text-transform: none; letter-spacing: 0; font-weight: 500; }
