@@ -707,7 +707,7 @@ function renderTimer() {
 // O servidor guarda a última foto da meta em andamento (enviada por uma rotina que lê a Guruja).
 // O app busca ao abrir, a cada 5 min e ao voltar para a aba; sem rede, mostra a última foto salva.
 const GURUJA_REFRESH_MS = 5 * 60_000;
-const guruja = { data: null, fetchedAt: 0, loading: false, showDone: false };
+const guruja = { data: null, fetchedAt: 0, loading: false, showDone: false, open: new Set() };
 
 async function refreshGuruja(force = false) {
     if (!config.gurujaUrl || guruja.loading) return;
@@ -741,11 +741,82 @@ function gurujaAgo(isoText) {
 function gurujaItem(a, done) {
     const score = done && a.questoes ? `${a.acertos ?? 0}/${a.questoes} · ${Math.round(((a.acertos ?? 0) / a.questoes) * 100)}%` : '';
     const extra = done ? [score, a.minutos ? formatDuration(a.minutos * 60_000) : ''].filter(Boolean).join(' · ') : '';
-    return `<li class="${done ? 'done' : ''}${a.ignorada || a.ignorado ? ' skipped' : ''}">
+    const code = a.codigo_atividade ?? '';
+    const comando = code ? guruja.data?.comandos?.[code] : null;
+    const isOpen = code && guruja.open.has(code);
+    return `<li class="${done ? 'done' : ''}${a.ignorada || a.ignorado ? ' skipped' : ''}${code ? ' gj-clickable' : ''}"
+        ${code ? `data-action="guruja-item" data-id="${esc(code)}"` : ''}>
         <span class="gj-check" aria-hidden="true">${done ? '✓' : ''}</span>
         <div><b>${esc(a.titulo)}</b>
-            <small>${esc(a.disciplina ?? '')}${a.tipo ? ` · ${esc(a.tipo)}` : ''}${extra ? ` · ${esc(extra)}` : ''}</small></div>
+            <small>${esc(a.disciplina ?? '')}${a.tipo ? ` · ${esc(a.tipo)}` : ''}${extra ? ` · ${esc(extra)}` : ''}${comando && !isOpen ? ' · <span class="gj-has-cmd">comando ▸</span>' : ''}</small>
+            ${isOpen ? `<div class="gj-cmd">${comando
+                ? `<p>${esc(comando)}</p>`
+                : '<p class="gj-cmd-empty">Sem comando salvo. No portal, abra esta atividade na aba <b>Comandos</b> e clique no favorito <b>Enviar comando</b>.</p>'}
+                <small>${esc(code)}</small></div>` : ''}
+        </div>
     </li>`;
+}
+
+// Favorito (bookmarklet) para o portal da Guruja: com a atividade aberta na aba "Comandos", lê o texto do
+// quadro do comando e o código ("Código: XXX.123.456") da janela e abre /estudos#gj-cmd=... nesta conta.
+function gurujaBookmarklet() {
+    const app = location.origin;
+    const code = `(()=>{const f=[...document.querySelectorAll('iframe')].find(i=>i.title==='command');`
+        + `if(!f){alert('Abra a atividade e a aba Comandos antes de clicar.');return}`
+        + `let t='';try{t=f.contentDocument.body.innerText.trim()}catch(e){}`
+        + `if(!t&&f.srcdoc){const d=new DOMParser().parseFromString(f.srcdoc,'text/html');t=(d.body.innerText||d.body.textContent||'').trim()}`
+        + `if(!t){alert('Comando vazio ou ainda carregando.');return}`
+        + `let n=f,m=null;while(n&&!(m=(n.innerText||'').match(/C\\u00f3digo:\\s*([A-Z]{2,10}\\.\\d+\\.\\d+)/)))n=n.parentElement;`
+        + `if(!m){alert('N\\u00e3o achei o c\\u00f3digo da atividade.');return}`
+        + `window.open('${app}/estudos#gj-cmd='+encodeURIComponent(JSON.stringify({c:m[1],t:t.slice(0,9000)})),'estudos_gj')})()`;
+    return `javascript:${encodeURIComponent(code)}`;
+}
+
+function openGurujaHelp() {
+    openDialog(`<h3>Comandos da Guruja</h3>
+        <p>1. Arraste o botão abaixo para a barra de favoritos.</p>
+        <p class="gj-bm-wrap"><a class="btn gj-bm" href="${gurujaBookmarklet()}" onclick="event.preventDefault(); alert('Arraste para a barra de favoritos.')">⚑ Enviar comando</a></p>
+        <p>2. No portal da Guruja, abra uma atividade e vá na aba <b>Comandos</b>.</p>
+        <p>3. Clique no favorito <b>Enviar comando</b>. Esta página abre e salva o comando; ele aparece ao tocar na atividade.</p>
+        <p class="hint">No celular: crie um favorito qualquer, edite e cole no endereço o código copiado abaixo.</p>
+        <p class="form-error"></p>
+        <div class="row"><button type="submit" value="copy" class="btn ghost">Copiar código do favorito</button>
+            <button type="submit" value="cancel" class="btn">Fechar</button></div>`, async (action) => {
+        if (action !== 'copy') return null;
+        try { await navigator.clipboard.writeText(gurujaBookmarklet()); alert('Código copiado.'); } catch { prompt('Copie:', gurujaBookmarklet()); }
+        return null;
+    });
+}
+
+/** Chegou de um clique no favorito (#gj-cmd=...): salva o comando no servidor e limpa o endereço. */
+async function receiveGurujaCommand() {
+    if (!location.hash.startsWith('#gj-cmd=')) return;
+    let payload;
+    try { payload = JSON.parse(decodeURIComponent(location.hash.slice(8))); } catch { payload = null; }
+    history.replaceState(null, '', location.pathname + location.search);
+    if (!payload?.c || !payload?.t) return;
+    const send = (token) => fetch(config.gurujaComandoUrl, {
+        method: 'POST',
+        credentials: 'same-origin',
+        headers: { Accept: 'application/json', 'Content-Type': 'application/json', 'X-CSRF-TOKEN': token },
+        body: JSON.stringify({ codigo: payload.c, texto: payload.t }),
+    });
+    try {
+        let response = await send(config.csrf);
+        if (response.status === 419) {
+            const fresh = await fetch(config.tokenUrl, { credentials: 'same-origin', headers: { Accept: 'application/json' } });
+            if (fresh.ok) response = await send((await fresh.json()).token);
+        }
+        if (!response.ok) throw new Error(`Erro ${response.status}`);
+        guruja.open.add(payload.c);
+        if (guruja.data) guruja.data.comandos = { ...(guruja.data.comandos ?? {}), [payload.c]: payload.t.trim() };
+        state.tab = 'timer';
+        await refreshGuruja(true);
+        render();
+        root.querySelector(`[data-action="guruja-item"][data-id="${CSS.escape(payload.c)}"]`)?.scrollIntoView({ block: 'center' });
+    } catch (error) {
+        alert(`Não consegui salvar o comando (${error.message}). Entre no app e tente de novo.`);
+    }
 }
 
 function renderGuruja() {
@@ -774,7 +845,7 @@ function renderGuruja() {
         ${done.length || refDone.length ? `<button type="button" class="gj-toggle" data-action="guruja-done">
             ${guruja.showDone ? '▾' : '▸'} Concluídas (${done.length + refDone.length})</button>
             ${guruja.showDone ? `<ul class="gj-list">${done.map((a) => gurujaItem(a, true)).join('')}${refDone.map((r) => gurujaItem({ ...r, tipo: 'Reforço', questoes: r.questoes_resolvidas }, true)).join('')}</ul>` : ''}` : ''}
-        <p class="gj-updated">Atualizado ${esc(gurujaAgo(guruja.data.lido_em))}</p>
+        <p class="gj-updated"><button type="button" data-action="guruja-help">⚑ Comandos</button>Atualizado ${esc(gurujaAgo(guruja.data.lido_em))}</p>
     </section>`;
 }
 
@@ -2025,6 +2096,8 @@ root.addEventListener('click', async (event) => {
     const handlers = {
         toggle: () => toggleSubject(id),
         'guruja-done': () => { guruja.showDone = !guruja.showDone; render(); },
+        'guruja-item': () => { guruja.open.has(id) ? guruja.open.delete(id) : guruja.open.add(id); render(); },
+        'guruja-help': () => openGurujaHelp(),
         'focus-open': () => openFocus(),
         'room-create': () => openRoomDialog('create'),
         'room-join': () => openRoomDialog('join'),
@@ -2228,7 +2301,8 @@ async function boot() {
     setInterval(tick, 1000);
     await checkSuspicious();
     sync.start();
-    refreshGuruja(true);
+    refreshGuruja(true).then(receiveGurujaCommand);
+    window.addEventListener('hashchange', receiveGurujaCommand);
     setInterval(() => refreshGuruja(true), GURUJA_REFRESH_MS);
 
     if ('serviceWorker' in navigator && config.swUrl) {

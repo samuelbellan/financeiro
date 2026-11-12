@@ -38,14 +38,31 @@ class EstudosController extends Controller
     public function guruja(): JsonResponse
     {
         $row = DB::table('study_guruja_metas')->where('user_id', Auth::id())->first();
-        if (!$row) {
-            return response()->json(['meta' => null, 'lido_em' => null]);
-        }
+        $comandos = DB::table('study_guruja_comandos')->where('user_id', Auth::id())
+            ->get(['codigo', 'texto'])->pluck('texto', 'codigo');
 
         return response()->json([
-            'meta' => json_decode($row->payload, true),
-            'lido_em' => $row->lido_em ? Carbon::parse($row->lido_em)->utc()->format('Y-m-d\TH:i:s\Z') : null,
+            'meta' => $row ? json_decode($row->payload, true) : null,
+            'lido_em' => $row?->lido_em ? Carbon::parse($row->lido_em)->utc()->format('Y-m-d\\TH:i:s\\Z') : null,
+            'comandos' => (object) $comandos->all(),
         ]);
+    }
+
+    /**
+     * Salva o comando de uma atividade, copiado do portal da Guruja pelo favorito (via /estudos#gj-cmd=...).
+     */
+    public function gurujaComando(Request $request): JsonResponse
+    {
+        $data = $request->validate([
+            'codigo' => ['required', 'string', 'max:40', 'regex:/^[A-Z]{2,10}\.\d{1,6}\.\d{1,9}$/'],
+            'texto' => 'required|string|max:10000',
+        ]);
+        DB::table('study_guruja_comandos')->updateOrInsert(
+            ['user_id' => Auth::id(), 'codigo' => $data['codigo']],
+            ['texto' => trim($data['texto']), 'updated_at' => now(), 'created_at' => now()],
+        );
+
+        return response()->json(['ok' => true]);
     }
 
     public function sync(Request $request, StudySyncService $service): JsonResponse

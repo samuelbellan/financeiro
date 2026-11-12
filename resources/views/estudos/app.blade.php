@@ -28,6 +28,7 @@
          data-token-url="{{ route('estudos.token', [], false) }}"
          data-rooms-url="{{ route('estudos.salas', [], false) }}"
          data-guruja-url="{{ route('estudos.guruja', [], false) }}"
+         data-guruja-comando-url="{{ route('estudos.guruja.comando', [], false) }}"
          data-api-tokens-url="{{ route('estudos.api-tokens', [], false) }}"
          data-api-dia-url="{{ route('api.estudos.dia') }}"
          data-login-url="{{ route('login', [], false) }}"
