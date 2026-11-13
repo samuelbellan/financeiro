@@ -866,6 +866,8 @@ function gurujaBookmarklet() {
     const app = location.origin;
     const code = `(()=>{const f=[...document.querySelectorAll('iframe')].find(i=>i.title==='command');`
         + `if(!f){alert('Abra a atividade e a aba Comandos antes de clicar.');return}`
+        + `const dlg=f.closest('[role=dialog]')||document;`
+        + `if([...dlg.querySelectorAll('button,[role=tab]')].some(b=>(b.innerText||'').trim()==='Refor\\u00e7o')){alert('Isto \\u00e9 um refor\\u00e7o: a instru\\u00e7\\u00e3o da aba Refor\\u00e7o j\\u00e1 chega sozinha ao app. N\\u00e3o precisa enviar.');return}`
         + `let t='';try{t=f.contentDocument.body.innerText.trim()}catch(e){}`
         + `if(!t&&f.srcdoc){const d=new DOMParser().parseFromString(f.srcdoc,'text/html');t=(d.body.innerText||d.body.textContent||'').trim()}`
         + `if(!t){alert('Comando vazio ou ainda carregando.');return}`
@@ -881,6 +883,7 @@ function openGurujaHelp() {
         <p class="gj-bm-wrap"><a class="btn gj-bm" href="${gurujaBookmarklet()}" onclick="event.preventDefault(); alert('Arraste para a barra de favoritos.')">⚑ Enviar comando</a></p>
         <p>2. No portal da Guruja, abra uma atividade e vá na aba <b>Comandos</b>.</p>
         <p>3. Clique no favorito <b>Enviar comando</b>. Esta página abre e salva o comando; ele aparece ao tocar na atividade.</p>
+        <p class="hint">Reforços não precisam: a instrução da aba Reforço já chega sozinha ao app.</p>
         <p class="hint">No celular: crie um favorito qualquer, edite e cole no endereço o código copiado abaixo.</p>
         <p class="form-error"></p>
         <div class="row"><button type="submit" value="copy" class="btn ghost">Copiar código do favorito</button>
