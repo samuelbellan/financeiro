@@ -157,4 +157,42 @@ class EstudosGurujaTest extends TestCase
         $this->postJson('/estudos/guruja/ordem', ['target_id' => 1080000, 'codigos' => []])->assertOk();
         $this->assertSame(0, DB::table('study_guruja_ordens')->count());
     }
+
+    public function test_botao_atualizar_dispara_a_tarefa_uma_vez_a_cada_2_minutos(): void
+    {
+        $this->actingAs(User::factory()->create());
+        $this->postJson('/estudos/guruja/atualizar')->assertStatus(503);
+
+        config(['services.guruja_sync.fire_url' => 'https://api.anthropic.com/v1/claude_code/routines/trig_x/fire', 'services.guruja_sync.fire_token' => 'tok']);
+        Http::fake(['api.anthropic.com/*' => Http::response(['type' => 'routine_fire'])]);
+
+        $this->postJson('/estudos/guruja/atualizar')->assertOk()->assertJsonMissing(['repetido' => true]);
+        $this->postJson('/estudos/guruja/atualizar')->assertOk()->assertJson(['repetido' => true]);
+        Http::assertSentCount(1);
+        Http::assertSent(fn ($r) => $r->hasHeader('Authorization', 'Bearer tok')
+            && $r->hasHeader('anthropic-beta', 'experimental-cc-routine-2026-04-01')
+            && str_contains($r['text'], 'botão'));
+    }
+
+    public function test_falha_no_disparo_volta_erro_legivel(): void
+    {
+        $this->actingAs(User::factory()->create());
+        config(['services.guruja_sync.fire_url' => 'https://api.anthropic.com/x/fire', 'services.guruja_sync.fire_token' => 'tok']);
+        Http::fake(['api.anthropic.com/*' => Http::response('nope', 401)]);
+
+        $this->postJson('/estudos/guruja/atualizar')->assertStatus(502)->assertJsonFragment(['message' => 'A tarefa de atualização recusou o disparo (erro 401).']);
+    }
+
+    public function test_envio_avisa_quando_as_estimativas_sao_de_outra_meta(): void
+    {
+        $user = User::factory()->create();
+        $headers = ['Authorization' => 'Bearer ' . $this->token($user)];
+        $com = $this->payload(61);
+        $com['meta']['estimativas'] = ['Teoria' => 46];
+
+        $this->postJson('/api/estudos/guruja/meta', $this->payload(61), $headers)->assertOk()->assertJson(['precisa_estimativas' => true]);
+        $this->postJson('/api/estudos/guruja/meta', $com, $headers)->assertOk()->assertJson(['precisa_estimativas' => false]);
+        $this->postJson('/api/estudos/guruja/meta', $this->payload(61), $headers)->assertOk()->assertJson(['precisa_estimativas' => false]);
+        $this->postJson('/api/estudos/guruja/meta', $this->payload(62), $headers)->assertOk()->assertJson(['precisa_estimativas' => true]);
+    }
 }
