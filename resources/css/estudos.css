@@ -878,3 +878,7 @@ body.rest-over [data-live="rest"], body.rest-over [data-w-time] { color: var(--d
 .gj-list li > div { flex: 1; }
 .gj-move { display: flex; flex-direction: column; gap: 4px; flex: none; }
 .gj-move button { width: 34px; height: 28px; border: 1px solid var(--border); border-radius: 8px; background: var(--card); color: var(--text); font-size: .9rem; cursor: pointer; }
+.gj-updated .gj-sync { color: var(--muted); font-weight: 500; }
+.gj-updated button.gj-sync { color: var(--primary); font-weight: 600; }
+.gj-updated span.gj-sync.on { color: var(--primary); animation: gj-pulse 1.4s ease-in-out infinite; }
+@keyframes gj-pulse { 50% { opacity: .45; } }

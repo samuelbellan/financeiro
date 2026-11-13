@@ -707,7 +707,7 @@ function renderTimer() {
 // O servidor guarda a última foto da meta em andamento (enviada por uma rotina que lê a Guruja).
 // O app busca ao abrir, a cada 5 min e ao voltar para a aba; sem rede, mostra a última foto salva.
 const GURUJA_REFRESH_MS = 5 * 60_000;
-const guruja = { data: null, fetchedAt: 0, loading: false, showDone: false, open: new Set(), summarizing: new Set(), resumindo: null, subjectMap: {}, organizando: false };
+const guruja = { data: null, fetchedAt: 0, loading: false, showDone: false, open: new Set(), summarizing: new Set(), resumindo: null, subjectMap: {}, organizando: false, atualizando: null };
 
 async function refreshGuruja(force = false) {
     if (!config.gurujaUrl || guruja.loading) return;
@@ -772,8 +772,41 @@ async function postGuruja(url, body) {
         const fresh = await fetch(config.tokenUrl, { credentials: 'same-origin', headers: { Accept: 'application/json' } });
         if (fresh.ok) response = await send((await fresh.json()).token);
     }
-    if (!response.ok) throw new Error(`Erro ${response.status}`);
+    if (!response.ok) {
+        let message = `Erro ${response.status}`;
+        try { message = (await response.json()).message ?? message; } catch { /* corpo sem JSON */ }
+        throw new Error(message);
+    }
     return response.json();
+}
+
+/** ↻ Atualizar: pede ao servidor para disparar a leitura da Guruja e espera a meta nova chegar (até 5 min). */
+async function gurujaAtualizar() {
+    if (guruja.atualizando) return;
+    const antes = guruja.data?.lido_em ?? null;
+    guruja.atualizando = { inicio: nowMs() };
+    render();
+    try {
+        await postGuruja(config.gurujaAtualizarUrl, {});
+    } catch (error) {
+        guruja.atualizando = null;
+        render();
+        alert(error.message);
+        return;
+    }
+    const poll = async () => {
+        if (!guruja.atualizando) return;
+        await refreshGuruja(true);
+        const chegou = guruja.data?.lido_em && guruja.data.lido_em !== antes;
+        if (chegou || nowMs() - guruja.atualizando.inicio > 5 * 60_000) {
+            guruja.atualizando = null;
+            render();
+            if (!chegou) alert('A atualização está demorando. O card vai mostrar a meta nova assim que ela chegar.');
+            return;
+        }
+        setTimeout(poll, 10_000);
+    };
+    setTimeout(poll, 15_000);
 }
 
 async function saveGurujaOrder(keys) {
@@ -1059,7 +1092,10 @@ function renderGuruja() {
         ${done.length ? `<button type="button" class="gj-toggle" data-action="guruja-done">
             ${guruja.showDone ? '▾' : '▸'} Concluídas (${done.length})</button>
             ${guruja.showDone ? `<ul class="gj-list">${done.map((a) => gurujaItem(a, true)).join('')}</ul>` : ''}` : ''}
-        <p class="gj-updated"><button type="button" data-action="guruja-help">⚑ Comandos</button>Atualizado ${esc(gurujaAgo(guruja.data.lido_em))}</p>
+        <p class="gj-updated"><button type="button" data-action="guruja-help">⚑ Comandos</button>
+            ${guruja.atualizando
+                ? '<span class="gj-sync on">↻ Atualizando com a Guruja… (1–2 min)</span>'
+                : `<button type="button" class="gj-sync" data-action="guruja-refresh">↻ Atualizar · ${esc(gurujaAgo(guruja.data.lido_em))}</button>`}</p>
     </section>`;
 }
 
@@ -2320,6 +2356,7 @@ root.addEventListener('click', async (event) => {
         },
         'guruja-help': () => openGurujaHelp(),
         'guruja-study': () => gurujaStudy(id),
+        'guruja-refresh': () => gurujaAtualizar(),
         'guruja-organize': () => { guruja.organizando = !guruja.organizando; render(); },
         'guruja-move': () => moveGurujaItem(id, Number(button.dataset.dir)),
         'guruja-reset-order': () => { if (confirm('Voltar à ordem da Guruja?')) saveGurujaOrder([]); },

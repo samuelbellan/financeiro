@@ -40,6 +40,13 @@ return [
     ],
 
     // Módulo de estudos (PWA): a nuvem é a fonte única da verdade; fora dela, /estudos redireciona para cá.
+    // Botão "Atualizar" do card da Guruja: dispara a tarefa agendada do Claude (gatilho de API) que lê a
+    // Guruja e envia a meta para /api/estudos/guruja/meta.
+    'guruja_sync' => [
+        'fire_url' => env('GURUJA_SYNC_FIRE_URL'),
+        'fire_token' => env('GURUJA_SYNC_FIRE_TOKEN'),
+    ],
+
     'gemini' => [
         'key' => env('GEMINI_API_KEY'),
     ],

@@ -136,6 +136,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/estudos', [EstudosController::class, 'index'])->name('estudos.index');
     Route::post('/estudos/sync', [EstudosController::class, 'sync'])->name('estudos.sync');
     Route::get('/estudos/guruja', [EstudosController::class, 'guruja'])->name('estudos.guruja');
+    Route::post('/estudos/guruja/atualizar', [EstudosController::class, 'gurujaAtualizar'])->middleware('throttle:10,10')->name('estudos.guruja.atualizar');
     Route::post('/estudos/guruja/ordem', [EstudosController::class, 'gurujaOrdem'])->name('estudos.guruja.ordem');
     Route::post('/estudos/guruja/comando', [EstudosController::class, 'gurujaComando'])->name('estudos.guruja.comando');
     Route::get('/estudos/token', [EstudosController::class, 'token'])->name('estudos.token');

@@ -432,20 +432,31 @@ class EstudosApiController extends Controller
         ]);
 
         $lidoEm = isset($data['lido_em']) ? Carbon::parse($data['lido_em']) : now();
-        // Estimativas de tempo por tipo são recalculadas só de vez em quando: sem elas no envio, mantém as anteriores.
-        if (!isset($data['meta']['estimativas'])) {
+        // Estimativas de tempo por tipo são recalculadas só quando a meta muda: sem elas no envio, mantém as
+        // anteriores e avisa (precisa_estimativas) se foram calculadas para outra meta.
+        $ordem = $data['meta']['ordem'] ?? null;
+        $precisaEstimativas = false;
+        if (isset($data['meta']['estimativas'])) {
+            $data['meta']['estimativas_ordem'] = $ordem;
+        } else {
             $anterior = DB::table('study_guruja_metas')->where('user_id', $userId)->value('payload');
-            $estimativas = $anterior ? (json_decode($anterior, true)['estimativas'] ?? null) : null;
-            if ($estimativas) {
-                $data['meta']['estimativas'] = $estimativas;
+            $anterior = $anterior ? json_decode($anterior, true) : [];
+            if (!empty($anterior['estimativas'])) {
+                $data['meta']['estimativas'] = $anterior['estimativas'];
+                $data['meta']['estimativas_ordem'] = $anterior['estimativas_ordem'] ?? ($anterior['ordem'] ?? null);
             }
+            $precisaEstimativas = ($data['meta']['estimativas_ordem'] ?? null) !== $ordem;
         }
         DB::table('study_guruja_metas')->updateOrInsert(
             ['user_id' => $userId],
             ['payload' => json_encode($data['meta'], JSON_UNESCAPED_UNICODE), 'lido_em' => $lidoEm, 'updated_at' => now(), 'created_at' => now()],
         );
 
-        return response()->json(['ok' => true, 'lido_em' => $lidoEm->utc()->format('Y-m-d\TH:i:s\Z')]);
+        return response()->json([
+            'ok' => true,
+            'lido_em' => $lidoEm->utc()->format('Y-m-d\TH:i:s\Z'),
+            'precisa_estimativas' => $precisaEstimativas,
+        ]);
     }
 
     protected function authenticate(Request $request): ?int

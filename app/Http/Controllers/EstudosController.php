@@ -8,7 +8,10 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
 /**
  * Módulo de estudos estilo YPT (PWA offline-first).
@@ -98,6 +101,42 @@ class EstudosController extends Controller
         );
 
         return response()->json(['ok' => true]);
+    }
+
+    /**
+     * Botão "Atualizar" do card: dispara a tarefa agendada do Claude que lê a Guruja (gatilho de API). O card
+     * percebe a atualização quando o lido_em da meta muda. Um disparo a cada 2 minutos, no máximo.
+     */
+    public function gurujaAtualizar(): JsonResponse
+    {
+        $url = config('services.guruja_sync.fire_url');
+        $token = config('services.guruja_sync.fire_token');
+        if (!$url || !$token) {
+            return response()->json(['message' => 'Atualização sob demanda não configurada (GURUJA_SYNC_FIRE_URL e GURUJA_SYNC_FIRE_TOKEN no Render).'], 503);
+        }
+        $key = 'guruja-atualizar:' . Auth::id();
+        if ($desde = Cache::get($key)) {
+            return response()->json(['ok' => true, 'disparado_em' => $desde, 'repetido' => true]);
+        }
+        try {
+            $response = Http::timeout(20)->withToken($token)->withHeaders([
+                'anthropic-beta' => 'experimental-cc-routine-2026-04-01',
+                'anthropic-version' => '2023-06-01',
+            ])->post($url, ['text' => 'Atualização pedida pelo botão do card da Guruja no app de estudos.']);
+        } catch (\Throwable $e) {
+            Log::warning('Disparo da atualização da Guruja falhou: ' . $e->getMessage());
+
+            return response()->json(['message' => 'Não consegui disparar a atualização agora. Tente de novo em instantes.'], 502);
+        }
+        if (!$response->successful()) {
+            Log::warning("Disparo da atualização da Guruja: status {$response->status()} " . substr($response->body(), 0, 200));
+
+            return response()->json(['message' => "A tarefa de atualização recusou o disparo (erro {$response->status()})."], 502);
+        }
+        $agora = now()->utc()->format('Y-m-d\\TH:i:s\\Z');
+        Cache::put($key, $agora, now()->addMinutes(2));
+
+        return response()->json(['ok' => true, 'disparado_em' => $agora]);
     }
 
     public function sync(Request $request, StudySyncService $service): JsonResponse
