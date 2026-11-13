@@ -862,3 +862,7 @@ body.rest-over [data-live="rest"], body.rest-over [data-w-time] { color: var(--d
 .gj-ritmo.warn span { color: var(--warn); font-weight: 600; }
 .gj-study { margin-top: 8px; width: 100%; padding: 8px 10px; border: 0; border-radius: 10px; background: var(--primary); color: var(--on-primary, #fff); font: inherit; font-size: .84rem; font-weight: 600; cursor: pointer; }
 .guruja h4 .gj-h4-time { text-transform: none; letter-spacing: 0; font-weight: 500; }
+.gj-tipo { display: inline-block; margin-right: 6px; padding: 1px 7px; border-radius: 99px; font-size: .68rem; font-weight: 700; letter-spacing: .02em;
+    color: color-mix(in srgb, var(--t) 65%, var(--text)); background: color-mix(in srgb, var(--t) 16%, transparent); border: 1px solid color-mix(in srgb, var(--t) 45%, transparent); vertical-align: 1px; }
+.gj-list li:not(.done) .gj-check { border-color: var(--t); }
+.gj-list li.done .gj-tipo { opacity: .7; }

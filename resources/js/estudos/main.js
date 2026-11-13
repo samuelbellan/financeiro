@@ -738,6 +738,12 @@ function gurujaAgo(isoText) {
     return h < 24 ? `há ${h}h` : `há ${Math.floor(h / 24)}d`;
 }
 
+// Cor de cada tipo de atividade da Guruja (rótulo e círculo no card).
+const GJ_TIPO_COR = {
+    'Teoria': '#4F86F7', 'Questões': '#43AA8B', 'Revisão': '#9B5DE5', 'Mapeamento': '#F9A03F',
+    'Teste': '#F25F5C', 'Lei Seca': '#00BBF9', 'Reforço': '#F15BB5',
+};
+
 function gurujaItem(a, done) {
     const score = done && a.questoes ? `${a.acertos ?? 0}/${a.questoes} · ${Math.round(((a.acertos ?? 0) / a.questoes) * 100)}%` : '';
     const extra = done ? [score, a.minutos ? formatDuration(a.minutos * 60_000) : ''].filter(Boolean).join(' · ') : '';
@@ -763,11 +769,11 @@ function gurujaItem(a, done) {
         if (!done) body += `<button type="button" class="gj-study" data-action="guruja-study" data-id="${esc(a.disciplina ?? '')}">▶ Estudar ${esc(a.disciplina ?? '')}</button>`;
         if (!isRef) body += `<small>${esc(code)}</small>`;
     }
-    return `<li class="${done ? 'done' : ''}${a.ignorada || a.ignorado ? ' skipped' : ''}${code ? ' gj-clickable' : ''}"
+    return `<li class="${done ? 'done' : ''}${a.ignorada || a.ignorado ? ' skipped' : ''}${code ? ' gj-clickable' : ''}" style="--t:${GJ_TIPO_COR[a.tipo] ?? 'var(--border)'}"
         ${code ? `data-action="guruja-item" data-id="${esc(code)}"` : ''}>
         <span class="gj-check" aria-hidden="true">${done ? '✓' : ''}</span>
         <div><b>${esc(a.titulo)}</b>
-            <small>${esc(a.disciplina ?? '')}${a.tipo ? ` · ${esc(a.tipo)}` : ''}${extra ? ` · ${esc(extra)}` : ''}${est ? ` · ${est}` : ''}${hasDetail && !isOpen ? ` · <span class="gj-has-cmd">${isRef ? 'instrução' : 'comando'} ▸</span>` : ''}</small>
+            <small>${a.tipo ? `<span class="gj-tipo" style="--t:${GJ_TIPO_COR[a.tipo] ?? 'var(--muted)'}">${esc(a.tipo)}</span>` : ''}${esc(a.disciplina ?? '')}${extra ? ` · ${esc(extra)}` : ''}${est ? ` · ${est}` : ''}${hasDetail && !isOpen ? ` · <span class="gj-has-cmd">${isRef ? 'instrução' : 'comando'} ▸</span>` : ''}</small>
             ${isOpen ? `<div class="gj-cmd">${body}</div>` : ''}
         </div>
     </li>`;
