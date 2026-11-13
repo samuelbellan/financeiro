@@ -866,3 +866,15 @@ body.rest-over [data-live="rest"], body.rest-over [data-w-time] { color: var(--d
     color: color-mix(in srgb, var(--t) 65%, var(--text)); background: color-mix(in srgb, var(--t) 16%, transparent); border: 1px solid color-mix(in srgb, var(--t) 45%, transparent); vertical-align: 1px; }
 .gj-list li:not(.done) .gj-check { border-color: var(--t); }
 .gj-list li.done .gj-tipo { opacity: .7; }
+/* Reforço pendente em destaque + modo Organizar */
+.gj-list li.gj-ref-pending { background: color-mix(in srgb, #F15BB5 9%, transparent); box-shadow: inset 3px 0 0 #F15BB5; border-radius: 10px; padding-left: 10px; padding-right: 6px; margin: 2px 0; }
+.gj-ref-alert { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin: 10px 0 0; padding: 8px 10px; border-radius: 10px;
+    background: color-mix(in srgb, #F15BB5 12%, transparent); border: 1px solid color-mix(in srgb, #F15BB5 45%, transparent); font-size: .8rem; }
+.gj-ref-alert b { color: color-mix(in srgb, #F15BB5 65%, var(--text)); }
+.gj-ref-alert button { background: none; border: 0; padding: 0; color: var(--text); font: inherit; text-decoration: underline; cursor: pointer; }
+.gj-tools { display: flex; justify-content: flex-end; gap: 8px; margin-top: 8px; }
+.gj-tools button { background: none; border: 1px solid var(--border); border-radius: 99px; padding: 4px 10px; color: var(--muted); font: inherit; font-size: .74rem; font-weight: 600; cursor: pointer; }
+.gj-tools button.on { background: var(--primary); border-color: var(--primary); color: var(--on-primary, #fff); }
+.gj-list li > div { flex: 1; }
+.gj-move { display: flex; flex-direction: column; gap: 4px; flex: none; }
+.gj-move button { width: 34px; height: 28px; border: 1px solid var(--border); border-radius: 8px; background: var(--card); color: var(--text); font-size: .9rem; cursor: pointer; }

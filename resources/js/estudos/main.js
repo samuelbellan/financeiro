@@ -707,7 +707,7 @@ function renderTimer() {
 // O servidor guarda a última foto da meta em andamento (enviada por uma rotina que lê a Guruja).
 // O app busca ao abrir, a cada 5 min e ao voltar para a aba; sem rede, mostra a última foto salva.
 const GURUJA_REFRESH_MS = 5 * 60_000;
-const guruja = { data: null, fetchedAt: 0, loading: false, showDone: false, open: new Set(), summarizing: new Set(), resumindo: null, subjectMap: {} };
+const guruja = { data: null, fetchedAt: 0, loading: false, showDone: false, open: new Set(), summarizing: new Set(), resumindo: null, subjectMap: {}, organizando: false };
 
 async function refreshGuruja(force = false) {
     if (!config.gurujaUrl || guruja.loading) return;
@@ -744,12 +744,71 @@ const GJ_TIPO_COR = {
     'Teste': '#F25F5C', 'Lei Seca': '#00BBF9', 'Reforço': '#F15BB5',
 };
 
+/** Chave de um item do card: código da atividade, ou R:<id> do reforço. */
+const gjKey = (a) => (a.tipo === 'Reforço' ? (a.target_activity_id ? `R:${a.target_activity_id}` : '') : (a.codigo_atividade ?? ''));
+
+/**
+ * Pendentes na ordem do aluno: reforços novos (fora da ordem salva) primeiro, depois a ordem salva no card
+ * (↕ Organizar), depois as atividades novas na ordem da Guruja.
+ */
+function gurujaOrdered(pending) {
+    const ordem = guruja.data?.ordem ?? [];
+    const pos = new Map(ordem.map((k, i) => [k, i]));
+    const novosRef = pending.filter((a) => a.tipo === 'Reforço' && !pos.has(gjKey(a)));
+    const salvos = pending.filter((a) => pos.has(gjKey(a))).sort((a, b) => pos.get(gjKey(a)) - pos.get(gjKey(b)));
+    const novos = pending.filter((a) => a.tipo !== 'Reforço' && !pos.has(gjKey(a)));
+    return [...novosRef, ...salvos, ...novos];
+}
+
+async function postGuruja(url, body) {
+    const send = (token) => fetch(url, {
+        method: 'POST',
+        credentials: 'same-origin',
+        headers: { Accept: 'application/json', 'Content-Type': 'application/json', 'X-CSRF-TOKEN': token },
+        body: JSON.stringify(body),
+    });
+    let response = await send(config.csrf);
+    if (response.status === 419) {
+        const fresh = await fetch(config.tokenUrl, { credentials: 'same-origin', headers: { Accept: 'application/json' } });
+        if (fresh.ok) response = await send((await fresh.json()).token);
+    }
+    if (!response.ok) throw new Error(`Erro ${response.status}`);
+    return response.json();
+}
+
+async function saveGurujaOrder(keys) {
+    const meta = guruja.data?.meta;
+    if (!meta) return;
+    guruja.data.ordem = keys.length ? keys : null;
+    render();
+    try {
+        await postGuruja(config.gurujaOrdemUrl, { target_id: meta.target_id, codigos: keys });
+        await setMeta('guruja', guruja.data);
+    } catch (error) {
+        alert(`Não consegui salvar a ordem (${error.message}).`);
+    }
+}
+
+function moveGurujaItem(key, dir) {
+    const meta = guruja.data?.meta;
+    if (!meta) return;
+    const isDone = (a) => a.concluida || a.ignorada;
+    const refs = (meta.reforcos ?? []).filter((r) => !r.concluido && !r.ignorado).map((r) => ({ ...r, tipo: 'Reforço' }));
+    const keys = gurujaOrdered([...(meta.atividades ?? []).filter((a) => !isDone(a)), ...refs]).map(gjKey).filter(Boolean);
+    const i = keys.indexOf(key);
+    const j = i + dir;
+    if (i < 0 || j < 0 || j >= keys.length) return;
+    [keys[i], keys[j]] = [keys[j], keys[i]];
+    saveGurujaOrder(keys);
+}
+
 function gurujaItem(a, done) {
     const score = done && a.questoes ? `${a.acertos ?? 0}/${a.questoes} · ${Math.round(((a.acertos ?? 0) / a.questoes) * 100)}%` : '';
     const extra = done ? [score, a.minutos ? formatDuration(a.minutos * 60_000) : ''].filter(Boolean).join(' · ') : '';
     const est = !done && a.estMin ? `~${formatDuration(a.estMin * 60_000)}` : '';
     const isRef = a.tipo === 'Reforço';
-    const code = isRef ? (a.target_activity_id ? `R:${a.target_activity_id}` : '') : (a.codigo_atividade ?? '');
+    const code = gjKey(a);
+    const organizing = guruja.organizando && !done;
     const raw = !isRef && code ? guruja.data?.comandos?.[code] : null;
     const comando = typeof raw === 'string' ? { texto: raw, resumo: null } : raw;
     const hasDetail = isRef ? Boolean(a.instrucao) : Boolean(comando);
@@ -769,13 +828,18 @@ function gurujaItem(a, done) {
         if (!done) body += `<button type="button" class="gj-study" data-action="guruja-study" data-id="${esc(a.disciplina ?? '')}">▶ Estudar ${esc(a.disciplina ?? '')}</button>`;
         if (!isRef) body += `<small>${esc(code)}</small>`;
     }
-    return `<li class="${done ? 'done' : ''}${a.ignorada || a.ignorado ? ' skipped' : ''}${code ? ' gj-clickable' : ''}" style="--t:${GJ_TIPO_COR[a.tipo] ?? 'var(--border)'}"
-        ${code ? `data-action="guruja-item" data-id="${esc(code)}"` : ''}>
+    const clickable = code && !organizing;
+    const moves = organizing && code ? `<span class="gj-move">
+        <button type="button" data-action="guruja-move" data-id="${esc(code)}" data-dir="-1" aria-label="Subir">↑</button>
+        <button type="button" data-action="guruja-move" data-id="${esc(code)}" data-dir="1" aria-label="Descer">↓</button></span>` : '';
+    return `<li class="${done ? 'done' : ''}${a.ignorada || a.ignorado ? ' skipped' : ''}${clickable ? ' gj-clickable' : ''}${isRef && !done ? ' gj-ref-pending' : ''}${organizing ? ' gj-organizing' : ''}" style="--t:${GJ_TIPO_COR[a.tipo] ?? 'var(--border)'}"
+        ${clickable ? `data-action="guruja-item" data-id="${esc(code)}"` : ''}>
         <span class="gj-check" aria-hidden="true">${done ? '✓' : ''}</span>
         <div><b>${esc(a.titulo)}</b>
             <small>${a.tipo ? `<span class="gj-tipo" style="--t:${GJ_TIPO_COR[a.tipo] ?? 'var(--muted)'}">${esc(a.tipo)}</span>` : ''}${esc(a.disciplina ?? '')}${extra ? ` · ${esc(extra)}` : ''}${est ? ` · ${est}` : ''}${hasDetail && !isOpen ? ` · <span class="gj-has-cmd">${isRef ? 'instrução' : 'comando'} ▸</span>` : ''}</small>
-            ${isOpen ? `<div class="gj-cmd">${body}</div>` : ''}
+            ${isOpen && !organizing ? `<div class="gj-cmd">${body}</div>` : ''}
         </div>
+        ${moves}
     </li>`;
 }
 
@@ -962,7 +1026,8 @@ function renderGuruja() {
     const acts = meta.atividades ?? [];
     const isDone = (a) => a.concluida || a.ignorada;
     const refs = (meta.reforcos ?? []).map((r) => ({ ...r, tipo: 'Reforço', questoes: r.questoes_resolvidas }));
-    const pending = [...acts.filter((a) => !isDone(a)), ...refs.filter((r) => !r.concluido && !r.ignorado)];
+    const pending = gurujaOrdered([...acts.filter((a) => !isDone(a)), ...refs.filter((r) => !r.concluido && !r.ignorado)]);
+    const refsPend = pending.filter((a) => a.tipo === 'Reforço');
     const done = [...acts.filter(isDone), ...refs.filter((r) => r.concluido || r.ignorado)];
     const pct = acts.length ? Math.round((acts.filter(isDone).length / acts.length) * 100) : 0;
     const startDay = meta.data_inicio ? Math.floor((nowMs() - Date.parse(meta.data_inicio)) / GJ_DIA_MS) + 1 : null;
@@ -981,7 +1046,12 @@ function renderGuruja() {
             <span class="gj-pct">${pct}%</span>
         </header>
         <div class="goal-bar"><span style="width:${pct}%"></span></div>
+        ${refsPend.length ? `<div class="gj-ref-alert"><b>⚡ ${refsPend.length === 1 ? '1 reforço pendente' : `${refsPend.length} reforços pendentes`}</b>
+            ${refsPend.map((r) => `<button type="button" data-action="guruja-item" data-id="${esc(gjKey(r))}">${esc(r.disciplina ?? r.titulo)}</button>`).join('')}</div>` : ''}
         ${ritmo}
+        ${pending.length > 1 ? `<div class="gj-tools">${guruja.organizando
+            ? `<button type="button" data-action="guruja-reset-order">Ordem da Guruja</button><button type="button" class="on" data-action="guruja-organize">✓ Pronto</button>`
+            : '<button type="button" data-action="guruja-organize">↕ Organizar</button>'}</div>` : ''}
         ${pending.length
             ? plan.days.map((d) => `<h4>${gurujaDayLabel(plan.hoje, d.i)} <span class="gj-h4-time">· ~${formatDuration(d.min * 60_000)}</span></h4>
                 <ul class="gj-list">${d.items.map((a) => gurujaItem(a, false)).join('')}</ul>`).join('')
@@ -2241,7 +2311,8 @@ root.addEventListener('click', async (event) => {
         toggle: () => toggleSubject(id),
         'guruja-done': () => { guruja.showDone = !guruja.showDone; render(); },
         'guruja-item': () => {
-            if (event.target.closest('.gj-cmd')) return; // clique dentro do comando (ex.: "Comando completo") não fecha
+            if (event.target.closest('.gj-cmd')) return;
+            guruja.organizando = false; // clique dentro do comando (ex.: "Comando completo") não fecha
             const opening = !guruja.open.has(id);
             opening ? guruja.open.add(id) : guruja.open.delete(id);
             render();
@@ -2249,6 +2320,9 @@ root.addEventListener('click', async (event) => {
         },
         'guruja-help': () => openGurujaHelp(),
         'guruja-study': () => gurujaStudy(id),
+        'guruja-organize': () => { guruja.organizando = !guruja.organizando; render(); },
+        'guruja-move': () => moveGurujaItem(id, Number(button.dataset.dir)),
+        'guruja-reset-order': () => { if (confirm('Voltar à ordem da Guruja?')) saveGurujaOrder([]); },
         'focus-open': () => openFocus(),
         'room-create': () => openRoomDialog('create'),
         'room-join': () => openRoomDialog('join'),

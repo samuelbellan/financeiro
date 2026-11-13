@@ -102,7 +102,7 @@ class EstudosGurujaTest extends TestCase
         $this->assertSame(1, DB::table('study_guruja_comandos')->count());
 
         $outro = User::factory()->create();
-        $this->actingAs($outro)->getJson('/estudos/guruja')->assertOk()->assertExactJson(['meta' => null, 'lido_em' => null, 'comandos' => []]);
+        $this->actingAs($outro)->getJson('/estudos/guruja')->assertOk()->assertExactJson(['meta' => null, 'ordem' => null, 'lido_em' => null, 'comandos' => []]);
     }
 
     public function test_sem_resposta_do_gemini_salva_so_o_comando(): void
@@ -134,5 +134,27 @@ class EstudosGurujaTest extends TestCase
         $ruim = $this->payload();
         $ruim['meta']['estimativas'] = ['Teoria' => 0];
         $this->postJson('/api/estudos/guruja/meta', $ruim, $headers)->assertUnprocessable();
+    }
+
+    public function test_ordem_do_card_vale_so_para_a_meta_em_que_foi_salva(): void
+    {
+        $user = User::factory()->create();
+        $headers = ['Authorization' => 'Bearer ' . $this->token($user)];
+        $this->postJson('/api/estudos/guruja/meta', $this->payload(), $headers)->assertOk();
+        $this->actingAs($user);
+
+        $this->postJson('/estudos/guruja/ordem', ['target_id' => 1069184, 'codigos' => ['R:25834364', 'DCON.3712.118720', 'R:25834364']])->assertOk();
+        $this->assertSame(['R:25834364', 'DCON.3712.118720'], $this->getJson('/estudos/guruja')->json('ordem'));
+        $this->postJson('/estudos/guruja/ordem', ['target_id' => 1069184, 'codigos' => ['nada']])->assertUnprocessable();
+
+        // Meta nova: a ordem antiga não vale mais.
+        $nova = $this->payload(62);
+        $nova['meta']['target_id'] = 1080000;
+        $this->postJson('/api/estudos/guruja/meta', $nova, $headers)->assertOk();
+        $this->assertNull($this->getJson('/estudos/guruja')->json('ordem'));
+
+        // Lista vazia = volta à ordem da Guruja.
+        $this->postJson('/estudos/guruja/ordem', ['target_id' => 1080000, 'codigos' => []])->assertOk();
+        $this->assertSame(0, DB::table('study_guruja_ordens')->count());
     }
 }
