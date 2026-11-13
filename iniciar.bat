@@ -38,18 +38,37 @@ echo Para desligar o sistema, feche esta janela preta.
 echo ========================================================================
 echo.
 
-:: 1. ngrok (para webhooks externos caso ativo)
+:: 1. ngrok: tunel publico para a Nuvem (Render) repassar as mensagens do bot
+set NGROK_URL=https://unfrosted-surreal-ducky.ngrok-free.dev
 tasklist /fi "imagename eq ngrok.exe" 2>nul | find /i "ngrok.exe" >nul
 if errorlevel 1 (
     echo [1/4] Iniciando tunel ngrok em background na porta %PORT%...
-    start /min "ngrok" ngrok http --url=unfrosted-surreal-ducky.ngrok-free.dev %PORT%
+    start /min "ngrok" ngrok http --url=%NGROK_URL% %PORT%
 ) else (
     echo [1/4] Tunel ngrok ja esta em execucao.
 )
 
-:: 2. Configurar webhook do Telegram
-echo [2/4] Configurando webhook do Telegram...
-php artisan telegram:set-webhook https://unfrosted-surreal-ducky.ngrok-free.dev/webhook/telegram >nul 2>&1
+:: Aguarda o tunel ficar ativo (API local do ngrok na porta 4040, ate ~15 s)
+set NGROK_OK=0
+set NGROK_TRIES=0
+:esperar_ngrok
+curl.exe -s --max-time 1 http://127.0.0.1:4040/api/tunnels 2>nul | find /i "ngrok-free.dev" >nul && set NGROK_OK=1
+if %NGROK_OK%==0 if %NGROK_TRIES% LSS 15 (
+    set /a NGROK_TRIES+=1
+    timeout /t 1 /nobreak >nul
+    goto esperar_ngrok
+)
+if %NGROK_OK%==1 (
+    echo       Tunel ativo: %NGROK_URL%
+) else (
+    echo       [AVISO] O tunel ngrok nao subiu. Notas fiscais do Telegram NAO chegarao ao PC.
+    echo               Veja a janela minimizada "ngrok" para o erro.
+)
+
+:: 2. Registrar o tunel na Nuvem (o webhook do Telegram continua apontando para o Render,
+::    que repassa as mensagens para ca enquanto o PC estiver online)
+echo [2/4] Registrando o projeto local na Nuvem para o bot do Telegram...
+php artisan telegram:register-local %NGROK_URL% 2>&1 | findstr /c:"sucesso" /c:"Falha" /c:"Erro"
 
 :: Backup dos dados de estudo da nuvem para o PC (em segundo plano, nao atrasa a inicializacao)
 echo [+] Fazendo backup dos estudos da nuvem em segundo plano...
