@@ -102,7 +102,7 @@ class EstudosGurujaTest extends TestCase
         $this->assertSame(1, DB::table('study_guruja_comandos')->count());
 
         $outro = User::factory()->create();
-        $this->actingAs($outro)->getJson('/estudos/guruja')->assertOk()->assertExactJson(['meta' => null, 'ordem' => null, 'lido_em' => null, 'comandos' => []]);
+        $this->actingAs($outro)->getJson('/estudos/guruja')->assertOk()->assertExactJson(['meta' => null, 'ordem' => null, 'feitas' => [], 'atualizar_disponivel' => false, 'lido_em' => null, 'comandos' => []]);
     }
 
     public function test_sem_resposta_do_gemini_salva_so_o_comando(): void
@@ -194,5 +194,30 @@ class EstudosGurujaTest extends TestCase
         $this->postJson('/api/estudos/guruja/meta', $com, $headers)->assertOk()->assertJson(['precisa_estimativas' => false]);
         $this->postJson('/api/estudos/guruja/meta', $this->payload(61), $headers)->assertOk()->assertJson(['precisa_estimativas' => false]);
         $this->postJson('/api/estudos/guruja/meta', $this->payload(62), $headers)->assertOk()->assertJson(['precisa_estimativas' => true]);
+    }
+
+    public function test_concluir_no_app_vale_so_para_a_meta_atual_e_pode_ser_desfeito(): void
+    {
+        $user = User::factory()->create();
+        $headers = ['Authorization' => 'Bearer ' . $this->token($user)];
+        $this->postJson('/api/estudos/guruja/meta', $this->payload(), $headers)->assertOk();
+        $this->actingAs($user);
+
+        $this->postJson('/estudos/guruja/feita', ['target_id' => 1069184, 'codigo' => 'DTRIB.3886.115658', 'feita' => true])->assertOk();
+        $this->postJson('/estudos/guruja/feita', ['target_id' => 1069184, 'codigo' => 'R:25834364', 'feita' => true])->assertOk();
+        $this->postJson('/estudos/guruja/feita', ['target_id' => 1069184, 'codigo' => 'R:25834364', 'feita' => true])->assertOk();
+        $this->assertSame(['DTRIB.3886.115658', 'R:25834364'], $this->getJson('/estudos/guruja')->json('feitas'));
+
+        $this->postJson('/estudos/guruja/feita', ['target_id' => 1069184, 'codigo' => 'R:25834364', 'feita' => false])->assertOk();
+        $this->assertSame(['DTRIB.3886.115658'], $this->getJson('/estudos/guruja')->json('feitas'));
+        $this->postJson('/estudos/guruja/feita', ['target_id' => 1069184, 'codigo' => 'x', 'feita' => true])->assertUnprocessable();
+
+        $nova = $this->payload(62);
+        $nova['meta']['target_id'] = 1080000;
+        $this->postJson('/api/estudos/guruja/meta', $nova, $headers)->assertOk();
+        $this->assertSame([], $this->getJson('/estudos/guruja')->json('feitas'));
+
+        config(['services.guruja_sync.fire_url' => 'https://x/fire', 'services.guruja_sync.fire_token' => 't']);
+        $this->assertTrue($this->getJson('/estudos/guruja')->json('atualizar_disponivel'));
     }
 }
