@@ -882,3 +882,9 @@ body.rest-over [data-live="rest"], body.rest-over [data-w-time] { color: var(--d
 .gj-updated button.gj-sync { color: var(--primary); font-weight: 600; }
 .gj-updated span.gj-sync.on { color: var(--primary); animation: gj-pulse 1.4s ease-in-out infinite; }
 @keyframes gj-pulse { 50% { opacity: .45; } }
+/* ✓ Concluí / Desfazer */
+.gj-actions { display: flex; gap: 8px; margin-top: 8px; }
+.gj-actions .gj-study { margin-top: 0; flex: 1; }
+.gj-feita { flex: none; padding: 8px 12px; border: 1px solid #43AA8B; border-radius: 10px; background: color-mix(in srgb, #43AA8B 14%, transparent);
+    color: color-mix(in srgb, #43AA8B 65%, var(--text)); font: inherit; font-size: .84rem; font-weight: 700; cursor: pointer; }
+.gj-desfazer { margin-top: 8px; padding: 6px 10px; border: 1px solid var(--border); border-radius: 10px; background: none; color: var(--muted); font: inherit; font-size: .8rem; cursor: pointer; }
