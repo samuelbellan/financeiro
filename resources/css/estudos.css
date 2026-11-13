@@ -876,8 +876,6 @@ body.rest-over [data-live="rest"], body.rest-over [data-w-time] { color: var(--d
 .gj-tools button { background: none; border: 1px solid var(--border); border-radius: 99px; padding: 4px 10px; color: var(--muted); font: inherit; font-size: .74rem; font-weight: 600; cursor: pointer; }
 .gj-tools button.on { background: var(--primary); border-color: var(--primary); color: var(--on-primary, #fff); }
 .gj-list li > div { flex: 1; }
-.gj-move { display: flex; flex-direction: column; gap: 4px; flex: none; }
-.gj-move button { width: 34px; height: 28px; border: 1px solid var(--border); border-radius: 8px; background: var(--card); color: var(--text); font-size: .9rem; cursor: pointer; }
 .gj-updated .gj-sync { color: var(--muted); font-weight: 500; }
 .gj-updated button.gj-sync { color: var(--primary); font-weight: 600; }
 .gj-updated span.gj-sync.on { color: var(--primary); animation: gj-pulse 1.4s ease-in-out infinite; }
@@ -888,3 +886,13 @@ body.rest-over [data-live="rest"], body.rest-over [data-w-time] { color: var(--d
 .gj-feita { flex: none; padding: 8px 12px; border: 1px solid #43AA8B; border-radius: 10px; background: color-mix(in srgb, #43AA8B 14%, transparent);
     color: color-mix(in srgb, #43AA8B 65%, var(--text)); font: inherit; font-size: .84rem; font-weight: 700; cursor: pointer; }
 .gj-desfazer { margin-top: 8px; padding: 6px 10px; border: 1px solid var(--border); border-radius: 10px; background: none; color: var(--muted); font: inherit; font-size: .8rem; cursor: pointer; }
+/* Arrastar para reordenar */
+.gj-tools { align-items: center; }
+.gj-tools small { margin-right: auto; color: var(--muted); font-size: .72rem; }
+.gj-drag { flex: none; align-self: center; padding: 6px 4px 6px 8px; color: var(--muted); font-size: 1.1rem; line-height: 1; cursor: grab; touch-action: none; user-select: none; opacity: .55; }
+.gj-list li[data-key]:hover .gj-drag { opacity: 1; }
+@media (pointer: fine) { .gj-list li[data-key] { cursor: grab; } }
+.guruja.gj-sorting, .guruja.gj-sorting * { cursor: grabbing !important; user-select: none; }
+.gj-list li.gj-dragging { position: relative; z-index: 2; background: var(--card); border-radius: 10px; opacity: .95;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, .35), inset 3px 0 0 var(--t); }
+.guruja.gj-sorting ul.gj-pending { min-height: 12px; }

@@ -707,7 +707,7 @@ function renderTimer() {
 // O servidor guarda a última foto da meta em andamento (enviada por uma rotina que lê a Guruja).
 // O app busca ao abrir, a cada 5 min e ao voltar para a aba; sem rede, mostra a última foto salva.
 const GURUJA_REFRESH_MS = 5 * 60_000;
-const guruja = { data: null, fetchedAt: 0, loading: false, showDone: false, open: new Set(), summarizing: new Set(), resumindo: null, subjectMap: {}, organizando: false, atualizando: null };
+const guruja = { data: null, fetchedAt: 0, loading: false, showDone: false, open: new Set(), summarizing: new Set(), resumindo: null, subjectMap: {}, atualizando: null };
 
 async function refreshGuruja(force = false) {
     if (!config.gurujaUrl || guruja.loading) return;
@@ -722,7 +722,7 @@ async function refreshGuruja(force = false) {
         guruja.data = data;
         if (changed) {
             await setMeta('guruja', data);
-            if (state.tab === 'timer' && !dialog.open) render();
+            if (state.tab === 'timer' && !dialog.open && !gjDrag.li) render();
         }
     } catch { /* offline: fica a última foto */ } finally {
         guruja.loading = false;
@@ -845,16 +845,66 @@ async function saveGurujaOrder(keys) {
     }
 }
 
-function moveGurujaItem(key, dir) {
+// ── Arrastar para reordenar as pendentes ──
+// Mouse: arrasta o card inteiro (depois de mover 6 px; antes disso é clique). Toque: só pela alça ⠿, para
+// não brigar com a rolagem. Durante o arrasto o item troca de lugar no DOM; ao soltar, a ordem lida da tela
+// é salva e o plano do dia se refaz.
+const gjDrag = { li: null, startY: 0, active: false, pointerId: null, justDragged: false };
+
+root.addEventListener('pointerdown', (event) => {
+    const li = event.target.closest('.guruja li[data-key]');
+    if (!li || event.button > 0) return;
+    const onHandle = Boolean(event.target.closest('.gj-drag'));
+    if (event.pointerType !== 'mouse' && !onHandle) return;
+    if (!onHandle && event.target.closest('.gj-cmd, button, a, summary')) return;
+    Object.assign(gjDrag, { li, startY: event.clientY, active: false, pointerId: event.pointerId });
+    if (onHandle) event.preventDefault();
+});
+
+root.addEventListener('pointermove', (event) => {
+    if (!gjDrag.li || event.pointerId !== gjDrag.pointerId) return;
+    if (!gjDrag.active) {
+        if (Math.abs(event.clientY - gjDrag.startY) < 6) return;
+        gjDrag.active = true;
+        gjDrag.li.classList.add('gj-dragging');
+        root.querySelector('.guruja')?.classList.add('gj-sorting');
+        try { gjDrag.li.setPointerCapture(event.pointerId); } catch { /* sem captura: segue pelo root */ }
+    }
+    event.preventDefault();
+    const over = document.elementFromPoint(event.clientX, event.clientY)?.closest('.guruja li[data-key]');
+    if (over && over !== gjDrag.li) {
+        const box = over.getBoundingClientRect();
+        over.parentElement.insertBefore(gjDrag.li, event.clientY < box.top + box.height / 2 ? over : over.nextSibling);
+    } else if (!over) {
+        // Sobre o título de um dia: entra no começo daquela lista.
+        const h4 = document.elementFromPoint(event.clientX, event.clientY)?.closest('.guruja h4');
+        const list = h4?.nextElementSibling;
+        if (list?.matches('ul.gj-pending')) list.prepend(gjDrag.li);
+    }
+});
+
+function endGurujaDrag(event) {
+    if (!gjDrag.li || (event && event.pointerId !== gjDrag.pointerId)) return;
+    const { li, active } = gjDrag;
+    gjDrag.li = null;
+    if (!active) return;
+    li.classList.remove('gj-dragging');
+    root.querySelector('.guruja')?.classList.remove('gj-sorting');
+    gjDrag.justDragged = true;
+    setTimeout(() => { gjDrag.justDragged = false; }, 0);
+    const keys = [...root.querySelectorAll('.guruja ul.gj-pending li[data-key]')].map((x) => x.dataset.key);
+    const atual = gurujaOrderedKeys();
+    if (keys.join('|') !== atual.join('|')) saveGurujaOrder(keys);
+    else render();
+}
+root.addEventListener('pointerup', endGurujaDrag);
+root.addEventListener('pointercancel', endGurujaDrag);
+
+function gurujaOrderedKeys() {
     const meta = guruja.data?.meta;
-    if (!meta) return;
+    if (!meta) return [];
     const refs = (meta.reforcos ?? []).map((r) => ({ ...r, tipo: 'Reforço' }));
-    const keys = gurujaOrdered([...(meta.atividades ?? []), ...refs].filter((a) => !gjDone(a))).map(gjKey).filter(Boolean);
-    const i = keys.indexOf(key);
-    const j = i + dir;
-    if (i < 0 || j < 0 || j >= keys.length) return;
-    [keys[i], keys[j]] = [keys[j], keys[i]];
-    saveGurujaOrder(keys);
+    return gurujaOrdered([...(meta.atividades ?? []), ...refs].filter((a) => !gjDone(a))).map(gjKey).filter(Boolean);
 }
 
 function gurujaItem(a, done) {
@@ -863,7 +913,6 @@ function gurujaItem(a, done) {
     const est = !done && a.estMin ? `~${formatDuration(a.estMin * 60_000)}` : '';
     const isRef = a.tipo === 'Reforço';
     const code = gjKey(a);
-    const organizing = guruja.organizando && !done;
     const marcada = done && gjMarcada(a);
     const raw = !isRef && code ? guruja.data?.comandos?.[code] : null;
     const comando = typeof raw === 'string' ? { texto: raw, resumo: null } : raw;
@@ -889,18 +938,17 @@ function gurujaItem(a, done) {
         }
         if (!isRef) body += `<small>${esc(code)}</small>`;
     }
-    const clickable = code && !organizing;
-    const moves = organizing && code ? `<span class="gj-move">
-        <button type="button" data-action="guruja-move" data-id="${esc(code)}" data-dir="-1" aria-label="Subir">↑</button>
-        <button type="button" data-action="guruja-move" data-id="${esc(code)}" data-dir="1" aria-label="Descer">↓</button></span>` : '';
-    return `<li class="${done ? 'done' : ''}${a.ignorada || a.ignorado ? ' skipped' : ''}${clickable ? ' gj-clickable' : ''}${isRef && !done ? ' gj-ref-pending' : ''}${organizing ? ' gj-organizing' : ''}" style="--t:${GJ_TIPO_COR[a.tipo] ?? 'var(--border)'}"
+    const clickable = Boolean(code);
+    const handle = !done && code ? '<span class="gj-drag" aria-label="Arrastar para reordenar" title="Arraste para reordenar">⠿</span>' : '';
+    return `<li class="${done ? 'done' : ''}${a.ignorada || a.ignorado ? ' skipped' : ''}${clickable ? ' gj-clickable' : ''}${isRef && !done ? ' gj-ref-pending' : ''}" style="--t:${GJ_TIPO_COR[a.tipo] ?? 'var(--border)'}"
+        ${!done && code ? `data-key="${esc(code)}"` : ''}
         ${clickable ? `data-action="guruja-item" data-id="${esc(code)}"` : ''}>
         <span class="gj-check" aria-hidden="true">${done ? '✓' : ''}</span>
         <div><b>${esc(a.titulo)}</b>
             <small>${a.tipo ? `<span class="gj-tipo" style="--t:${GJ_TIPO_COR[a.tipo] ?? 'var(--muted)'}">${esc(a.tipo)}</span>` : ''}${esc(a.disciplina ?? '')}${extra ? ` · ${esc(extra)}` : ''}${est ? ` · ${est}` : ''}${hasDetail && !isOpen ? ` · <span class="gj-has-cmd">${isRef ? 'instrução' : 'comando'} ▸</span>` : ''}</small>
-            ${isOpen && !organizing ? `<div class="gj-cmd">${body}</div>` : ''}
+            ${isOpen ? `<div class="gj-cmd">${body}</div>` : ''}
         </div>
-        ${moves}
+        ${handle}
     </li>`;
 }
 
@@ -1110,12 +1158,11 @@ function renderGuruja() {
         ${refsPend.length ? `<div class="gj-ref-alert"><b>⚡ ${refsPend.length === 1 ? '1 reforço pendente' : `${refsPend.length} reforços pendentes`}</b>
             ${refsPend.map((r) => `<button type="button" data-action="guruja-item" data-id="${esc(gjKey(r))}">${esc(r.disciplina ?? r.titulo)}</button>`).join('')}</div>` : ''}
         ${ritmo}
-        ${pending.length > 1 ? `<div class="gj-tools">${guruja.organizando
-            ? `<button type="button" data-action="guruja-reset-order">Ordem da Guruja</button><button type="button" class="on" data-action="guruja-organize">✓ Pronto</button>`
-            : '<button type="button" data-action="guruja-organize">↕ Organizar</button>'}</div>` : ''}
+        ${pending.length > 1 ? `<div class="gj-tools"><small>Arraste os cards para reordenar</small>${guruja.data?.ordem?.length
+            ? '<button type="button" data-action="guruja-reset-order">Ordem da Guruja</button>' : ''}</div>` : ''}
         ${pending.length
             ? plan.days.map((d) => `<h4>${gurujaDayLabel(plan.hoje, d.i)} <span class="gj-h4-time">· ~${formatDuration(d.min * 60_000)}</span></h4>
-                <ul class="gj-list">${d.items.map((a) => gurujaItem(a, false)).join('')}</ul>`).join('')
+                <ul class="gj-list gj-pending">${d.items.map((a) => gurujaItem(a, false)).join('')}</ul>`).join('')
             : '<p class="gj-empty">Tudo feito nesta meta 🎉</p>'}
         ${done.length ? `<button type="button" class="gj-toggle" data-action="guruja-done">
             ${guruja.showDone ? '▾' : '▸'} Concluídas (${done.length})</button>
@@ -2377,8 +2424,8 @@ root.addEventListener('click', async (event) => {
         toggle: () => toggleSubject(id),
         'guruja-done': () => { guruja.showDone = !guruja.showDone; render(); },
         'guruja-item': () => {
-            if (event.target.closest('.gj-cmd')) return;
-            guruja.organizando = false; // clique dentro do comando (ex.: "Comando completo") não fecha
+            // Clique dentro do comando (ex.: "Comando completo"), na alça ou logo após arrastar não abre/fecha.
+            if (event.target.closest('.gj-cmd, .gj-drag') || gjDrag.justDragged) return;
             const opening = !guruja.open.has(id);
             opening ? guruja.open.add(id) : guruja.open.delete(id);
             render();
@@ -2389,8 +2436,6 @@ root.addEventListener('click', async (event) => {
         'guruja-refresh': () => gurujaAtualizar(),
         'guruja-feita': () => marcarGuruja(id, true),
         'guruja-desfazer': () => marcarGuruja(id, false),
-        'guruja-organize': () => { guruja.organizando = !guruja.organizando; render(); },
-        'guruja-move': () => moveGurujaItem(id, Number(button.dataset.dir)),
         'guruja-reset-order': () => { if (confirm('Voltar à ordem da Guruja?')) saveGurujaOrder([]); },
         'focus-open': () => openFocus(),
         'room-create': () => openRoomDialog('create'),
