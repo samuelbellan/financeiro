@@ -1,5 +1,5 @@
 // Bosses da Jornada (31 bosses da BOSS PROGRESSION 01 to 31 com suporte a modelos 3D).
-// Fonte de dados: bosses.json. Os bosses 06, 07 e 22 possuem modelo 3D (.glb). Os demais 28 são 2D.
+// Fonte de dados: bosses.json. Bosses com status_3d "pronto" possuem modelo 3D (.glb); os demais são 2D.
 // Novos modelos podem ser adicionados apenas atualizando o JSON e copiando os arquivos para public/bosses/modelos/.
 
 import bossesData from './bosses.json';
@@ -64,7 +64,7 @@ export const BOSSES = bossesData.bosses.map((b) => {
         titulo,
         fala,
         cor,
-        orientacao_yaw_graus: b.orientacao_yaw_graus ?? 60,
+        orientacao_yaw_graus: b.orientacao_yaw_graus ?? 0,
         triangulos: b.triangulos,
         tamanho_bytes: b.tamanho_bytes,
         observacao: b.observacao,
@@ -134,12 +134,12 @@ export function ensureModelViewer() {
     modelViewerLoaded = true;
 }
 
-/** Renderiza o elemento <model-viewer> para bosses 3D com rotação de 60 graus para visualização frontal. */
+/** Renderiza o elemento <model-viewer> para bosses 3D, girado pelo orientacao_yaw_graus de cada boss para ficar de frente. */
 export function renderBoss3D(boss, { height = 280, autoRotate = true, cls = '' } = {}) {
     ensureModelViewer();
     const modelSrc = boss.modelo.startsWith('/') ? boss.modelo : `/bosses/${boss.modelo}`;
     const posterAttr = boss.imagem_fonte ? `poster="/bosses/${boss.imagem_fonte}"` : '';
-    const yaw = boss.orientacao_yaw_graus ?? 60;
+    const yaw = boss.orientacao_yaw_graus ?? 0;
     return `<model-viewer
         src="${modelSrc}"
         ${posterAttr}

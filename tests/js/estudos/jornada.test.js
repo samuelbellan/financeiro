@@ -109,30 +109,31 @@ describe('bosses', () => {
         expect(bossSvg(4, { locked: true })).toContain('Boss desconhecido');
     });
 
-    it('progressão possui 31 bosses com 06, 07 e 22 em 3D e 28 pendentes em 2D', () => {
+    it('progressão possui 31 bosses; os prontos (01, 06, 07, 22) em 3D e o resto em 2D', () => {
         expect(BOSSES).toHaveLength(31);
         expect(BOSS_HP).toHaveLength(31);
 
-        const prontoIndices = [5, 6, 21]; // bosses 6, 7 e 22 (base 0)
+        const prontoIndices = BOSSES.map((b, i) => (b.status_3d === 'pronto' ? i : -1)).filter((i) => i >= 0);
+        expect(prontoIndices).toEqual(expect.arrayContaining([0, 5, 6, 21])); // bosses 1, 6, 7 e 22 (base 0)
         for (const idx of prontoIndices) {
             const b = BOSSES[idx];
-            expect(b.status_3d).toBe('pronto');
             expect(b.is3D).toBe(true);
             expect(b.modelo).toMatch(/boss-\d+\.glb$/);
-            expect(b.orientacao_yaw_graus).toBe(60);
+            expect(Number.isFinite(b.orientacao_yaw_graus)).toBe(true);
 
             const html3d = renderBoss3D(b);
             expect(html3d).toContain('<model-viewer');
-            expect(html3d).toContain('orientation="0deg 0deg 60deg"');
+            expect(html3d).toContain(`orientation="0deg 0deg ${b.orientacao_yaw_graus}deg"`);
             expect(html3d).toContain('loading="lazy"');
             expect(html3d).toContain('camera-controls');
 
             const stageHtml = renderBossStage(b);
             expect(stageHtml).toContain('<model-viewer');
         }
+        expect(BOSSES[0].orientacao_yaw_graus).toBe(345); // cada boss tem o seu ângulo de frente
 
         const pendentes = BOSSES.filter((_, i) => !prontoIndices.includes(i));
-        expect(pendentes).toHaveLength(28);
+        expect(pendentes).toHaveLength(31 - prontoIndices.length);
         for (const b of pendentes) {
             expect(b.status_3d).toBe('pendente');
             expect(b.is3D).toBe(false);

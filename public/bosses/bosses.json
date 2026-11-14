@@ -8,9 +8,15 @@
       "id": "boss-01",
       "nome": "Caçador da Floresta",
       "ato": "Ato I · Terras Selvagens",
-      "status_3d": "pendente",
-      "modelo": null,
-      "imagem_fonte": null
+      "status_3d": "pronto",
+      "modelo": "modelos/boss-01.glb",
+      "imagem_fonte": "imagens-fonte/boss-01-entrada.png",
+      "lore": "Emboscada entre as raízes.",
+      "cor_destaque": "#8fc26b",
+      "orientacao_yaw_graus": 345,
+      "triangulos": 37160,
+      "tamanho_bytes": 1206164,
+      "observacao": "Gerado da imagem própria em alta definição (vista frontal da folha de personagem)."
     },
     {
       "numero": 2,
@@ -58,7 +64,7 @@
       "imagem_fonte": "imagens-fonte/boss-06.png",
       "lore": "Juramento quebrado, aço intacto.",
       "cor_destaque": "#ff5a4a",
-      "orientacao_yaw_graus": 60,
+      "orientacao_yaw_graus": 30,
       "triangulos": 39990,
       "tamanho_bytes": 1223504,
       "observacao": "Modelo é um busto (cintura para cima): a ilustração original corta as pernas."
@@ -73,7 +79,7 @@
       "imagem_fonte": "imagens-fonte/boss-07.png",
       "lore": "Ruína que aprendeu a andar.",
       "cor_destaque": "#5fb8ff",
-      "orientacao_yaw_graus": 60,
+      "orientacao_yaw_graus": 30,
       "triangulos": 38636,
       "tamanho_bytes": 1126708,
       "observacao": "Pés com aspecto derretido (poeira na ilustração)."
@@ -214,7 +220,7 @@
       "imagem_fonte": "imagens-fonte/boss-22.png",
       "lore": "O inverno caminha sobre você.",
       "cor_destaque": "#9fe8ff",
-      "orientacao_yaw_graus": 60,
+      "orientacao_yaw_graus": 30,
       "triangulos": 40000,
       "tamanho_bytes": 1521456,
       "observacao": "Há uma placa fina de 'neve' junto aos pés; pode ser limpa no Blender depois."
@@ -300,5 +306,6 @@
       "modelo": null,
       "imagem_fonte": null
     }
-  ]
+  ],
+  "nota_orientacao": "orientacao_yaw_graus = giro em torno do eixo vertical (graus) para o boss ficar de frente para a câmera do model-viewer (eixo +Z). Varia por boss."
 }
