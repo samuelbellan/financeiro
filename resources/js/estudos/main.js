@@ -195,7 +195,7 @@ function openSessionNoteDialog(session) {
     });
 }
 
-async function toggleSubject(subjectId) {
+async function toggleSubject(subjectId, tipo = null) {
     const at = nowMs();
     const running = runningSession();
     if (running) {
@@ -211,6 +211,7 @@ async function toggleSubject(subjectId) {
         fim: null,
         origem: 'timer',
         status: 'ok',
+        tipo,
         device_id: await getMeta('device_id'),
         deleted_at: null,
         created_at: iso(at),
@@ -931,7 +932,7 @@ function gurujaItem(a, done) {
             body = '<p class="gj-cmd-empty">Sem comando salvo. No portal, abra esta atividade na aba <b>Comandos</b> e clique no favorito <b>Enviar comando</b>.</p>';
         }
         if (!done) {
-            body += `<div class="gj-actions"><button type="button" class="gj-study" data-action="guruja-study" data-id="${esc(a.disciplina ?? '')}">▶ Estudar ${esc(a.disciplina ?? '')}</button>
+            body += `<div class="gj-actions"><button type="button" class="gj-study" data-action="guruja-study" data-id="${esc(a.disciplina ?? '')}" data-tipo="${esc(a.tipo ?? '')}">▶ Estudar ${esc(a.disciplina ?? '')}</button>
                 <button type="button" class="gj-feita" data-action="guruja-feita" data-id="${esc(code)}">✓ Concluí</button></div>`;
         } else if (marcada) {
             body += `<button type="button" class="gj-desfazer" data-action="guruja-desfazer" data-id="${esc(code)}">↺ Desfazer (voltar para pendentes)</button>`;
@@ -995,6 +996,15 @@ function gurujaDayLabel(hoje, i) {
 }
 
 // ── ▶ Estudar: disciplina da Guruja → matéria do app ──
+// Tipo da atividade na Guruja → tipo de estudo do app. Os que não têm equivalente viram tipo personalizado
+// com o mesmo nome do card (ex.: "Mapeamento", "Reforço").
+const GJ_TIPO_ESTUDO = { 'Teoria': 'teoria', 'Questões': 'questoes', 'Revisão': 'revisao', 'Lei Seca': 'lei_seca' };
+
+function gurujaStudyType(gurujaTipo) {
+    if (!gurujaTipo) return null;
+    return GJ_TIPO_ESTUDO[gurujaTipo] ?? typeIdFromName(gurujaTipo, customTypes(state.sessions));
+}
+
 const gjNorm = (text) => String(text ?? '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase()
     .replace(/\bd\.\s*/g, 'direito ').replace(/[^a-z0-9 ]+/g, ' ')
     .split(/\s+/).filter((w) => w && !['de', 'da', 'do', 'das', 'dos', 'e', 'i', 'ii'].includes(w));
@@ -1014,11 +1024,17 @@ function gurujaSubjectFor(disciplina) {
     return bestScore >= 0.5 ? best : null;
 }
 
-async function gurujaStudy(disciplina) {
+async function gurujaStudy(disciplina, gurujaTipo) {
     const subjectId = gurujaSubjectFor(disciplina);
+    // A sessão já nasce com o tipo da atividade (pré-marcado ao parar; dá para trocar no diálogo).
+    const tipo = gurujaStudyType(gurujaTipo);
     const start = async (id) => {
-        if (runningSession()?.subject_id === id) return openFocus();
-        await toggleSubject(id);
+        const running = runningSession();
+        if (running?.subject_id === id) {
+            if (tipo && running.tipo !== tipo) await persist('sessions', { ...running, tipo });
+            return openFocus();
+        }
+        await toggleSubject(id, tipo);
     };
     if (subjectId) return start(subjectId);
     const subjects = [...activeSubjects()].sort((a, b) => a.nome.localeCompare(b.nome, 'pt-BR', { sensitivity: 'base' }));
@@ -2432,7 +2448,7 @@ root.addEventListener('click', async (event) => {
             if (opening) summarizeGurujaCommand(id);
         },
         'guruja-help': () => openGurujaHelp(),
-        'guruja-study': () => gurujaStudy(id),
+        'guruja-study': () => gurujaStudy(id, button.dataset.tipo),
         'guruja-refresh': () => gurujaAtualizar(),
         'guruja-feita': () => marcarGuruja(id, true),
         'guruja-desfazer': () => marcarGuruja(id, false),
