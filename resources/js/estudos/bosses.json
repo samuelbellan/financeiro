@@ -1,0 +1,304 @@
+{
+  "versao": 1,
+  "gerado_em": "2026-11-14",
+  "origem": "Hunyuan3D-2 Mini Turbo (local) a partir de recortes da ilustração BOSS PROGRESSION 01-31",
+  "bosses": [
+    {
+      "numero": 1,
+      "id": "boss-01",
+      "nome": "Caçador da Floresta",
+      "ato": "Ato I · Terras Selvagens",
+      "status_3d": "pendente",
+      "modelo": null,
+      "imagem_fonte": null
+    },
+    {
+      "numero": 2,
+      "id": "boss-02",
+      "nome": "Lobo Sombrio",
+      "ato": "Ato I · Terras Selvagens",
+      "status_3d": "pendente",
+      "modelo": null,
+      "imagem_fonte": null
+    },
+    {
+      "numero": 3,
+      "id": "boss-03",
+      "nome": "Chefe Orc",
+      "ato": "Ato I · Terras Selvagens",
+      "status_3d": "pendente",
+      "modelo": null,
+      "imagem_fonte": null
+    },
+    {
+      "numero": 4,
+      "id": "boss-04",
+      "nome": "Goblin Piromante",
+      "ato": "Ato I · Terras Selvagens",
+      "status_3d": "pendente",
+      "modelo": null,
+      "imagem_fonte": null
+    },
+    {
+      "numero": 5,
+      "id": "boss-05",
+      "nome": "Aranha Rainha",
+      "ato": "Ato I · Terras Selvagens",
+      "status_3d": "pendente",
+      "modelo": null,
+      "imagem_fonte": null
+    },
+    {
+      "numero": 6,
+      "id": "boss-06",
+      "nome": "Cavaleiro Negro",
+      "ato": "Ato I · Terras Selvagens",
+      "status_3d": "pronto",
+      "modelo": "modelos/boss-06.glb",
+      "imagem_fonte": "imagens-fonte/boss-06.png",
+      "lore": "Juramento quebrado, aço intacto.",
+      "cor_destaque": "#ff5a4a",
+      "orientacao_yaw_graus": 60,
+      "triangulos": 39990,
+      "tamanho_bytes": 1223504,
+      "observacao": "Modelo é um busto (cintura para cima): a ilustração original corta as pernas."
+    },
+    {
+      "numero": 7,
+      "id": "boss-07",
+      "nome": "Golem de Pedra",
+      "ato": "Ato I · Terras Selvagens",
+      "status_3d": "pronto",
+      "modelo": "modelos/boss-07.glb",
+      "imagem_fonte": "imagens-fonte/boss-07.png",
+      "lore": "Ruína que aprendeu a andar.",
+      "cor_destaque": "#5fb8ff",
+      "orientacao_yaw_graus": 60,
+      "triangulos": 38636,
+      "tamanho_bytes": 1126708,
+      "observacao": "Pés com aspecto derretido (poeira na ilustração)."
+    },
+    {
+      "numero": 8,
+      "id": "boss-08",
+      "nome": "Necromante",
+      "ato": "Ato I · Terras Selvagens",
+      "status_3d": "pendente",
+      "modelo": null,
+      "imagem_fonte": null
+    },
+    {
+      "numero": 9,
+      "id": "boss-09",
+      "nome": "Quimera",
+      "ato": "Ato I · Terras Selvagens",
+      "status_3d": "pendente",
+      "modelo": null,
+      "imagem_fonte": null
+    },
+    {
+      "numero": 10,
+      "id": "boss-10",
+      "nome": "Troll das Cavernas",
+      "ato": "Ato I · Terras Selvagens",
+      "status_3d": "pendente",
+      "modelo": null,
+      "imagem_fonte": null
+    },
+    {
+      "numero": 11,
+      "id": "boss-11",
+      "nome": "Espectro",
+      "ato": "Ato II · Reinos Sombrios",
+      "status_3d": "pendente",
+      "modelo": null,
+      "imagem_fonte": null
+    },
+    {
+      "numero": 12,
+      "id": "boss-12",
+      "nome": "Elemental de Fogo",
+      "ato": "Ato II · Reinos Sombrios",
+      "status_3d": "pendente",
+      "modelo": null,
+      "imagem_fonte": null
+    },
+    {
+      "numero": 13,
+      "id": "boss-13",
+      "nome": "Hidra do Pântano",
+      "ato": "Ato II · Reinos Sombrios",
+      "status_3d": "pendente",
+      "modelo": null,
+      "imagem_fonte": null
+    },
+    {
+      "numero": 14,
+      "id": "boss-14",
+      "nome": "Grifo",
+      "ato": "Ato II · Reinos Sombrios",
+      "status_3d": "pendente",
+      "modelo": null,
+      "imagem_fonte": null
+    },
+    {
+      "numero": 15,
+      "id": "boss-15",
+      "nome": "Senhor da Guerra Infernal",
+      "ato": "Ato II · Reinos Sombrios",
+      "status_3d": "pendente",
+      "modelo": null,
+      "imagem_fonte": null
+    },
+    {
+      "numero": 16,
+      "id": "boss-16",
+      "nome": "Colosso a Vapor",
+      "ato": "Ato II · Reinos Sombrios",
+      "status_3d": "pendente",
+      "modelo": null,
+      "imagem_fonte": null
+    },
+    {
+      "numero": 17,
+      "id": "boss-17",
+      "nome": "Lich Esmeralda",
+      "ato": "Ato II · Reinos Sombrios",
+      "status_3d": "pendente",
+      "modelo": null,
+      "imagem_fonte": null
+    },
+    {
+      "numero": 18,
+      "id": "boss-18",
+      "nome": "Verme das Areias",
+      "ato": "Ato II · Reinos Sombrios",
+      "status_3d": "pendente",
+      "modelo": null,
+      "imagem_fonte": null
+    },
+    {
+      "numero": 19,
+      "id": "boss-19",
+      "nome": "Dragão Rubro",
+      "ato": "Ato II · Reinos Sombrios",
+      "status_3d": "pendente",
+      "modelo": null,
+      "imagem_fonte": null
+    },
+    {
+      "numero": 20,
+      "id": "boss-20",
+      "nome": "Kraken",
+      "ato": "Ato II · Reinos Sombrios",
+      "status_3d": "pendente",
+      "modelo": null,
+      "imagem_fonte": null
+    },
+    {
+      "numero": 21,
+      "id": "boss-21",
+      "nome": "Lorde Vampiro",
+      "ato": "Ato III · O Abismo",
+      "status_3d": "pendente",
+      "modelo": null,
+      "imagem_fonte": null
+    },
+    {
+      "numero": 22,
+      "id": "boss-22",
+      "nome": "Gigante de Gelo",
+      "ato": "Ato III · O Abismo",
+      "status_3d": "pronto",
+      "modelo": "modelos/boss-22.glb",
+      "imagem_fonte": "imagens-fonte/boss-22.png",
+      "lore": "O inverno caminha sobre você.",
+      "cor_destaque": "#9fe8ff",
+      "orientacao_yaw_graus": 60,
+      "triangulos": 40000,
+      "tamanho_bytes": 1521456,
+      "observacao": "Há uma placa fina de 'neve' junto aos pés; pode ser limpa no Blender depois."
+    },
+    {
+      "numero": 23,
+      "id": "boss-23",
+      "nome": "Arquidemônio",
+      "ato": "Ato III · O Abismo",
+      "status_3d": "pendente",
+      "modelo": null,
+      "imagem_fonte": null
+    },
+    {
+      "numero": 24,
+      "id": "boss-24",
+      "nome": "Anjo Caído",
+      "ato": "Ato III · O Abismo",
+      "status_3d": "pendente",
+      "modelo": null,
+      "imagem_fonte": null
+    },
+    {
+      "numero": 25,
+      "id": "boss-25",
+      "nome": "Titã de Magma",
+      "ato": "Ato III · O Abismo",
+      "status_3d": "pendente",
+      "modelo": null,
+      "imagem_fonte": null
+    },
+    {
+      "numero": 26,
+      "id": "boss-26",
+      "nome": "Deus do Trovão",
+      "ato": "Ato III · O Abismo",
+      "status_3d": "pendente",
+      "modelo": null,
+      "imagem_fonte": null
+    },
+    {
+      "numero": 27,
+      "id": "boss-27",
+      "nome": "Horror Cósmico",
+      "ato": "Ato III · O Abismo",
+      "status_3d": "pendente",
+      "modelo": null,
+      "imagem_fonte": null
+    },
+    {
+      "numero": 28,
+      "id": "boss-28",
+      "nome": "Feiticeira dos Seis Braços",
+      "ato": "Ato III · O Abismo",
+      "status_3d": "pendente",
+      "modelo": null,
+      "imagem_fonte": null
+    },
+    {
+      "numero": 29,
+      "id": "boss-29",
+      "nome": "Mecha Titã",
+      "ato": "Ato III · O Abismo",
+      "status_3d": "pendente",
+      "modelo": null,
+      "imagem_fonte": null
+    },
+    {
+      "numero": 30,
+      "id": "boss-30",
+      "nome": "Dragão do Vazio",
+      "ato": "Ato III · O Abismo",
+      "status_3d": "pendente",
+      "modelo": null,
+      "imagem_fonte": null
+    },
+    {
+      "numero": 31,
+      "id": "boss-31",
+      "nome": "Entidade Astral",
+      "ato": "Chefe final",
+      "status_3d": "pendente",
+      "modelo": null,
+      "imagem_fonte": null
+    }
+  ]
+}

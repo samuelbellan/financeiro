@@ -11,25 +11,34 @@ import { addDays, dayStats, NO_TYPE } from './metrics.js';
 
 export const JORNADA_PADRAO = Object.freeze({ objetivo: 'total', minutos: 300 });
 
-/** Vida de cada boss, na ordem da jornada (o desenho fica em bosses.js, com o mesmo índice). */
-export const BOSS_HP = Object.freeze([3, 5, 7, 10, 12, 15, 20, 30]);
+/** Vida de cada boss, na ordem da jornada (31 bosses da BOSS PROGRESSION 01 to 31). */
+export const BOSS_HP = Object.freeze([
+    3, 3, 4, 4, 5, 5, 6, 6, 7, 8,
+    8, 9, 9, 10, 10, 11, 11, 12, 12, 13,
+    13, 14, 14, 15, 15, 16, 17, 18, 19, 20,
+    25,
+]);
 
 /** Ciclo 0 = vida normal; cada ciclo seguinte soma 50%. */
 export function bossMaxHp(index, cycle = 0) {
-    return Math.round(BOSS_HP[index] * (1 + cycle * 0.5));
+    const base = BOSS_HP[index] ?? 10;
+    return Math.round(base * (1 + cycle * 0.5));
 }
 
 /**
- * Objetivo normalizado: { objetivo: 'total' | 'tipo:<id>' | 'materia:<id>', minutos, inicio }.
+ * Objetivo normalizado: { objetivo: 'total' | 'tipo:<id>' | 'materia:<id>', minutos, inicio, boss_index }.
  * `null`/indefinido = jornada ainda não começou.
  */
 export function normalizeJornada(jornada) {
     if (!jornada || !jornada.inicio) return null;
     const minutos = Number(jornada.minutos);
+    const rawBoss = jornada.boss_index;
+    const bossIndex = rawBoss !== undefined && rawBoss !== null && rawBoss !== '' ? Number(rawBoss) : null;
     return {
         inicio: jornada.inicio,
         objetivo: typeof jornada.objetivo === 'string' && jornada.objetivo ? jornada.objetivo : JORNADA_PADRAO.objetivo,
         minutos: Number.isFinite(minutos) && minutos > 0 ? minutos : JORNADA_PADRAO.minutos,
+        boss_index: Number.isInteger(bossIndex) && bossIndex >= 0 && bossIndex < BOSS_HP.length ? bossIndex : null,
     };
 }
 
@@ -88,10 +97,24 @@ export function jornadaState(daily, jornada, today) {
     }
 
     const progressMs = today >= j.inicio ? objectiveProgressMs(dayStats(daily, today), j.objetivo) : 0;
-    const maxHp = bossMaxHp(index, cycle);
+    const progressIndex = index;
+    const isManual = j.boss_index !== null;
+    const activeIndex = isManual ? j.boss_index : progressIndex;
+    const maxHp = bossMaxHp(activeIndex, cycle);
+    const hp = isManual && activeIndex !== progressIndex ? maxHp : Math.max(0, maxHp - hits.length);
+
     return {
         jornada: j,
-        current: { index, cycle, maxHp, hp: maxHp - hits.length, hits, since },
+        current: {
+            index: activeIndex,
+            progressIndex,
+            isManual,
+            cycle,
+            maxHp,
+            hp,
+            hits,
+            since,
+        },
         defeated,
         today: { day: today, progressMs, goalMs, pct: Math.min(100, (progressMs / goalMs) * 100), met: progressMs >= goalMs },
         combo: run,

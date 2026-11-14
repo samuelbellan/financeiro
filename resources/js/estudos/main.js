@@ -7,7 +7,7 @@ import {
 } from 'chart.js';
 import { playBossHitSound, playFocusEndSound, playLevelUpSound, playRestDueSound, playRestSoonSound } from './audio.js';
 import { AVATARS, AVATAR_LIMITES_MIN, avatarStage, avatarSvg } from './avatars.js';
-import { BOSSES, bossSvg } from './bosses.js';
+import { BOSSES, bossSvg, renderBossStage, renderBoss3D, renderBoss2D } from './bosses.js';
 import { ensureUser, getMeta, loadAll, saveLocal, saveLocalMany, setMeta, uuid } from './db.js';
 import { planImport } from './importer.js';
 import { BOSS_HP, cycleMark, JORNADA_PADRAO, jornadaState, normalizeJornada, objectiveProgressMs } from './jornada.js';
@@ -2006,10 +2006,11 @@ function bossCard() {
     const { current } = j;
     const boss = BOSSES[current.index];
     const fx = state.jornadaFx ? `fx-${state.jornadaFx}` : '';
+    const badge3d = boss.is3D ? '<span class="pill-3d">3D</span>' : '';
     return `<button type="button" class="boss-card ${fx}" data-action="goto-jornada" style="--boss:${boss.cor}">
         <span class="boss-mini">${bossSvg(current.index, { size: 72, hp: current.hp, maxHp: current.maxHp })}</span>
         <span class="boss-info">
-            <small>${bossLabel(current)} · ${esc(objectiveLabel(j.jornada.objetivo))} ${formatDuration(j.today.goalMs)}/dia</small>
+            <small>${bossLabel(current)} · ${esc(objectiveLabel(j.jornada.objetivo))} ${formatDuration(j.today.goalMs)}/dia ${badge3d}</small>
             <b>${esc(boss.nome)}</b>
             ${hpBar(current)}
             ${chargeBar(j)}
@@ -2018,6 +2019,7 @@ function bossCard() {
 
 function jornadaForm(j) {
     const minutos = j?.minutos ?? JORNADA_PADRAO.minutos;
+    const currentBoss = j?.boss_index;
     return `<form class="form" data-form="jornada">
         <label>O que conta para o golpe
             <select name="objetivo">${objectiveOptions(j?.objetivo ?? JORNADA_PADRAO.objetivo)}</select></label>
@@ -2027,6 +2029,12 @@ function jornadaForm(j) {
         <label>Contar a partir de
             <input type="date" name="inicio" value="${j?.inicio ?? today()}" max="${today()}" required>
             <small>Uma data passada faz os dias já estudados contarem como golpes. Mudar a data recomeça a jornada dali.</small></label>
+        <label>Boss ativo na arena
+            <select name="boss_index">
+                <option value="" ${currentBoss === null || currentBoss === undefined ? 'selected' : ''}>Automático (definido pela meta cumprida)</option>
+                ${BOSSES.map((b, i) => `<option value="${i}" ${currentBoss === i ? 'selected' : ''}>${String(b.numero).padStart(2, '0')}. ${esc(b.nome)} ${b.is3D ? '★ [3D]' : ''}</option>`).join('')}
+            </select>
+            <small>Você pode trocar de boss a qualquer momento sem perder os golpes registrados.</small></label>
         <button class="btn" type="submit">${j ? 'Salvar objetivo' : '⚔ Começar a jornada'}</button>
     </form>`;
 }
@@ -2059,19 +2067,36 @@ function renderJornada() {
         const isCurrent = i === current.index;
         const known = isCurrent || ko;
         const status = isCurrent ? `<b>${current.hp}/${current.maxHp} HP</b>` : ko ? `Derrotado ${formatDay(ko.day, { day: '2-digit', month: '2-digit' })}` : `${BOSS_HP[i]} HP`;
-        return `<li class="${isCurrent ? 'current' : ko ? 'defeated' : 'locked'}" style="--boss:${b.cor}">
-            ${bossSvg(i, { size: 64, defeated: !isCurrent && Boolean(ko), locked: !known, hp: isCurrent ? current.hp : null, maxHp: current.maxHp })}
-            <span class="name">${known ? esc(b.nome) : '???'}</span><small>${status}</small></li>`;
+        const badge3d = b.is3D ? '<span class="boss-badge-pill is-3d">3D</span>' : '<span class="boss-badge-pill is-2d">2D</span>';
+        return `<li class="${isCurrent ? 'current' : ko ? 'defeated' : 'locked'}" style="--boss:${b.cor}" data-action="inspect-boss" data-index="${i}" title="Clique para inspecionar ${esc(b.nome)}">
+            ${bossSvg(i, { size: 56, defeated: !isCurrent && Boolean(ko), locked: !known, hp: isCurrent ? current.hp : null, maxHp: current.maxHp })}
+            <span class="name">${known ? esc(b.nome) : `Boss ${b.numero}`}</span>
+            <div class="boss-map-meta">${badge3d} <small>${status}</small></div>
+        </li>`;
     }).join('');
 
     return `${victory}
         <section class="arena ${fx === 'hit' ? 'fx-hit' : ''} ${fx === 'ko' ? 'fx-enter' : ''}" style="--boss:${boss.cor}">
-            <p class="arena-tag">${bossLabel(current)}${current.cycle ? ` · ciclo ${current.cycle + 1}, bosses mais fortes` : ''}</p>
+            <div class="arena-header-controls">
+                <button type="button" class="btn-boss-nav" data-action="prev-boss" title="Boss anterior" aria-label="Boss anterior">‹</button>
+                <div class="arena-nav-center">
+                    <p class="arena-tag">${bossLabel(current)}${current.isManual ? ' · Escolha manual' : (current.cycle ? ` · ciclo ${current.cycle + 1}, bosses mais fortes` : '')}</p>
+                    <div class="boss-select-wrap">
+                        <select class="boss-picker-select" data-action="pick-boss" aria-label="Trocar boss da arena">
+                            ${BOSSES.map((b, i) => `<option value="${i}" ${i === current.index ? 'selected' : ''}>
+                                ${String(b.numero).padStart(2, '0')}. ${esc(b.nome)} ${b.is3D ? '★ [3D]' : ''}
+                            </option>`).join('')}
+                        </select>
+                    </div>
+                </div>
+                <button type="button" class="btn-boss-nav" data-action="next-boss" title="Próximo boss" aria-label="Próximo boss">›</button>
+            </div>
             <h2>${esc(boss.nome)}</h2>
             <p class="arena-title">${esc(boss.titulo)}</p>
+            ${current.isManual ? `<p class="arena-manual-alert"><span>Boss selecionado manualmente.</span> <button type="button" class="link" data-action="reset-boss-auto">Voltar para automático (Boss ${current.progressIndex + 1})</button></p>` : ''}
             <div class="arena-stage">
                 <p class="taunt">${esc(boss.fala)}</p>
-                <div class="arena-boss">${bossSvg(current.index, { size: 220, hp: current.hp, maxHp: current.maxHp })}</div>
+                <div class="arena-boss">${renderBossStage(boss, { hp: current.hp, maxHp: current.maxHp, fx })}</div>
                 ${fx === 'hit' ? '<span class="dmg" aria-hidden="true">−1</span>' : ''}
             </div>
             <div class="hp-row"><span>HP</span>${hpBar(current)}<b>${current.hp}/${current.maxHp}</b></div>
@@ -2133,6 +2158,46 @@ function openDialog(html, onSubmit) {
         render();
     });
     dialog.showModal();
+}
+
+function openBossInspectionDialog(boss, currentBossIndex = null) {
+    const is3d = boss.is3D;
+    const isCurrentlyActive = (boss.numero - 1) === currentBossIndex;
+    const body = is3d ? `
+        <div class="boss-dialog-viewer">
+            ${renderBoss3D(boss, { height: 280, cls: 'boss-detail-viewer' })}
+            <p class="center muted hint">Arraste para girar · Use toque ou scroll para aproximar</p>
+            <dl class="boss-specs">
+                <dt>Triângulos</dt><dd>${boss.triangulos ? boss.triangulos.toLocaleString('pt-BR') : '~40.000'}</dd>
+                <dt>Tamanho</dt><dd>${boss.tamanho_bytes ? (boss.tamanho_bytes / 1024 / 1024).toFixed(1) + ' MB' : '~1.2 MB'}</dd>
+                ${boss.observacao ? `<dt>Observação</dt><dd>${esc(boss.observacao)}</dd>` : ''}
+            </dl>
+        </div>` : `
+        <div class="boss-dialog-2d">
+            <div class="arena-2d-card" style="--boss:${boss.cor}">
+                <span class="boss-badge-2d">${String(boss.numero).padStart(2, '0')}</span>
+                <b>${esc(boss.nome)}</b>
+                <small>${esc(boss.ato)}</small>
+                <p class="muted">Ilustração original em 2D. Modelo 3D em geração pelo Hunyuan3D-2.</p>
+            </div>
+        </div>`;
+
+    const actionBtn = isCurrentlyActive
+        ? '<span class="boss-active-pill">✓ Boss atual na arena</span>'
+        : `<button type="button" class="btn" data-action="set-active-boss" data-index="${boss.numero - 1}">⚔ Definir como boss atual</button>`;
+
+    openDialog(`
+        <div class="boss-dialog-header" style="--boss:${boss.cor}">
+            <div class="eyebrow"><b>Boss ${String(boss.numero).padStart(2, '0')}</b> <span>${esc(boss.ato)}</span> ${is3d ? '<span class="boss-badge-pill is-3d">Modelo 3D</span>' : '<span class="boss-badge-pill is-2d">2D</span>'}</div>
+            <h2>${esc(boss.nome)}</h2>
+            ${boss.lore ? `<p class="lore">“${esc(boss.lore)}”</p>` : ''}
+        </div>
+        ${body}
+        <div class="actions center" style="margin-top:14px; gap:8px;">
+            ${actionBtn}
+            <button class="btn ghost" value="cancel" formnovalidate>Fechar</button>
+        </div>`,
+    () => {});
 }
 
 function colorPicker(current) {
@@ -2536,6 +2601,49 @@ root.addEventListener('click', async (event) => {
             if (confirm(`Excluir "${dday.titulo}"?`)) { await persist('ddays', { ...dday, deleted_at: iso(nowMs()) }); render(); }
         },
         'goto-jornada': () => { state.tab = 'jornada'; render(); window.scrollTo(0, 0); },
+        'inspect-boss': () => {
+            const idx = Number(button.dataset.index);
+            const b = BOSSES[idx];
+            const j = jornadaState(daily(), state.settings.jornada, today());
+            if (b) openBossInspectionDialog(b, j?.current?.index);
+        },
+        'prev-boss': async () => {
+            const j = state.settings.jornada;
+            if (!j) return;
+            const stateJornada = jornadaState(daily(), j, today());
+            const cur = stateJornada ? stateJornada.current.index : 0;
+            const nextIdx = (cur - 1 + BOSSES.length) % BOSSES.length;
+            await persist('settings', { ...state.settings, jornada: { ...j, boss_index: nextIdx } });
+            render();
+        },
+        'next-boss': async () => {
+            const j = state.settings.jornada;
+            if (!j) return;
+            const stateJornada = jornadaState(daily(), j, today());
+            const cur = stateJornada ? stateJornada.current.index : 0;
+            const nextIdx = (cur + 1) % BOSSES.length;
+            await persist('settings', { ...state.settings, jornada: { ...j, boss_index: nextIdx } });
+            render();
+        },
+        'set-active-boss': async () => {
+            const j = state.settings.jornada;
+            if (!j) return;
+            const idx = Number(button.dataset.index);
+            if (Number.isInteger(idx) && idx >= 0 && idx < BOSSES.length) {
+                dialog.close();
+                await persist('settings', { ...state.settings, jornada: { ...j, boss_index: idx } });
+                render();
+                root.querySelector('.arena')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        },
+        'reset-boss-auto': async () => {
+            const j = state.settings.jornada;
+            if (!j) return;
+            const updated = { ...j };
+            delete updated.boss_index;
+            await persist('settings', { ...state.settings, jornada: updated });
+            render();
+        },
         'sync-now': () => sync.syncNow(),
         'export-backup': () => exportBackup(),
         'api-token-create': () => createApiToken(),
@@ -2545,6 +2653,18 @@ root.addEventListener('click', async (event) => {
 });
 
 root.addEventListener('change', async (event) => {
+    const bossSelect = event.target.closest('[data-action="pick-boss"]');
+    if (bossSelect) {
+        const j = state.settings.jornada;
+        if (!j) return;
+        const val = bossSelect.value;
+        const idx = val === '' ? null : Number(val);
+        const updated = { ...j, boss_index: idx };
+        if (idx === null) delete updated.boss_index;
+        await persist('settings', { ...state.settings, jornada: updated });
+        render();
+        return;
+    }
     const projField = event.target.closest('[data-proj] [name]');
     if (projField) {
         const p = state.proj;
@@ -2600,7 +2720,11 @@ root.addEventListener('submit', async (event) => {
         const minutos = Math.round(Number(data.get('horas') || 0) * 60) + Number(data.get('minutos') || 0);
         if (minutos < 10 || minutos > 1440) return alert('O objetivo precisa ficar entre 10 minutos e 24 horas.');
         const inicio = String(data.get('inicio') || '') || state.settings.jornada?.inicio || today();
-        await persist('settings', { ...state.settings, jornada: { inicio, objetivo: String(data.get('objetivo') || 'total'), minutos } });
+        const rawBoss = data.get('boss_index');
+        const boss_index = rawBoss !== null && rawBoss !== '' ? Number(rawBoss) : null;
+        const jornada = { inicio, objetivo: String(data.get('objetivo') || 'total'), minutos };
+        if (boss_index !== null && Number.isInteger(boss_index)) jornada.boss_index = boss_index;
+        await persist('settings', { ...state.settings, jornada });
         state.jornadaMet = null;
     } else if (form.dataset.form === 'dday') {
         await persist('ddays', { id: uuid(), titulo: String(data.get('titulo')).trim(), data: String(data.get('data')), deleted_at: null, created_at: iso(nowMs()) });

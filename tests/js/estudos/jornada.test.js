@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { BOSSES, bossSvg } from '../../../resources/js/estudos/bosses.js';
+import { BOSSES, bossSvg, renderBoss2D, renderBoss3D, renderBossStage } from '../../../resources/js/estudos/bosses.js';
 import { BOSS_HP, bossMaxHp, jornadaState, normalizeJornada, objectiveProgressMs } from '../../../resources/js/estudos/jornada.js';
 import { addDays } from '../../../resources/js/estudos/metrics.js';
 
@@ -72,6 +72,21 @@ describe('jornadaState', () => {
         const state = jornadaState(dailyOf({ '2026-11-01': stats }), jornada({ objetivo: 'tipo:questoes', minutos: 120 }), '2026-11-01');
         expect(state.totalHits).toBe(1);
     });
+
+    it('permite escolher o boss manualmente (boss_index)', () => {
+        const base = jornada();
+        const auto = jornadaState(dailyOf({ '2026-11-01': 5 }), base, '2026-11-02');
+        expect(auto.current.index).toBe(0);
+        expect(auto.current.isManual).toBe(false);
+
+        // Escolhe o boss 6 (Cavaleiro Negro, índice 5) manualmente
+        const manual = jornadaState(dailyOf({ '2026-11-01': 5 }), { ...base, boss_index: 5 }, '2026-11-02');
+        expect(manual.current.index).toBe(5);
+        expect(manual.current.isManual).toBe(true);
+        expect(manual.current.progressIndex).toBe(0);
+        expect(manual.current.maxHp).toBe(BOSS_HP[5]);
+        expect(manual.current.hp).toBe(BOSS_HP[5]);
+    });
 });
 
 describe('bosses', () => {
@@ -92,5 +107,44 @@ describe('bosses', () => {
         expect(bossSvg(2, { hp: 7, maxHp: 7 })).not.toContain('b-slash');
         expect(bossSvg(3, { defeated: true })).toContain('is-defeated');
         expect(bossSvg(4, { locked: true })).toContain('Boss desconhecido');
+    });
+
+    it('progressão possui 31 bosses com 06, 07 e 22 em 3D e 28 pendentes em 2D', () => {
+        expect(BOSSES).toHaveLength(31);
+        expect(BOSS_HP).toHaveLength(31);
+
+        const prontoIndices = [5, 6, 21]; // bosses 6, 7 e 22 (base 0)
+        for (const idx of prontoIndices) {
+            const b = BOSSES[idx];
+            expect(b.status_3d).toBe('pronto');
+            expect(b.is3D).toBe(true);
+            expect(b.modelo).toMatch(/boss-\d+\.glb$/);
+            expect(b.orientacao_yaw_graus).toBe(60);
+
+            const html3d = renderBoss3D(b);
+            expect(html3d).toContain('<model-viewer');
+            expect(html3d).toContain('orientation="0deg 0deg 60deg"');
+            expect(html3d).toContain('loading="lazy"');
+            expect(html3d).toContain('camera-controls');
+
+            const stageHtml = renderBossStage(b);
+            expect(stageHtml).toContain('<model-viewer');
+        }
+
+        const pendentes = BOSSES.filter((_, i) => !prontoIndices.includes(i));
+        expect(pendentes).toHaveLength(28);
+        for (const b of pendentes) {
+            expect(b.status_3d).toBe('pendente');
+            expect(b.is3D).toBe(false);
+
+            const html2d = renderBoss2D(b);
+            expect(html2d).toContain('arena-2d-card');
+            expect(html2d).not.toContain('<model-viewer');
+            expect(html2d).toContain(b.nome);
+
+            const stageHtml = renderBossStage(b);
+            expect(stageHtml).not.toContain('<model-viewer');
+            expect(stageHtml).toContain('arena-2d-card');
+        }
     });
 });

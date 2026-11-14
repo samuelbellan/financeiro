@@ -83,7 +83,7 @@ self.addEventListener('fetch', (event) => {
 
     if (request.mode === 'navigate' && (url.pathname === SHELL || url.pathname === SHELL + '/')) {
         event.respondWith(shellResponse(request));
-    } else if (url.pathname.startsWith('/build/assets/') || STATIC.includes(url.pathname)) {
+    } else if (url.pathname.startsWith('/build/assets/') || url.pathname.startsWith('/bosses/') || STATIC.includes(url.pathname)) {
         event.respondWith(cacheFirst(request));
     }
 });

@@ -807,12 +807,164 @@ body.rest-over [data-live="rest"], body.rest-over [data-w-time] { color: var(--d
 @keyframes victory-in { 0% { transform: scale(.7); opacity: 0; } 100% { transform: none; opacity: 1; } }
 
 .boss-map { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
-.boss-map li { display: grid; justify-items: center; gap: 2px; padding: 8px 4px; text-align: center; border-radius: 12px; background: var(--card); border: 1px solid var(--border); }
+.boss-map li { display: grid; justify-items: center; gap: 2px; padding: 8px 4px; text-align: center; border-radius: 12px; background: var(--card); border: 1px solid var(--border); cursor: pointer; transition: transform .15s ease, border-color .15s ease; }
+.boss-map li:hover { transform: translateY(-2px); border-color: var(--boss); }
 .boss-map li { min-width: 0; }
 .boss-map li .name { font-size: .72rem; font-weight: 600; line-height: 1.15; white-space: normal; overflow: visible; max-width: 100%; overflow-wrap: break-word; hyphens: auto; }
 .boss-map li small { font-size: .68rem; color: var(--muted); }
 .boss-map li.current { border-color: var(--boss); box-shadow: 0 0 0 1px var(--boss); background: color-mix(in srgb, var(--boss) 12%, var(--card)); }
 .boss-map li.locked .name { color: var(--muted); }
+.boss-map-meta { display: flex; align-items: center; justify-content: center; gap: 4px; margin-top: 2px; }
+
+/* Controles de troca rápida de boss na Arena */
+.arena-header-controls {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 6px;
+}
+.btn-boss-nav {
+    background: color-mix(in srgb, var(--card) 85%, transparent);
+    border: 1px solid var(--border);
+    color: var(--text);
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    font-size: 1.2rem;
+    font-weight: 700;
+    cursor: pointer;
+    line-height: 1;
+    transition: transform .15s ease, border-color .15s ease, background .15s ease;
+    flex-shrink: 0;
+}
+.btn-boss-nav:hover {
+    border-color: var(--boss);
+    background: color-mix(in srgb, var(--boss) 18%, var(--card));
+    transform: scale(1.06);
+}
+.arena-nav-center {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    min-width: 0;
+}
+.boss-select-wrap select.boss-picker-select {
+    background: color-mix(in srgb, var(--card) 90%, transparent);
+    border: 1px solid color-mix(in srgb, var(--boss) 40%, var(--border));
+    color: var(--text);
+    font-family: inherit;
+    font-size: .82rem;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 99px;
+    cursor: pointer;
+    max-width: 250px;
+    text-overflow: ellipsis;
+    outline: none;
+    transition: border-color .15s ease;
+}
+.boss-select-wrap select.boss-picker-select:hover,
+.boss-select-wrap select.boss-picker-select:focus {
+    border-color: var(--boss);
+}
+.arena-manual-alert {
+    margin: 4px 0 0;
+    font-size: .76rem;
+    color: var(--muted);
+}
+.arena-manual-alert .link {
+    color: var(--primary);
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    font: inherit;
+    text-decoration: underline;
+}
+.boss-active-pill {
+    display: inline-block;
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: .84rem;
+    font-weight: 700;
+    background: color-mix(in srgb, #43AA8B 20%, var(--card));
+    color: #43AA8B;
+    border: 1px solid color-mix(in srgb, #43AA8B 40%, var(--border));
+}
+
+/* Model Viewer 3D e Palco */
+.arena-stage-model { display: flex; flex-direction: column; align-items: center; width: 100%; max-width: 340px; margin: 0 auto; }
+.arena-model-viewer {
+    width: 100%;
+    max-width: 320px;
+    height: 280px;
+    --poster-color: transparent;
+    background: radial-gradient(ellipse at 50% 80%, color-mix(in srgb, var(--boss, #5fb8ff) 24%, #12151B), #101318);
+    border-radius: 16px;
+    border: 1px solid color-mix(in srgb, var(--boss, #5fb8ff) 35%, var(--border));
+    box-shadow: 0 4px 16px rgb(0 0 0 / .2);
+    outline: none;
+}
+.model-hint { margin-top: 6px; font-size: .72rem; color: var(--muted); }
+
+/* Card 2D na Arena */
+.arena-2d-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    max-width: 290px;
+    min-height: 190px;
+    padding: 16px 14px;
+    border-radius: 16px;
+    background: radial-gradient(circle at 50% 40%, color-mix(in srgb, var(--boss, #5fb8ff) 16%, var(--card)), var(--card));
+    border: 1px dashed color-mix(in srgb, var(--boss, #5fb8ff) 40%, var(--border));
+    text-align: center;
+}
+.boss-badge-2d { font-size: 2.4rem; font-weight: 900; color: var(--boss, #5fb8ff); line-height: 1; margin-bottom: 4px; }
+.boss-name-2d { font-size: 1.05rem; font-weight: 700; margin-bottom: 2px; }
+.boss-act-2d { color: var(--muted); font-size: .74rem; text-transform: uppercase; letter-spacing: .04em; }
+.boss-lore-2d { margin: 8px 0 0; font-size: .84rem; font-style: italic; color: var(--text); opacity: .9; }
+.boss-2d-status { display: inline-block; margin-top: 10px; padding: 3px 10px; border-radius: 99px; font-size: .72rem; font-weight: 600; background: color-mix(in srgb, var(--boss, #5fb8ff) 15%, transparent); color: var(--boss, #5fb8ff); border: 1px solid color-mix(in srgb, var(--boss, #5fb8ff) 30%, transparent); }
+
+/* Badges e Pílulas */
+.pill-3d { display: inline-block; background: #3B82F6; color: #fff; font-size: .65rem; font-weight: 800; padding: 1px 5px; border-radius: 4px; vertical-align: middle; margin-left: 4px; letter-spacing: .05em; }
+.boss-badge-pill { display: inline-block; font-size: .62rem; font-weight: 800; padding: 1px 5px; border-radius: 4px; text-transform: uppercase; letter-spacing: .04em; }
+.boss-badge-pill.is-3d { background: #3B82F6; color: #fff; }
+.boss-badge-pill.is-2d { background: color-mix(in srgb, var(--muted) 20%, transparent); color: var(--muted); }
+
+/* Dialog de Inspeção do Boss */
+.boss-dialog-header { text-align: center; margin-bottom: 12px; }
+.boss-dialog-header .eyebrow { display: flex; align-items: center; justify-content: center; gap: 6px; font-size: .76rem; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 4px; }
+.boss-dialog-header .eyebrow b { font-size: 1rem; color: var(--boss, var(--primary)); }
+.boss-dialog-header h2 { margin: 2px 0 4px; font-size: 1.35rem; }
+.boss-dialog-header .lore { font-style: italic; color: var(--muted); font-size: .88rem; margin: 0; }
+.boss-dialog-viewer { display: flex; flex-direction: column; align-items: center; }
+.boss-detail-viewer {
+    width: 100%;
+    max-width: 340px;
+    height: 300px;
+    --poster-color: transparent;
+    background: radial-gradient(ellipse at 50% 80%, color-mix(in srgb, var(--boss, #5fb8ff) 26%, #12151B), #101318);
+    border-radius: 16px;
+    border: 1px solid color-mix(in srgb, var(--boss, #5fb8ff) 40%, var(--border));
+    outline: none;
+}
+.boss-specs { display: grid; grid-template-columns: auto 1fr; gap: 4px 12px; margin: 12px auto 0; font-size: .8rem; max-width: 300px; text-align: left; }
+.boss-specs dt { color: var(--muted); font-weight: 500; }
+.boss-specs dd { margin: 0; font-weight: 600; font-variant-numeric: tabular-nums; }
+.boss-dialog-2d { display: flex; justify-content: center; padding: 12px 0; }
+
+@media (max-width: 480px) {
+    .boss-map { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
+    .boss-map li { padding: 6px 2px; }
+    .arena-model-viewer, .boss-detail-viewer { max-width: 280px; height: 240px; }
+}
 .form .hm { display: flex; align-items: center; gap: 6px; }
 .form .hm input { width: 5.5em; }
 
