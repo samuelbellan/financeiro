@@ -102,7 +102,7 @@ class EstudosGurujaTest extends TestCase
         $this->assertSame(1, DB::table('study_guruja_comandos')->count());
 
         $outro = User::factory()->create();
-        $this->actingAs($outro)->getJson('/estudos/guruja')->assertOk()->assertExactJson(['meta' => null, 'ordem' => null, 'feitas' => [], 'atualizar_disponivel' => false, 'lido_em' => null, 'comandos' => []]);
+        $this->actingAs($outro)->getJson('/estudos/guruja')->assertOk()->assertJson(['meta' => null, 'ordem' => null, 'feitas' => [], 'atualizar_disponivel' => false, 'lido_em' => null, 'comandos' => [], 'mcp_conectado' => false]);
     }
 
     public function test_sem_resposta_do_gemini_salva_so_o_comando(): void

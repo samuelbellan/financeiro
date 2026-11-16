@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Services\GurujaComandoResumoService;
+use App\Services\GurujaMcpService;
 use App\Services\StudySyncService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -39,7 +40,7 @@ class EstudosController extends Controller
     /**
      * Última foto da meta atual da Guruja (ou null se nunca foi enviada).
      */
-    public function guruja(): JsonResponse
+    public function guruja(GurujaMcpService $mcpService): JsonResponse
     {
         $row = DB::table('study_guruja_metas')->where('user_id', Auth::id())->first();
         $comandos = DB::table('study_guruja_comandos')->where('user_id', Auth::id())
@@ -48,6 +49,7 @@ class EstudosController extends Controller
 
         $meta = $row ? json_decode($row->payload, true) : null;
         $ordem = DB::table('study_guruja_ordens')->where('user_id', Auth::id())->first();
+        $mcpConectado = $mcpService->isConnected(Auth::id());
 
         return response()->json([
             'meta' => $meta,
@@ -56,7 +58,10 @@ class EstudosController extends Controller
             // Marcadas como feitas no card ("✓ Concluí"), só as da meta atual.
             'feitas' => $meta ? DB::table('study_guruja_feitas')->where('user_id', Auth::id())
                 ->where('target_id', (int) ($meta['target_id'] ?? 0))->orderBy('id')->pluck('codigo')->all() : [],
-            'atualizar_disponivel' => (bool) (config('services.guruja_sync.fire_url') && config('services.guruja_sync.fire_token')),
+            'atualizar_disponivel' => $mcpConectado || (bool) (config('services.guruja_sync.fire_url') && config('services.guruja_sync.fire_token')),
+            'mcp_conectado' => $mcpConectado,
+            'mcp_auth_url' => route('estudos.guruja.auth'),
+            'mcp_desconectar_url' => route('estudos.guruja.desconectar'),
             'lido_em' => $row?->lido_em ? Carbon::parse($row->lido_em)->utc()->format('Y-m-d\\TH:i:s\\Z') : null,
             'comandos' => (object) $comandos->all(),
         ]);
@@ -130,15 +135,36 @@ class EstudosController extends Controller
     }
 
     /**
-     * Botão "Atualizar" do card: dispara a tarefa agendada do Claude que lê a Guruja (gatilho de API). O card
-     * percebe a atualização quando o lido_em da meta muda. Um disparo a cada 2 minutos, no máximo.
+     * Botão "Atualizar" do card: se conectado via MCP (https://mcp.guruja.com.br/mcp),
+     * busca as metas instantaneamente. Caso contrário, dispara a rotina externa se configurada.
      */
-    public function gurujaAtualizar(): JsonResponse
+    public function gurujaAtualizar(GurujaMcpService $mcpService): JsonResponse
     {
+        if ($mcpService->isConnected(Auth::id())) {
+            try {
+                $meta = $mcpService->fetchCurrentMeta(Auth::id());
+
+                return response()->json([
+                    'ok' => true,
+                    'via_mcp' => true,
+                    'meta' => $meta,
+                    'lido_em' => now()->utc()->format('Y-m-d\\TH:i:s\\Z'),
+                ]);
+            } catch (\Throwable $e) {
+                Log::warning('Atualização via Guruja MCP falhou: ' . $e->getMessage());
+
+                return response()->json([
+                    'message' => 'Falha ao sincronizar com a Guruja: ' . $e->getMessage(),
+                ], 502);
+            }
+        }
+
         $url = config('services.guruja_sync.fire_url');
         $token = config('services.guruja_sync.fire_token');
         if (!$url || !$token) {
-            return response()->json(['message' => 'Atualização sob demanda não configurada (GURUJA_SYNC_FIRE_URL e GURUJA_SYNC_FIRE_TOKEN no Render).'], 503);
+            return response()->json([
+                'message' => 'Guruja não conectada. Conecte sua conta via OAuth ou cole o JSON manualmente.',
+            ], 503);
         }
         $key = 'guruja-atualizar:' . Auth::id();
         if ($desde = Cache::get($key)) {
@@ -163,6 +189,91 @@ class EstudosController extends Controller
         Cache::put($key, $agora, now()->addMinutes(2));
 
         return response()->json(['ok' => true, 'disparado_em' => $agora]);
+    }
+
+    /**
+     * Inicia autorização OAuth PKCE com o conector da Guruja.
+     */
+    public function gurujaAuth(Request $request, GurujaMcpService $mcpService)
+    {
+        $redirectUri = route('estudos.guruja.callback');
+        $authUrl = $mcpService->buildAuthUrl(Auth::id(), $redirectUri);
+
+        return redirect()->away($authUrl);
+    }
+
+    /**
+     * Callback do OAuth da Guruja: recebe o code, troca pelo token e tenta a primeira sincronização.
+     */
+    public function gurujaCallback(Request $request, GurujaMcpService $mcpService)
+    {
+        $code = $request->input('code');
+        $state = $request->input('state');
+        $error = $request->input('error') ?? $request->input('error_description');
+
+        if ($error) {
+            return redirect()->to(route('estudos.index') . '#guruja-erro=' . urlencode($error));
+        }
+
+        if (!$code || !$state) {
+            return redirect()->to(route('estudos.index') . '#guruja-erro=' . urlencode('Parâmetros de autorização incompletos.'));
+        }
+
+        try {
+            $mcpService->handleCallback($code, $state);
+
+            try {
+                $mcpService->fetchCurrentMeta(Auth::id());
+            } catch (\Throwable $e) {
+                Log::info('Conexão Guruja concluída, mas primeira busca falhou: ' . $e->getMessage());
+            }
+
+            return redirect()->to(route('estudos.index') . '#guruja-conectado');
+        } catch (\Throwable $e) {
+            Log::warning('Erro no callback OAuth da Guruja: ' . $e->getMessage());
+
+            return redirect()->to(route('estudos.index') . '#guruja-erro=' . urlencode($e->getMessage()));
+        }
+    }
+
+    /**
+     * Desconecta a conta Guruja e remove tokens salvos.
+     */
+    public function gurujaDesconectar(GurujaMcpService $mcpService): JsonResponse
+    {
+        $mcpService->disconnect(Auth::id());
+
+        return response()->json(['ok' => true]);
+    }
+
+    /**
+     * Atualização manual: o usuário cola o JSON da meta ou de atividades diretamente no card.
+     */
+    public function gurujaImportar(Request $request, GurujaMcpService $mcpService): JsonResponse
+    {
+        $raw = $request->input('payload') ?? $request->input('json') ?? $request->getContent();
+        if (is_string($raw)) {
+            $data = json_decode($raw, true);
+        } else {
+            $data = $raw;
+        }
+
+        if (!is_array($data)) {
+            return response()->json(['message' => 'O payload fornecido não é um JSON válido.'], 422);
+        }
+
+        $meta = $mcpService->normalizeMetaPayload($data);
+        if (empty($meta['atividades']) && empty($meta['reforcos'])) {
+            return response()->json(['message' => 'Nenhuma atividade ou reforço foi identificado no JSON fornecido.'], 422);
+        }
+
+        $mcpService->saveMetaToDatabase(Auth::id(), $meta, now());
+
+        return response()->json([
+            'ok' => true,
+            'meta' => $meta,
+            'lido_em' => now()->utc()->format('Y-m-d\\TH:i:s\\Z'),
+        ]);
     }
 
     public function sync(Request $request, StudySyncService $service): JsonResponse

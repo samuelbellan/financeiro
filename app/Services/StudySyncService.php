@@ -130,6 +130,8 @@ class StudySyncService
                         $fail('Tipo de estudo inválido.');
                     }
                 }],
+                'reforco_limite_min' => 'nullable|integer|min:1|max:240',
+                'reforco_grau' => 'nullable|in:leve,medio,intenso',
                 'device_id' => 'nullable|uuid',
                 'deleted_at' => 'nullable|date',
             ]);
@@ -176,6 +178,8 @@ class StudySyncService
                 'status' => $data['status'],
                 'observacao' => $data['observacao'] ?? null,
                 'tipo' => $data['tipo'] ?? null,
+                'reforco_limite_min' => $data['reforco_limite_min'] ?? null,
+                'reforco_grau' => $data['reforco_grau'] ?? null,
                 'device_id' => $data['device_id'] ?? $deviceId,
             ], $deleted];
             // Sessões importadas têm horários fictícios: não geram conflito.
@@ -221,6 +225,10 @@ class StudySyncService
             'avatar' => ['nullable', 'string', 'max:40', 'regex:/^[a-z0-9-]+$/'],
             'retro_sound' => 'nullable|boolean',
             'descanso_min' => 'nullable|integer|min:1|max:240',
+            'reforco_leve_min' => 'nullable|integer|min:1|max:240',
+            'reforco_medio_min' => 'nullable|integer|min:1|max:240',
+            'reforco_intenso_min' => 'nullable|integer|min:1|max:240',
+            'reforco_padrao_grau' => 'nullable|in:leve,medio,intenso',
             'tema' => 'nullable|in:auto,claro,escuro,floresta,lavanda,areia,contraste',
             'jornada' => 'nullable|array:inicio,objetivo,minutos',
             'jornada.inicio' => 'required_with:jornada|date_format:Y-m-d',
@@ -242,6 +250,10 @@ class StudySyncService
                 'avatar' => $data['avatar'] ?? 'bichinho',
                 'retro_sound' => (bool) ($data['retro_sound'] ?? false),
                 'descanso_min' => $data['descanso_min'] ?? null,
+                'reforco_leve_min' => $data['reforco_leve_min'] ?? null,
+                'reforco_medio_min' => $data['reforco_medio_min'] ?? null,
+                'reforco_intenso_min' => $data['reforco_intenso_min'] ?? null,
+                'reforco_padrao_grau' => $data['reforco_padrao_grau'] ?? null,
                 'tema' => $data['tema'] ?? 'auto',
                 'jornada' => empty($data['jornada']) ? null : json_encode([
                     'inicio' => $data['jornada']['inicio'],
@@ -400,7 +412,7 @@ class StudySyncService
                 $row[$col] = $row[$col] === null ? null : Carbon::parse($row[$col], 'UTC')->format('Y-m-d\TH:i:s.v\Z');
             }
         }
-        foreach (['ordem', 'virada_hora', 'limite_suspeita_min', 'meta_diaria_min', 'descanso_min', 'alvo_horas'] as $col) {
+        foreach (['ordem', 'virada_hora', 'limite_suspeita_min', 'meta_diaria_min', 'descanso_min', 'alvo_horas', 'reforco_leve_min', 'reforco_medio_min', 'reforco_intenso_min', 'reforco_limite_min'] as $col) {
             if (isset($row[$col])) {
                 $row[$col] = (int) $row[$col];
             }

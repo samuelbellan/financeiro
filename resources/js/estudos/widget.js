@@ -3,7 +3,10 @@
 // O relógio roda dentro da janela do widget: ela fica visível, então o Chrome não desacelera o timer
 // mesmo com o app minimizado.
 
-import { buildDaily, dayBounds, dayStats, formatDuration, lastStopped, restAlertStage, restMaxGapMs, studyDayOf, toMs } from './metrics.js';
+import {
+    buildDaily, dayBounds, dayStats, formatDuration, isReforcoSession, lastStopped,
+    reforcoAlertStage, reforcoLimitMinutes, restAlertStage, restMaxGapMs, studyDayOf, toMs,
+} from './metrics.js';
 
 // Altura útil do conteúdo; o Chrome desconta ~56 px da altura pedida para a própria barra da janela.
 const SIZE = { width: 260, height: 100 };
@@ -28,7 +31,22 @@ export function widgetView({ sessions, subjects, settings }, nowMs) {
 
     const running = live.find((s) => !s.fim);
     if (running) {
-        return { mode: 'running', subject: subjectOf(running.subject_id), subjectId: running.subject_id, sessionMs: nowMs - toMs(running.inicio), todayMs };
+        const isRef = isReforcoSession(running);
+        const reforcoGrau = running.reforco_grau ?? settings?.reforco_padrao_grau ?? 'medio';
+        const reforcoLimitMin = isRef ? (running.reforco_limite_min ?? reforcoLimitMinutes(settings, reforcoGrau)) : null;
+        const sessionMs = nowMs - toMs(running.inicio);
+        const reforcoAlert = reforcoLimitMin ? reforcoAlertStage(sessionMs, reforcoLimitMin) : 'none';
+        return {
+            mode: 'running',
+            subject: subjectOf(running.subject_id),
+            subjectId: running.subject_id,
+            sessionMs,
+            todayMs,
+            isReforco: isRef,
+            reforcoGrau,
+            reforcoLimitMin,
+            reforcoAlert,
+        };
     }
 
     let last = null;
@@ -66,9 +84,12 @@ export function createWidget({ getState, onToggle, onClose, onTick, onInteract }
 
     function shape(view, hint) {
         const color = view.mode === 'running' ? (view.subject?.cor ?? '#888') : 'var(--muted)';
-        const name = view.mode === 'running'
+        let name = view.mode === 'running'
             ? (view.subject?.nome ?? 'Matéria')
             : (view.mode === 'rest' ? `Descanso${view.restLimitMs ? ` · ${view.restLimitMs / 60_000} min` : ''}` : 'Pronto para estudar');
+        if (view.mode === 'running' && view.isReforco && view.reforcoLimitMin) {
+            name = `${name} · Reforço (${view.reforcoLimitMin}m)`;
+        }
         let button;
         if (view.mode === 'running') {
             button = `<button type="button" class="w-btn" data-w="toggle" data-id="${esc(view.subjectId)}">⏸ Parar</button>`;
@@ -90,13 +111,21 @@ export function createWidget({ getState, onToggle, onClose, onTick, onInteract }
         if (!win) return;
         win.document.documentElement.dataset.theme = document.documentElement.dataset.theme ?? 'auto';
         const view = widgetView(getState(), Date.now());
-        const key = [view.mode, view.subjectId, view.resumeId, view.subject?.nome, view.subject?.cor, view.restLimitMs].join('|');
+        const key = [
+            view.mode, view.subjectId, view.resumeId, view.subject?.nome, view.subject?.cor,
+            view.restLimitMs, view.isReforco, view.reforcoLimitMin,
+        ].join('|');
         if (key !== shapeKey) {
             shapeKey = key;
             win.document.body.innerHTML = shape(view, win.showHint);
         }
         const time = view.mode === 'running' ? view.sessionMs : view.restMs;
-        win.document.querySelector('[data-w-time]').textContent = time === null ? '--:--:--' : formatDuration(time, { seconds: true });
+        const timeEl = win.document.querySelector('[data-w-time]');
+        if (timeEl) {
+            const isOver = Boolean(view.isReforco && view.reforcoLimitMin && view.sessionMs >= view.reforcoLimitMin * 60_000);
+            timeEl.classList.toggle('reforco-overdue', isOver);
+            timeEl.textContent = time === null ? '--:--:--' : formatDuration(time, { seconds: true });
+        }
         win.document.querySelector('[data-w-today]').textContent = formatDuration(view.todayMs);
     }
 

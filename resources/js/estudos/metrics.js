@@ -24,6 +24,10 @@ export const DEFAULT_SETTINGS = Object.freeze({
     tema: 'auto',
     jornada: null, // { inicio, objetivo, minutos }: ver jornada.js
     alvo_horas: null,
+    reforco_leve_min: 10,
+    reforco_medio_min: 20,
+    reforco_intenso_min: 30,
+    reforco_padrao_grau: 'medio',
 });
 
 /** Tipos de estudo da sessão (mesma lista de StudySyncService::SESSION_TYPES). Sessão sem tipo conta como NO_TYPE. */
@@ -617,6 +621,59 @@ export function restAlertStage(restMs, descansoMin) {
     if (restMs >= limit + REST_ALERT_MS) return 'over';
     if (restMs >= limit) return 'due';
     if (descansoMin >= 2 && restMs >= limit - REST_WARN_MS) return 'soon';
+    return 'none';
+}
+
+/** Graus de reforço recomendados (minutos padrão). */
+export const REFORCO_GRAUS = Object.freeze({
+    leve: 10,
+    medio: 20,
+    intenso: 30,
+});
+
+/** Antecedência do aviso sutil de término do reforço (1 min). */
+export const REFORCO_WARN_MS = 60_000;
+/** Duração do aviso de teto do reforço (30 s). */
+export const REFORCO_ALERT_MS = 30_000;
+
+export function reforcoLimitMinutes(settings, grau = 'medio') {
+    const key = `reforco_${grau}_min`;
+    const configured = settings?.[key];
+    if (configured && Number(configured) > 0) return Number(configured);
+    return REFORCO_GRAUS[grau] ?? 20;
+}
+
+export function detectGurujaReforcoGrau(reforco) {
+    if (!reforco) return 'medio';
+    const text = `${reforco.titulo ?? ''} ${reforco.instrucao ?? ''}`
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .toLowerCase();
+
+    if (/\b(leve|curto|rapido|10\s*min|10m)\b/.test(text)) return 'leve';
+    if (/\b(intenso|pesado|profundo|dificil|30\s*min|30m)\b/.test(text)) return 'intenso';
+    if (/\b(medio|moderado|padrao|20\s*min|20m)\b/.test(text)) return 'medio';
+
+    const q = Number(reforco.questoes_resolvidas ?? reforco.questoes ?? 0);
+    if (q > 0 && q <= 5) return 'leve';
+    if (q >= 15) return 'intenso';
+
+    return 'medio';
+}
+
+export function isReforcoSession(session) {
+    if (!session) return false;
+    if (session.reforco_limite_min || session.reforco_grau) return true;
+    const name = studyTypeName(session.tipo)?.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+    return name === 'reforco';
+}
+
+export function reforcoAlertStage(sessionMs, limitMin) {
+    if (!limitMin || sessionMs === null || sessionMs === undefined || sessionMs < 0) return 'none';
+    const limit = limitMin * MIN;
+    if (sessionMs >= limit + REFORCO_ALERT_MS) return 'over';
+    if (sessionMs >= limit) return 'due';
+    if (limitMin >= 2 && sessionMs >= limit - REFORCO_WARN_MS) return 'soon';
     return 'none';
 }
 

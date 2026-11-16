@@ -33,6 +33,24 @@ describe('widgetView', () => {
         expect(view.subjectId).toBe('cont');
         expect(view.sessionMs).toBe(30 * M);
         expect(view.todayMs).toBe(H + 30 * M);
+        expect(view.isReforco).toBe(false);
+    });
+
+    it('sessão de reforço rodando: identifica reforço, grau, limite e alerta', () => {
+        const sessions = [
+            session('cont', '2026-10-31T14:00:00', null, { tipo: 'x:Reforço', reforco_grau: 'medio', reforco_limite_min: 20 }),
+        ];
+        const at19m = widgetView({ sessions, subjects, settings }, at('2026-10-31T14:19:00'));
+        expect(at19m.isReforco).toBe(true);
+        expect(at19m.reforcoGrau).toBe('medio');
+        expect(at19m.reforcoLimitMin).toBe(20);
+        expect(at19m.reforcoAlert).toBe('soon');
+
+        const at20m = widgetView({ sessions, subjects, settings }, at('2026-10-31T14:20:00'));
+        expect(at20m.reforcoAlert).toBe('due');
+
+        const at21m = widgetView({ sessions, subjects, settings }, at('2026-10-31T14:21:00'));
+        expect(at21m.reforcoAlert).toBe('over');
     });
 
     it('descanso: tempo desde a última sessão e retomar a mesma matéria', () => {

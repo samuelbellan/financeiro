@@ -303,6 +303,43 @@ class StudySyncTest extends TestCase
         $this->sync(['settings' => $base + ['descanso_min' => 0]])->assertOk()->assertJsonPath('rejected.0.type', 'settings');
     }
 
+    public function test_settings_store_reforco_limits(): void
+    {
+        $base = ['virada_hora' => 3, 'limite_suspeita_min' => 180, 'timezone' => 'America/Sao_Paulo'];
+        $reforco = [
+            'reforco_leve_min' => 12,
+            'reforco_medio_min' => 22,
+            'reforco_intenso_min' => 35,
+            'reforco_padrao_grau' => 'intenso',
+        ];
+
+        $this->sync(['settings' => $base + $reforco])
+            ->assertOk()
+            ->assertJsonPath('changes.settings.reforco_leve_min', 12)
+            ->assertJsonPath('changes.settings.reforco_medio_min', 22)
+            ->assertJsonPath('changes.settings.reforco_intenso_min', 35)
+            ->assertJsonPath('changes.settings.reforco_padrao_grau', 'intenso');
+
+        $this->sync(['settings' => $base + ['reforco_leve_min' => 0]])->assertOk()->assertJsonPath('rejected.0.type', 'settings');
+        $this->sync(['settings' => $base + ['reforco_padrao_grau' => 'gigante']])->assertOk()->assertJsonPath('rejected.0.type', 'settings');
+    }
+
+    public function test_session_stores_reforco_fields(): void
+    {
+        $subject = $this->makeSubject();
+        $session = $this->makeSession($subject['id'], [
+            'tipo' => 'x:Reforço',
+            'reforco_limite_min' => 20,
+            'reforco_grau' => 'medio',
+        ]);
+
+        $this->sync(['subjects' => [$subject], 'sessions' => [$session]])
+            ->assertOk()
+            ->assertJsonPath('rejected', [])
+            ->assertJsonPath('changes.sessions.0.reforco_limite_min', 20)
+            ->assertJsonPath('changes.sessions.0.reforco_grau', 'medio');
+    }
+
     public function test_settings_store_theme(): void
     {
         $base = ['virada_hora' => 3, 'limite_suspeita_min' => 180, 'timezone' => 'America/Sao_Paulo'];

@@ -21,7 +21,7 @@ import {
     addDays, allTimeStats, buildDaily, compareWithPrevious, comparisonSeries, dayBounds, dayGaps, dayStats, daysUntil, findOverlaps,
     formatClock, formatDuration, heatLevel, monthsBetween, hourProfile, isSuspicious, lastStopped, lastTypeFor, localInputToMs, customTypes, CUSTOM_TYPE_MAX, typeIdFromName, NO_TYPE, STUDY_TYPES, studyTypeName, monthRange, msToLocalInput,
     quarterWeeks, rangeStats, restAlertStage, restMaxGapMs, streak, studyDayOf, studyVsOther, timelineBlocks, toMs, trendBuckets, weekdayAverages,
-    weekRange, yearMonths,
+    weekRange, yearMonths, detectGurujaReforcoGrau, isReforcoSession, reforcoLimitMinutes, reforcoAlertStage, REFORCO_GRAUS,
 } from './metrics.js';
 
 Chart.register(
@@ -70,7 +70,7 @@ const widget = createWidget({
     getState: () => state,
     onToggle: (subjectId) => toggleSubject(subjectId),
     onClose: () => { sync?.setFast(false); renderWidgetButton(); },
-    onTick: () => checkRestAlert(),
+    onTick: () => { checkRestAlert(); checkReforcoAlert(); },
     onInteract: () => dismissRestAlert(),
 });
 
@@ -195,7 +195,7 @@ function openSessionNoteDialog(session) {
     });
 }
 
-async function toggleSubject(subjectId, tipo = null) {
+async function toggleSubject(subjectId, tipo = null, extra = {}) {
     const at = nowMs();
     const running = runningSession();
     if (running) {
@@ -204,6 +204,11 @@ async function toggleSubject(subjectId, tipo = null) {
         openSessionNoteDialog(stopped);
         if (running.subject_id === subjectId) return render();
     }
+    const isRef = (tipo && studyTypeName(tipo)?.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase() === 'reforco')
+        || Boolean(extra.reforco_limite_min);
+    const reforcoGrau = isRef ? (extra.reforco_grau ?? state.settings?.reforco_padrao_grau ?? 'medio') : null;
+    const reforcoLimitMin = isRef ? (extra.reforco_limite_min ?? reforcoLimitMinutes(state.settings, reforcoGrau)) : null;
+
     await persist('sessions', {
         id: uuid(),
         subject_id: subjectId,
@@ -212,6 +217,8 @@ async function toggleSubject(subjectId, tipo = null) {
         origem: 'timer',
         status: 'ok',
         tipo,
+        reforco_grau: reforcoGrau,
+        reforco_limite_min: reforcoLimitMin,
         device_id: await getMeta('device_id'),
         deleted_at: null,
         created_at: iso(at),
@@ -342,6 +349,39 @@ function dismissRestAlert() {
     checkRestAlert();
 }
 
+const reforcoAlert = { sessionId: null, stage: 'none', notified: null };
+
+function checkReforcoAlert() {
+    const running = runningSession();
+    if (!running || !isReforcoSession(running)) {
+        if (reforcoAlert.sessionId) Object.assign(reforcoAlert, { sessionId: null, stage: 'none', notified: null });
+        const classes = { 'reforco-soon': false, 'reforco-due': false, 'reforco-over': false };
+        for (const [name, on] of Object.entries(classes)) document.body.classList.toggle(name, on);
+        widget.setClasses(classes);
+        return;
+    }
+    const id = running.id;
+    const elapsedMs = nowMs() - toMs(running.inicio);
+    const limitMin = running.reforco_limite_min ?? reforcoLimitMinutes(state.settings, running.reforco_grau ?? 'medio');
+    const stage = reforcoAlertStage(elapsedMs, limitMin);
+    if (id !== reforcoAlert.sessionId) Object.assign(reforcoAlert, { sessionId: id, stage: 'none', notified: null });
+    if (stage !== reforcoAlert.stage) {
+        reforcoAlert.stage = stage;
+        const key = `${id}:${stage}`;
+        if ((stage === 'soon' || stage === 'due') && reforcoAlert.notified !== key) {
+            reforcoAlert.notified = key;
+            if (stage === 'due') playFocusEndSound(); else playRestSoonSound();
+        }
+    }
+    const classes = {
+        'reforco-soon': reforcoAlert.stage === 'soon',
+        'reforco-due': reforcoAlert.stage === 'due',
+        'reforco-over': reforcoAlert.stage === 'due' || reforcoAlert.stage === 'over',
+    };
+    for (const [name, on] of Object.entries(classes)) document.body.classList.toggle(name, on);
+    widget.setClasses(classes);
+}
+
 const restLimitText = () => (state.settings?.descanso_min ? ` / ${state.settings.descanso_min} min` : '');
 
 function nextStageText(nextInMs) {
@@ -425,10 +465,35 @@ function renderFocus() {
         panel.innerHTML = renderStudyRoom(running, rest, subject) + switcher;
         return;
     }
+    const isRef = running && isReforcoSession(running);
+    let focusLabelHtml = '<p class="focus-label">Focando</p>';
+    let reforcoChipsHtml = '';
+    let reforcoProgressHtml = '';
+    if (isRef) {
+        const reforcoGrau = running.reforco_grau ?? state.settings?.reforco_padrao_grau ?? 'medio';
+        const limitMin = running.reforco_limite_min ?? reforcoLimitMinutes(state.settings, reforcoGrau);
+        const leveMin = reforcoLimitMinutes(state.settings, 'leve');
+        const medioMin = reforcoLimitMinutes(state.settings, 'medio');
+        const intensoMin = reforcoLimitMinutes(state.settings, 'intenso');
+        focusLabelHtml = `<p class="focus-label">Reforço · máx ${limitMin} min</p>`;
+        reforcoChipsHtml = `
+            <div class="focus-reforco-chips">
+                <button type="button" class="reforco-chip ${reforcoGrau === 'leve' ? 'active' : ''}" data-action="focus-reforco-grau" data-grau="leve">Leve (${leveMin}m)</button>
+                <button type="button" class="reforco-chip ${reforcoGrau === 'medio' ? 'active' : ''}" data-action="focus-reforco-grau" data-grau="medio">Médio (${medioMin}m)</button>
+                <button type="button" class="reforco-chip ${reforcoGrau === 'intenso' ? 'active' : ''}" data-action="focus-reforco-grau" data-grau="intenso">Intenso (${intensoMin}m)</button>
+            </div>`;
+        reforcoProgressHtml = `
+            <div class="focus-reforco-track" title="Progresso do reforço">
+                <div class="focus-reforco-bar" data-live="reforco-bar" style="width: 0%"></div>
+            </div>
+            <p class="focus-reforco-over" data-live="reforco-over" hidden></p>`;
+    }
     panel.innerHTML = switcher + (running ? `
         <button type="button" class="focus-close" data-action="focus-close" aria-label="Sair do modo foco">✕</button>
         ${avatarBlock(todayTotals().totalMs, 150, false)}
-        <p class="focus-label">Focando</p>
+        ${focusLabelHtml}
+        ${reforcoChipsHtml}
+        ${reforcoProgressHtml}
         <p class="focus-time" data-live="session">--</p>
         <div class="focus-sub">
             <div><small><span class="dot"></span>${esc(subject?.nome ?? 'Matéria')}</small><b data-live="current-subject">--</b></div>
@@ -708,7 +773,7 @@ function renderTimer() {
 // O servidor guarda a última foto da meta em andamento (enviada por uma rotina que lê a Guruja).
 // O app busca ao abrir, a cada 5 min e ao voltar para a aba; sem rede, mostra a última foto salva.
 const GURUJA_REFRESH_MS = 5 * 60_000;
-const guruja = { data: null, fetchedAt: 0, loading: false, showDone: false, open: new Set(), summarizing: new Set(), resumindo: null, subjectMap: {}, atualizando: null };
+const guruja = { data: null, fetchedAt: 0, loading: false, showDone: false, open: new Set(), summarizing: new Set(), resumindo: null, subjectMap: {}, atualizando: null, reforcoGraus: {} };
 
 async function refreshGuruja(force = false) {
     if (!config.gurujaUrl || guruja.loading) return;
@@ -804,14 +869,24 @@ async function postGuruja(url, body) {
     return response.json();
 }
 
-/** ↻ Atualizar: pede ao servidor para disparar a leitura da Guruja e espera a meta nova chegar (até 5 min). */
+/** ↻ Atualizar: pede ao servidor para atualizar as metas via MCP da Guruja ou rotina externa. */
 async function gurujaAtualizar() {
     if (guruja.atualizando) return;
     const antes = guruja.data?.lido_em ?? null;
     guruja.atualizando = { inicio: nowMs() };
     render();
     try {
-        await postGuruja(config.gurujaAtualizarUrl, {});
+        const res = await postGuruja(config.gurujaAtualizarUrl, {});
+        if (res?.meta) {
+            guruja.data = guruja.data ?? {};
+            guruja.data.meta = res.meta;
+            guruja.data.lido_em = res.lido_em ?? new Date().toISOString();
+            guruja.data.mcp_conectado = true;
+            guruja.atualizando = null;
+            await setMeta('guruja', guruja.data);
+            render();
+            return;
+        }
     } catch (error) {
         guruja.atualizando = null;
         render();
@@ -831,6 +906,56 @@ async function gurujaAtualizar() {
         setTimeout(poll, 10_000);
     };
     setTimeout(poll, 15_000);
+}
+
+function openGurujaImportDialog() {
+    openDialog(`
+        <h3>Importar Atividades da Guruja</h3>
+        <p class="muted small">Cole o JSON completo da meta ou lista de tarefas da Guruja para atualizar as atividades manualmente.</p>
+        <p class="form-error" role="alert"></p>
+        <label>JSON da Meta / Atividades
+            <textarea name="payload" rows="8" placeholder='{"target_id": 123, "atividades": [...]}' required style="font-family:monospace;font-size:12px;width:100%;box-sizing:border-box;"></textarea>
+        </label>
+        <div class="actions">
+            <button class="btn ghost" type="submit" value="cancel">Cancelar</button>
+            <button class="btn" type="submit" value="import">Importar Atividades</button>
+        </div>
+    `, async (action, form) => {
+        if (action !== 'import') return;
+        const raw = form.get('payload')?.trim();
+        if (!raw) return 'Cole o JSON antes de continuar.';
+        try {
+            JSON.parse(raw);
+        } catch {
+            return 'O conteúdo colado não é um JSON válido. Verifique a formatação e tente novamente.';
+        }
+        try {
+            const res = await postGuruja(config.gurujaImportarUrl, { payload: raw });
+            if (res?.meta) {
+                guruja.data = guruja.data ?? {};
+                guruja.data.meta = res.meta;
+                guruja.data.lido_em = res.lido_em ?? new Date().toISOString();
+                guruja.data.atualizar_disponivel = true;
+                await setMeta('guruja', guruja.data);
+            }
+        } catch (error) {
+            return `Falha ao importar: ${error.message}`;
+        }
+    });
+}
+
+async function gurujaDesconectar() {
+    if (!confirm('Deseja realmente desconectar sua conta da Guruja deste aplicativo?')) return;
+    try {
+        await postGuruja(config.gurujaDesconectarUrl, {});
+        if (guruja.data) {
+            guruja.data.mcp_conectado = false;
+            await setMeta('guruja', guruja.data);
+        }
+        render();
+    } catch (error) {
+        alert(`Erro ao desconectar: ${error.message}`);
+    }
 }
 
 async function saveGurujaOrder(keys) {
@@ -914,6 +1039,8 @@ function gurujaItem(a, done) {
     const est = !done && a.estMin ? `~${formatDuration(a.estMin * 60_000)}` : '';
     const isRef = a.tipo === 'Reforço';
     const code = gjKey(a);
+    const selectedGrau = isRef ? (guruja.reforcoGraus[code] ?? detectGurujaReforcoGrau(a)) : null;
+    const refLimitTag = isRef && !done ? ` · máx ${reforcoLimitMinutes(state.settings, selectedGrau)} min` : '';
     const marcada = done && gjMarcada(a);
     const raw = !isRef && code ? guruja.data?.comandos?.[code] : null;
     const comando = typeof raw === 'string' ? { texto: raw, resumo: null } : raw;
@@ -922,7 +1049,18 @@ function gurujaItem(a, done) {
     let body = '';
     if (isOpen) {
         if (isRef) {
-            body = a.instrucao ? `<p>${esc(a.instrucao)}</p>` : '<p class="gj-cmd-empty">Sem instrução para este reforço.</p>';
+            const leveMin = reforcoLimitMinutes(state.settings, 'leve');
+            const medioMin = reforcoLimitMinutes(state.settings, 'medio');
+            const intensoMin = reforcoLimitMinutes(state.settings, 'intenso');
+            body = `<div class="gj-reforco-box">
+                ${a.instrucao ? `<p class="gj-reforco-instrucao">${esc(a.instrucao)}</p>` : '<p class="gj-cmd-empty">Sem instrução para este reforço.</p>'}
+                <div class="gj-reforco-chips">
+                    <span class="gj-reforco-label">Tempo máximo:</span>
+                    <button type="button" class="reforco-chip ${selectedGrau === 'leve' ? 'active' : ''}" data-action="guruja-reforco-grau" data-key="${esc(code)}" data-grau="leve">Leve (${leveMin}m)</button>
+                    <button type="button" class="reforco-chip ${selectedGrau === 'medio' ? 'active' : ''}" data-action="guruja-reforco-grau" data-key="${esc(code)}" data-grau="medio">Médio (${medioMin}m)</button>
+                    <button type="button" class="reforco-chip ${selectedGrau === 'intenso' ? 'active' : ''}" data-action="guruja-reforco-grau" data-key="${esc(code)}" data-grau="intenso">Intenso (${intensoMin}m)</button>
+                </div>
+            </div>`;
         } else if (comando?.resumo) {
             body = `<p class="gj-resumo">${esc(comando.resumo)}</p>
                 <details><summary>Comando completo</summary><p>${esc(comando.texto)}</p></details>`;
@@ -932,7 +1070,8 @@ function gurujaItem(a, done) {
             body = '<p class="gj-cmd-empty">Sem comando salvo. No portal, abra esta atividade na aba <b>Comandos</b> e clique no favorito <b>Enviar comando</b>.</p>';
         }
         if (!done) {
-            body += `<div class="gj-actions"><button type="button" class="gj-study" data-action="guruja-study" data-id="${esc(a.disciplina ?? '')}" data-tipo="${esc(a.tipo ?? '')}">▶ Estudar ${esc(a.disciplina ?? '')}</button>
+            const grauAttr = isRef ? ` data-grau="${esc(selectedGrau)}"` : '';
+            body += `<div class="gj-actions"><button type="button" class="gj-study" data-action="guruja-study" data-id="${esc(a.disciplina ?? '')}" data-tipo="${esc(a.tipo ?? '')}"${grauAttr}>▶ Estudar ${esc(a.disciplina ?? '')}</button>
                 <button type="button" class="gj-feita" data-action="guruja-feita" data-id="${esc(code)}">✓ Concluí</button></div>`;
         } else if (marcada) {
             body += `<button type="button" class="gj-desfazer" data-action="guruja-desfazer" data-id="${esc(code)}">↺ Desfazer (voltar para pendentes)</button>`;
@@ -946,7 +1085,7 @@ function gurujaItem(a, done) {
         ${clickable ? `data-action="guruja-item" data-id="${esc(code)}"` : ''}>
         <span class="gj-check" aria-hidden="true">${done ? '✓' : ''}</span>
         <div><b>${esc(a.titulo)}</b>
-            <small>${a.tipo ? `<span class="gj-tipo" style="--t:${GJ_TIPO_COR[a.tipo] ?? 'var(--muted)'}">${esc(a.tipo)}</span>` : ''}${esc(a.disciplina ?? '')}${extra ? ` · ${esc(extra)}` : ''}${est ? ` · ${est}` : ''}${hasDetail && !isOpen ? ` · <span class="gj-has-cmd">${isRef ? 'instrução' : 'comando'} ▸</span>` : ''}</small>
+            <small>${a.tipo ? `<span class="gj-tipo" style="--t:${GJ_TIPO_COR[a.tipo] ?? 'var(--muted)'}">${esc(a.tipo)}</span>` : ''}${esc(a.disciplina ?? '')}${extra ? ` · ${esc(extra)}` : ''}${est ? ` · ${est}` : ''}${refLimitTag}${hasDetail && !isOpen ? ` · <span class="gj-has-cmd">${isRef ? 'instrução' : 'comando'} ▸</span>` : ''}</small>
             ${isOpen ? `<div class="gj-cmd">${body}</div>` : ''}
         </div>
         ${handle}
@@ -1024,17 +1163,26 @@ function gurujaSubjectFor(disciplina) {
     return bestScore >= 0.5 ? best : null;
 }
 
-async function gurujaStudy(disciplina, gurujaTipo) {
+async function gurujaStudy(disciplina, gurujaTipo, grau = null) {
     const subjectId = gurujaSubjectFor(disciplina);
     // A sessão já nasce com o tipo da atividade (pré-marcado ao parar; dá para trocar no diálogo).
     const tipo = gurujaStudyType(gurujaTipo);
+    const isRef = gurujaTipo === 'Reforço' || (tipo && studyTypeName(tipo)?.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase() === 'reforco');
+    const reforcoGrau = isRef ? (grau ?? state.settings?.reforco_padrao_grau ?? 'medio') : null;
+    const reforcoLimitMin = isRef ? reforcoLimitMinutes(state.settings, reforcoGrau) : null;
     const start = async (id) => {
         const running = runningSession();
         if (running?.subject_id === id) {
-            if (tipo && running.tipo !== tipo) await persist('sessions', { ...running, tipo });
+            const updates = {};
+            if (tipo && running.tipo !== tipo) updates.tipo = tipo;
+            if (isRef) {
+                updates.reforco_grau = reforcoGrau;
+                updates.reforco_limite_min = reforcoLimitMin;
+            }
+            if (Object.keys(updates).length) await persist('sessions', { ...running, ...updates });
             return openFocus();
         }
-        await toggleSubject(id, tipo);
+        await toggleSubject(id, tipo, { reforco_grau: reforcoGrau, reforco_limite_min: reforcoLimitMin });
     };
     if (subjectId) return start(subjectId);
     const subjects = [...activeSubjects()].sort((a, b) => a.nome.localeCompare(b.nome, 'pt-BR', { sensitivity: 'base' }));
@@ -1145,9 +1293,39 @@ async function receiveGurujaCommand() {
     }
 }
 
+/** Trata retorno de autorização do conector MCP da Guruja via hash (#guruja-conectado ou #guruja-erro=...). */
+async function checkGurujaAuthRedirect() {
+    if (location.hash === '#guruja-conectado') {
+        history.replaceState(null, '', location.pathname + location.search);
+        state.tab = 'timer';
+        await refreshGuruja(true);
+        render();
+        alert('Conta da Guruja conectada com sucesso! As atividades foram atualizadas.');
+    } else if (location.hash.startsWith('#guruja-erro=')) {
+        const msg = decodeURIComponent(location.hash.replace('#guruja-erro=', ''));
+        history.replaceState(null, '', location.pathname + location.search);
+        alert('Erro ao conectar com a Guruja: ' + msg);
+    }
+}
+
 function renderGuruja() {
     const meta = guruja.data?.meta;
-    if (!meta) return '';
+    if (!meta) {
+        const isConnected = Boolean(guruja.data?.mcp_conectado);
+        return `<section class="guruja gj-empty-card">
+            <header>
+                <div><small>Guruja</small><b>Planejamento Guruja</b></div>
+                ${isConnected ? '<span class="gj-mcp-pill connected" title="Conectado ao MCP da Guruja">● MCP Conectado</span>' : ''}
+            </header>
+            <p class="muted small gj-empty-desc">Sincronize suas atividades conectando sua conta ou cole o JSON da meta manualmente.</p>
+            <div class="gj-empty-actions">
+                ${isConnected
+                    ? `<button type="button" class="btn" data-action="guruja-refresh">↻ Sincronizar Atividades</button>`
+                    : (config.gurujaAuthUrl ? `<a href="${esc(config.gurujaAuthUrl)}" class="btn gj-auth-btn">🔗 Conectar Guruja</a>` : '')}
+                <button type="button" class="btn ghost" data-action="guruja-import-json">📥 Colar JSON</button>
+            </div>
+        </section>`;
+    }
     const acts = meta.atividades ?? [];
     const refs = (meta.reforcos ?? []).map((r) => ({ ...r, tipo: 'Reforço', questoes: r.questoes_resolvidas }));
     const pending = gurujaOrdered([...acts, ...refs].filter((a) => !gjDone(a)));
@@ -1168,7 +1346,12 @@ function renderGuruja() {
         <header>
             <div><small>Guruja${meta.ordem ? ` · Meta ${meta.ordem}` : ''}${startDay ? ` · dia ${startDay}` : ''}${late}</small>
                 <b>${acts.filter(gjDone).length}/${acts.length} atividades</b></div>
-            <span class="gj-pct">${pct}%</span>
+            <div class="gj-header-right">
+                ${guruja.data?.mcp_conectado
+                    ? '<span class="gj-mcp-pill connected" title="Conectado ao MCP da Guruja">● MCP</span>'
+                    : (config.gurujaAuthUrl ? `<a href="${esc(config.gurujaAuthUrl)}" class="gj-mcp-pill" title="Conectar Guruja via OAuth">🔗 Conectar</a>` : '')}
+                <span class="gj-pct">${pct}%</span>
+            </div>
         </header>
         <div class="goal-bar"><span style="width:${pct}%"></span></div>
         ${refsPend.length ? `<div class="gj-ref-alert"><b>⚡ ${refsPend.length === 1 ? '1 reforço pendente' : `${refsPend.length} reforços pendentes`}</b>
@@ -1183,12 +1366,17 @@ function renderGuruja() {
         ${done.length ? `<button type="button" class="gj-toggle" data-action="guruja-done">
             ${guruja.showDone ? '▾' : '▸'} Concluídas (${done.length})</button>
             ${guruja.showDone ? `<ul class="gj-list">${done.map((a) => gurujaItem(a, true)).join('')}</ul>` : ''}` : ''}
-        <p class="gj-updated"><button type="button" data-action="guruja-help">⚑ Comandos</button>
+        <div class="gj-updated">
+            <div class="gj-updated-left">
+                <button type="button" data-action="guruja-help">⚑ Comandos</button>
+                <button type="button" class="btn-subtle" data-action="guruja-import-json" title="Colar JSON manualmente">📥 Colar JSON</button>
+            </div>
             ${guruja.atualizando
-                ? '<span class="gj-sync on">↻ Atualizando com a Guruja… (1–2 min)</span>'
-                : (guruja.data.atualizar_disponivel
+                ? '<span class="gj-sync on">↻ Sincronizando com a Guruja…</span>'
+                : (guruja.data?.atualizar_disponivel
                     ? `<button type="button" class="gj-sync" data-action="guruja-refresh">↻ Atualizar · ${esc(gurujaAgo(guruja.data.lido_em))}</button>`
-                    : `<span class="gj-sync">Atualizado ${esc(gurujaAgo(guruja.data.lido_em))}</span>`)}</p>
+                    : `<span class="gj-sync">Atualizado ${esc(gurujaAgo(guruja.data?.lido_em))}</span>`)}
+        </div>
     </section>`;
 }
 
@@ -1862,6 +2050,19 @@ function renderSettings() {
             <label>Tempo de descanso (minutos)
                 <input type="number" name="descanso_min" min="1" max="240" value="${s.descanso_min ?? ''}" placeholder="Sem aviso">
                 <small>Bip e tela piscando 1 min antes e por 30 s quando o descanso acabar; 3 min depois, a pausa deixa de contar como descanso.</small></label>
+            <label>Tempo de reforço leve (minutos)
+                <input type="number" name="reforco_leve_min" min="1" max="120" value="${s.reforco_leve_min ?? 10}" required></label>
+            <label>Tempo de reforço médio (minutos)
+                <input type="number" name="reforco_medio_min" min="1" max="180" value="${s.reforco_medio_min ?? 20}" required></label>
+            <label>Tempo de reforço intenso (minutos)
+                <input type="number" name="reforco_intenso_min" min="1" max="240" value="${s.reforco_intenso_min ?? 30}" required></label>
+            <label>Grau padrão de reforço
+                <select name="reforco_padrao_grau">
+                    <option value="leve" ${s.reforco_padrao_grau === 'leve' ? 'selected' : ''}>Leve</option>
+                    <option value="medio" ${(!s.reforco_padrao_grau || s.reforco_padrao_grau === 'medio') ? 'selected' : ''}>Médio</option>
+                    <option value="intenso" ${s.reforco_padrao_grau === 'intenso' ? 'selected' : ''}>Intenso</option>
+                </select>
+                <small>Usado quando o reforço não indicar grau na Guruja.</small></label>
             <label>Confirmar sessão aberta após (minutos)
                 <input type="number" name="limite_suspeita_min" min="30" max="1440" step="10" value="${s.limite_suspeita_min}" required></label>
             <label>Fuso horário
@@ -1898,6 +2099,19 @@ function renderSettings() {
         ${(st.rejected ?? []).length ? `<p class="warn">${st.rejected.length} item(ns) recusado(s) pelo servidor: ${esc(st.rejected.map((r) => r.motivo).join('; '))}</p>` : ''}
         <button type="button" class="btn ghost" data-action="sync-now">Sincronizar agora</button>
 
+        <h3>Integração Guruja</h3>
+        <p class="muted">Conexão oficial via MCP (<code>https://mcp.guruja.com.br/mcp</code>) para sincronizar metas e atividades em 1 clique.</p>
+        <p class="muted">${guruja.data?.mcp_conectado
+            ? 'Status: <strong style="color:var(--c-sucesso, #10b981);">✓ Conectado via OAuth</strong>'
+            : 'Status: <em>Não conectado</em>'}</p>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin:8px 0 16px;">
+            ${guruja.data?.mcp_conectado
+                ? `<button type="button" class="btn" data-action="guruja-refresh">↻ Sincronizar atividades agora</button>
+                   <button type="button" class="btn ghost warn" data-action="guruja-disconnect">Desconectar Guruja</button>`
+                : (config.gurujaAuthUrl ? `<a href="${esc(config.gurujaAuthUrl)}" class="btn" style="text-decoration:none;display:inline-flex;align-items:center;">🔗 Conectar Guruja</a>` : '')}
+            <button type="button" class="btn ghost" data-action="guruja-import-json">📥 Colar JSON manualmente</button>
+        </div>
+
         <h3>API de leitura</h3>
         <p class="muted">Token pessoal para ler os dados de um dia fora do app (ex.: pelo Claude):
             <code>GET ${esc(config.apiDiaUrl)}?data=AAAA-MM-DD</code> com o cabeçalho <code>Authorization: Bearer &lt;token&gt;</code>.
@@ -1917,6 +2131,7 @@ function renderSettings() {
 // Atualiza apenas os números vivos (evita re-renderizar a tela toda a cada segundo).
 function tick() {
     checkRestAlert();
+    checkReforcoAlert();
     const roomsVisible = state.tab === 'sala' || (state.focusOpen && state.focusView === 'sala');
     if (roomsVisible && !rooms.loading && nowMs() - rooms.lastTry >= ROOMS_REFRESH_MS) refreshRooms();
     root.querySelectorAll('[data-live="member"]').forEach((el) => {
@@ -1945,6 +2160,30 @@ function tick() {
         el.textContent = formatDuration(stats.bySubject[el.dataset.id] ?? 0, { seconds: true });
     });
     if (running) set('[data-live="session"]', formatDuration(nowMs() - toMs(running.inicio), { seconds: true }));
+    if (running && isReforcoSession(running)) {
+        const elapsedMs = nowMs() - toMs(running.inicio);
+        const limitMin = running.reforco_limite_min ?? reforcoLimitMinutes(state.settings, running.reforco_grau ?? 'medio');
+        const limitMs = limitMin * 60_000;
+        const pct = Math.min(100, (elapsedMs / limitMs) * 100);
+        root.querySelectorAll('[data-live="reforco-bar"]').forEach((el) => { el.style.width = `${pct}%`; });
+        const isOver = elapsedMs >= limitMs;
+        root.querySelectorAll('[data-focus] .focus-time, [data-live="session"]').forEach((el) => {
+            el.classList.toggle('reforco-overdue', isOver);
+        });
+        root.querySelectorAll('[data-live="reforco-over"]').forEach((el) => {
+            if (isOver) {
+                el.hidden = false;
+                el.textContent = `+${formatDuration(elapsedMs - limitMs, { seconds: true })} além do limite`;
+            } else {
+                el.hidden = true;
+            }
+        });
+    } else {
+        root.querySelectorAll('[data-live="reforco-over"]').forEach((el) => { el.hidden = true; });
+        root.querySelectorAll('[data-focus] .focus-time, [data-live="session"]').forEach((el) => {
+            el.classList.remove('reforco-overdue');
+        });
+    }
     tickJornada(stats);
     const meta = state.settings.meta_diaria_min;
     if (meta) {
@@ -2513,8 +2752,26 @@ root.addEventListener('click', async (event) => {
             if (opening) summarizeGurujaCommand(id);
         },
         'guruja-help': () => openGurujaHelp(),
-        'guruja-study': () => gurujaStudy(id, button.dataset.tipo),
+        'guruja-study': () => gurujaStudy(id, button.dataset.tipo, button.dataset.grau),
+        'guruja-reforco-grau': () => {
+            const key = button.dataset.key;
+            const grau = button.dataset.grau;
+            if (!key || !grau) return;
+            guruja.reforcoGraus[key] = grau;
+            render();
+        },
+        'focus-reforco-grau': async () => {
+            const running = runningSession();
+            if (!running) return;
+            const grau = button.dataset.grau;
+            const limit = reforcoLimitMinutes(state.settings, grau);
+            await persist('sessions', { ...running, reforco_grau: grau, reforco_limite_min: limit });
+            renderFocus();
+            tick();
+        },
         'guruja-refresh': () => gurujaAtualizar(),
+        'guruja-import-json': () => openGurujaImportDialog(),
+        'guruja-disconnect': () => gurujaDesconectar(),
         'guruja-feita': () => marcarGuruja(id, true),
         'guruja-desfazer': () => marcarGuruja(id, false),
         'guruja-reset-order': () => { if (confirm('Voltar à ordem da Guruja?')) saveGurujaOrder([]); },
@@ -2709,6 +2966,10 @@ root.addEventListener('submit', async (event) => {
             limite_suspeita_min: Number(data.get('limite_suspeita_min')),
             meta_diaria_min: meta === '' ? null : Number(meta),
             descanso_min: descanso === '' ? null : Number(descanso),
+            reforco_leve_min: Number(data.get('reforco_leve_min')) || 10,
+            reforco_medio_min: Number(data.get('reforco_medio_min')) || 20,
+            reforco_intenso_min: Number(data.get('reforco_intenso_min')) || 30,
+            reforco_padrao_grau: String(data.get('reforco_padrao_grau') ?? 'medio'),
             retro_sound: data.get('retro_sound') === 'on',
             tema: String(data.get('tema') ?? 'auto'),
         });
@@ -2781,8 +3042,14 @@ async function boot() {
     setInterval(tick, 1000);
     await checkSuspicious();
     sync.start();
-    refreshGuruja(true).then(receiveGurujaCommand);
-    window.addEventListener('hashchange', receiveGurujaCommand);
+    refreshGuruja(true).then(() => {
+        receiveGurujaCommand();
+        checkGurujaAuthRedirect();
+    });
+    window.addEventListener('hashchange', () => {
+        receiveGurujaCommand();
+        checkGurujaAuthRedirect();
+    });
     setInterval(() => refreshGuruja(true), GURUJA_REFRESH_MS);
 
     if ('serviceWorker' in navigator && config.swUrl) {

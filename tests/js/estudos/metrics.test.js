@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
     DEFAULT_SETTINGS, buildDaily, dayBounds, dayStats, findOverlaps, formatClock, isSuspicious,
     monthRange, rangeStats, streak, studyDayOf, timelineBlocks, timelineSlots, weekRange,
+    detectGurujaReforcoGrau, reforcoLimitMinutes, isReforcoSession, reforcoAlertStage,
 } from '../../../resources/js/estudos/metrics.js';
 
 const H = 3_600_000;
@@ -251,5 +252,53 @@ describe('linha do tempo vertical (blocos estilo YPT)', () => {
     it('dia sem estudo: nenhum bloco', () => {
         const daily = buildDaily([], settings, NOW);
         expect(timelineBlocks(dayStats(daily, '2026-10-30'), settings)).toEqual({ blocks: [], fromMs: null, toMs: null });
+    });
+});
+
+describe('reforço (graus, detecção e alertas)', () => {
+    it('detecta grau leve, médio e intenso a partir do texto ou número de questões', () => {
+        expect(detectGurujaReforcoGrau({ titulo: 'Reforço Leve', instrucao: 'Revisar 4 questões' })).toBe('leve');
+        expect(detectGurujaReforcoGrau({ titulo: 'CPC 46', instrucao: '10 min rápido nos pontos fracos' })).toBe('leve');
+        expect(detectGurujaReforcoGrau({ titulo: 'Direito Tributário', questoes_resolvidas: 3 })).toBe('leve');
+
+        expect(detectGurujaReforcoGrau({ titulo: 'Reforço Médio', instrucao: 'Refazer questões' })).toBe('medio');
+        expect(detectGurujaReforcoGrau({ titulo: 'Contabilidade', instrucao: 'Sem instrução' })).toBe('medio');
+        expect(detectGurujaReforcoGrau(null)).toBe('medio');
+
+        expect(detectGurujaReforcoGrau({ titulo: 'Reforço Intenso', instrucao: 'Treino pesado' })).toBe('intenso');
+        expect(detectGurujaReforcoGrau({ titulo: 'Processo Civil', instrucao: '30 min de leitura atenta' })).toBe('intenso');
+        expect(detectGurujaReforcoGrau({ titulo: 'Português', questoes_resolvidas: 20 })).toBe('intenso');
+    });
+
+    it('calcula limites em minutos respeitando ajustes personalizados', () => {
+        expect(reforcoLimitMinutes(DEFAULT_SETTINGS, 'leve')).toBe(10);
+        expect(reforcoLimitMinutes(DEFAULT_SETTINGS, 'medio')).toBe(20);
+        expect(reforcoLimitMinutes(DEFAULT_SETTINGS, 'intenso')).toBe(30);
+
+        const custom = { reforco_leve_min: 15, reforco_medio_min: 25, reforco_intenso_min: 45 };
+        expect(reforcoLimitMinutes(custom, 'leve')).toBe(15);
+        expect(reforcoLimitMinutes(custom, 'medio')).toBe(25);
+        expect(reforcoLimitMinutes(custom, 'intenso')).toBe(45);
+    });
+
+    it('identifica se uma sessão é de reforço', () => {
+        expect(isReforcoSession(null)).toBe(false);
+        expect(isReforcoSession({ tipo: 'teoria' })).toBe(false);
+        expect(isReforcoSession({ tipo: 'x:Reforço' })).toBe(true);
+        expect(isReforcoSession({ tipo: 'questoes', reforco_limite_min: 20 })).toBe(true);
+        expect(isReforcoSession({ tipo: 'questoes', reforco_grau: 'medio' })).toBe(true);
+    });
+
+    it('controla os estágios de alerta do reforço (none -> soon -> due -> over)', () => {
+        const M = 60_000;
+        expect(reforcoAlertStage(5 * M, 20)).toBe('none');
+        expect(reforcoAlertStage(18 * M + 59_000, 20)).toBe('none');
+        expect(reforcoAlertStage(19 * M, 20)).toBe('soon');
+        expect(reforcoAlertStage(20 * M - 1, 20)).toBe('soon');
+        expect(reforcoAlertStage(20 * M, 20)).toBe('due');
+        expect(reforcoAlertStage(20 * M + 29_999, 20)).toBe('due');
+        expect(reforcoAlertStage(20 * M + 30_000, 20)).toBe('over');
+        expect(reforcoAlertStage(25 * M, 20)).toBe('over');
+        expect(reforcoAlertStage(10 * M, null)).toBe('none');
     });
 });

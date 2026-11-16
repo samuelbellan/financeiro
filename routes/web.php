@@ -137,6 +137,10 @@ Route::middleware('auth')->group(function () {
     Route::post('/estudos/sync', [EstudosController::class, 'sync'])->name('estudos.sync');
     Route::get('/estudos/guruja', [EstudosController::class, 'guruja'])->name('estudos.guruja');
     Route::post('/estudos/guruja/atualizar', [EstudosController::class, 'gurujaAtualizar'])->middleware('throttle:10,10')->name('estudos.guruja.atualizar');
+    Route::get('/estudos/guruja/auth', [EstudosController::class, 'gurujaAuth'])->name('estudos.guruja.auth');
+    Route::get('/estudos/guruja/callback', [EstudosController::class, 'gurujaCallback'])->name('estudos.guruja.callback');
+    Route::post('/estudos/guruja/desconectar', [EstudosController::class, 'gurujaDesconectar'])->name('estudos.guruja.desconectar');
+    Route::post('/estudos/guruja/importar', [EstudosController::class, 'gurujaImportar'])->name('estudos.guruja.importar');
     Route::post('/estudos/guruja/feita', [EstudosController::class, 'gurujaFeita'])->name('estudos.guruja.feita');
     Route::post('/estudos/guruja/ordem', [EstudosController::class, 'gurujaOrdem'])->name('estudos.guruja.ordem');
     Route::post('/estudos/guruja/comando', [EstudosController::class, 'gurujaComando'])->name('estudos.guruja.comando');

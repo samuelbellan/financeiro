@@ -1,22 +1,22 @@
-# Graph Report - financeiro  (2026-11-14)
+# Graph Report - financeiro  (2026-11-16)
 
 ## Corpus Check
-- 311 files · ~650,608 words
+- 314 files · ~654,991 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 2124 nodes · 5036 edges · 195 communities (153 shown, 42 thin omitted)
-- Extraction: 98% EXTRACTED · 2% INFERRED · 0% AMBIGUOUS · INFERRED: 113 edges (avg confidence: 0.75)
+- 2172 nodes · 5185 edges · 196 communities (149 shown, 47 thin omitted)
+- Extraction: 98% EXTRACTED · 2% INFERRED · 0% AMBIGUOUS · INFERRED: 118 edges (avg confidence: 0.75)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `580bf537`
+- Built from commit: `93662c04`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
 ## Community Hubs (Navigation)
-- WorkoutModuleTest.php
-- EstudosApiController
+- Illuminate\Database\Seeder
+- StudySummaryService
 - EventoAuxilioDTO
 - PhotoController
 - composer.json
@@ -24,17 +24,18 @@
 - scripts
 - OfxParserService
 - devDependencies
-- Illuminate\Support\Facades\DB
-- .count
-- FiscalConcurso
-- EstudosController
-- FiscalConcursoDataService
 - FiscalNoticia
+- CreditCardReconciliationService
+- FiscalConcurso
+- addDays
+- FiscalConcursoDataService
+- FiscalNewsCrawlerService
 - esc
-- Cartao
+- mountStatsCharts
 - TelegramWebhookController
 - README.md
-- types.test.js
+- Categoria
+- Cartao
 - 🚀 Guia de Deploy em Nuvem - Sistema Financeiro & Concursos
 - metrics.js
 - sidebar.js
@@ -42,20 +43,19 @@
 - logging.php
 - Illuminate\Console\Command
 - StudySyncTest
-- AllowedGoogleEmail
-- Illuminate\Database\Migrations\Migration
+- GoogleAuthAndWhitelistTest
+- Illuminate\Database\Schema\Blueprint
 - tick
 - Illuminate\Database\Eloquent\Model
-- Illuminate\Support\Facades\Schema
 - Transacao
-- AuthController.php
+- EstudosApiController
 - NetworkService
-- Categoria
+- CategoriasController
 - main.js
 - DailyLog
 - Illuminate\Http\JsonResponse
 - Exercise
-- projection.js
+- MidiaEstudosCommandTest
 - setup
 - console.php
 - rules/graphify.md
@@ -76,16 +76,16 @@
 - CartaoCompra
 - transaction-autocomplete.js
 - SalaryProjectionTest
-- Illuminate\Support\Facades\Log
+- Carbon\Carbon
 - NotaFiscal
-- ResumoEstudosCommand.php
-- EstudosGurujaTest
-- StudySyncService
+- ProgressPhoto
+- .count
+- GurujaMcpService
 - Illuminate\Http\Request
 - StatementImportService
 - SalaryProjectionTest.php
-- StudyRoomService
-- toMs
+- web.php
+- StudySyncService
 - bootstrap/app.php
 - psr-4
 - bosses.js
@@ -93,17 +93,15 @@
 - require
 - qrcode.min.js
 - extra
-- jornada.test.js
-- TvWidgetEndpointTest
+- jornada.js
 - Sabatina 2026-11-01 — "App desktop para o módulo de estudos?"
-- .app
+- StudyRoomService
 - TestCase
+- EstudosGurujaTest
 - avatars-vetor.js
 - Sabatina 2026-11-01: widget flutuante do cronômetro de estudos
-- WorkoutPlan
-- TelegramWebhookTest
+- Illuminate\Database\Migrations\Migration
 - Módulo de estudos estilo YPT (offline)
-- DatabaseSyncService
 - ServidorDTO
 - post-create-project-cmd
 - SalaryController
@@ -113,29 +111,31 @@
 - AppServiceProvider
 - estudos-sw.js
 - Sabatina 2026-11-08 — Calculadora de projeção e gerador de mídias (Instagram)
+- Illuminate\Support\Facades\Schema
 - Controller
-- ResumoEstudosCommandTest
 - TransacaoUpdateDateTest
 - QualificacaoPermanenteDTO
 - /post-estudos semanal | semanal --parcial | diario [YYYY-MM-DD]
-- MidiaEstudosCommand
 - QualificacaoTemporariaDTO
 - Convite para teste — Horas de Estudo
-- Illuminate\Database\Schema\Blueprint
-- StudyRoomsTest
-- StudyRoomsController
-- ImportarHoleritesCommand.php
+- DatabaseSyncService
+- TelegramWebhookRoutingTest
+- ExercisePersonalRecord
+- FitnessAiModuleTest
+- MidiaEstudosCommand
+- rooms.js
+- SalaryPayslip
 
 ## God Nodes (most connected - your core abstractions)
-1. `User` - 184 edges
-2. `TestCase` - 70 edges
+1. `User` - 193 edges
+2. `TestCase` - 72 edges
 3. `Cartao` - 66 edges
 4. `Transacao` - 64 edges
 5. `FiscalConcurso` - 52 edges
 6. `CartaoCompra` - 46 edges
 7. `CartaoParcela` - 42 edges
-8. `esc()` - 35 edges
-9. `StudySyncTest` - 35 edges
+8. `StudySyncTest` - 37 edges
+9. `esc()` - 35 edges
 10. `PhotoController` - 34 edges
 
 ## Surprising Connections (you probably didn't know these)
@@ -145,23 +145,23 @@
   resources/js/estudos/metrics.js → public/js/qrcode.min.js
 - `CartaoCompraTest` --references--> `Cartao`  [EXTRACTED]
   tests/Feature/CartaoCompraTest.php → app/Models/Cartao.php
-- `CreditCardDeleteTest` --references--> `Cartao`  [EXTRACTED]
-  tests/Feature/CreditCardDeleteTest.php → app/Models/Cartao.php
 - `CreditCardReconciliationTest` --references--> `Cartao`  [EXTRACTED]
   tests/Feature/CreditCardReconciliationTest.php → app/Models/Cartao.php
+- `FinancialSummaryAndCardLimitsTest` --references--> `Cartao`  [EXTRACTED]
+  tests/Feature/FinancialSummaryAndCardLimitsTest.php → app/Models/Cartao.php
 
 ## Import Cycles
 - None detected.
 
-## Communities (195 total, 42 thin omitted)
+## Communities (196 total, 47 thin omitted)
 
-### Community 0 - "WorkoutModuleTest.php"
-Cohesion: 0.15
-Nodes (7): DatabaseSeeder, ExerciseCatalogSeeder, ProductionDataSeeder, UserSeeder, Illuminate\Database\Console\Seeds\WithoutModelEvents, Illuminate\Database\Seeder, Illuminate\Support\Facades\Hash
+### Community 0 - "Illuminate\Database\Seeder"
+Cohesion: 0.11
+Nodes (11): UserFactory, DatabaseSeeder, ProductionDataSeeder, UserSeeder, Illuminate\Database\Console\Seeds\WithoutModelEvents, Illuminate\Database\Eloquent\Attributes\Fillable, Illuminate\Database\Eloquent\Attributes\Hidden, Illuminate\Database\Eloquent\Factories\Factory (+3 more)
 
-### Community 1 - "EstudosApiController"
-Cohesion: 0.14
-Nodes (6): EstudosApiController, CarbonImmutable, CarbonImmutable, StudySummaryService, Carbon\CarbonImmutable, Illuminate\Database\ConnectionInterface
+### Community 1 - "StudySummaryService"
+Cohesion: 0.17
+Nodes (4): CarbonImmutable, StudySummaryService, Illuminate\Database\ConnectionInterface, ResumoEstudosCommandTest
 
 ### Community 2 - "EventoAuxilioDTO"
 Cohesion: 0.18
@@ -173,7 +173,7 @@ Nodes (13): autoload-dev, psr-4, description, keywords, license, minimum-stabili
 
 ### Community 5 - "User"
 Cohesion: 0.06
-Nodes (9): User, Illuminate\Database\Eloquent\Attributes\Fillable, Illuminate\Database\Eloquent\Attributes\Hidden, Illuminate\Database\Eloquent\Relations\HasMany, Illuminate\Foundation\Auth\User, Illuminate\Notifications\Notifiable, CreditCardDeleteTest, MercadoModuleTest (+1 more)
+Nodes (7): User, Illuminate\Database\Eloquent\Relations\HasMany, Illuminate\Foundation\Auth\User, EstudosGurujaMcpTest, ManagersTest, PhotoModuleTest, StudyRoomsTest
 
 ### Community 6 - "scripts"
 Cohesion: 0.14
@@ -187,25 +187,21 @@ Nodes (18): OfxAccountDTO, OfxImportResultDTO, OfxStatementDTO, OfxTransactionDT
 Cohesion: 0.08
 Nodes (25): chart.js, concurrently, idb, laravel-vite-plugin, dependencies, chart.js, idb, devDependencies (+17 more)
 
-### Community 9 - "Illuminate\Support\Facades\DB"
-Cohesion: 0.11
-Nodes (6): Illuminate\Support\Facades\DB, Illuminate\Support\Facades\Validator, Illuminate\Support\Str, Illuminate\Validation\ValidationException, Pdo\Mysql, BackupEstudosCommandTest
+### Community 9 - "FiscalNoticia"
+Cohesion: 0.12
+Nodes (3): FiscalConcursosController, FiscalNoticia, FiscalTelegramConfig
 
-### Community 11 - "FiscalConcurso"
-Cohesion: 0.07
-Nodes (3): FiscalConcursosController, FiscalConcurso, FiscalTelegramConfig
-
-### Community 13 - "FiscalConcursoDataService"
-Cohesion: 0.14
-Nodes (4): FiscalCrawlCommand, FiscalConcursoDataService, FiscalTelegramNotifierService, Command
+### Community 12 - "addDays"
+Cohesion: 0.16
+Nodes (26): folgaPicker(), formatBigHours(), longDay(), projInputs(), projPaces(), renderProjection(), renderProjHowMuch(), renderProjWhen() (+18 more)
 
 ### Community 15 - "esc"
-Cohesion: 0.11
-Nodes (46): allTypes(), blockKey(), bossCard(), cards(), chargeBar(), chargeText(), colorVars(), daily() (+38 more)
+Cohesion: 0.12
+Nodes (49): blockKey(), bossCard(), bossLabel(), cards(), chargeBar(), chargeText(), colorVars(), daily() (+41 more)
 
-### Community 16 - "Cartao"
-Cohesion: 0.14
-Nodes (7): Cartao, CreditCardService, Carbon, Barryvdh\DomPDF\Facade\Pdf, Carbon\Carbon, Illuminate\Support\Facades\URL, CreditCardClosingTest
+### Community 16 - "mountStatsCharts"
+Cohesion: 0.31
+Nodes (10): applyTheme(), colorOf(), cssVar(), hoursOf(), mountDonut(), mountStatsCharts(), nameOf(), simpleBars() (+2 more)
 
 ### Community 17 - "TelegramWebhookController"
 Cohesion: 0.16
@@ -215,17 +211,21 @@ Nodes (3): JsonResponse, TelegramWebhookController, WhatsappLog
 Cohesion: 0.25
 Nodes (7): About Laravel, Agentic Development, Code of Conduct, Contributing, Learning Laravel, License, Security Vulnerabilities
 
-### Community 19 - "types.test.js"
-Cohesion: 0.24
-Nodes (8): gurujaStudyType(), typeFromForm(), customTypes(), lastTypeFor(), NO_TYPE, typeIdFromName(), NOW, settings
+### Community 19 - "Categoria"
+Cohesion: 0.10
+Nodes (5): Categoria, TransactionSuggestionService, WhatsappMessageParser, TransactionSuggestionTest, WhatsappMessageParserTest
+
+### Community 20 - "Cartao"
+Cohesion: 0.14
+Nodes (5): Cartao, CreditCardService, Carbon, CreditCardClosingTest, CreditCardDeleteTest
 
 ### Community 22 - "🚀 Guia de Deploy em Nuvem - Sistema Financeiro & Concursos"
 Cohesion: 0.15
 Nodes (12): 🔄 Como atualizar os dados antes da viagem se fizer novos lançamentos locais, 🤖 Como funciona o Bot do Telegram com Roteamento Inteligente (Local-First + Nuvem Fallback), 📱 Dica de Acesso pelo Celular, 🚀 Guia de Deploy em Nuvem - Sistema Financeiro & Concursos, 📦 O que foi preparado no projeto, 🌟 Opção 1: Deploy no Render.com com Banco Vitalício no Neon.tech (Recomendado), 🚂 Opção 2: Deploy no Railway.app, ⚡ Opção 3: Usando Banco Gratuito no Neon.tech ou Supabase (+4 more)
 
 ### Community 23 - "metrics.js"
-Cohesion: 0.09
-Nodes (45): mountStatsCharts(), renderHeatmap(), renderTrend(), shiftStats(), statsRange(), trendSessions(), addDays(), allTimeStats() (+37 more)
+Cohesion: 0.07
+Nodes (53): recentSessions(), renderSyncBadge(), amountBetween(), buildDaily(), compareWithPrevious(), comparisonRanges(), comparisonSeries(), CUSTOM_TYPE_MAX (+45 more)
 
 ### Community 24 - "sidebar.js"
 Cohesion: 0.27
@@ -240,52 +240,40 @@ Cohesion: 0.40
 Nodes (4): Monolog\Handler\NullHandler, Monolog\Handler\StreamHandler, Monolog\Handler\SyslogUdpHandler, Monolog\Processor\PsrLogMessageProcessor
 
 ### Community 27 - "Illuminate\Console\Command"
-Cohesion: 0.11
-Nodes (9): BackupEstudosCommand, ExportProductionDataCommand, FiscalSeedDataCommand, ImportOfxCommand, PregeneratePhotoCacheCommand, ScanPhotoModelsCommand, TelegramRegisterLocalCommand, TelegramSetWebhook (+1 more)
-
-### Community 29 - "AllowedGoogleEmail"
-Cohesion: 0.11
-Nodes (5): AllowedEmailController, AllowedGoogleEmail, Mockery, GoogleAuthAndWhitelistTest, ManagersTest
+Cohesion: 0.10
+Nodes (10): ExportProductionDataCommand, FiscalCrawlCommand, FiscalSeedDataCommand, ImportOfxCommand, PregeneratePhotoCacheCommand, ResumoEstudosCommand, ScanPhotoModelsCommand, TelegramRegisterLocalCommand (+2 more)
 
 ### Community 31 - "tick"
-Cohesion: 0.14
-Nodes (26): avatarStage(), avatarSvg(), avatarBlock(), checkRestAlert(), currentRoom(), DESK_SVG(), dismissRestAlert(), nextStageText() (+18 more)
+Cohesion: 0.09
+Nodes (41): avatarStage(), avatarSvg(), avatarBlock(), checkReforcoAlert(), checkRestAlert(), currentRoom(), DESK_SVG(), dismissRestAlert() (+33 more)
 
 ### Community 32 - "Illuminate\Database\Eloquent\Model"
-Cohesion: 0.09
-Nodes (6): CartaoFaturaFechamento, SalaryPayslip, SalaryProfile, Illuminate\Database\Eloquent\Factories\HasFactory, Illuminate\Database\Eloquent\Model, Illuminate\Database\Eloquent\Relations\BelongsTo
+Cohesion: 0.10
+Nodes (7): CartaoFaturaFechamento, SalaryProfile, StretchingLog, WorkoutPlanItem, Illuminate\Database\Eloquent\Factories\HasFactory, Illuminate\Database\Eloquent\Model, Illuminate\Database\Eloquent\Relations\BelongsTo
 
 ### Community 35 - "Transacao"
-Cohesion: 0.10
-Nodes (4): Transacao, TransactionDeduplicationService, TransactionDeduplicationTest, TransactionSuggestionTest
+Cohesion: 0.09
+Nodes (7): Conta, Transacao, Mockery\MockInterface, StatementImportTest, TelegramOfxDocumentTest, TelegramWebhookTest, TransactionDeduplicationTest
 
-### Community 36 - "AuthController.php"
-Cohesion: 0.33
-Nodes (3): AuthController, Illuminate\Http\RedirectResponse, Laravel\Socialite\Facades\Socialite
-
-### Community 40 - "Categoria"
-Cohesion: 0.12
-Nodes (6): CategoriasController, Categoria, Subcategoria, CategorySanitizer, TransactionSuggestionService, WhatsappMessageParser
+### Community 36 - "EstudosApiController"
+Cohesion: 0.25
+Nodes (3): EstudosApiController, CarbonImmutable, Carbon\CarbonImmutable
 
 ### Community 41 - "main.js"
-Cohesion: 0.06
-Nodes (51): cycleMark(), activeSubjects(), apiTokensCall(), applyTheme(), bossLabel(), charts, chartTooltip, colorOf() (+43 more)
+Cohesion: 0.07
+Nodes (52): activeSubjects(), allTypes(), apiTokensCall(), charts, chartTooltip, closeFocus(), createApiToken(), dayDiff() (+44 more)
 
 ### Community 43 - "DailyLog"
-Cohesion: 0.08
-Nodes (6): TreinosController, DailyLog, Measurement, ProgressPhoto, BodyTrackerService, FitnessAiService
+Cohesion: 0.10
+Nodes (5): TreinosController, DailyLog, Measurement, BodyTrackerService, FitnessAiService
 
 ### Community 44 - "Illuminate\Http\JsonResponse"
-Cohesion: 0.21
-Nodes (3): BodyTrackerController, Illuminate\Http\JsonResponse, Symfony\Component\HttpFoundation\BinaryFileResponse
+Cohesion: 0.11
+Nodes (5): BodyTrackerController, EstudosController, StudyRoomsController, Illuminate\Http\JsonResponse, Symfony\Component\HttpFoundation\BinaryFileResponse
 
 ### Community 45 - "Exercise"
-Cohesion: 0.07
-Nodes (5): Exercise, ExercisePersonalRecord, UserBodyMetric, WorkoutGoal, WorkoutModuleTest
-
-### Community 46 - "projection.js"
-Cohesion: 0.19
-Nodes (19): folgaPicker(), formatBigHours(), longDay(), projInputs(), projPaces(), renderProjection(), renderProjHowMuch(), renderProjWhen() (+11 more)
+Cohesion: 0.06
+Nodes (6): Exercise, UserBodyMetric, WorkoutGoal, WorkoutPlan, ExerciseCatalogSeeder, WorkoutModuleTest
 
 ### Community 47 - "setup"
 Cohesion: 0.25
@@ -299,45 +287,41 @@ Nodes (7): pestphp/pest-plugin, php-http/discovery, config, allow-plugins, optim
 Cohesion: 0.29
 Nodes (7): require-dev, fakerphp/faker, laravel/pail, laravel/pint, mockery/mockery, nunomaduro/collision, phpunit/phpunit
 
-### Community 63 - "GearItem"
-Cohesion: 0.12
-Nodes (4): GearItem, UserFactory, Illuminate\Database\Eloquent\Factories\Factory, static
-
 ### Community 66 - ".http"
 Cohesion: 0.15
-Nodes (3): TelegramService, PendingRequest, TelegramWebhookRoutingTest
+Nodes (3): TelegramSetWebhook, TelegramService, PendingRequest
 
 ### Community 75 - "WorkoutSession"
-Cohesion: 0.08
-Nodes (4): RunningLog, RunningSplit, StretchingLog, WorkoutSession
+Cohesion: 0.09
+Nodes (3): RunningLog, RunningSplit, WorkoutSession
 
 ### Community 77 - "CartaoCompra"
-Cohesion: 0.10
-Nodes (5): CartaoCompra, CartaoParcela, CartaoPrevisao, CreditCardReconciliationTest, FinancialSummaryAndCardLimitsTest
+Cohesion: 0.06
+Nodes (12): ExportController, CartaoCompra, CartaoParcela, CartaoPrevisao, TransacaoPrevisao, CategorySanitizer, FinancialSummaryService, Illuminate\Support\Facades\URL (+4 more)
 
 ### Community 78 - "transaction-autocomplete.js"
 Cohesion: 0.80
 Nodes (4): escapeHtml(), highlightMatch(), initTransactionAutocomplete(), normalizeStr()
 
-### Community 83 - "Illuminate\Support\Facades\Log"
-Cohesion: 0.17
-Nodes (7): GurujaComandoResumoService, Illuminate\Support\Carbon, Illuminate\Support\Facades\Cache, Illuminate\Support\Facades\Http, Illuminate\Support\Facades\Log, Throwable, ZipArchive
+### Community 83 - "Carbon\Carbon"
+Cohesion: 0.12
+Nodes (12): GeminiService, GurujaComandoResumoService, Barryvdh\DomPDF\Facade\Pdf, Carbon\Carbon, Illuminate\Support\Carbon, Illuminate\Support\Facades\Cache, Illuminate\Support\Facades\Http, Illuminate\Support\Facades\Log (+4 more)
 
 ### Community 84 - "NotaFiscal"
-Cohesion: 0.12
-Nodes (4): MercadoController, NotaFiscal, NotaFiscalItem, GeminiService
+Cohesion: 0.11
+Nodes (4): MercadoController, NotaFiscal, NotaFiscalItem, MercadoModuleTest
 
 ### Community 91 - "Illuminate\Http\Request"
-Cohesion: 0.11
-Nodes (9): ExportController, FinancasController, PhotoAuth, TransacaoPrevisao, FinancialSummaryService, Closure, Illuminate\Http\Request, Illuminate\Support\Facades\Auth (+1 more)
+Cohesion: 0.19
+Nodes (5): FinancasController, PhotoAuth, Closure, Illuminate\Http\Request, Symfony\Component\HttpFoundation\Response
 
 ### Community 95 - "SalaryProjectionTest.php"
 Cohesion: 0.13
 Nodes (6): CassemsEventoDTO, self, ConsignadoDTO, self, DespesaForaFolhaDTO, self
 
-### Community 97 - "toMs"
-Cohesion: 0.13
-Nodes (29): liveSessions(), openSessionDialog(), openSuspiciousDialog(), recentSessions(), renderTimeline(), subjectById(), dayBounds(), dayStats() (+21 more)
+### Community 96 - "web.php"
+Cohesion: 0.14
+Nodes (4): TvWidgetController, DatabaseSyncController, HomeController, Illuminate\Support\Facades\Route
 
 ### Community 98 - "bootstrap/app.php"
 Cohesion: 0.40
@@ -348,12 +332,12 @@ Cohesion: 0.40
 Nodes (5): autoload, psr-4, App\\, Database\\Factories\\, Database\\Seeders\\
 
 ### Community 102 - "bosses.js"
-Cohesion: 0.23
+Cohesion: 0.21
 Nodes (15): BOSSES, bossSvg(), DEFAULT_COLORS, ensureModelViewer(), escSvg(), ground(), koStars(), linear() (+7 more)
 
 ### Community 104 - "render"
-Cohesion: 0.10
-Nodes (48): applyServerChanges(), db(), dropFromQueue(), ensureUser(), getMeta(), loadAll(), pendingQueue(), saveLocal() (+40 more)
+Cohesion: 0.11
+Nodes (49): applyServerChanges(), db(), dropFromQueue(), ensureUser(), getMeta(), loadAll(), pendingQueue(), saveLocal() (+41 more)
 
 ### Community 105 - "require"
 Cohesion: 0.33
@@ -367,21 +351,17 @@ Nodes (6): a(), b(), d(), g(), r(), s()
 Cohesion: 0.67
 Nodes (3): extra, laravel, dont-discover
 
-### Community 108 - "jornada.test.js"
-Cohesion: 0.22
-Nodes (14): getAudioContext(), playBossHitSound(), playFocusEndSound(), playLevelUpSound(), playNote(), playRestDueSound(), playRestSoonSound(), BOSS_HP (+6 more)
+### Community 108 - "jornada.js"
+Cohesion: 0.23
+Nodes (15): getAudioContext(), playBossHitSound(), playFocusEndSound(), playLevelUpSound(), playNote(), playRestDueSound(), playRestSoonSound(), BOSS_HP (+7 more)
 
 ### Community 116 - "Sabatina 2026-11-01 — "App desktop para o módulo de estudos?""
 Cohesion: 0.22
 Nodes (8): Conclusão, Decisões tomadas, Pergunta original, Próximos passos, Resultados medidos, Riscos e pontos em aberto, Sabatina 2026-11-01 — "App desktop para o módulo de estudos?", Suposições
 
-### Community 118 - ".app"
-Cohesion: 0.11
-Nodes (3): Illuminate\Support\Facades\File, FiscalModuleTest, MidiaEstudosCommandTest
-
 ### Community 122 - "TestCase"
-Cohesion: 0.05
-Nodes (15): Conta, Illuminate\Foundation\Testing\RefreshDatabase, Illuminate\Foundation\Testing\TestCase, Illuminate\Http\UploadedFile, Illuminate\Support\Facades\Storage, Mockery\MockInterface, CartaoCompraTest, DatabaseSyncTest (+7 more)
+Cohesion: 0.07
+Nodes (12): Illuminate\Foundation\Testing\RefreshDatabase, Illuminate\Foundation\Testing\TestCase, Illuminate\Http\UploadedFile, Illuminate\Support\Facades\DB, Illuminate\Support\Str, Illuminate\Validation\ValidationException, Pdo\Mysql, BackupEstudosCommandTest (+4 more)
 
 ### Community 124 - "avatars-vetor.js"
 Cohesion: 0.08
@@ -394,10 +374,6 @@ Nodes (7): Decisões tomadas, Implementação, Pergunta original, Próximos pass
 ### Community 135 - "Módulo de estudos estilo YPT (offline)"
 Cohesion: 0.20
 Nodes (9): Avatares, Backup no PC, Decisões, Jornada dos Bosses, Módulo de estudos estilo YPT (offline), Onde está o código, Riscos conhecidos, Roteiro de teste manual (modo avião) (+1 more)
-
-### Community 136 - "DatabaseSyncService"
-Cohesion: 0.21
-Nodes (3): SyncDatabaseCommand, DatabaseSyncController, DatabaseSyncService
 
 ### Community 139 - "post-create-project-cmd"
 Cohesion: 0.50
@@ -416,8 +392,8 @@ Cohesion: 0.29
 Nodes (6): Calculadora de projeção, Decisões, Gerador de mídias, Riscos, Sabatina 2026-11-08 — Calculadora de projeção e gerador de mídias (Instagram), Suposições
 
 ### Community 152 - "Controller"
-Cohesion: 0.22
-Nodes (4): TvWidgetController, Controller, HomeController, Illuminate\Support\Facades\Route
+Cohesion: 0.14
+Nodes (7): AllowedEmailController, AuthController, Controller, AllowedGoogleEmail, Illuminate\Http\RedirectResponse, Illuminate\Support\Facades\Auth, Laravel\Socialite\Facades\Socialite
 
 ### Community 159 - "/post-estudos semanal | semanal --parcial | diario [YYYY-MM-DD]"
 Cohesion: 0.33
@@ -427,25 +403,29 @@ Nodes (5): Diário (Story 1080×1920), /post-estudos semanal | semanal --parcial
 Cohesion: 0.50
 Nodes (3): Convite para teste — Horas de Estudo, 🇺🇸 English, 🇧🇷 Português
 
+### Community 180 - "rooms.js"
+Cohesion: 0.60
+Nodes (3): createRoomsApi(), memberSessionMs(), memberTodayMs()
+
 ## Knowledge Gaps
-- **172 isolated node(s):** `$schema`, `name`, `type`, `description`, `laravel` (+167 more)
+- **175 isolated node(s):** `$schema`, `name`, `type`, `description`, `laravel` (+170 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **42 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **47 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `User` connect `User` to `WorkoutModuleTest.php`, `TelegramWebhookTest`, `Illuminate\Support\Facades\DB`, `FiscalNoticia`, `Cartao`, `TelegramWebhookController`, `ResumoEstudosCommandTest`, `TransacaoUpdateDateTest`, `StudySyncTest`, `AllowedGoogleEmail`, `Illuminate\Database\Eloquent\Model`, `Transacao`, `AuthController.php`, `NetworkService`, `StudyRoomsTest`, `Exercise`, `ImportarHoleritesCommand.php`, `BodyTrackerTest`, `GearItem`, `.http`, `EstudosApiTest`, `CartaoCompra`, `SalaryProjectionTest`, `Illuminate\Support\Facades\Log`, `EstudosGurujaTest`, `Illuminate\Http\Request`, `SalaryProjectionTest.php`, `TvWidgetEndpointTest`, `.app`, `TestCase`?**
-  _High betweenness centrality (0.110) - this node is a cross-community bridge._
-- **Why does `TestCase` connect `TestCase` to `WorkoutModuleTest.php`, `User`, `TelegramWebhookTest`, `Illuminate\Support\Facades\DB`, `FiscalNoticia`, `Cartao`, `ResumoEstudosCommandTest`, `TransacaoUpdateDateTest`, `StudySyncTest`, `AllowedGoogleEmail`, `Transacao`, `NetworkService`, `StudyRoomsTest`, `Exercise`, `BodyTrackerTest`, `.http`, `EstudosApiTest`, `CartaoCompra`, `SalaryProjectionTest`, `Illuminate\Support\Facades\Log`, `EstudosGurujaTest`, `SalaryProjectionTest.php`, `TvWidgetEndpointTest`, `.app`?**
-  _High betweenness centrality (0.031) - this node is a cross-community bridge._
-- **Why does `Cartao` connect `Cartao` to `Illuminate\Database\Eloquent\Model`, `Transacao`, `User`, `Categoria`, `CartoesController`, `.count`, `CartaoCompra`, `TelegramWebhookController`, `Illuminate\Support\Facades\Log`, `NotaFiscal`, `TestCase`, `Illuminate\Http\Request`?**
-  _High betweenness centrality (0.023) - this node is a cross-community bridge._
+- **Why does `User` connect `User` to `Illuminate\Database\Seeder`, `StudySummaryService`, `FiscalConcurso`, `TelegramWebhookController`, `Categoria`, `Cartao`, `Controller`, `TransacaoUpdateDateTest`, `StudySyncTest`, `GoogleAuthAndWhitelistTest`, `Illuminate\Database\Eloquent\Model`, `Transacao`, `NetworkService`, `TelegramWebhookRoutingTest`, `Exercise`, `FitnessAiModuleTest`, `SalaryPayslip`, `BodyTrackerTest`, `.http`, `EstudosApiTest`, `CartaoCompra`, `SalaryProjectionTest`, `Carbon\Carbon`, `NotaFiscal`, `SalaryProjectionTest.php`, `web.php`, `TestCase`, `EstudosGurujaTest`?**
+  _High betweenness centrality (0.109) - this node is a cross-community bridge._
+- **Why does `Cartao` connect `Cartao` to `Illuminate\Database\Eloquent\Model`, `CartoesController`, `CreditCardReconciliationService`, `CartaoCompra`, `TelegramWebhookController`, `Categoria`, `Carbon\Carbon`, `NotaFiscal`?**
+  _High betweenness centrality (0.027) - this node is a cross-community bridge._
+- **Why does `FiscalConcurso` connect `FiscalConcurso` to `Illuminate\Database\Eloquent\Model`, `User`, `FiscalNoticia`, `FiscalConcursoDataService`, `FiscalNewsCrawlerService`, `FiscalNewsAiService`, `TelegramWebhookController`, `Carbon\Carbon`, `TestCase`?**
+  _High betweenness centrality (0.026) - this node is a cross-community bridge._
 - **What connects `$schema`, `name`, `type` to the rest of the system?**
-  _172 weakly-connected nodes found - possible documentation gaps or missing edges._
-- **Should `EstudosApiController` be split into smaller, more focused modules?**
-  _Cohesion score 0.14366998577524892 - nodes in this community are weakly interconnected._
+  _175 weakly-connected nodes found - possible documentation gaps or missing edges._
+- **Should `Illuminate\Database\Seeder` be split into smaller, more focused modules?**
+  _Cohesion score 0.11255411255411256 - nodes in this community are weakly interconnected._
 - **Should `PhotoController` be split into smaller, more focused modules?**
-  _Cohesion score 0.1476923076923077 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.13333333333333333 - nodes in this community are weakly interconnected._
 - **Should `composer.json` be split into smaller, more focused modules?**
   _Cohesion score 0.14285714285714285 - nodes in this community are weakly interconnected._
