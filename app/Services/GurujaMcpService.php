@@ -18,6 +18,10 @@ class GurujaMcpService
 
     public function isConnected(int $userId): bool
     {
+        if (config('services.guruja_mcp.access_token') || env('GURUJA_ACCESS_TOKEN')) {
+            return true;
+        }
+
         return DB::table('study_guruja_tokens')
             ->where('user_id', $userId)
             ->whereNotNull('access_token')
@@ -147,6 +151,11 @@ class GurujaMcpService
      */
     public function getValidAccessToken(int $userId): ?string
     {
+        $directToken = config('services.guruja_mcp.access_token') ?: env('GURUJA_ACCESS_TOKEN');
+        if (!empty($directToken)) {
+            return $directToken;
+        }
+
         $row = DB::table('study_guruja_tokens')->where('user_id', $userId)->first();
         if (!$row || empty($row->access_token)) {
             return null;

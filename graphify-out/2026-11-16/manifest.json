@@ -55,8 +55,8 @@
     "semantic_hash": ""
   },
   "app/Http/Controllers/EstudosController.php": {
-    "mtime": 1794680572.367864,
-    "ast_hash": "34ca4a801d35cda6a7e0b3dc7bc8684d",
+    "mtime": 1794817293.3156242,
+    "ast_hash": "8b92a3ea9db00e2a57edb3083930eb44",
     "semantic_hash": ""
   },
   "app/Http/Controllers/ExportController.php": {
@@ -475,8 +475,8 @@
     "semantic_hash": ""
   },
   "routes/web.php": {
-    "mtime": 1794680572.3797297,
-    "ast_hash": "df082b167af84a0872ca0a4675147538",
+    "mtime": 1794817244.7759714,
+    "ast_hash": "1faa9ccb0df2ca79468a6db1c923089d",
     "semantic_hash": ""
   },
   "tests/Feature/ExampleTest.php": {
@@ -1220,8 +1220,8 @@
     "semantic_hash": ""
   },
   "resources/js/estudos/main.js": {
-    "mtime": 1794768691.9919486,
-    "ast_hash": "05b229ce5a0103016aa937297d06b1a0",
+    "mtime": 1794817459.5351362,
+    "ast_hash": "ac56df3d0a2f4aa47855e447ac6b3d16",
     "semantic_hash": ""
   },
   "resources/js/estudos/metrics.js": {
@@ -1235,8 +1235,8 @@
     "semantic_hash": ""
   },
   "resources/views/estudos/app.blade.php": {
-    "mtime": 1794680572.3784091,
-    "ast_hash": "2abcd14d494d8756dee4214eb6c988d1",
+    "mtime": 1794817311.454137,
+    "ast_hash": "83d31c42ca21c58381676964b2fa399b",
     "semantic_hash": ""
   },
   "tests/Feature/BackupEstudosCommandTest.php": {
@@ -1665,8 +1665,8 @@
     "semantic_hash": ""
   },
   "tests/Feature/EstudosGurujaTest.php": {
-    "mtime": 1794680572.3807316,
-    "ast_hash": "12fb12fae04b09d95f4e47367060795b",
+    "mtime": 1794817597.4459326,
+    "ast_hash": "b3f25404419410ad20d072539d8946ce",
     "semantic_hash": ""
   },
   "public/bosses/imagens-fonte/boss-06.png": {
@@ -1692,6 +1692,21 @@
   "database/migrations/2026_11_15_150000_add_reforco_settings_and_session_fields.php": {
     "mtime": 1794768127.7890584,
     "ast_hash": "c943efd56a2c0f682674a07400e56aea",
+    "semantic_hash": ""
+  },
+  "app/Services/GurujaMcpService.php": {
+    "mtime": 1794817052.1312985,
+    "ast_hash": "16615a6e988d37c0c88c158a32f1fdc2",
+    "semantic_hash": ""
+  },
+  "database/migrations/2026_11_16_060000_create_study_guruja_tokens_table.php": {
+    "mtime": 1794816977.6691577,
+    "ast_hash": "f959906ece432705e749be43d15ecfc3",
+    "semantic_hash": ""
+  },
+  "tests/Feature/EstudosGurujaMcpTest.php": {
+    "mtime": 1794817531.9900072,
+    "ast_hash": "8fc68469b5d1f25d16e18ecfed77ffe4",
     "semantic_hash": ""
   }
 }
