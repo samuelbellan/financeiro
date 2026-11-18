@@ -15,6 +15,7 @@ import {
     averagePace, manualPace, paceWeeklyMs, projectDate, reachedOn, requiredPerDay, totalMs as historyTotalMs, weekdayPace,
 } from './projection.js';
 import { createRoomsApi, memberTodayMs } from './rooms.js';
+import { renderStudyStoryCanvas } from './story.js';
 import { createSync } from './sync.js';
 import { createWidget, widgetSupported } from './widget.js';
 import {
@@ -1002,10 +1003,14 @@ root.addEventListener('pointermove', (event) => {
         const box = over.getBoundingClientRect();
         over.parentElement.insertBefore(gjDrag.li, event.clientY < box.top + box.height / 2 ? over : over.nextSibling);
     } else if (!over) {
-        // Sobre o título de um dia: entra no começo daquela lista.
-        const h4 = document.elementFromPoint(event.clientX, event.clientY)?.closest('.guruja h4');
-        const list = h4?.nextElementSibling;
-        if (list?.matches('ul.gj-pending')) list.prepend(gjDrag.li);
+        // Sobre o título ou bloco de um dia: entra no começo daquela lista.
+        const dayTarget = document.elementFromPoint(event.clientX, event.clientY)?.closest('.gj-day-group, .guruja h4');
+        const list = dayTarget?.matches('ul.gj-pending')
+            ? dayTarget
+            : (dayTarget?.querySelector('ul.gj-pending') ?? dayTarget?.nextElementSibling);
+        if (list?.matches('ul.gj-pending') && !list.contains(gjDrag.li)) {
+            list.prepend(gjDrag.li);
+        }
     }
 });
 
@@ -1132,6 +1137,68 @@ function gurujaDayLabel(hoje, i) {
     if (i === 1) return 'Amanhã';
     const d = new Date(Date.parse(`${hoje}T12:00:00Z`) + i * GJ_DIA_MS);
     return d.toLocaleDateString('pt-BR', { weekday: 'short', day: '2-digit', month: '2-digit', timeZone: 'UTC' });
+}
+
+function gurujaDayDate(hoje, i) {
+    const d = new Date(Date.parse(`${hoje}T12:00:00Z`) + i * GJ_DIA_MS);
+    return d.toLocaleDateString('pt-BR', { weekday: 'short', day: '2-digit', month: '2-digit', timeZone: 'UTC' });
+}
+
+function renderGurujaDay(plan, d) {
+    const isToday = d.i === 0;
+    const isTomorrow = d.i === 1;
+    let dayClass = 'gj-day-future';
+    let badgeClass = 'gj-badge-future';
+    let label = '';
+    let dateSubtext = '';
+
+    if (isToday) {
+        dayClass = 'gj-day-today';
+        badgeClass = 'gj-badge-today';
+        label = '<span class="gj-pulse-dot" aria-hidden="true"></span> HOJE';
+        dateSubtext = gurujaDayDate(plan.hoje, 0);
+    } else if (isTomorrow) {
+        dayClass = 'gj-day-tomorrow';
+        badgeClass = 'gj-badge-tomorrow';
+        label = 'AMANHÃ';
+        dateSubtext = gurujaDayDate(plan.hoje, 1);
+    } else {
+        const step = d.i;
+        if (step === 2) {
+            dayClass = 'gj-day-future gj-day-step-2';
+            badgeClass = 'gj-badge-future gj-badge-step-2';
+        } else if (step === 3) {
+            dayClass = 'gj-day-future gj-day-step-3';
+            badgeClass = 'gj-badge-future gj-badge-step-3';
+        } else if (step === 4) {
+            dayClass = 'gj-day-future gj-day-step-4';
+            badgeClass = 'gj-badge-future gj-badge-step-4';
+        } else if (step === 5) {
+            dayClass = 'gj-day-future gj-day-step-5';
+            badgeClass = 'gj-badge-future gj-badge-step-5';
+        } else {
+            dayClass = 'gj-day-future gj-day-step-more';
+            badgeClass = 'gj-badge-future gj-badge-step-more';
+        }
+        label = esc(gurujaDayLabel(plan.hoje, d.i).toUpperCase());
+    }
+
+    const countText = `${d.items.length} ${d.items.length === 1 ? 'atividade' : 'atividades'}`;
+    const timeText = `~${formatDuration(d.min * 60_000)}`;
+
+    return `<div class="gj-day-group ${dayClass}" data-day-index="${d.i}">
+        <h4 class="gj-day-header">
+            <span class="gj-day-title">
+                <span class="gj-day-badge ${badgeClass}">${label}</span>
+                ${dateSubtext ? `<span class="gj-day-date">${esc(dateSubtext)}</span>` : ''}
+            </span>
+            <span class="gj-day-meta">
+                <span class="gj-day-time">${esc(timeText)}</span>
+                <span class="gj-day-count">${esc(countText)}</span>
+            </span>
+        </h4>
+        <ul class="gj-list gj-pending">${d.items.map((a) => gurujaItem(a, false)).join('')}</ul>
+    </div>`;
 }
 
 // ── ▶ Estudar: disciplina da Guruja → matéria do app ──
@@ -1360,8 +1427,7 @@ function renderGuruja() {
         ${pending.length > 1 ? `<div class="gj-tools"><small>Arraste os cards para reordenar</small>${guruja.data?.ordem?.length
             ? '<button type="button" data-action="guruja-reset-order">Ordem da Guruja</button>' : ''}</div>` : ''}
         ${pending.length
-            ? plan.days.map((d) => `<h4>${gurujaDayLabel(plan.hoje, d.i)} <span class="gj-h4-time">· ~${formatDuration(d.min * 60_000)}</span></h4>
-                <ul class="gj-list gj-pending">${d.items.map((a) => gurujaItem(a, false)).join('')}</ul>`).join('')
+            ? plan.days.map((d) => renderGurujaDay(plan, d)).join('')
             : '<p class="gj-empty">Tudo feito nesta meta 🎉</p>'}
         ${done.length ? `<button type="button" class="gj-toggle" data-action="guruja-done">
             ${guruja.showDone ? '▾' : '▸'} Concluídas (${done.length})</button>
@@ -1511,7 +1577,10 @@ function renderTimeline() {
         ${renderVerticalTimeline(stats, day)}
         <h3>Sessões</h3>
         <ul class="session-list">${list || '<li class="empty">Nenhuma sessão neste dia.</li>'}</ul>
-        <button type="button" class="btn ghost" data-action="new-session" data-day="${day}">+ Sessão manual</button>`;
+        <div class="timeline-actions">
+            <button type="button" class="btn ghost" data-action="new-session" data-day="${day}">+ Sessão manual</button>
+            <button type="button" class="btn" data-action="story-open" data-day="${day}">Gerar Story</button>
+        </div>`;
 }
 
 const STATS_MODES = { day: 'Dia', week: 'Semana', month: 'Mês', trend: 'Tendência', total: 'Total', proj: 'Projeção' };
@@ -1585,6 +1654,7 @@ function renderStats() {
             <button type="button" data-action="stats-next" aria-label="Próximo" ${to >= t ? 'disabled' : ''}>›</button>
         </nav>
         ${summary}
+        ${mode === 'day' ? `<button type="button" class="btn story-stats-btn" data-action="story-open" data-day="${from}">Gerar Story do dia</button>` : ''}
         ${isCurrent ? renderComparison(d, mode, t) : ''}
         ${renderStudyVsOther(d, from, to)}
         ${mode !== 'day' ? '<div class="chart-box"><canvas data-chart="bars"></canvas></div>' : ''}
@@ -2399,6 +2469,110 @@ function openDialog(html, onSubmit) {
     dialog.showModal();
 }
 
+function storyFilename(day) {
+    const [, m, d] = day.split('-');
+    return `story-${d}-${m}.png`;
+}
+
+function canvasToPngBlob(canvas) {
+    return new Promise((resolve) => canvas.toBlob(resolve, 'image/png'));
+}
+
+function openStoryDialog(initialDay) {
+    const maxDay = today();
+    let currentDay = initialDay || maxDay;
+    let currentCanvas = null;
+
+    dialog.innerHTML = `<form method="dialog" class="form story-dialog">
+        <h3>Story do Instagram (1080×1920)</h3>
+        <label>Dia do estudo
+            <input type="date" id="story-day-input" value="${esc(currentDay)}" max="${esc(maxDay)}">
+        </label>
+        <div class="story-preview-wrap">
+            <div class="story-empty muted" hidden>Nenhum estudo registrado neste dia.</div>
+            <img class="story-preview-img" alt="Prévia do story de estudo" hidden>
+        </div>
+        <div class="actions">
+            <button type="button" class="btn" id="story-download-btn" disabled>Baixar PNG</button>
+            <button type="button" class="btn ghost" id="story-share-btn" hidden>Compartilhar</button>
+            <button type="submit" class="btn ghost" value="cancel">Fechar</button>
+        </div>
+    </form>`;
+
+    const dayInput = dialog.querySelector('#story-day-input');
+    const previewImg = dialog.querySelector('.story-preview-img');
+    const emptyMsg = dialog.querySelector('.story-empty');
+    const downloadBtn = dialog.querySelector('#story-download-btn');
+    const shareBtn = dialog.querySelector('#story-share-btn');
+
+    async function refreshPreview(day) {
+        currentDay = day;
+        currentCanvas = null;
+        downloadBtn.disabled = true;
+        shareBtn.hidden = true;
+
+        const stats = dayStats(daily(), day);
+        if (!stats || stats.totalMs <= 0) {
+            previewImg.hidden = true;
+            emptyMsg.hidden = false;
+            return;
+        }
+
+        emptyMsg.hidden = true;
+        const canvas = await renderStudyStoryCanvas({
+            day,
+            stats,
+            subjects: state.subjects,
+            settings: state.settings,
+        });
+        if (currentDay !== day) return;
+
+        currentCanvas = canvas;
+        previewImg.src = canvas.toDataURL('image/png');
+        previewImg.hidden = false;
+        downloadBtn.disabled = false;
+
+        if (typeof navigator.share === 'function' && typeof navigator.canShare === 'function') {
+            const blob = await canvasToPngBlob(canvas);
+            if (blob) {
+                const file = new File([blob], storyFilename(day), { type: 'image/png' });
+                if (navigator.canShare({ files: [file] })) shareBtn.hidden = false;
+            }
+        }
+    }
+
+    dayInput.addEventListener('change', () => {
+        if (dayInput.value) refreshPreview(dayInput.value);
+    });
+
+    downloadBtn.addEventListener('click', async () => {
+        if (!currentCanvas) return;
+        const blob = await canvasToPngBlob(currentCanvas);
+        if (!blob) return;
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = storyFilename(currentDay);
+        link.click();
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
+    });
+
+    shareBtn.addEventListener('click', async () => {
+        if (!currentCanvas) return;
+        const blob = await canvasToPngBlob(currentCanvas);
+        if (!blob) return;
+        const file = new File([blob], storyFilename(currentDay), { type: 'image/png' });
+        try {
+            await navigator.share({ files: [file], title: `Story ${currentDay}` });
+        } catch (err) {
+            if (err?.name !== 'AbortError') throw err;
+        }
+    });
+
+    dialog.showModal();
+    refreshPreview(currentDay);
+}
+
 function openBossInspectionDialog(boss, currentBossIndex = null) {
     const is3d = boss.is3D;
     const isCurrentlyActive = (boss.numero - 1) === currentBossIndex;
@@ -2819,6 +2993,7 @@ root.addEventListener('click', async (event) => {
             render();
         },
         'new-session': () => openSessionDialog(null, button.dataset.day),
+        'story-open': () => openStoryDialog(button.dataset.day || today()),
         'edit-session': () => openSessionDialog(state.sessions.find((s) => s.id === id), state.timelineDay ?? today()),
         'day-prev': () => { state.timelineDay = addDays(state.timelineDay ?? today(), -1); state.timelineSel.clear(); render(); },
         'day-next': () => { state.timelineDay = addDays(state.timelineDay ?? today(), 1); state.timelineSel.clear(); render(); },

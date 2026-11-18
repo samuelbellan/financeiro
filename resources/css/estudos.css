@@ -1011,6 +1011,278 @@ body.rest-over [data-live="rest"], body.rest-over [data-w-time] { color: var(--d
 .guruja .gj-pct { font-weight: 700; color: var(--primary); }
 .guruja .gj-late { color: var(--warn); }
 .guruja h4 { margin: 12px 0 4px; font-size: .8rem; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: .03em; }
+
+/* ── Agrupamento e diferenciação visual dos dias (Hoje, Amanhã e sucessivos) ── */
+.gj-day-group {
+    position: relative;
+    margin-top: 12px;
+    border-radius: 12px;
+    padding: 10px 12px 6px;
+    border: 1px solid var(--border);
+    background: color-mix(in srgb, var(--card) 98%, var(--bg));
+    transition: border-color .2s ease, box-shadow .2s ease, background-color .2s ease;
+}
+
+.guruja h4.gj-day-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin: 0 0 8px 0;
+    padding-bottom: 8px;
+    border-bottom: 1px solid color-mix(in srgb, var(--border) 70%, transparent);
+    font-size: .82rem;
+    font-weight: 600;
+    text-transform: none;
+    letter-spacing: 0;
+    color: var(--text);
+}
+
+.gj-day-title {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+}
+
+.gj-day-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 2px 9px;
+    border-radius: 99px;
+    font-size: .72rem;
+    font-weight: 700;
+    letter-spacing: .03em;
+    text-transform: uppercase;
+    line-height: 1.3;
+    white-space: nowrap;
+}
+
+.gj-day-date {
+    font-size: .74rem;
+    font-weight: 500;
+    color: var(--muted);
+    text-transform: capitalize;
+}
+
+.gj-day-meta {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: .74rem;
+    white-space: nowrap;
+    margin-left: auto;
+}
+
+.gj-day-time {
+    font-weight: 600;
+    color: var(--text);
+}
+
+.gj-day-count {
+    font-size: .68rem;
+    font-weight: 600;
+    padding: 1px 7px;
+    border-radius: 99px;
+    background: color-mix(in srgb, var(--border) 60%, transparent);
+    color: var(--muted);
+}
+
+/* Indicador de Hoje com pulso */
+.gj-pulse-dot {
+    display: inline-block;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #22c55e;
+    box-shadow: 0 0 0 0 rgba(34, 197, 94, .7);
+    animation: gj-pulse-anim 2s infinite;
+}
+
+@keyframes gj-pulse-anim {
+    0% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7);
+    }
+    70% {
+        transform: scale(1);
+        box-shadow: 0 0 0 6px rgba(34, 197, 94, 0);
+    }
+    100% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgba(34, 197, 94, 0);
+    }
+}
+
+/* 1. HOJE: Destaque máximo, ação iminente */
+.gj-day-group.gj-day-today {
+    background: linear-gradient(180deg, color-mix(in srgb, var(--primary) 10%, var(--card)) 0%, color-mix(in srgb, var(--primary) 3%, var(--card)) 100%);
+    border: 1px solid color-mix(in srgb, var(--primary) 45%, var(--border));
+    border-left: 4px solid var(--primary);
+    box-shadow: 0 4px 18px -4px color-mix(in srgb, var(--primary) 20%, transparent);
+}
+.gj-day-group.gj-day-today .gj-badge-today {
+    background: var(--primary);
+    color: var(--on-primary, #fff);
+    box-shadow: 0 2px 8px color-mix(in srgb, var(--primary) 40%, transparent);
+}
+.gj-day-group.gj-day-today .gj-day-time {
+    color: var(--primary);
+    font-weight: 700;
+}
+.gj-day-group.gj-day-today .gj-day-count {
+    background: color-mix(in srgb, var(--primary) 20%, transparent);
+    color: color-mix(in srgb, var(--primary) 85%, var(--text));
+    font-weight: 700;
+}
+
+/* 2. AMANHÃ: Destaque secundário, próximo passo claro */
+.gj-day-group.gj-day-tomorrow {
+    background: linear-gradient(180deg, color-mix(in srgb, #0ea5e9 8%, var(--card)) 0%, color-mix(in srgb, #0ea5e9 2%, var(--card)) 100%);
+    border: 1px solid color-mix(in srgb, #0ea5e9 35%, var(--border));
+    border-left: 4px solid #0ea5e9;
+    box-shadow: 0 3px 14px -4px color-mix(in srgb, #0ea5e9 15%, transparent);
+}
+.gj-day-group.gj-day-tomorrow .gj-badge-tomorrow {
+    background: color-mix(in srgb, #0ea5e9 20%, transparent);
+    border: 1px solid color-mix(in srgb, #0ea5e9 55%, transparent);
+    color: #0284c7;
+}
+@media (prefers-color-scheme: dark) {
+    :root:not([data-theme]), :root[data-theme="auto"] {
+        .gj-day-group.gj-day-tomorrow .gj-badge-tomorrow { color: #38bdf8; }
+    }
+}
+:root[data-theme="escuro"] .gj-day-group.gj-day-tomorrow .gj-badge-tomorrow,
+:root[data-theme="floresta"] .gj-day-group.gj-day-tomorrow .gj-badge-tomorrow,
+:root[data-theme="lavanda"] .gj-day-group.gj-day-tomorrow .gj-badge-tomorrow,
+:root[data-theme="contraste"] .gj-day-group.gj-day-tomorrow .gj-badge-tomorrow {
+    color: #38bdf8;
+}
+.gj-day-group.gj-day-tomorrow .gj-day-time {
+    color: color-mix(in srgb, #0ea5e9 85%, var(--text));
+}
+.gj-day-group.gj-day-tomorrow .gj-day-count {
+    background: color-mix(in srgb, #0ea5e9 16%, transparent);
+    color: color-mix(in srgb, #0ea5e9 80%, var(--muted));
+}
+
+/* 3. DIAS SEGUINTES / SUCESSIVAMENTE */
+/* Dia 2 (Depois de amanhã): Roxo/Lavanda */
+.gj-day-group.gj-day-step-2 {
+    background: linear-gradient(180deg, color-mix(in srgb, #a855f7 7%, var(--card)) 0%, color-mix(in srgb, #a855f7 2%, var(--card)) 100%);
+    border: 1px solid color-mix(in srgb, #a855f7 32%, var(--border));
+    border-left: 4px solid #a855f7;
+}
+.gj-day-group.gj-day-step-2 .gj-badge-step-2 {
+    background: color-mix(in srgb, #a855f7 18%, transparent);
+    border: 1px solid color-mix(in srgb, #a855f7 45%, transparent);
+    color: #9333ea;
+}
+@media (prefers-color-scheme: dark) {
+    :root:not([data-theme]), :root[data-theme="auto"] {
+        .gj-day-group.gj-day-step-2 .gj-badge-step-2 { color: #c084fc; }
+    }
+}
+:root[data-theme="escuro"] .gj-day-group.gj-day-step-2 .gj-badge-step-2,
+:root[data-theme="floresta"] .gj-day-group.gj-day-step-2 .gj-badge-step-2,
+:root[data-theme="lavanda"] .gj-day-group.gj-day-step-2 .gj-badge-step-2,
+:root[data-theme="contraste"] .gj-day-group.gj-day-step-2 .gj-badge-step-2 {
+    color: #c084fc;
+}
+
+/* Dia 3: Âmbar/Dourado */
+.gj-day-group.gj-day-step-3 {
+    background: linear-gradient(180deg, color-mix(in srgb, #f59e0b 7%, var(--card)) 0%, color-mix(in srgb, #f59e0b 2%, var(--card)) 100%);
+    border: 1px solid color-mix(in srgb, #f59e0b 32%, var(--border));
+    border-left: 4px solid #f59e0b;
+}
+.gj-day-group.gj-day-step-3 .gj-badge-step-3 {
+    background: color-mix(in srgb, #f59e0b 18%, transparent);
+    border: 1px solid color-mix(in srgb, #f59e0b 45%, transparent);
+    color: #d97706;
+}
+@media (prefers-color-scheme: dark) {
+    :root:not([data-theme]), :root[data-theme="auto"] {
+        .gj-day-group.gj-day-step-3 .gj-badge-step-3 { color: #fbbf24; }
+    }
+}
+:root[data-theme="escuro"] .gj-day-group.gj-day-step-3 .gj-badge-step-3,
+:root[data-theme="floresta"] .gj-day-group.gj-day-step-3 .gj-badge-step-3,
+:root[data-theme="lavanda"] .gj-day-group.gj-day-step-3 .gj-badge-step-3,
+:root[data-theme="contraste"] .gj-day-group.gj-day-step-3 .gj-badge-step-3 {
+    color: #fbbf24;
+}
+
+/* Dia 4: Esmeralda/Verde */
+.gj-day-group.gj-day-step-4 {
+    background: linear-gradient(180deg, color-mix(in srgb, #10b981 7%, var(--card)) 0%, color-mix(in srgb, #10b981 2%, var(--card)) 100%);
+    border: 1px solid color-mix(in srgb, #10b981 32%, var(--border));
+    border-left: 4px solid #10b981;
+}
+.gj-day-group.gj-day-step-4 .gj-badge-step-4 {
+    background: color-mix(in srgb, #10b981 18%, transparent);
+    border: 1px solid color-mix(in srgb, #10b981 45%, transparent);
+    color: #059669;
+}
+@media (prefers-color-scheme: dark) {
+    :root:not([data-theme]), :root[data-theme="auto"] {
+        .gj-day-group.gj-day-step-4 .gj-badge-step-4 { color: #34d399; }
+    }
+}
+:root[data-theme="escuro"] .gj-day-group.gj-day-step-4 .gj-badge-step-4,
+:root[data-theme="floresta"] .gj-day-group.gj-day-step-4 .gj-badge-step-4,
+:root[data-theme="lavanda"] .gj-day-group.gj-day-step-4 .gj-badge-step-4,
+:root[data-theme="contraste"] .gj-day-group.gj-day-step-4 .gj-badge-step-4 {
+    color: #34d399;
+}
+
+/* Dia 5: Rosa/Magenta */
+.gj-day-group.gj-day-step-5 {
+    background: linear-gradient(180deg, color-mix(in srgb, #ec4899 7%, var(--card)) 0%, color-mix(in srgb, #ec4899 2%, var(--card)) 100%);
+    border: 1px solid color-mix(in srgb, #ec4899 32%, var(--border));
+    border-left: 4px solid #ec4899;
+}
+.gj-day-group.gj-day-step-5 .gj-badge-step-5 {
+    background: color-mix(in srgb, #ec4899 18%, transparent);
+    border: 1px solid color-mix(in srgb, #ec4899 45%, transparent);
+    color: #db2777;
+}
+@media (prefers-color-scheme: dark) {
+    :root:not([data-theme]), :root[data-theme="auto"] {
+        .gj-day-group.gj-day-step-5 .gj-badge-step-5 { color: #f472b6; }
+    }
+}
+:root[data-theme="escuro"] .gj-day-group.gj-day-step-5 .gj-badge-step-5,
+:root[data-theme="floresta"] .gj-day-group.gj-day-step-5 .gj-badge-step-5,
+:root[data-theme="lavanda"] .gj-day-group.gj-day-step-5 .gj-badge-step-5,
+:root[data-theme="contraste"] .gj-day-group.gj-day-step-5 .gj-badge-step-5 {
+    color: #f472b6;
+}
+
+/* Dia 6+: Neutro estruturado */
+.gj-day-group.gj-day-step-more {
+    border-left: 4px solid color-mix(in srgb, var(--muted) 45%, var(--border));
+}
+.gj-day-group.gj-day-step-more .gj-badge-step-more {
+    background: color-mix(in srgb, var(--border) 60%, transparent);
+    border: 1px solid var(--border);
+    color: var(--muted);
+}
+
+.gj-day-group .gj-list li {
+    padding: 8px 4px;
+    border-top: 1px solid color-mix(in srgb, var(--border) 60%, transparent);
+    border-radius: 8px;
+    transition: background-color .15s ease;
+}
+.gj-day-group .gj-list li:first-child {
+    border-top: 0;
+}
+.gj-day-group .gj-list li:hover {
+    background: color-mix(in srgb, var(--text) 3.5%, transparent);
+}
 .gj-list { list-style: none; margin: 0; padding: 0; }
 .gj-list li { display: flex; gap: 10px; align-items: flex-start; padding: 7px 0; border-top: 1px solid var(--border); }
 .gj-list li:first-child { border-top: 0; }
@@ -1078,7 +1350,8 @@ body.rest-over [data-live="rest"], body.rest-over [data-w-time] { color: var(--d
 .guruja.gj-sorting, .guruja.gj-sorting * { cursor: grabbing !important; user-select: none; }
 .gj-list li.gj-dragging { position: relative; z-index: 2; background: var(--card); border-radius: 10px; opacity: .95;
     box-shadow: 0 6px 18px rgba(0, 0, 0, .35), inset 3px 0 0 var(--t); }
-.guruja.gj-sorting ul.gj-pending { min-height: 12px; }
+.guruja.gj-sorting .gj-day-group { border-style: dashed; }
+.guruja.gj-sorting ul.gj-pending { min-height: 28px; border-radius: 8px; }
 
 /* Conexão MCP Guruja & Importação Manual */
 .gj-header-right { display: flex; align-items: center; gap: 8px; }
@@ -1093,3 +1366,33 @@ body.rest-over [data-live="rest"], body.rest-over [data-w-time] { color: var(--d
 .btn-subtle:hover { color: var(--primary); }
 .btn.warn { color: var(--warn, #ef4444); border-color: rgba(239, 68, 68, 0.4); }
 .btn.warn:hover { background: rgba(239, 68, 68, 0.1); }
+
+/* ── Gerador de Story (1080×1920) ─────────────────────────────────────────── */
+.timeline-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-top: 8px;
+}
+.timeline-actions .btn { width: 100%; margin: 0; }
+.story-stats-btn { width: 100%; margin: 10px 0 6px; }
+.story-dialog { max-width: 420px; }
+.story-preview-wrap {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #0B1422;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 10px;
+    min-height: 220px;
+}
+.story-preview-img {
+    display: block;
+    width: auto;
+    max-width: 100%;
+    max-height: 55vh;
+    border-radius: 10px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, .35);
+}
+.story-empty { text-align: center; padding: 24px 12px; }

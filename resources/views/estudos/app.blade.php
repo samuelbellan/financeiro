@@ -17,6 +17,9 @@
     <link rel="manifest" href="{{ asset('estudos.webmanifest') }}">
     <link rel="icon" type="image/png" sizes="192x192" href="{{ asset('img/estudos/icon-192.png') }}">
     <link rel="apple-touch-icon" href="{{ asset('img/estudos/icon-192.png') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@700&display=swap" rel="stylesheet">
     <script>try { document.documentElement.dataset.theme = localStorage.getItem('estudos_tema') || 'auto'; } catch (e) {}</script>
     @vite(['resources/css/estudos.css', 'resources/js/estudos/main.js'])
 </head>
