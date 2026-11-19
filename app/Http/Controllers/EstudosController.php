@@ -225,7 +225,9 @@ class EstudosController extends Controller
             try {
                 $mcpService->fetchCurrentMeta(Auth::id());
             } catch (\Throwable $e) {
-                Log::info('Conexão Guruja concluída, mas primeira busca falhou: ' . $e->getMessage());
+                Log::warning('Conexão Guruja concluída, mas primeira busca falhou: ' . $e->getMessage());
+
+                return redirect()->to(route('estudos.index') . '#guruja-conectado-aviso=' . urlencode($e->getMessage()));
             }
 
             return redirect()->to(route('estudos.index') . '#guruja-conectado');
@@ -267,7 +269,7 @@ class EstudosController extends Controller
             return response()->json(['message' => 'Nenhuma atividade ou reforço foi identificado no JSON fornecido.'], 422);
         }
 
-        $mcpService->saveMetaToDatabase(Auth::id(), $meta, now());
+        $meta = $mcpService->saveMetaToDatabase(Auth::id(), $meta, now());
 
         return response()->json([
             'ok' => true,

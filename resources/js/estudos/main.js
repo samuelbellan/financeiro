@@ -1368,6 +1368,13 @@ async function checkGurujaAuthRedirect() {
         await refreshGuruja(true);
         render();
         alert('Conta da Guruja conectada com sucesso! As atividades foram atualizadas.');
+    } else if (location.hash.startsWith('#guruja-conectado-aviso=')) {
+        const msg = decodeURIComponent(location.hash.replace('#guruja-conectado-aviso=', ''));
+        history.replaceState(null, '', location.pathname + location.search);
+        state.tab = 'timer';
+        await refreshGuruja(true);
+        render();
+        alert('Conta da Guruja conectada, mas a primeira atualização falhou: ' + msg);
     } else if (location.hash.startsWith('#guruja-erro=')) {
         const msg = decodeURIComponent(location.hash.replace('#guruja-erro=', ''));
         history.replaceState(null, '', location.pathname + location.search);

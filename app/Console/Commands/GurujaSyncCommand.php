@@ -95,8 +95,10 @@ class GurujaSyncCommand extends Command
             return self::FAILURE;
         }
 
-        $this->warn('Nenhum método automático configurado (OAuth MCP pendente de aprovação e GURUJA_SYNC_FIRE_* não definidos).');
-        $this->line('Para sincronizar agora, você pode:');
+        $this->warn('Nenhum método automático configurado (OAuth MCP não conectado e GURUJA_SYNC_FIRE_* não definidos).');
+        $this->line('Para conectar via OAuth (uma vez, sem IA) e já sincronizar:');
+        $this->line('  php artisan estudos:guruja-connect');
+        $this->line('Ou para importar manualmente:');
         $this->line('  1. Passar um JSON: php artisan estudos:guruja-sync --json=\'{"atividades":[...]}\'');
         $this->line('  2. Passar um arquivo: php artisan estudos:guruja-sync --file=caminho.json');
         $this->line('  3. Passar o Bearer token do MCP: php artisan estudos:guruja-sync --token="<token>"');
