@@ -1396,3 +1396,78 @@ body.rest-over [data-live="rest"], body.rest-over [data-w-time] { color: var(--d
     box-shadow: 0 8px 24px rgba(0, 0, 0, .35);
 }
 .story-empty { text-align: center; padding: 24px 12px; }
+
+/* ── Gerador de Post da Meta (1080×1350, carrossel) ───────────────────────── */
+.gj-post-row { margin-top: 10px; }
+.gj-post-btn { width: 100%; }
+.stats-share-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin: 10px 0 6px;
+}
+.stats-share-actions .btn { width: 100%; margin: 0; }
+.post-meta-dialog { max-width: 560px; width: min(94vw, 560px); }
+.post-meta-notice {
+    padding: 10px 12px;
+    border-radius: 10px;
+    font-size: .84rem;
+    line-height: 1.4;
+    background: color-mix(in srgb, #F5B83D 16%, transparent);
+    border: 1px solid color-mix(in srgb, #F5B83D 55%, transparent);
+    color: var(--text);
+}
+.post-meta-status {
+    text-align: center;
+    padding: 20px 12px;
+    background: #0B1422;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+.post-meta-status p { margin: 0; }
+.post-meta-slides {
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+    padding: 10px;
+    background: #0B1422;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    scroll-snap-type: x proximity;
+}
+.post-meta-thumb {
+    flex: 0 0 auto;
+    width: 148px;
+    margin: 0;
+    scroll-snap-align: start;
+    text-align: center;
+}
+.post-meta-thumb img {
+    display: block;
+    width: 148px;
+    height: 185px;
+    object-fit: cover;
+    border-radius: 8px;
+    cursor: pointer;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, .35);
+    transition: transform .15s ease;
+}
+.post-meta-thumb img:hover { transform: scale(1.03); }
+.post-meta-thumb figcaption {
+    margin-top: 6px;
+    font-size: .72rem;
+    color: var(--muted);
+    font-weight: 600;
+}
+.post-meta-caption-wrap textarea {
+    font-family: inherit;
+    font-size: .82rem;
+    line-height: 1.45;
+    resize: vertical;
+    min-height: 130px;
+}
+.post-meta-actions { flex-wrap: wrap; }

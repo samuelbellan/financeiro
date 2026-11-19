@@ -31,6 +31,7 @@
          data-token-url="{{ route('estudos.token', [], false) }}"
          data-rooms-url="{{ route('estudos.salas', [], false) }}"
          data-guruja-url="{{ route('estudos.guruja', [], false) }}"
+         data-guruja-post-meta-url="{{ route('estudos.guruja.post-meta', [], false) }}"
          data-guruja-atualizar-url="{{ route('estudos.guruja.atualizar', [], false) }}"
          data-guruja-auth-url="{{ route('estudos.guruja.auth', [], false) }}"
          data-guruja-desconectar-url="{{ route('estudos.guruja.desconectar', [], false) }}"

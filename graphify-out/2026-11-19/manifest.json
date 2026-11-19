@@ -55,8 +55,8 @@
     "semantic_hash": ""
   },
   "app/Http/Controllers/EstudosController.php": {
-    "mtime": 1795073693.060907,
-    "ast_hash": "279c582b09b96d59735ba996ea5520da",
+    "mtime": 1795074307.939361,
+    "ast_hash": "5002e64b045723d0098df2f1483aef9e",
     "semantic_hash": ""
   },
   "app/Http/Controllers/ExportController.php": {
@@ -1565,8 +1565,8 @@
     "semantic_hash": ""
   },
   "app/Services/GurujaMcpService.php": {
-    "mtime": 1795073642.0115142,
-    "ast_hash": "a4cf087af2630cee1fb861770a6b32d0",
+    "mtime": 1795074299.2401605,
+    "ast_hash": "90d37ddc8b19133fb6707c32a40a1bcf",
     "semantic_hash": ""
   },
   "database/migrations/2026_11_16_060000_create_study_guruja_tokens_table.php": {

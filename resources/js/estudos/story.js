@@ -1,4 +1,15 @@
 import { formatClock } from './metrics.js';
+import {
+    BODY_FONT,
+    DISPLAY_FONT,
+    FOOTER_BRAND,
+    THEME,
+    canonicalSubjectName,
+    ensureFontsLoaded,
+    fillRoundRect,
+    formatCompactDuration,
+    formatHoursMinutes,
+} from './story-common.js';
 
 const STORY_WIDTH = 1080;
 const STORY_HEIGHT = 1920;
@@ -6,51 +17,6 @@ const PAD_X = 96;
 const PAD_TOP = 256;
 const PAD_BOTTOM = 256;
 const CONTENT_WIDTH = STORY_WIDTH - PAD_X * 2;
-
-const THEME = {
-    bg: '#0F1B2D',
-    card: '#18283F',
-    text: '#F4F1EA',
-    textSecondary: '#C9D2DE',
-    footer: '#9AA7BA',
-    accent: '#F5B83D',
-    secondaryBar: '#6F86A6',
-};
-
-const SUBJECT_ALIASES = {
-    'D. Civil': 'Direito Civil',
-    Contabilidade: 'Contabilidade Geral e Avançada',
-    'TI - CD': 'Tecnologia da Informação',
-    'TI - BD': 'Tecnologia da Informação',
-    'Tecnologia da Informação': 'Tecnologia da Informação',
-    'D. Tributário': 'Direito Tributário',
-    'D. Administrativo': 'Direito Administrativo',
-    'D. Constitucional': 'Direito Constitucional',
-    'D. Empresarial': 'Direito Empresarial (Comercial)',
-    'Mat. Financeira': 'Matemática Financeira',
-    Auditoria: 'Auditoria Privada',
-};
-
-const DISPLAY_FONT = '"Space Grotesk", system-ui, -apple-system, sans-serif';
-const BODY_FONT = '"Inter", system-ui, -apple-system, sans-serif';
-
-function canonicalSubjectName(name) {
-    const trimmed = String(name || 'Matéria').trim();
-    return SUBJECT_ALIASES[trimmed] ?? trimmed;
-}
-
-function formatHoursMinutes(ms) {
-    const totalMin = Math.max(0, Math.round(ms / 60_000));
-    const h = Math.floor(totalMin / 60);
-    const m = totalMin % 60;
-    return `${h}h${String(m).padStart(2, '0')}`;
-}
-
-function formatCompactDuration(ms) {
-    const totalMin = Math.max(0, Math.round(ms / 60_000));
-    if (totalMin < 60) return `${totalMin}min`;
-    return formatHoursMinutes(ms);
-}
 
 function formatStoryDate(day) {
     const [y, m, d] = day.split('-').map(Number);
@@ -66,23 +32,6 @@ function formatStoryDate(day) {
 function dayMidnightMs(day) {
     const [y, m, d] = day.split('-').map(Number);
     return new Date(y, m - 1, d, 0, 0, 0, 0).getTime();
-}
-
-function roundRectPath(ctx, x, y, w, h, r) {
-    const radius = Math.min(r, w / 2, h / 2);
-    ctx.beginPath();
-    ctx.moveTo(x + radius, y);
-    ctx.arcTo(x + w, y, x + w, y + h, radius);
-    ctx.arcTo(x + w, y + h, x, y + h, radius);
-    ctx.arcTo(x, y + h, x, y, radius);
-    ctx.arcTo(x, y, x + w, y, radius);
-    ctx.closePath();
-}
-
-function fillRoundRect(ctx, x, y, w, h, r, color) {
-    ctx.fillStyle = color;
-    roundRectPath(ctx, x, y, w, h, r);
-    ctx.fill();
 }
 
 function consolidateSubjects(bySubject, subjects) {
@@ -123,16 +72,6 @@ function timelineRangeHours(pieces, midnightMs) {
         if (eH > endHour) endHour = Math.ceil(eH);
     }
     return { startHour, endHour };
-}
-
-async function ensureFontsLoaded() {
-    if (!document.fonts) return;
-    await Promise.allSettled([
-        document.fonts.load(`700 48px ${DISPLAY_FONT}`),
-        document.fonts.load(`400 30px ${BODY_FONT}`),
-        document.fonts.load(`700 30px ${BODY_FONT}`),
-        document.fonts.ready,
-    ]);
 }
 
 /**
@@ -333,7 +272,7 @@ export async function renderStudyStoryCanvas({ day, stats, subjects, settings })
     y += statH + 40;
 
     // 6. Rodapé
-    const footerText = 'Samuel · Rumo a Auditor Fiscal';
+    const footerText = FOOTER_BRAND;
     ctx.fillStyle = THEME.footer;
     ctx.font = `400 26px ${BODY_FONT}`;
     const footerW = ctx.measureText(footerText).width;

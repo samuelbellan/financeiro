@@ -408,6 +408,204 @@ class GurujaMcpService
     }
 
     /**
+     * Consulta o histórico de metas e o detalhe de uma meta específica (ou da última concluída) via MCP.
+     * Nunca retorna metas futuras.
+     *
+     * @param callable(int): ?array $resolveCachedPayload Se fornecido e a meta for concluída, evita chamar detalhe_de_uma_meta.
+     */
+    public function fetchMetaForPost(
+        int $userId,
+        ?int $ordem = null,
+        ?callable $resolveCachedPayload = null,
+        ?string $connection = null
+    ): array {
+        $token = $this->getValidAccessToken($userId, false, $connection);
+        if (!$token) {
+            throw new \RuntimeException('Não conectado à Guruja. Conecte sua conta para gerar o post da meta.');
+        }
+
+        try {
+            return $this->executeFetchMetaForPost($token, $ordem, $resolveCachedPayload);
+        } catch (\RuntimeException $e) {
+            if ($e->getCode() !== 401) {
+                throw $e;
+            }
+
+            $refreshed = $this->getValidAccessToken($userId, true, $connection);
+            if (!$refreshed) {
+                throw $e;
+            }
+
+            return $this->executeFetchMetaForPost($refreshed, $ordem, $resolveCachedPayload);
+        }
+    }
+
+    protected function executeFetchMetaForPost(
+        string $token,
+        ?int $ordem,
+        ?callable $resolveCachedPayload
+    ): array {
+        $sessionId = null;
+        $rpcId = 1;
+
+        $this->callMcp($token, 'initialize', [
+            'protocolVersion' => self::PROTOCOL_VERSION,
+            'capabilities' => (object) [],
+            'clientInfo' => ['name' => 'Financeiro Estudos', 'version' => '1.0'],
+        ], $rpcId++, $sessionId);
+
+        try {
+            $this->callMcp($token, 'notifications/initialized', [], null, $sessionId);
+        } catch (\RuntimeException $e) {
+            if ($e->getCode() === 401) {
+                throw $e;
+            }
+            Log::debug('Notificação MCP notifications/initialized ignorada: ' . $e->getMessage());
+        }
+
+        $toolsResult = $this->callMcp($token, 'tools/list', [], $rpcId++, $sessionId);
+        $tools = $toolsResult['tools'] ?? [];
+        if (empty($tools)) {
+            throw new \RuntimeException('O servidor MCP da Guruja não retornou ferramentas disponíveis.');
+        }
+
+        $historicoTool = $this->findTool($tools, ['historico_de_metas'], ['historico', 'meta']);
+        $detalheTool = $this->findTool($tools, ['detalhe_de_uma_meta'], ['detalhe', 'meta']);
+        if (!$historicoTool || !$detalheTool) {
+            throw new \RuntimeException('Ferramentas historico_de_metas/detalhe_de_uma_meta não disponíveis no MCP da Guruja.');
+        }
+
+        $historicoResult = $this->callMcp($token, 'tools/call', [
+            'name' => (string) $historicoTool['name'],
+            'arguments' => (object) [],
+        ], $rpcId++, $sessionId);
+
+        $historicoParsed = $this->extractToolJson($historicoResult);
+        $metasList = $this->extractMetaList($historicoParsed);
+
+        $completedMetas = array_values(array_filter($metasList, fn (array $m) => $this->isCompletedMeta($m)));
+        usort($completedMetas, fn (array $a, array $b) => ((int) ($b['ordem'] ?? 0)) <=> ((int) ($a['ordem'] ?? 0)));
+
+        $activeMeta = $this->findActiveMeta($metasList);
+        if ($activeMeta && $this->isCompletedMeta($activeMeta)) {
+            $activeMeta = null;
+        }
+
+        $metasConcluidas = count($completedMetas);
+        $metasAdiadas = count(array_filter($metasList, fn (array $m) => ((int) ($m['vezes_adiada'] ?? 0)) > 0));
+
+        $targetSummary = null;
+        $isCompleted = false;
+
+        if ($ordem === null) {
+            if (!empty($completedMetas)) {
+                $targetSummary = $completedMetas[0];
+                $isCompleted = true;
+            }
+        } else {
+            foreach ($completedMetas as $m) {
+                if (isset($m['ordem']) && (int) $m['ordem'] === $ordem) {
+                    $targetSummary = $m;
+                    $isCompleted = true;
+                    break;
+                }
+            }
+            if (!$targetSummary && $activeMeta && isset($activeMeta['ordem']) && (int) $activeMeta['ordem'] === $ordem) {
+                $targetSummary = $activeMeta;
+                $isCompleted = false;
+            }
+        }
+
+        if (!$targetSummary) {
+            return [
+                'found' => false,
+                'completed_metas' => $completedMetas,
+                'active_meta' => $activeMeta,
+                'metas_concluidas' => $metasConcluidas,
+                'metas_adiadas' => $metasAdiadas,
+            ];
+        }
+
+        $targetOrdem = isset($targetSummary['ordem']) ? (int) $targetSummary['ordem'] : $ordem;
+        if ($isCompleted && $targetOrdem !== null && $resolveCachedPayload !== null) {
+            $cached = $resolveCachedPayload($targetOrdem);
+            if ($cached !== null) {
+                return [
+                    'found' => true,
+                    'cached' => true,
+                    'cached_payload' => $cached,
+                    'concluida' => true,
+                    'summary' => $targetSummary,
+                    'completed_metas' => $completedMetas,
+                    'active_meta' => $activeMeta,
+                    'metas_concluidas' => $metasConcluidas,
+                    'metas_adiadas' => $metasAdiadas,
+                ];
+            }
+        }
+
+        $targetId = $targetSummary['target_id'] ?? $targetSummary['id'] ?? null;
+        if ($targetId === null) {
+            throw new \RuntimeException('A meta selecionada da Guruja não possui target_id.');
+        }
+
+        $paramName = $this->resolveTargetIdParamName($detalheTool);
+        $detalheResult = $this->callMcp($token, 'tools/call', [
+            'name' => (string) $detalheTool['name'],
+            'arguments' => [$paramName => is_numeric($targetId) ? (int) $targetId : $targetId],
+        ], $rpcId++, $sessionId);
+
+        $detalheParsed = $this->extractToolJson($detalheResult);
+        $detalheBody = isset($detalheParsed['meta']) && is_array($detalheParsed['meta'])
+            ? $detalheParsed['meta']
+            : $detalheParsed;
+
+        $merged = $detalheBody;
+        foreach ([
+            'target_id', 'ordem', 'status', 'concluida', 'esta_em_andamento',
+            'data_inicio', 'data_conclusao', 'dias_atraso', 'vezes_adiada',
+            'questoes_resolvidas', 'acertos', 'minutos_estudados',
+        ] as $key) {
+            if (!isset($merged[$key]) && isset($targetSummary[$key])) {
+                $merged[$key] = $targetSummary[$key];
+            }
+        }
+        if (!isset($merged['target_id'])) {
+            $merged['target_id'] = (int) $targetId;
+        }
+        $merged['concluida'] = $isCompleted;
+
+        $meta = $this->normalizeMetaPayload($merged);
+
+        return [
+            'found' => true,
+            'cached' => false,
+            'concluida' => $isCompleted,
+            'summary' => $targetSummary,
+            'meta' => $meta,
+            'completed_metas' => $completedMetas,
+            'active_meta' => $activeMeta,
+            'metas_concluidas' => $metasConcluidas,
+            'metas_adiadas' => $metasAdiadas,
+        ];
+    }
+
+    public function isCompletedMeta(array $meta): bool
+    {
+        if (array_key_exists('concluida', $meta)) {
+            return (bool) $meta['concluida'];
+        }
+
+        if (!empty($meta['esta_em_andamento'])) {
+            return false;
+        }
+
+        $status = strtolower((string) ($meta['status'] ?? ''));
+
+        return in_array($status, ['ontime', 'anticipated', 'late', 'concluida', 'concluido', 'completed', 'finished'], true);
+    }
+
+    /**
      * Consulta a meta atual através do conector MCP da Guruja e atualiza o banco.
      */
     public function fetchCurrentMeta(int $userId, ?string $connection = null): array
@@ -825,6 +1023,9 @@ class GurujaMcpService
         }
         if (!empty($meta['data_inicio']) && is_string($meta['data_inicio'])) {
             $meta['data_inicio'] = $this->normalizeDataInicio($meta['data_inicio']);
+        }
+        if (!empty($meta['data_conclusao']) && is_string($meta['data_conclusao'])) {
+            $meta['data_conclusao'] = $this->normalizeDataInicio($meta['data_conclusao']);
         }
 
         if (!isset($meta['atividades']) && isset($meta['tasks'])) {

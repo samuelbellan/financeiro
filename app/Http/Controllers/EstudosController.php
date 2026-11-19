@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Services\GurujaComandoResumoService;
 use App\Services\GurujaMcpService;
+use App\Services\GurujaPostMetaService;
 use App\Services\StudySyncService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -132,6 +133,49 @@ class EstudosController extends Controller
         }
 
         return response()->json(['ok' => true]);
+    }
+
+    /**
+     * Dados prontos para o carrossel do Instagram de uma meta concluída (ou em andamento) da Guruja.
+     */
+    public function gurujaPostMeta(
+        Request $request,
+        GurujaMcpService $mcpService,
+        GurujaPostMetaService $postMetaService
+    ): JsonResponse {
+        $data = $request->validate([
+            'ordem' => 'nullable|integer|min:1',
+        ]);
+
+        $userId = Auth::id();
+        if (!$mcpService->isConnected($userId)) {
+            return response()->json([
+                'message' => 'Conecte sua conta da Guruja para gerar o post da meta.',
+                'mcp_auth_url' => route('estudos.guruja.auth'),
+            ], 409);
+        }
+
+        $ordem = isset($data['ordem']) ? (int) $data['ordem'] : null;
+
+        try {
+            $payload = $postMetaService->buildForUser($userId, $ordem);
+        } catch (\Throwable $e) {
+            Log::warning('Erro ao montar post da meta da Guruja: ' . $e->getMessage());
+
+            return response()->json([
+                'message' => 'Falha ao consultar dados da Guruja: ' . $e->getMessage(),
+            ], 502);
+        }
+
+        if ($payload === null) {
+            return response()->json([
+                'message' => $ordem !== null
+                    ? "Meta {$ordem} não encontrada no histórico da Guruja."
+                    : 'Nenhuma meta concluída encontrada na Guruja.',
+            ], 404);
+        }
+
+        return response()->json($payload);
     }
 
     /**
