@@ -14,10 +14,6 @@ use App\Services\WhatsappMessageParser;
 use App\Services\TelegramService;
 use App\Services\GeminiService;
 use App\Services\CreditCardService;
-use App\Services\FiscalTelegramNotifierService;
-use App\Services\FiscalConcursoDataService;
-use App\Models\FiscalConcurso;
-use App\Models\FiscalNoticia;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -39,9 +35,7 @@ class TelegramWebhookController extends Controller
     public function __construct(
         protected WhatsappMessageParser $parser,
         protected TelegramService $telegram,
-        protected GeminiService $gemini,
-        protected FiscalTelegramNotifierService $fiscalNotifier,
-        protected FiscalConcursoDataService $fiscalData
+        protected GeminiService $gemini
     ) {}
 
     /**
@@ -200,19 +194,6 @@ class TelegramWebhookController extends Controller
             if ($ext === 'ofx' || str_ends_with(strtolower($fileName), '.ofx') || $mime === 'application/x-ofx') {
                 return $this->handleOfxDocument($user, $chatId, $document);
             }
-        }
-
-        // ── 5.5. Interceptar Comandos do Módulo Fiscal & Concursos ─────────────
-        $fiscalResponse = $this->handleFiscalTelegramCommand($texto ?? '', $chatId);
-        if ($fiscalResponse !== null) {
-            $this->telegram->sendMessage($chatId, $fiscalResponse);
-            WhatsappLog::create([
-                'numero'            => "tg:{$chatId}",
-                'mensagem_original' => $texto,
-                'status'            => 'ok',
-                'resposta'          => $fiscalResponse,
-            ]);
-            return response()->json(['ok' => true, 'processed' => 'fiscal_command']);
         }
 
         // ── 6. Parsear mensagem de texto (Gemini IA com fallback para Regex) ──────────────────
@@ -482,132 +463,13 @@ class TelegramWebhookController extends Controller
 
     protected function cmdAjuda(): string
     {
-        return "🤖 *Assistente Financeiro & Radar Fiscal:*\n\n"
+        return "🤖 *Assistente Financeiro:*\n\n"
             . "💳 *Finanças e Cartões:*\n"
             . "• `lancei 35 de uber no cartao visa`\n"
             . "• `despesa de 50 de mercado no cartao vuon`\n"
             . "• `saldo` — ver saldo consolidado do mês\n"
-            . "• `fatura visa pdf` — exportar fatura em PDF\n\n"
-            . "🏛️ *Radar de Concursos Fiscais:*\n"
-            . "• `/fiscal` ou `/concursos` — panorama dos editais quentes\n"
-            . "• `/sefaz sp` — raio-x e remuneração da SEFAZ (ou qualquer UF)\n"
-            . "• `/iss sp` — raio-x e remuneração do ISS (ou qualquer cidade)\n"
-            . "• `/receita` — detalhes de Auditor e Analista da Receita Federal\n"
-            . "• `/noticias_fiscal` — últimas notícias fiscais monitoradas\n"
+            . "• `fatura visa pdf` — exportar fatura em PDF\n"
             . "• `/ajuda` — ver esta mensagem";
-    }
-
-    /**
-     * Trata comandos específicos do Radar Fiscal e Remunerações.
-     */
-    protected function handleFiscalTelegramCommand(string $texto, int|string $chatId): ?string
-    {
-        $limpo = trim($texto);
-        $termo = strtolower($limpo);
-
-        // 1. Comando Geral de Concursos Fiscais
-        if (in_array($termo, ['/fiscal', '/concursos', '/concurso', '/radar', 'concursos fiscais', 'concursos'])) {
-            return $this->fiscalNotifier->formatHotContestsSummary();
-        }
-
-        // 2. Notícias Fiscais Recentes
-        if (in_array($termo, ['/noticias_fiscal', '/noticias', '/noticia', 'noticias fiscais', 'noticias fiscal'])) {
-            $noticias = FiscalNoticia::recentes(5)->get();
-            if ($noticias->isEmpty()) {
-                return "📭 Nenhuma notícia fiscal cadastrada no momento. Execute a busca no sistema web.";
-            }
-
-            $msg = "📰 *ÚLTIMAS NOTÍCIAS DOS CONCURSOS FISCAIS* 📰\n";
-            $msg .= "━━━━━━━━━━━━━━━━━━━━━━\n\n";
-            foreach ($noticias as $n) {
-                $emoji = match ($n->esfera) {
-                    'federal'   => '🏛️',
-                    'estadual'  => '🗺️',
-                    'municipal' => '🏙️',
-                    default     => '📜',
-                };
-                $data = $n->publicado_em ? $n->publicado_em->format('d/m/Y') : '';
-                $msg .= "{$emoji} *{$n->titulo}*\n";
-                $msg .= "📅 {$data} | Fonte: {$n->fonte}\n";
-                $msg .= "🔗 [Ver Notícia]({$n->url})\n";
-                $msg .= "──────────────────────\n";
-            }
-            $msg .= "\n💡 _Para ver a análise salarial de um órgão, use /sefaz <uf> ou /iss <cidade>_";
-            return $msg;
-        }
-
-        // 3. Receita Federal Direta
-        if (in_array($termo, ['/receita', '/rfb', '/receita_federal', 'receita federal', 'auditor receita', 'analista receita'])) {
-            $auditor = FiscalConcurso::where('sigla', 'RFB - Auditor')->first();
-            $analista = FiscalConcurso::where('sigla', 'RFB - Analista')->first();
-
-            $msg = "🏛️ *RECEITA FEDERAL DO BRASIL (RFB)* 🏛️\n";
-            $msg .= "━━━━━━━━━━━━━━━━━━━━━━\n\n";
-
-            if ($auditor) {
-                $msg .= "👑 *AUDITOR-FISCAL (AFRFB)*\n";
-                $msg .= "💵 Inicial: `{$auditor->remuneracao_inicial_formatada}`\n";
-                $msg .= "▫️ Base: R$ " . number_format((float)$auditor->vencimento_basico, 2, ',', '.') . " + Bônus Eficiência (até R$ 11.500)\n";
-                $msg .= "💎 Real Transparência: `{$auditor->remuneracao_real_formatada}`\n";
-                $msg .= "🏆 Teto: `{$auditor->remuneracao_teto_formatada}`\n";
-                $msg .= "🎓 Requisito: {$auditor->requisito_escolaridade}\n\n";
-            }
-
-            if ($analista) {
-                $msg .= "🛡️ *ANALISTA-TRIBUTÁRIO (ATRFB)*\n";
-                $msg .= "💵 Inicial: `{$analista->remuneracao_inicial_formatada}`\n";
-                $msg .= "▫️ Base: R$ " . number_format((float)$analista->vencimento_basico, 2, ',', '.') . " + Bônus Eficiência\n";
-                $msg .= "💎 Real Transparência: `{$analista->remuneracao_real_formatada}`\n";
-                $msg .= "🏆 Teto: `{$analista->remuneracao_teto_formatada}`\n";
-                $msg .= "🎓 Requisito: {$analista->requisito_escolaridade}\n\n";
-            }
-
-            $msg .= "💡 _Novo pedido com mais de 2.000 vagas em tramitação no MGI._";
-            return $msg;
-        }
-
-        // 4. SEFAZ Estadual (/sefaz sp, /sefaz mg, etc.)
-        if (str_starts_with($termo, '/sefaz') || str_starts_with($termo, 'sefaz ')) {
-            $param = trim(preg_replace('/^\/?sefaz\s*/i', '', $limpo));
-            if (empty($param)) {
-                return "ℹ️ *Uso do comando SEFAZ:*\nEnvie `/sefaz <UF>` para pesquisar a remuneração detalhada.\nExemplo: `/sefaz sp`, `/sefaz rj`, `/sefaz mg`, `/sefaz sc`, `/sefaz pr`.";
-            }
-
-            $concurso = $this->fiscalData->search("SEFAZ " . $param) ?? $this->fiscalData->search($param);
-            if ($concurso) {
-                return $this->fiscalNotifier->formatConcursoProfileMessage($concurso);
-            }
-
-            return "❌ Não encontrei dados para a SEFAZ informada ('{$param}'). Tente a sigla do estado (ex: `/sefaz sp`).";
-        }
-
-        // 5. ISS Municipal (/iss sp, /iss curitiba, /iss bh, etc.)
-        if (str_starts_with($termo, '/iss') || str_starts_with($termo, 'iss ')) {
-            $param = trim(preg_replace('/^\/?iss\s*/i', '', $limpo));
-            if (empty($param)) {
-                return "ℹ️ *Uso do comando ISS:*\nEnvie `/iss <cidade ou sigla>` para pesquisar a remuneração detalhada.\nExemplo: `/iss sp`, `/iss curitiba`, `/iss rio`, `/iss bh`, `/iss campinas`, `/iss osasco`.";
-            }
-
-            $concurso = $this->fiscalData->search("ISS " . $param) ?? $this->fiscalData->search($param);
-            if ($concurso) {
-                return $this->fiscalNotifier->formatConcursoProfileMessage($concurso);
-            }
-
-            return "❌ Não encontrei dados para o ISS informado ('{$param}'). Tente o nome da cidade ou sigla (ex: `/iss curitiba`, `/iss sp`).";
-        }
-
-        // 6. Pesquisa livre de remuneração (/remuneracao <termo>)
-        if (str_starts_with($termo, '/remuneracao') || str_starts_with($termo, 'salario ')) {
-            $param = trim(preg_replace('/^\/?(remuneracao|salario)\s*/i', '', $limpo));
-            if (!empty($param)) {
-                $concurso = $this->fiscalData->search($param);
-                if ($concurso) {
-                    return $this->fiscalNotifier->formatConcursoProfileMessage($concurso);
-                }
-            }
-        }
-
-        return null;
     }
 
     /**

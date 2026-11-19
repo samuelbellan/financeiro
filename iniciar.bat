@@ -2,8 +2,8 @@
 title Sistema Financeiro
 cd /d C:\Users\SaMuB\Documents\financeiro
 
-:: Ler porta configurada no .env (se nao definida, padrao 8001)
-set PORT=8001
+:: Ler porta configurada no .env (se nao definida, padrao 8000)
+set PORT=8000
 for /f "tokens=1,2 delims==" %%a in ('findstr /r "^SERVER_PORT=" .env') do (
     set PORT=%%b
 )
@@ -33,6 +33,7 @@ echo.
 curl.exe -s --connect-timeout 2 "https://qrenco.de/http://%LOCAL_IP%:%PORT%?inline=true" 2>nul
 echo.
 echo ========================================================================
+echo O ngrok e o servidor local serao iniciados.
 echo O navegador sera aberto automaticamente.
 echo Para desligar o sistema, feche esta janela preta.
 echo ========================================================================
@@ -82,3 +83,6 @@ start /min cmd /c "timeout /t 2 /nobreak >nul && start http://127.0.0.1:%PORT%/h
 echo [4/4] Iniciando o servidor PHP Laravel escutando em 0.0.0.0:%PORT%...
 set PHP_CLI_SERVER_WORKERS=8
 php -d upload_max_filesize=128M -d post_max_size=128M -d memory_limit=512M -d max_execution_time=0 artisan serve --host=0.0.0.0 --port=%PORT%
+
+:: Limpeza ao encerrar (caso feche com Ctrl+C)
+taskkill /f /im ngrok.exe >nul 2>&1

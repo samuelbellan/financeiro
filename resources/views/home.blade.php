@@ -53,15 +53,6 @@
                         <span>Supermercado & NFs</span>
                     </a>
 
-                    <a href="{{ route('fiscal.index') }}" class="nav-item">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
-                            <path d="M12 8v4"></path>
-                            <path d="M12 16h.01"></path>
-                        </svg>
-                        <span>Concursos Fiscais</span>
-                    </a>
-
                     <a href="{{ route('estudos.index') }}" class="nav-item">
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <circle cx="12" cy="12" r="10"></circle>
@@ -70,16 +61,7 @@
                         <span>Horas de Estudo</span>
                     </a>
 
-                                        <a href="{{ route('photos.index') }}" class="nav-item">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-                            <circle cx="8.5" cy="8.5" r="1.5"></circle>
-                            <polyline points="21 15 16 10 5 21"></polyline>
-                        </svg>
-                        <span>Galeria Fotos</span>
-                    </a>
-
-<a href="{{ route('salary.index') }}" class="nav-item">
+                    <a href="{{ route('salary.index') }}" class="nav-item">
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
                             <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
@@ -227,19 +209,6 @@
 
 
                                         <div class="info-card">
-                        <div class="card-icon card-icon-purple" style="background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-                                <circle cx="8.5" cy="8.5" r="1.5"></circle>
-                                <polyline points="21 15 16 10 5 21"></polyline>
-                            </svg>
-                        </div>
-                        <h3>Galeria de Fotos</h3>
-                        <p>Mapeamento inteligente de fotos divididos por produtores, modelos, datas e álbuns.</p>
-                        <a href="{{ route('photos.index') }}" class="card-link">Acessar →</a>
-                    </div>
-
-<div class="info-card">
                         <div class="card-icon card-icon-green" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);">
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
@@ -249,19 +218,6 @@
                         <h3>Projetor Salarial</h3>
                         <p>Simulador e projetor salarial TJMS com plano de carreira, tributos e auxílios.</p>
                         <a href="{{ route('salary.index') }}" class="card-link">Acessar →</a>
-                    </div>
-
-                    <div class="info-card">
-                        <div class="card-icon card-icon-blue" style="background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
-                                <path d="M12 8v4"></path>
-                                <path d="M12 16h.01"></path>
-                            </svg>
-                        </div>
-                        <h3>Concursos Fiscais & Salários</h3>
-                        <p>Radar de notícias e pesquisa aprofundada de remunerações da área fiscal (RFB, 27 SEFAZ e 30+ ISS) com alertas no Telegram.</p>
-                        <a href="{{ route('fiscal.index') }}" class="card-link">Acessar →</a>
                     </div>
 
                     <div class="info-card">

@@ -11,9 +11,7 @@ use App\Http\Controllers\ExportController;
 use App\Http\Controllers\TelegramWebhookController;
 use App\Http\Controllers\EstudosController;
 use App\Http\Controllers\StudyRoomsController;
-use App\Http\Controllers\PhotoController;
 use App\Http\Controllers\SalaryController;
-use App\Http\Controllers\FiscalConcursosController;
 use App\Http\Controllers\MercadoController;
 use App\Http\Controllers\TreinosController;
 use App\Http\Controllers\DatabaseSyncController;
@@ -162,27 +160,6 @@ Route::middleware('auth')->group(function () {
         return redirect()->route('home');
     })->name('dashboard');
 
-    // Sistema 7 - Galeria & Mapeador de Fotos Inteligente
-    Route::get('/photos/login', [PhotoController::class, 'showLogin'])->name('photos.login');
-    Route::post('/photos/login', [PhotoController::class, 'login'])->name('photos.login.post');
-    Route::post('/photos/logout', [PhotoController::class, 'logout'])->name('photos.logout');
-
-    Route::middleware(\App\Http\Middleware\PhotoAuth::class)->group(function () {
-        Route::get('/photos', [PhotoController::class, 'index'])->name('photos.index');
-        Route::get('/photos/album/{id}', [PhotoController::class, 'showAlbum'])->name('photos.album');
-        Route::get('/photos/file', [PhotoController::class, 'servePhoto'])->name('photos.serve');
-        Route::post('/photos/sync', [PhotoController::class, 'sync'])->name('photos.sync');
-        Route::post('/photos/locations/add', [PhotoController::class, 'addLocation'])->name('photos.locations.add');
-        Route::post('/photos/locations/remove', [PhotoController::class, 'removeLocation'])->name('photos.locations.remove');
-        Route::post('/photos/pregenerate-thumbs', [PhotoController::class, 'pregenerateThumbs'])->name('photos.pregenerate');
-        Route::post('/photos/album/{id}/rate', [PhotoController::class, 'rateAlbum'])->name('photos.album.rate');
-        Route::post('/photos/album/{id}/favorite', [PhotoController::class, 'favoriteAlbum'])->name('photos.album.favorite');
-        Route::post('/photos/album/{id}/tags', [PhotoController::class, 'updateTags'])->name('photos.album.tags');
-        Route::post('/photos/album/{id}/delete', [PhotoController::class, 'deleteAlbum'])->name('photos.album.delete');
-        Route::post('/photos/album/{id}/open-folder', [PhotoController::class, 'openFolder'])->name('photos.album.open-folder');
-        Route::post('/photos/rescan-models', [PhotoController::class, 'rescanModels'])->name('photos.rescan-models');
-    });
-
     // Sistema 7 - Simulador & Projetor Salarial (TJMS)
     Route::get('/salario', [SalaryController::class, 'index'])->name('salary.index');
     Route::post('/salario/projetar', [SalaryController::class, 'project'])->name('salary.project');
@@ -194,18 +171,6 @@ Route::middleware('auth')->group(function () {
     Route::patch('/salario/holerites/{mesAno}/outlier', [SalaryController::class, 'toggleOutlier'])
         ->where('mesAno', '\d{4}-\d{2}')
         ->name('salary.payslips.outlier');
-
-    // Sistema 9 - Radar de Concursos Fiscais & Remunerações com Alertas Telegram
-    Route::get('/concursos-fiscais', [FiscalConcursosController::class, 'index'])->name('fiscal.index');
-    Route::get('/concursos-fiscais/concurso/{id}', [FiscalConcursosController::class, 'show'])->name('fiscal.show');
-    Route::put('/concursos-fiscais/concurso/{id}', [FiscalConcursosController::class, 'update'])->name('fiscal.update');
-    Route::post('/concursos-fiscais/concurso/{id}/reset', [FiscalConcursosController::class, 'reset'])->name('fiscal.reset');
-    Route::post('/concursos-fiscais/ai-extract-url', [FiscalConcursosController::class, 'extractFromUrl'])->name('fiscal.ai-extract-url');
-    Route::post('/concursos-fiscais/crawl', [FiscalConcursosController::class, 'crawl'])->name('fiscal.crawl');
-    Route::post('/concursos-fiscais/send-news-telegram/{id}', [FiscalConcursosController::class, 'sendNewsToTelegram'])->name('fiscal.send-news-telegram');
-    Route::post('/concursos-fiscais/send-concurso-telegram/{id}', [FiscalConcursosController::class, 'sendConcursoToTelegram'])->name('fiscal.send-concurso-telegram');
-    Route::post('/concursos-fiscais/test-telegram', [FiscalConcursosController::class, 'testTelegram'])->name('fiscal.test-telegram');
-    Route::post('/concursos-fiscais/telegram-config', [FiscalConcursosController::class, 'saveTelegramConfig'])->name('fiscal.telegram-config');
 
     // Sistema 10 - Treinos & Exercícios Físicos & BodyTracker
     Route::get('/treinos', [TreinosController::class, 'index'])->name('treinos.index');

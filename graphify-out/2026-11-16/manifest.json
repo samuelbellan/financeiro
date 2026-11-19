@@ -55,7 +55,7 @@
     "semantic_hash": ""
   },
   "app/Http/Controllers/EstudosController.php": {
-    "mtime": 1794817293.3156242,
+    "mtime": 1794817975.8598094,
     "ast_hash": "8b92a3ea9db00e2a57edb3083930eb44",
     "semantic_hash": ""
   },
@@ -475,7 +475,7 @@
     "semantic_hash": ""
   },
   "routes/web.php": {
-    "mtime": 1794817244.7759714,
+    "mtime": 1794817975.8939865,
     "ast_hash": "1faa9ccb0df2ca79468a6db1c923089d",
     "semantic_hash": ""
   },
@@ -1175,7 +1175,7 @@
     "semantic_hash": ""
   },
   "app/Services/StudySyncService.php": {
-    "mtime": 1794768182.5632012,
+    "mtime": 1794817975.8598094,
     "ast_hash": "daffa0f34dccddf0f41905cb22faa773",
     "semantic_hash": ""
   },
@@ -1220,12 +1220,12 @@
     "semantic_hash": ""
   },
   "resources/js/estudos/main.js": {
-    "mtime": 1794817459.5351362,
+    "mtime": 1794817975.890841,
     "ast_hash": "ac56df3d0a2f4aa47855e447ac6b3d16",
     "semantic_hash": ""
   },
   "resources/js/estudos/metrics.js": {
-    "mtime": 1794768235.052536,
+    "mtime": 1794817975.8918397,
     "ast_hash": "170664e8f742dd3b45c26fb0bb87817a",
     "semantic_hash": ""
   },
@@ -1235,7 +1235,7 @@
     "semantic_hash": ""
   },
   "resources/views/estudos/app.blade.php": {
-    "mtime": 1794817311.454137,
+    "mtime": 1794817975.8939865,
     "ast_hash": "83d31c42ca21c58381676964b2fa399b",
     "semantic_hash": ""
   },
@@ -1245,7 +1245,7 @@
     "semantic_hash": ""
   },
   "tests/Feature/StudySyncTest.php": {
-    "mtime": 1794768196.6930404,
+    "mtime": 1794817975.8959863,
     "ast_hash": "3b71ec6d26e3d5da3f85b6af344f1e90",
     "semantic_hash": ""
   },
@@ -1260,8 +1260,8 @@
     "semantic_hash": ""
   },
   "tests/js/estudos/metrics.test.js": {
-    "mtime": 1794768264.8000455,
-    "ast_hash": "278407039b44d1707c1094d9ae2f56c8",
+    "mtime": 1794817975.8969934,
+    "ast_hash": "695994fb5e07f6aed9e6a33f9dcc39da",
     "semantic_hash": ""
   },
   "tests/js/estudos/trends.test.js": {
@@ -1425,8 +1425,8 @@
     "semantic_hash": ""
   },
   "resources/js/estudos/bosses.js": {
-    "mtime": 1794680580.2732413,
-    "ast_hash": "dc3c9acc9bab2863c096ebbe53f18094",
+    "mtime": 1794817970.375125,
+    "ast_hash": "b2a6a8d3a3ecc6695e26baeb575ad83a",
     "semantic_hash": ""
   },
   "resources/js/estudos/jornada.js": {
@@ -1445,7 +1445,7 @@
     "semantic_hash": ""
   },
   "resources/js/estudos/widget.js": {
-    "mtime": 1794768322.124707,
+    "mtime": 1794817975.8929884,
     "ast_hash": "01ffdb2000cb028603cc18d8744a56f6",
     "semantic_hash": ""
   },
@@ -1485,8 +1485,8 @@
     "semantic_hash": ""
   },
   "tests/js/estudos/jornada.test.js": {
-    "mtime": 1794680580.2782416,
-    "ast_hash": "e29b962674a670b1dffb06e2e36d1347",
+    "mtime": 1794817970.3778014,
+    "ast_hash": "bbca9c1339af74d1bb18f3770f8d9727",
     "semantic_hash": ""
   },
   "tests/js/estudos/projection.test.js": {
@@ -1505,7 +1505,7 @@
     "semantic_hash": ""
   },
   "tests/js/estudos/widget.test.js": {
-    "mtime": 1794768335.7349122,
+    "mtime": 1794817975.8979928,
     "ast_hash": "820e1a7eb044032802d4512139e582ec",
     "semantic_hash": ""
   },
@@ -1665,7 +1665,7 @@
     "semantic_hash": ""
   },
   "tests/Feature/EstudosGurujaTest.php": {
-    "mtime": 1794817597.4459326,
+    "mtime": 1794817975.8949873,
     "ast_hash": "b3f25404419410ad20d072539d8946ce",
     "semantic_hash": ""
   },
@@ -1690,23 +1690,43 @@
     "semantic_hash": ""
   },
   "database/migrations/2026_11_15_150000_add_reforco_settings_and_session_fields.php": {
-    "mtime": 1794768127.7890584,
-    "ast_hash": "c943efd56a2c0f682674a07400e56aea",
+    "mtime": 1794817975.9485853,
+    "ast_hash": "4e48e89e0f085ddb788aaf754ca8dfb6",
     "semantic_hash": ""
   },
   "app/Services/GurujaMcpService.php": {
-    "mtime": 1794817052.1312985,
-    "ast_hash": "16615a6e988d37c0c88c158a32f1fdc2",
+    "mtime": 1794821762.5449016,
+    "ast_hash": "5cb58f8471f8d3913c807922d6cb2d1c",
     "semantic_hash": ""
   },
   "database/migrations/2026_11_16_060000_create_study_guruja_tokens_table.php": {
-    "mtime": 1794816977.6691577,
-    "ast_hash": "f959906ece432705e749be43d15ecfc3",
+    "mtime": 1794817975.9485853,
+    "ast_hash": "e94764fdc7fcbef0084cbb45bfc788fe",
     "semantic_hash": ""
   },
   "tests/Feature/EstudosGurujaMcpTest.php": {
-    "mtime": 1794817531.9900072,
-    "ast_hash": "8fc68469b5d1f25d16e18ecfed77ffe4",
+    "mtime": 1794817975.9904473,
+    "ast_hash": "544f66d9f0b06dc125979baa8ff6e33d",
+    "semantic_hash": ""
+  },
+  "app/Console/Commands/GurujaSyncCommand.php": {
+    "mtime": 1794821722.475397,
+    "ast_hash": "aaed3b264dafcf891cdeb0f36d1b7d9b",
+    "semantic_hash": ""
+  },
+  ".agents/rules/guruja.md": {
+    "mtime": 1794821801.3159163,
+    "ast_hash": "72ecccdaafe52f65b1ef9f9ac467b2dc",
+    "semantic_hash": ""
+  },
+  ".agents/skills/guruja-sync/SKILL.md": {
+    "mtime": 1794821777.276733,
+    "ast_hash": "e829b050b4c91478823804b398541e5c",
+    "semantic_hash": ""
+  },
+  "public/bosses/imagens-fonte/boss-01-entrada.png": {
+    "mtime": 1794817970.3644698,
+    "ast_hash": "a0a1cf830cdcf0ddd2a35d8a8975ed06",
     "semantic_hash": ""
   }
 }
