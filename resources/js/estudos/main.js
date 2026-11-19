@@ -15,6 +15,7 @@ import {
     averagePace, manualPace, paceWeeklyMs, projectDate, reachedOn, requiredPerDay, totalMs as historyTotalMs, weekdayPace,
 } from './projection.js';
 import { createRoomsApi, memberTodayMs } from './rooms.js';
+import { buildPostCaption, renderPostMetaCanvases } from './post-meta.js';
 import { renderStudyStoryCanvas } from './story.js';
 import { createSync } from './sync.js';
 import { createWidget, widgetSupported } from './widget.js';
@@ -1394,7 +1395,8 @@ function renderGuruja() {
             <p class="muted small gj-empty-desc">Sincronize suas atividades conectando sua conta ou cole o JSON da meta manualmente.</p>
             <div class="gj-empty-actions">
                 ${isConnected
-                    ? `<button type="button" class="btn" data-action="guruja-refresh">↻ Sincronizar Atividades</button>`
+                    ? `<button type="button" class="btn" data-action="guruja-refresh">↻ Sincronizar Atividades</button>
+                       <button type="button" class="btn ghost" data-action="post-meta-open">Gerar post da meta</button>`
                     : (config.gurujaAuthUrl ? `<a href="${esc(config.gurujaAuthUrl)}" class="btn gj-auth-btn">🔗 Conectar Guruja</a>` : '')}
                 <button type="button" class="btn ghost" data-action="guruja-import-json">📥 Colar JSON</button>
             </div>
@@ -1439,6 +1441,9 @@ function renderGuruja() {
         ${done.length ? `<button type="button" class="gj-toggle" data-action="guruja-done">
             ${guruja.showDone ? '▾' : '▸'} Concluídas (${done.length})</button>
             ${guruja.showDone ? `<ul class="gj-list">${done.map((a) => gurujaItem(a, true)).join('')}</ul>` : ''}` : ''}
+        <div class="gj-post-row">
+            <button type="button" class="btn ghost gj-post-btn" data-action="post-meta-open">Gerar post da meta</button>
+        </div>
         <div class="gj-updated">
             <div class="gj-updated-left">
                 <button type="button" data-action="guruja-help">⚑ Comandos</button>
@@ -1661,7 +1666,10 @@ function renderStats() {
             <button type="button" data-action="stats-next" aria-label="Próximo" ${to >= t ? 'disabled' : ''}>›</button>
         </nav>
         ${summary}
-        ${mode === 'day' ? `<button type="button" class="btn story-stats-btn" data-action="story-open" data-day="${from}">Gerar Story do dia</button>` : ''}
+        ${mode === 'day' ? `<div class="stats-share-actions">
+            <button type="button" class="btn" data-action="story-open" data-day="${from}">Gerar Story do dia</button>
+            <button type="button" class="btn ghost" data-action="post-meta-open">Gerar post da meta</button>
+        </div>` : mode === 'week' ? `<button type="button" class="btn ghost story-stats-btn" data-action="post-meta-open">Gerar post da meta</button>` : ''}
         ${isCurrent ? renderComparison(d, mode, t) : ''}
         ${renderStudyVsOther(d, from, to)}
         ${mode !== 'day' ? '<div class="chart-box"><canvas data-chart="bars"></canvas></div>' : ''}
@@ -2580,6 +2588,206 @@ function openStoryDialog(initialDay) {
     refreshPreview(currentDay);
 }
 
+function downloadCanvasPng(canvas, filename) {
+    return canvasToPngBlob(canvas).then((blob) => {
+        if (!blob) return;
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = filename;
+        link.click();
+        setTimeout(() => URL.revokeObjectURL(url), 1500);
+    });
+}
+
+function openPostMetaDialog(initialOrdem = null) {
+    const endpoint = config.gurujaPostMetaUrl;
+    if (!endpoint) return;
+
+    let requestSeq = 0;
+    let currentSlides = [];
+    let currentCaption = '';
+    let availableMetas = [];
+
+    dialog.innerHTML = `<form method="dialog" class="form story-dialog post-meta-dialog">
+        <h3>Post da meta (1080×1350)</h3>
+        <label>Meta concluída
+            <select id="post-meta-select" disabled>
+                <option value="">Carregando metas…</option>
+            </select>
+        </label>
+        <div class="post-meta-notice" id="post-meta-notice" hidden></div>
+        <div class="post-meta-status muted" id="post-meta-status">Carregando dados da Guruja…</div>
+        <div class="post-meta-slides" id="post-meta-slides" hidden></div>
+        <label class="post-meta-caption-wrap" id="post-meta-caption-wrap" hidden>Legenda
+            <textarea id="post-meta-caption" readonly rows="7"></textarea>
+        </label>
+        <div class="actions post-meta-actions">
+            <button type="button" class="btn" id="post-meta-download-btn" disabled>Baixar todos</button>
+            <button type="button" class="btn ghost" id="post-meta-copy-btn" disabled>Copiar legenda</button>
+            <button type="submit" class="btn ghost" value="cancel">Fechar</button>
+        </div>
+    </form>`;
+
+    const selectEl = dialog.querySelector('#post-meta-select');
+    const noticeEl = dialog.querySelector('#post-meta-notice');
+    const statusEl = dialog.querySelector('#post-meta-status');
+    const slidesEl = dialog.querySelector('#post-meta-slides');
+    const captionWrap = dialog.querySelector('#post-meta-caption-wrap');
+    const captionEl = dialog.querySelector('#post-meta-caption');
+    const downloadBtn = dialog.querySelector('#post-meta-download-btn');
+    const copyBtn = dialog.querySelector('#post-meta-copy-btn');
+
+    function renderSelectOptions(selectedOrdem) {
+        if (!availableMetas.length) {
+            selectEl.innerHTML = '<option value="">Nenhuma meta disponível</option>';
+            selectEl.disabled = true;
+            return;
+        }
+        selectEl.innerHTML = availableMetas.map((m) => {
+            const suffix = !m.concluida
+                ? ' (em andamento · 100%)'
+                : (m.periodo ? ` · ${m.periodo}` : '');
+            const selected = Number(m.ordem) === Number(selectedOrdem) ? ' selected' : '';
+            return `<option value="${esc(m.ordem)}"${selected}>Meta ${esc(m.ordem)}${esc(suffix)}</option>`;
+        }).join('');
+        selectEl.disabled = false;
+    }
+
+    async function loadMeta(ordem = null) {
+        const seq = ++requestSeq;
+        currentSlides = [];
+        currentCaption = '';
+        downloadBtn.disabled = true;
+        copyBtn.disabled = true;
+        slidesEl.hidden = true;
+        slidesEl.innerHTML = '';
+        captionWrap.hidden = true;
+        noticeEl.hidden = true;
+        statusEl.hidden = false;
+        statusEl.innerHTML = 'Carregando dados da Guruja…';
+
+        const url = ordem !== null && ordem !== ''
+            ? `${endpoint}?ordem=${encodeURIComponent(ordem)}`
+            : endpoint;
+
+        let response;
+        let data = null;
+        try {
+            response = await fetch(url, {
+                credentials: 'same-origin',
+                headers: { Accept: 'application/json' },
+            });
+            data = await response.json().catch(() => null);
+        } catch {
+            if (seq !== requestSeq) return;
+            statusEl.textContent = 'Não foi possível consultar o servidor agora.';
+            return;
+        }
+
+        if (seq !== requestSeq) return;
+
+        if (response.status === 409) {
+            const authUrl = data?.mcp_auth_url || config.gurujaAuthUrl;
+            statusEl.innerHTML = `<p>${esc(data?.message || 'Conecte sua conta da Guruja para gerar o post.')}</p>`
+                + (authUrl ? `<a href="${esc(authUrl)}" class="btn gj-auth-btn">🔗 Conectar Guruja</a>` : '');
+            selectEl.disabled = true;
+            return;
+        }
+
+        if (!response.ok || !data) {
+            statusEl.textContent = data?.message || `Erro ao carregar dados (${response.status}).`;
+            return;
+        }
+
+        if (Array.isArray(data.metas_disponiveis) && data.metas_disponiveis.length > 0) {
+            availableMetas = data.metas_disponiveis;
+        }
+        renderSelectOptions(data.meta?.ordem);
+
+        if (data.aviso) {
+            noticeEl.textContent = data.aviso;
+            noticeEl.hidden = false;
+        }
+
+        statusEl.textContent = 'Desenhando slides…';
+        const slides = await renderPostMetaCanvases(data);
+        if (seq !== requestSeq) return;
+
+        currentSlides = slides;
+        currentCaption = buildPostCaption(data);
+
+        slidesEl.innerHTML = '';
+        slides.forEach((slide) => {
+            const figure = document.createElement('figure');
+            figure.className = 'post-meta-thumb';
+
+            const img = document.createElement('img');
+            img.src = slide.canvas.toDataURL('image/png');
+            img.alt = `Slide ${slide.number} de ${slide.total}`;
+            img.title = `Clique para baixar ${slide.filename}`;
+            img.addEventListener('click', () => downloadCanvasPng(slide.canvas, slide.filename));
+
+            const cap = document.createElement('figcaption');
+            cap.textContent = `${slide.number}/${slide.total}`;
+
+            figure.append(img, cap);
+            slidesEl.appendChild(figure);
+        });
+
+        captionEl.value = currentCaption;
+        statusEl.hidden = true;
+        slidesEl.hidden = false;
+        captionWrap.hidden = false;
+        downloadBtn.disabled = false;
+        copyBtn.disabled = false;
+    }
+
+    selectEl.addEventListener('change', () => {
+        if (selectEl.value) loadMeta(Number(selectEl.value));
+    });
+
+    downloadBtn.addEventListener('click', async () => {
+        if (!currentSlides.length) return;
+        downloadBtn.disabled = true;
+        const originalText = downloadBtn.textContent;
+        downloadBtn.textContent = 'Baixando…';
+        try {
+            for (let i = 0; i < currentSlides.length; i++) {
+                await downloadCanvasPng(currentSlides[i].canvas, currentSlides[i].filename);
+                if (i < currentSlides.length - 1) {
+                    await new Promise((r) => setTimeout(r, 180));
+                }
+            }
+        } finally {
+            downloadBtn.textContent = originalText;
+            downloadBtn.disabled = false;
+        }
+    });
+
+    copyBtn.addEventListener('click', async () => {
+        if (!currentCaption) return;
+        try {
+            if (navigator.clipboard?.writeText) {
+                await navigator.clipboard.writeText(currentCaption);
+            } else {
+                captionEl.focus();
+                captionEl.select();
+                document.execCommand('copy');
+            }
+            const original = copyBtn.textContent;
+            copyBtn.textContent = 'Copiada ✓';
+            setTimeout(() => { copyBtn.textContent = original; }, 2000);
+        } catch {
+            captionEl.focus();
+            captionEl.select();
+        }
+    });
+
+    dialog.showModal();
+    loadMeta(initialOrdem);
+}
+
 function openBossInspectionDialog(boss, currentBossIndex = null) {
     const is3d = boss.is3D;
     const isCurrentlyActive = (boss.numero - 1) === currentBossIndex;
@@ -3001,6 +3209,7 @@ root.addEventListener('click', async (event) => {
         },
         'new-session': () => openSessionDialog(null, button.dataset.day),
         'story-open': () => openStoryDialog(button.dataset.day || today()),
+        'post-meta-open': () => openPostMetaDialog(),
         'edit-session': () => openSessionDialog(state.sessions.find((s) => s.id === id), state.timelineDay ?? today()),
         'day-prev': () => { state.timelineDay = addDays(state.timelineDay ?? today(), -1); state.timelineSel.clear(); render(); },
         'day-next': () => { state.timelineDay = addDays(state.timelineDay ?? today(), 1); state.timelineSel.clear(); render(); },

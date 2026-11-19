@@ -55,8 +55,8 @@
     "semantic_hash": ""
   },
   "app/Http/Controllers/EstudosController.php": {
-    "mtime": 1795074307.939361,
-    "ast_hash": "5002e64b045723d0098df2f1483aef9e",
+    "mtime": 1795080179.5326774,
+    "ast_hash": "6f25f7b72541b5f6dc33e65b3cd6ec88",
     "semantic_hash": ""
   },
   "app/Http/Controllers/ExportController.php": {
@@ -475,8 +475,8 @@
     "semantic_hash": ""
   },
   "routes/web.php": {
-    "mtime": 1794988895.8520577,
-    "ast_hash": "ce55ee780982aebeaf44add8b261cec9",
+    "mtime": 1795080181.3822298,
+    "ast_hash": "49a0573eaece1aa55e216f9b6d36c0d4",
     "semantic_hash": ""
   },
   "tests/Feature/ExampleTest.php": {
@@ -1090,8 +1090,8 @@
     "semantic_hash": ""
   },
   "resources/js/estudos/main.js": {
-    "mtime": 1795073738.5245204,
-    "ast_hash": "e5e00384f40f2a8ae02bd5c6dc4b0d01",
+    "mtime": 1795080346.5484986,
+    "ast_hash": "d82f30f1e709d0e9c1035e2f714dad4b",
     "semantic_hash": ""
   },
   "resources/js/estudos/metrics.js": {
@@ -1105,8 +1105,8 @@
     "semantic_hash": ""
   },
   "resources/views/estudos/app.blade.php": {
-    "mtime": 1794988812.2993357,
-    "ast_hash": "5748c07cbb5b5acef3617ff8d53da6b4",
+    "mtime": 1795080182.849267,
+    "ast_hash": "240ce747e9a50c9ec2e3073968b6504b",
     "semantic_hash": ""
   },
   "tests/Feature/BackupEstudosCommandTest.php": {
@@ -1565,8 +1565,8 @@
     "semantic_hash": ""
   },
   "app/Services/GurujaMcpService.php": {
-    "mtime": 1795074299.2401605,
-    "ast_hash": "90d37ddc8b19133fb6707c32a40a1bcf",
+    "mtime": 1795080099.7263868,
+    "ast_hash": "2743d1194be783bb391b4f70347c0f57",
     "semantic_hash": ""
   },
   "database/migrations/2026_11_16_060000_create_study_guruja_tokens_table.php": {
@@ -1600,8 +1600,8 @@
     "semantic_hash": ""
   },
   "resources/js/estudos/story.js": {
-    "mtime": 1794988812.298336,
-    "ast_hash": "be7b77fe10c5d2075dc8cbbab9a6ba27",
+    "mtime": 1795080212.339656,
+    "ast_hash": "9f8fb6603e29d125286acaae318b6255",
     "semantic_hash": ""
   },
   "database/migrations/2026_11_18_000001_drop_fiscal_tables.php": {
@@ -1612,6 +1612,41 @@
   "app/Console/Commands/GurujaConnectCommand.php": {
     "mtime": 1795073691.7177622,
     "ast_hash": "9d3a1f382326a0e77dfef240b4a272ea",
+    "semantic_hash": ""
+  },
+  "app/Services/GurujaPostMetaService.php": {
+    "mtime": 1795080163.243182,
+    "ast_hash": "cd66ff69a58ca1581f5c8860ecbcea1b",
+    "semantic_hash": ""
+  },
+  "database/migrations/2026_11_19_060000_create_study_guruja_posts_table.php": {
+    "mtime": 1795080059.1272795,
+    "ast_hash": "a13a34d11c58fb43c684aeb30e1c32c9",
+    "semantic_hash": ""
+  },
+  "resources/js/estudos/post-meta.js": {
+    "mtime": 1795080295.7270136,
+    "ast_hash": "9d18fe1f7ea7b35ff46d5a283dc078df",
+    "semantic_hash": ""
+  },
+  "resources/js/estudos/story-common.js": {
+    "mtime": 1795080206.0278006,
+    "ast_hash": "09b27e9dd594f429b51b33066b618d76",
+    "semantic_hash": ""
+  },
+  "tests/Feature/EstudosGurujaPostMetaTest.php": {
+    "mtime": 1795080504.047005,
+    "ast_hash": "d4bd0dff03d90d6b5184a663a03a3633",
+    "semantic_hash": ""
+  },
+  "tests/js/estudos/post-meta.test.js": {
+    "mtime": 1795080417.1076307,
+    "ast_hash": "6f431b0c19ccddad871d21e93669594c",
+    "semantic_hash": ""
+  },
+  "docs/instrucao-post-meta-semanal.md": {
+    "mtime": 1795079799.0854974,
+    "ast_hash": "1c60226ad33e021b72269e119a315dc8",
     "semantic_hash": ""
   }
 }

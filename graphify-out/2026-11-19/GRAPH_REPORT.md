@@ -1,11 +1,11 @@
 # Graph Report - financeiro  (2026-11-19)
 
 ## Corpus Check
-- 294 files · ~613,952 words
+- 294 files · ~613,954 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 2040 nodes · 4870 edges · 182 communities (140 shown, 42 thin omitted)
+- 2040 nodes · 4870 edges · 181 communities (140 shown, 41 thin omitted)
 - Extraction: 98% EXTRACTED · 2% INFERRED · 0% AMBIGUOUS · INFERRED: 98 edges (avg confidence: 0.74)
 - Token cost: 0 input · 0 output
 
@@ -44,7 +44,7 @@
 - Illuminate\Console\Command
 - StudySyncTest
 - Controller
-- Illuminate\Database\Migrations\Migration
+- Illuminate\Database\Schema\Blueprint
 - tick
 - Illuminate\Database\Eloquent\Model
 - MidiaEstudosCommand
@@ -75,7 +75,7 @@
 - Cartao
 - transaction-autocomplete.js
 - SalaryProjectionTest
-- Illuminate\Support\Facades\DB
+- Carbon\Carbon
 - NotaFiscal
 - Transacao
 - Illuminate\Http\JsonResponse
@@ -94,7 +94,6 @@
 - GearItem
 - WorkoutPlan
 - Sabatina 2026-11-01 — "App desktop para o módulo de estudos?"
-- TvWidgetEndpointTest
 - GurujaConnectCommand
 - OfxTransactionDTO
 - importar_ofx.php
@@ -102,7 +101,7 @@
 - EstudosGurujaTest
 - avatars-vetor.js
 - Sabatina 2026-11-01: widget flutuante do cronômetro de estudos
-- Illuminate\Database\Schema\Blueprint
+- Illuminate\Database\Migrations\Migration
 - Módulo de estudos estilo YPT (offline)
 - ServidorDTO
 - post-create-project-cmd
@@ -112,7 +111,7 @@
 - estudos-sw.js
 - Sabatina 2026-11-08 — Calculadora de projeção e gerador de mídias (Instagram)
 - Illuminate\Support\Facades\Schema
-- CartaoParcela
+- CartaoPrevisao
 - QualificacaoPermanenteDTO
 - /post-estudos semanal | semanal --parcial | diario [YYYY-MM-DD]
 - QualificacaoTemporariaDTO
@@ -138,17 +137,17 @@
   resources/js/estudos/main.js → public/js/qrcode.min.js
 - `trendBuckets()` --indirect_call--> `d()`  [INFERRED]
   resources/js/estudos/metrics.js → public/js/qrcode.min.js
-- `CreditCardDeleteTest` --references--> `Cartao`  [EXTRACTED]
-  tests/Feature/CreditCardDeleteTest.php → app/Models/Cartao.php
 - `FinancialSummaryAndCardLimitsTest` --references--> `Cartao`  [EXTRACTED]
   tests/Feature/FinancialSummaryAndCardLimitsTest.php → app/Models/Cartao.php
 - `BodyTrackerTest` --references--> `User`  [EXTRACTED]
   tests/Feature/BodyTrackerTest.php → app/Models/User.php
+- `CartaoCompraTest` --references--> `User`  [EXTRACTED]
+  tests/Feature/CartaoCompraTest.php → app/Models/User.php
 
 ## Import Cycles
 - None detected.
 
-## Communities (182 total, 42 thin omitted)
+## Communities (181 total, 41 thin omitted)
 
 ### Community 0 - ".count"
 Cohesion: 0.06
@@ -167,8 +166,8 @@ Cohesion: 0.14
 Nodes (13): autoload-dev, psr-4, description, keywords, license, minimum-stability, name, prefer-stable (+5 more)
 
 ### Community 5 - "User"
-Cohesion: 0.06
-Nodes (8): User, Illuminate\Database\Eloquent\Relations\HasMany, Illuminate\Foundation\Auth\User, CreditCardDeleteTest, EstudosGurujaMcpTest, ManagersTest, StudyRoomsTest, TelegramWebhookTest
+Cohesion: 0.07
+Nodes (8): User, Illuminate\Database\Eloquent\Relations\HasMany, Illuminate\Foundation\Auth\User, EstudosGurujaMcpTest, ManagersTest, StudyRoomsTest, TelegramWebhookTest, TransacaoUpdateDateTest
 
 ### Community 6 - "scripts"
 Cohesion: 0.14
@@ -199,8 +198,8 @@ Cohesion: 0.08
 Nodes (59): cycleMark(), allTypes(), blockKey(), bossCard(), bossLabel(), cards(), chargeBar(), chargeText() (+51 more)
 
 ### Community 17 - "TelegramWebhookController"
-Cohesion: 0.09
-Nodes (5): TelegramWebhookController, WhatsappLog, GeminiService, WhatsappMessageParser, WhatsappMessageParserTest
+Cohesion: 0.12
+Nodes (4): TelegramWebhookController, WhatsappLog, GeminiService, WhatsappMessageParser
 
 ### Community 18 - "README.md"
 Cohesion: 0.25
@@ -295,24 +294,24 @@ Cohesion: 0.09
 Nodes (3): RunningLog, RunningSplit, WorkoutSession
 
 ### Community 77 - "Cartao"
-Cohesion: 0.08
-Nodes (9): Cartao, CartaoCompra, CreditCardService, Carbon, Carbon\Carbon, Illuminate\Support\Facades\Validator, CartaoCompraTest, CreditCardClosingTest (+1 more)
+Cohesion: 0.06
+Nodes (10): Cartao, CartaoCompra, CartaoParcela, CreditCardService, Carbon, CartaoCompraTest, CreditCardClosingTest, CreditCardDeleteTest (+2 more)
 
 ### Community 78 - "transaction-autocomplete.js"
 Cohesion: 0.80
 Nodes (4): escapeHtml(), highlightMatch(), initTransactionAutocomplete(), normalizeStr()
 
-### Community 83 - "Illuminate\Support\Facades\DB"
-Cohesion: 0.11
-Nodes (12): Illuminate\Http\Client\Request, Illuminate\Support\Carbon, Illuminate\Support\Facades\Cache, Illuminate\Support\Facades\DB, Illuminate\Support\Facades\Http, Illuminate\Support\Facades\Log, Illuminate\Support\Facades\Storage, Illuminate\Support\Str (+4 more)
+### Community 83 - "Carbon\Carbon"
+Cohesion: 0.10
+Nodes (16): Barryvdh\DomPDF\Facade\Pdf, Carbon\Carbon, Illuminate\Http\Client\Request, Illuminate\Support\Carbon, Illuminate\Support\Facades\Auth, Illuminate\Support\Facades\Cache, Illuminate\Support\Facades\DB, Illuminate\Support\Facades\Http (+8 more)
 
 ### Community 84 - "NotaFiscal"
 Cohesion: 0.10
 Nodes (4): MercadoController, NotaFiscal, NotaFiscalItem, MercadoModuleTest
 
 ### Community 88 - "Transacao"
-Cohesion: 0.07
-Nodes (6): Conta, Transacao, TransactionDeduplicationService, StatementImportTest, TransactionDeduplicationTest, TransactionSuggestionTest
+Cohesion: 0.08
+Nodes (5): Conta, Transacao, TransactionDeduplicationService, StatementImportTest, TransactionDeduplicationTest
 
 ### Community 89 - "Illuminate\Http\JsonResponse"
 Cohesion: 0.15
@@ -390,9 +389,9 @@ Nodes (3): shellResponse(), STATIC, withTimeout()
 Cohesion: 0.29
 Nodes (6): Calculadora de projeção, Decisões, Gerador de mídias, Riscos, Sabatina 2026-11-08 — Calculadora de projeção e gerador de mídias (Instagram), Suposições
 
-### Community 152 - "CartaoParcela"
-Cohesion: 0.10
-Nodes (12): ExportController, CartaoParcela, CartaoPrevisao, Categoria, TransacaoPrevisao, CategorySanitizer, FinancialSummaryService, TransactionSuggestionService (+4 more)
+### Community 152 - "CartaoPrevisao"
+Cohesion: 0.07
+Nodes (10): ExportController, CartaoPrevisao, Categoria, TransacaoPrevisao, CategorySanitizer, FinancialSummaryService, TransactionSuggestionService, Illuminate\Support\Facades\URL (+2 more)
 
 ### Community 159 - "/post-estudos semanal | semanal --parcial | diario [YYYY-MM-DD]"
 Cohesion: 0.33
@@ -405,16 +404,16 @@ Nodes (3): Convite para teste — Horas de Estudo, 🇺🇸 English, 🇧🇷 Po
 ## Knowledge Gaps
 - **179 isolated node(s):** `$schema`, `name`, `type`, `description`, `laravel` (+174 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **42 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **41 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `User` connect `User` to `TelegramWebhookController`, `Illuminate\Database\Seeder`, `CartaoParcela`, `Illuminate\Console\Command`, `StudySyncTest`, `Controller`, `Illuminate\Database\Eloquent\Model`, `NetworkService`, `StudySummaryService`, `Exercise`, `GoogleAuthAndWhitelistTest`, `TelegramWebhookRoutingTest`, `.http`, `EstudosApiTest`, `Cartao`, `SalaryProjectionTest`, `Illuminate\Support\Facades\DB`, `NotaFiscal`, `Transacao`, `SalaryProjectionTest.php`, `TvWidgetEndpointTest`, `GurujaConnectCommand`, `TestCase`, `EstudosGurujaTest`?**
+- **Why does `User` connect `User` to `TelegramWebhookController`, `Illuminate\Database\Seeder`, `CartaoPrevisao`, `Illuminate\Console\Command`, `StudySyncTest`, `Controller`, `Illuminate\Database\Eloquent\Model`, `NetworkService`, `StudySummaryService`, `Exercise`, `GoogleAuthAndWhitelistTest`, `TelegramWebhookRoutingTest`, `.http`, `EstudosApiTest`, `Cartao`, `SalaryProjectionTest`, `Carbon\Carbon`, `NotaFiscal`, `Transacao`, `SalaryProjectionTest.php`, `GurujaConnectCommand`, `TestCase`, `EstudosGurujaTest`?**
   _High betweenness centrality (0.140) - this node is a cross-community bridge._
-- **Why does `TestCase` connect `TestCase` to `.count`, `User`, `TelegramWebhookController`, `CartaoParcela`, `StudySyncTest`, `NetworkService`, `StudySummaryService`, `Exercise`, `GoogleAuthAndWhitelistTest`, `TelegramWebhookRoutingTest`, `.http`, `EstudosApiTest`, `Cartao`, `SalaryProjectionTest`, `Illuminate\Support\Facades\DB`, `NotaFiscal`, `Transacao`, `SalaryProjectionTest.php`, `TvWidgetEndpointTest`, `EstudosGurujaTest`?**
+- **Why does `TestCase` connect `TestCase` to `.count`, `.http`, `User`, `EstudosApiTest`, `NetworkService`, `StudySummaryService`, `GoogleAuthAndWhitelistTest`, `Transacao`, `Cartao`, `Exercise`, `SalaryProjectionTest`, `Carbon\Carbon`, `NotaFiscal`, `CartaoPrevisao`, `EstudosGurujaTest`, `StudySyncTest`, `TelegramWebhookRoutingTest`, `SalaryProjectionTest.php`?**
   _High betweenness centrality (0.031) - this node is a cross-community bridge._
-- **Why does `Transacao` connect `Transacao` to `Illuminate\Database\Eloquent\Model`, `User`, `Cartao`, `TelegramWebhookController`, `Illuminate\Support\Facades\DB`, `TvWidgetEndpointTest`, `CartaoParcela`, `TestCase`, `Illuminate\Http\Request`, `StatementImportService`, `TelegramWebhookRoutingTest`?**
+- **Why does `Transacao` connect `Transacao` to `Illuminate\Database\Eloquent\Model`, `User`, `Cartao`, `TelegramWebhookController`, `Carbon\Carbon`, `CartaoPrevisao`, `TestCase`, `Illuminate\Http\Request`, `StatementImportService`, `TelegramWebhookRoutingTest`?**
   _High betweenness centrality (0.029) - this node is a cross-community bridge._
 - **What connects `$schema`, `name`, `type` to the rest of the system?**
   _179 weakly-connected nodes found - possible documentation gaps or missing edges._

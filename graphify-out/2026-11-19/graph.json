@@ -121,19 +121,6 @@
       "norm_label": "workoutplan"
     },
     {
-      "label": "TvWidgetEndpointTest",
-      "file_type": "code",
-      "source_file": "tests/Feature/TvWidgetEndpointTest.php",
-      "source_location": "L14",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "id": "tests_feature_tvwidgetendpointtest_tvwidgetendpointtest",
-      "community": 117,
-      "community_name": "TvWidgetEndpointTest",
-      "norm_label": "tvwidgetendpointtest"
-    },
-    {
       "label": "GurujaConnectCommand",
       "file_type": "code",
       "source_file": "app/Console/Commands/GurujaConnectCommand.php",
@@ -264,19 +251,6 @@
       "norm_label": "telegramofxdocumenttest"
     },
     {
-      "label": "TransacaoUpdateDateTest",
-      "file_type": "code",
-      "source_file": "tests/Feature/TransacaoUpdateDateTest.php",
-      "source_location": "L12",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "id": "tests_feature_transacaoupdatedatetest_transacaoupdatedatetest",
-      "community": 122,
-      "community_name": "TestCase",
-      "norm_label": "transacaoupdatedatetest"
-    },
-    {
       "label": "TestCase",
       "file_type": "code",
       "source_file": "tests/TestCase.php",
@@ -288,6 +262,19 @@
       "community": 122,
       "community_name": "TestCase",
       "norm_label": "testcase"
+    },
+    {
+      "label": "WhatsappMessageParserTest",
+      "file_type": "code",
+      "source_file": "tests/Unit/WhatsappMessageParserTest.php",
+      "source_location": "L9",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "id": "tests_unit_whatsappmessageparsertest_whatsappmessageparsertest",
+      "community": 122,
+      "community_name": "TestCase",
+      "norm_label": "whatsappmessageparsertest"
     },
     {
       "label": "EstudosGurujaTest",
@@ -390,21 +377,8 @@
       "_origin": "ast",
       "id": "app_http_controllers_exportcontroller_exportcontroller",
       "community": 152,
-      "community_name": "CartaoParcela",
+      "community_name": "CartaoPrevisao",
       "norm_label": "exportcontroller"
-    },
-    {
-      "label": "CartaoParcela",
-      "file_type": "code",
-      "source_file": "app/Models/CartaoParcela.php",
-      "source_location": "L8",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "id": "app_models_cartaoparcela_cartaoparcela",
-      "community": 152,
-      "community_name": "CartaoParcela",
-      "norm_label": "cartaoparcela"
     },
     {
       "label": "CartaoPrevisao",
@@ -416,7 +390,7 @@
       "_origin": "ast",
       "id": "app_models_cartaoprevisao_cartaoprevisao",
       "community": 152,
-      "community_name": "CartaoParcela",
+      "community_name": "CartaoPrevisao",
       "norm_label": "cartaoprevisao"
     },
     {
@@ -429,7 +403,7 @@
       "_origin": "ast",
       "id": "app_models_categoria_categoria",
       "community": 152,
-      "community_name": "CartaoParcela",
+      "community_name": "CartaoPrevisao",
       "norm_label": "categoria"
     },
     {
@@ -442,7 +416,7 @@
       "_origin": "ast",
       "id": "app_models_transacaoprevisao_transacaoprevisao",
       "community": 152,
-      "community_name": "CartaoParcela",
+      "community_name": "CartaoPrevisao",
       "norm_label": "transacaoprevisao"
     },
     {
@@ -455,7 +429,7 @@
       "_origin": "ast",
       "id": "app_services_categorysanitizer_categorysanitizer",
       "community": 152,
-      "community_name": "CartaoParcela",
+      "community_name": "CartaoPrevisao",
       "norm_label": "categorysanitizer"
     },
     {
@@ -468,7 +442,7 @@
       "_origin": "ast",
       "id": "app_services_financialsummaryservice_financialsummaryservice",
       "community": 152,
-      "community_name": "CartaoParcela",
+      "community_name": "CartaoPrevisao",
       "norm_label": "financialsummaryservice"
     },
     {
@@ -481,7 +455,7 @@
       "_origin": "ast",
       "id": "app_services_transactionsuggestionservice_transactionsuggestionservice",
       "community": 152,
-      "community_name": "CartaoParcela",
+      "community_name": "CartaoPrevisao",
       "norm_label": "transactionsuggestionservice"
     },
     {
@@ -494,8 +468,21 @@
       "_origin": "ast",
       "id": "tests_feature_financialsummaryandcardlimitstest_financialsummaryandcardlimitstest",
       "community": 152,
-      "community_name": "CartaoParcela",
+      "community_name": "CartaoPrevisao",
       "norm_label": "financialsummaryandcardlimitstest"
+    },
+    {
+      "label": "TransactionSuggestionTest",
+      "file_type": "code",
+      "source_file": "tests/Feature/TransactionSuggestionTest.php",
+      "source_location": "L14",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "id": "tests_feature_transactionsuggestiontest_transactionsuggestiontest",
+      "community": 152,
+      "community_name": "CartaoPrevisao",
+      "norm_label": "transactionsuggestiontest"
     },
     {
       "label": "QualificacaoPermanenteDTO",
@@ -587,19 +574,6 @@
       "community": 17,
       "community_name": "TelegramWebhookController",
       "norm_label": "whatsappmessageparser"
-    },
-    {
-      "label": "WhatsappMessageParserTest",
-      "file_type": "code",
-      "source_file": "tests/Unit/WhatsappMessageParserTest.php",
-      "source_location": "L9",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "id": "tests_unit_whatsappmessageparsertest_whatsappmessageparsertest",
-      "community": 17,
-      "community_name": "TelegramWebhookController",
-      "norm_label": "whatsappmessageparsertest"
     },
     {
       "label": "ExercisePersonalRecord",
@@ -1252,19 +1226,6 @@
       "norm_label": "user"
     },
     {
-      "label": "CreditCardDeleteTest",
-      "file_type": "code",
-      "source_file": "tests/Feature/CreditCardDeleteTest.php",
-      "source_location": "L15",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "id": "tests_feature_creditcarddeletetest_creditcarddeletetest",
-      "community": 5,
-      "community_name": "User",
-      "norm_label": "creditcarddeletetest"
-    },
-    {
       "label": "EstudosGurujaMcpTest",
       "file_type": "code",
       "source_file": "tests/Feature/EstudosGurujaMcpTest.php",
@@ -1315,6 +1276,19 @@
       "community": 5,
       "community_name": "User",
       "norm_label": "telegramwebhooktest"
+    },
+    {
+      "label": "TransacaoUpdateDateTest",
+      "file_type": "code",
+      "source_file": "tests/Feature/TransacaoUpdateDateTest.php",
+      "source_location": "L12",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "id": "tests_feature_transacaoupdatedatetest_transacaoupdatedatetest",
+      "community": 5,
+      "community_name": "User",
+      "norm_label": "transacaoupdatedatetest"
     },
     {
       "label": "GoogleAuthAndWhitelistTest",
@@ -1499,6 +1473,19 @@
       "norm_label": "cartaocompra"
     },
     {
+      "label": "CartaoParcela",
+      "file_type": "code",
+      "source_file": "app/Models/CartaoParcela.php",
+      "source_location": "L8",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "id": "app_models_cartaoparcela_cartaoparcela",
+      "community": 77,
+      "community_name": "Cartao",
+      "norm_label": "cartaoparcela"
+    },
+    {
       "label": "CreditCardService",
       "file_type": "code",
       "source_file": "app/Services/CreditCardService.php",
@@ -1538,6 +1525,19 @@
       "norm_label": "creditcardclosingtest"
     },
     {
+      "label": "CreditCardDeleteTest",
+      "file_type": "code",
+      "source_file": "tests/Feature/CreditCardDeleteTest.php",
+      "source_location": "L15",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "id": "tests_feature_creditcarddeletetest_creditcarddeletetest",
+      "community": 77,
+      "community_name": "Cartao",
+      "norm_label": "creditcarddeletetest"
+    },
+    {
       "label": "CreditCardReconciliationTest",
       "file_type": "code",
       "source_file": "tests/Feature/CreditCardReconciliationTest.php",
@@ -1549,6 +1549,19 @@
       "community": 77,
       "community_name": "Cartao",
       "norm_label": "creditcardreconciliationtest"
+    },
+    {
+      "label": "TvWidgetEndpointTest",
+      "file_type": "code",
+      "source_file": "tests/Feature/TvWidgetEndpointTest.php",
+      "source_location": "L14",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "id": "tests_feature_tvwidgetendpointtest_tvwidgetendpointtest",
+      "community": 77,
+      "community_name": "Cartao",
+      "norm_label": "tvwidgetendpointtest"
     },
     {
       "label": "SalaryProjectionTest",
@@ -1679,19 +1692,6 @@
       "community": 88,
       "community_name": "Transacao",
       "norm_label": "transactiondeduplicationtest"
-    },
-    {
-      "label": "TransactionSuggestionTest",
-      "file_type": "code",
-      "source_file": "tests/Feature/TransactionSuggestionTest.php",
-      "source_location": "L14",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "id": "tests_feature_transactionsuggestiontest_transactionsuggestiontest",
-      "community": 88,
-      "community_name": "Transacao",
-      "norm_label": "transactionsuggestiontest"
     },
     {
       "label": "BodyTrackerController",
@@ -4164,102 +4164,6 @@
       "norm_label": ".user()"
     },
     {
-      "label": ".setUp()",
-      "file_type": "code",
-      "source_file": "tests/Feature/TvWidgetEndpointTest.php",
-      "source_location": "L20",
-      "_callable": true,
-      "_origin": "ast",
-      "id": "tests_feature_tvwidgetendpointtest_tvwidgetendpointtest_setup",
-      "community": 117,
-      "community_name": "TvWidgetEndpointTest",
-      "norm_label": ".setup()"
-    },
-    {
-      "label": ".test_accepts_valid_token_via_header()",
-      "file_type": "code",
-      "source_file": "tests/Feature/TvWidgetEndpointTest.php",
-      "source_location": "L65",
-      "_callable": true,
-      "_origin": "ast",
-      "id": "tests_feature_tvwidgetendpointtest_tvwidgetendpointtest_test_accepts_valid_token_via_header",
-      "community": 117,
-      "community_name": "TvWidgetEndpointTest",
-      "norm_label": ".test_accepts_valid_token_via_header()"
-    },
-    {
-      "label": ".test_accepts_valid_token_via_query_string()",
-      "file_type": "code",
-      "source_file": "tests/Feature/TvWidgetEndpointTest.php",
-      "source_location": "L40",
-      "_callable": true,
-      "_origin": "ast",
-      "id": "tests_feature_tvwidgetendpointtest_tvwidgetendpointtest_test_accepts_valid_token_via_query_string",
-      "community": 117,
-      "community_name": "TvWidgetEndpointTest",
-      "norm_label": ".test_accepts_valid_token_via_query_string()"
-    },
-    {
-      "label": ".test_computes_accurate_financial_metrics_for_tv()",
-      "file_type": "code",
-      "source_file": "tests/Feature/TvWidgetEndpointTest.php",
-      "source_location": "L75",
-      "_callable": true,
-      "_origin": "ast",
-      "id": "tests_feature_tvwidgetendpointtest_tvwidgetendpointtest_test_computes_accurate_financial_metrics_for_tv",
-      "community": 117,
-      "community_name": "TvWidgetEndpointTest",
-      "norm_label": ".test_computes_accurate_financial_metrics_for_tv()"
-    },
-    {
-      "label": ".test_rejects_unauthorized_request_when_token_is_invalid()",
-      "file_type": "code",
-      "source_file": "tests/Feature/TvWidgetEndpointTest.php",
-      "source_location": "L29",
-      "_callable": true,
-      "_origin": "ast",
-      "id": "tests_feature_tvwidgetendpointtest_tvwidgetendpointtest_test_rejects_unauthorized_request_when_token_is_invalid",
-      "community": 117,
-      "community_name": "TvWidgetEndpointTest",
-      "norm_label": ".test_rejects_unauthorized_request_when_token_is_invalid()"
-    },
-    {
-      "label": ".test_tv_action_rejects_empty_url()",
-      "file_type": "code",
-      "source_file": "tests/Feature/TvWidgetEndpointTest.php",
-      "source_location": "L150",
-      "_callable": true,
-      "_origin": "ast",
-      "id": "tests_feature_tvwidgetendpointtest_tvwidgetendpointtest_test_tv_action_rejects_empty_url",
-      "community": 117,
-      "community_name": "TvWidgetEndpointTest",
-      "norm_label": ".test_tv_action_rejects_empty_url()"
-    },
-    {
-      "label": ".test_tv_action_rejects_invalid_key()",
-      "file_type": "code",
-      "source_file": "tests/Feature/TvWidgetEndpointTest.php",
-      "source_location": "L156",
-      "_callable": true,
-      "_origin": "ast",
-      "id": "tests_feature_tvwidgetendpointtest_tvwidgetendpointtest_test_tv_action_rejects_invalid_key",
-      "community": 117,
-      "community_name": "TvWidgetEndpointTest",
-      "norm_label": ".test_tv_action_rejects_invalid_key()"
-    },
-    {
-      "label": ".test_tv_control_ui_loads_successfully()",
-      "file_type": "code",
-      "source_file": "tests/Feature/TvWidgetEndpointTest.php",
-      "source_location": "L143",
-      "_callable": true,
-      "_origin": "ast",
-      "id": "tests_feature_tvwidgetendpointtest_tvwidgetendpointtest_test_tv_control_ui_loads_successfully",
-      "community": 117,
-      "community_name": "TvWidgetEndpointTest",
-      "norm_label": ".test_tv_control_ui_loads_successfully()"
-    },
-    {
       "label": ".handle()",
       "file_type": "code",
       "source_file": "app/Console/Commands/GurujaConnectCommand.php",
@@ -4740,64 +4644,64 @@
       "norm_label": ".test_telegram_webhook_processes_ofx_document()"
     },
     {
-      "label": ".criar()",
+      "label": ".setUp()",
       "file_type": "code",
-      "source_file": "tests/Feature/TransacaoUpdateDateTest.php",
-      "source_location": "L16",
+      "source_file": "tests/Unit/WhatsappMessageParserTest.php",
+      "source_location": "L15",
       "_callable": true,
       "_origin": "ast",
-      "id": "tests_feature_transacaoupdatedatetest_transacaoupdatedatetest_criar",
+      "id": "tests_unit_whatsappmessageparsertest_whatsappmessageparsertest_setup",
       "community": 122,
       "community_name": "TestCase",
-      "norm_label": ".criar()"
+      "norm_label": ".setup()"
     },
     {
-      "label": ".payload()",
+      "label": ".test_parses_direct_saldo_command()",
       "file_type": "code",
-      "source_file": "tests/Feature/TransacaoUpdateDateTest.php",
-      "source_location": "L28",
+      "source_file": "tests/Unit/WhatsappMessageParserTest.php",
+      "source_location": "L30",
       "_callable": true,
       "_origin": "ast",
-      "id": "tests_feature_transacaoupdatedatetest_transacaoupdatedatetest_payload",
+      "id": "tests_unit_whatsappmessageparsertest_whatsappmessageparsertest_test_parses_direct_saldo_command",
       "community": 122,
       "community_name": "TestCase",
-      "norm_label": ".payload()"
+      "norm_label": ".test_parses_direct_saldo_command()"
     },
     {
-      "label": ".test_editar_sem_mudar_data_preserva_data_e_data_hora()",
+      "label": ".test_parses_listar_and_ajuda_variations()",
       "file_type": "code",
-      "source_file": "tests/Feature/TransacaoUpdateDateTest.php",
-      "source_location": "L39",
+      "source_file": "tests/Unit/WhatsappMessageParserTest.php",
+      "source_location": "L63",
       "_callable": true,
       "_origin": "ast",
-      "id": "tests_feature_transacaoupdatedatetest_transacaoupdatedatetest_test_editar_sem_mudar_data_preserva_data_e_data_hora",
+      "id": "tests_unit_whatsappmessageparsertest_whatsappmessageparsertest_test_parses_listar_and_ajuda_variations",
       "community": 122,
       "community_name": "TestCase",
-      "norm_label": ".test_editar_sem_mudar_data_preserva_data_e_data_hora()"
+      "norm_label": ".test_parses_listar_and_ajuda_variations()"
     },
     {
-      "label": ".test_modal_de_edicao_recebe_data_no_formato_do_input()",
+      "label": ".test_parses_saldo_conta_corrente_variation()",
       "file_type": "code",
-      "source_file": "tests/Feature/TransacaoUpdateDateTest.php",
-      "source_location": "L64",
+      "source_file": "tests/Unit/WhatsappMessageParserTest.php",
+      "source_location": "L21",
       "_callable": true,
       "_origin": "ast",
-      "id": "tests_feature_transacaoupdatedatetest_transacaoupdatedatetest_test_modal_de_edicao_recebe_data_no_formato_do_input",
+      "id": "tests_unit_whatsappmessageparsertest_whatsappmessageparsertest_test_parses_saldo_conta_corrente_variation",
       "community": 122,
       "community_name": "TestCase",
-      "norm_label": ".test_modal_de_edicao_recebe_data_no_formato_do_input()"
+      "norm_label": ".test_parses_saldo_conta_corrente_variation()"
     },
     {
-      "label": ".test_mudar_data_acompanha_data_hora()",
+      "label": ".test_parses_slash_and_natural_saldo_questions()",
       "file_type": "code",
-      "source_file": "tests/Feature/TransacaoUpdateDateTest.php",
-      "source_location": "L52",
+      "source_file": "tests/Unit/WhatsappMessageParserTest.php",
+      "source_location": "L38",
       "_callable": true,
       "_origin": "ast",
-      "id": "tests_feature_transacaoupdatedatetest_transacaoupdatedatetest_test_mudar_data_acompanha_data_hora",
+      "id": "tests_unit_whatsappmessageparsertest_whatsappmessageparsertest_test_parses_slash_and_natural_saldo_questions",
       "community": 122,
       "community_name": "TestCase",
-      "norm_label": ".test_mudar_data_acompanha_data_hora()"
+      "norm_label": ".test_parses_slash_and_natural_saldo_questions()"
     },
     {
       "label": ".payload()",
@@ -5420,7 +5324,7 @@
       "_origin": "ast",
       "id": "database_migrations_2026_04_24_184002_create_cartao_parcelas_table_down",
       "community": 134,
-      "community_name": "Illuminate\\Database\\Schema\\Blueprint",
+      "community_name": "Illuminate\\Database\\Migrations\\Migration",
       "norm_label": "down()"
     },
     {
@@ -5432,31 +5336,7 @@
       "_origin": "ast",
       "id": "database_migrations_2026_04_24_184002_create_cartao_parcelas_table_up",
       "community": 134,
-      "community_name": "Illuminate\\Database\\Schema\\Blueprint",
-      "norm_label": "up()"
-    },
-    {
-      "label": "down()",
-      "file_type": "code",
-      "source_file": "database/migrations/2026_10_31_140000_drop_legacy_study_tables.php",
-      "source_location": "L41",
-      "_callable": true,
-      "_origin": "ast",
-      "id": "database_migrations_2026_10_31_140000_drop_legacy_study_tables_down",
-      "community": 134,
-      "community_name": "Illuminate\\Database\\Schema\\Blueprint",
-      "norm_label": "down()"
-    },
-    {
-      "label": "up()",
-      "file_type": "code",
-      "source_file": "database/migrations/2026_10_31_140000_drop_legacy_study_tables.php",
-      "source_location": "L14",
-      "_callable": true,
-      "_origin": "ast",
-      "id": "database_migrations_2026_10_31_140000_drop_legacy_study_tables_up",
-      "community": 134,
-      "community_name": "Illuminate\\Database\\Schema\\Blueprint",
+      "community_name": "Illuminate\\Database\\Migrations\\Migration",
       "norm_label": "up()"
     },
     {
@@ -5468,7 +5348,7 @@
       "_origin": "ast",
       "id": "database_migrations_2026_11_15_150000_add_reforco_settings_and_session_fields_down",
       "community": 134,
-      "community_name": "Illuminate\\Database\\Schema\\Blueprint",
+      "community_name": "Illuminate\\Database\\Migrations\\Migration",
       "norm_label": "down()"
     },
     {
@@ -5480,7 +5360,7 @@
       "_origin": "ast",
       "id": "database_migrations_2026_11_15_150000_add_reforco_settings_and_session_fields_up",
       "community": 134,
-      "community_name": "Illuminate\\Database\\Schema\\Blueprint",
+      "community_name": "Illuminate\\Database\\Migrations\\Migration",
       "norm_label": "up()"
     },
     {
@@ -5492,7 +5372,7 @@
       "_origin": "ast",
       "id": "database_migrations_2026_11_16_060000_create_study_guruja_tokens_table_down",
       "community": 134,
-      "community_name": "Illuminate\\Database\\Schema\\Blueprint",
+      "community_name": "Illuminate\\Database\\Migrations\\Migration",
       "norm_label": "down()"
     },
     {
@@ -5504,7 +5384,31 @@
       "_origin": "ast",
       "id": "database_migrations_2026_11_16_060000_create_study_guruja_tokens_table_up",
       "community": 134,
-      "community_name": "Illuminate\\Database\\Schema\\Blueprint",
+      "community_name": "Illuminate\\Database\\Migrations\\Migration",
+      "norm_label": "up()"
+    },
+    {
+      "label": "down()",
+      "file_type": "code",
+      "source_file": "database/migrations/2026_11_18_000001_drop_fiscal_tables.php",
+      "source_location": "L15",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "database_migrations_2026_11_18_000001_drop_fiscal_tables_down",
+      "community": 134,
+      "community_name": "Illuminate\\Database\\Migrations\\Migration",
+      "norm_label": "down()"
+    },
+    {
+      "label": "up()",
+      "file_type": "code",
+      "source_file": "database/migrations/2026_11_18_000001_drop_fiscal_tables.php",
+      "source_location": "L8",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "database_migrations_2026_11_18_000001_drop_fiscal_tables_up",
+      "community": 134,
+      "community_name": "Illuminate\\Database\\Migrations\\Migration",
       "norm_label": "up()"
     },
     {
@@ -6792,6 +6696,18 @@
       "norm_label": "up()"
     },
     {
+      "label": ".resumo()",
+      "file_type": "code",
+      "source_file": "app/Http/Controllers/Api/TvWidgetController.php",
+      "source_location": "L14",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "app_http_controllers_api_tvwidgetcontroller_tvwidgetcontroller_resumo",
+      "community": 152,
+      "community_name": "CartaoPrevisao",
+      "norm_label": ".resumo()"
+    },
+    {
       "label": ".index()",
       "file_type": "code",
       "source_file": "app/Http/Controllers/CartoesController.php",
@@ -6800,7 +6716,7 @@
       "_origin": "ast",
       "id": "app_http_controllers_cartoescontroller_cartoescontroller_index",
       "community": 152,
-      "community_name": "CartaoParcela",
+      "community_name": "CartaoPrevisao",
       "norm_label": ".index()"
     },
     {
@@ -6812,7 +6728,7 @@
       "_origin": "ast",
       "id": "app_http_controllers_exportcontroller_exportcontroller_exportfatura",
       "community": 152,
-      "community_name": "CartaoParcela",
+      "community_name": "CartaoPrevisao",
       "norm_label": ".exportfatura()"
     },
     {
@@ -6824,7 +6740,7 @@
       "_origin": "ast",
       "id": "app_http_controllers_exportcontroller_exportcontroller_exportorcamento",
       "community": 152,
-      "community_name": "CartaoParcela",
+      "community_name": "CartaoPrevisao",
       "norm_label": ".exportorcamento()"
     },
     {
@@ -6836,7 +6752,7 @@
       "_origin": "ast",
       "id": "app_http_controllers_exportcontroller_exportcontroller_exportorcamentopost",
       "community": 152,
-      "community_name": "CartaoParcela",
+      "community_name": "CartaoPrevisao",
       "norm_label": ".exportorcamentopost()"
     },
     {
@@ -6848,7 +6764,7 @@
       "_origin": "ast",
       "id": "app_http_controllers_exportcontroller_exportcontroller_exportresumofinanceiropdf",
       "community": 152,
-      "community_name": "CartaoParcela",
+      "community_name": "CartaoPrevisao",
       "norm_label": ".exportresumofinanceiropdf()"
     },
     {
@@ -6860,20 +6776,8 @@
       "_origin": "ast",
       "id": "app_http_controllers_financascontroller_financascontroller_index",
       "community": 152,
-      "community_name": "CartaoParcela",
+      "community_name": "CartaoPrevisao",
       "norm_label": ".index()"
-    },
-    {
-      "label": ".compra()",
-      "file_type": "code",
-      "source_file": "app/Models/CartaoParcela.php",
-      "source_location": "L20",
-      "_callable": true,
-      "_origin": "ast",
-      "id": "app_models_cartaoparcela_cartaoparcela_compra",
-      "community": 152,
-      "community_name": "CartaoParcela",
-      "norm_label": ".compra()"
     },
     {
       "label": ".cartao()",
@@ -6884,7 +6788,7 @@
       "_origin": "ast",
       "id": "app_models_cartaoprevisao_cartaoprevisao_cartao",
       "community": 152,
-      "community_name": "CartaoParcela",
+      "community_name": "CartaoPrevisao",
       "norm_label": ".cartao()"
     },
     {
@@ -6896,7 +6800,7 @@
       "_origin": "ast",
       "id": "app_models_categoria_categoria_subcategorias",
       "community": 152,
-      "community_name": "CartaoParcela",
+      "community_name": "CartaoPrevisao",
       "norm_label": ".subcategorias()"
     },
     {
@@ -6908,7 +6812,7 @@
       "_origin": "ast",
       "id": "app_models_categoria_categoria_user",
       "community": 152,
-      "community_name": "CartaoParcela",
+      "community_name": "CartaoPrevisao",
       "norm_label": ".user()"
     },
     {
@@ -6920,7 +6824,7 @@
       "_origin": "ast",
       "id": "app_models_transacaoprevisao_transacaoprevisao_user",
       "community": 152,
-      "community_name": "CartaoParcela",
+      "community_name": "CartaoPrevisao",
       "norm_label": ".user()"
     },
     {
@@ -6932,7 +6836,7 @@
       "_origin": "ast",
       "id": "app_services_categorysanitizer_categorysanitizer_slug",
       "community": 152,
-      "community_name": "CartaoParcela",
+      "community_name": "CartaoPrevisao",
       "norm_label": ".slug()"
     },
     {
@@ -6944,7 +6848,7 @@
       "_origin": "ast",
       "id": "app_services_financialsummaryservice_financialsummaryservice_generatesummary",
       "community": 152,
-      "community_name": "CartaoParcela",
+      "community_name": "CartaoPrevisao",
       "norm_label": ".generatesummary()"
     },
     {
@@ -6956,7 +6860,7 @@
       "_origin": "ast",
       "id": "app_services_transactionsuggestionservice_transactionsuggestionservice_getsuggestions",
       "community": 152,
-      "community_name": "CartaoParcela",
+      "community_name": "CartaoPrevisao",
       "norm_label": ".getsuggestions()"
     },
     {
@@ -6968,7 +6872,7 @@
       "_origin": "ast",
       "id": "app_services_transactionsuggestionservice_transactionsuggestionservice_normalize",
       "community": 152,
-      "community_name": "CartaoParcela",
+      "community_name": "CartaoPrevisao",
       "norm_label": ".normalize()"
     },
     {
@@ -6980,20 +6884,8 @@
       "_origin": "ast",
       "id": "tests_feature_creditcardclosingtest_creditcardclosingtest_test_financas_view_zeroes_remaining_margin_when_invoice_is_closed",
       "community": 152,
-      "community_name": "CartaoParcela",
+      "community_name": "CartaoPrevisao",
       "norm_label": ".test_financas_view_zeroes_remaining_margin_when_invoice_is_closed()"
-    },
-    {
-      "label": ".test_can_delete_credit_card_after_disabled()",
-      "file_type": "code",
-      "source_file": "tests/Feature/CreditCardDeleteTest.php",
-      "source_location": "L64",
-      "_callable": true,
-      "_origin": "ast",
-      "id": "tests_feature_creditcarddeletetest_creditcarddeletetest_test_can_delete_credit_card_after_disabled",
-      "community": 152,
-      "community_name": "CartaoParcela",
-      "norm_label": ".test_can_delete_credit_card_after_disabled()"
     },
     {
       "label": ".setUp()",
@@ -7004,7 +6896,7 @@
       "_origin": "ast",
       "id": "tests_feature_financialsummaryandcardlimitstest_financialsummaryandcardlimitstest_setup",
       "community": 152,
-      "community_name": "CartaoParcela",
+      "community_name": "CartaoPrevisao",
       "norm_label": ".setup()"
     },
     {
@@ -7016,7 +6908,7 @@
       "_origin": "ast",
       "id": "tests_feature_financialsummaryandcardlimitstest_financialsummaryandcardlimitstest_teardown",
       "community": 152,
-      "community_name": "CartaoParcela",
+      "community_name": "CartaoPrevisao",
       "norm_label": ".teardown()"
     },
     {
@@ -7028,7 +6920,7 @@
       "_origin": "ast",
       "id": "tests_feature_financialsummaryandcardlimitstest_financialsummaryandcardlimitstest_test_card_previsao_abates_existing_invoice_parcelas_from_previous_months",
       "community": 152,
-      "community_name": "CartaoParcela",
+      "community_name": "CartaoPrevisao",
       "norm_label": ".test_card_previsao_abates_existing_invoice_parcelas_from_previous_months()"
     },
     {
@@ -7040,7 +6932,7 @@
       "_origin": "ast",
       "id": "tests_feature_financialsummaryandcardlimitstest_financialsummaryandcardlimitstest_test_card_previsao_influences_checking_account_dashboard",
       "community": 152,
-      "community_name": "CartaoParcela",
+      "community_name": "CartaoPrevisao",
       "norm_label": ".test_card_previsao_influences_checking_account_dashboard()"
     },
     {
@@ -7052,7 +6944,7 @@
       "_origin": "ast",
       "id": "tests_feature_financialsummaryandcardlimitstest_financialsummaryandcardlimitstest_test_export_resumo_financeiro_pdf_generates_valid_pdf",
       "community": 152,
-      "community_name": "CartaoParcela",
+      "community_name": "CartaoPrevisao",
       "norm_label": ".test_export_resumo_financeiro_pdf_generates_valid_pdf()"
     },
     {
@@ -7064,7 +6956,7 @@
       "_origin": "ast",
       "id": "tests_feature_financialsummaryandcardlimitstest_financialsummaryandcardlimitstest_test_signed_url_allows_guest_to_download_resumo_financeiro_pdf",
       "community": 152,
-      "community_name": "CartaoParcela",
+      "community_name": "CartaoPrevisao",
       "norm_label": ".test_signed_url_allows_guest_to_download_resumo_financeiro_pdf()"
     },
     {
@@ -7076,7 +6968,7 @@
       "_origin": "ast",
       "id": "tests_feature_financialsummaryandcardlimitstest_financialsummaryandcardlimitstest_test_user_can_create_card_previsao_or_limit",
       "community": 152,
-      "community_name": "CartaoParcela",
+      "community_name": "CartaoPrevisao",
       "norm_label": ".test_user_can_create_card_previsao_or_limit()"
     },
     {
@@ -7088,8 +6980,68 @@
       "_origin": "ast",
       "id": "tests_feature_financialsummaryandcardlimitstest_financialsummaryandcardlimitstest_test_whatsapp_summary_endpoint_generates_correct_data",
       "community": 152,
-      "community_name": "CartaoParcela",
+      "community_name": "CartaoPrevisao",
       "norm_label": ".test_whatsapp_summary_endpoint_generates_correct_data()"
+    },
+    {
+      "label": ".setUp()",
+      "file_type": "code",
+      "source_file": "tests/Feature/TransactionSuggestionTest.php",
+      "source_location": "L20",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "tests_feature_transactionsuggestiontest_transactionsuggestiontest_setup",
+      "community": 152,
+      "community_name": "CartaoPrevisao",
+      "norm_label": ".setup()"
+    },
+    {
+      "label": ".test_suggestion_endpoint_filters_by_query_insensitively()",
+      "file_type": "code",
+      "source_file": "tests/Feature/TransactionSuggestionTest.php",
+      "source_location": "L85",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "tests_feature_transactionsuggestiontest_transactionsuggestiontest_test_suggestion_endpoint_filters_by_query_insensitively",
+      "community": 152,
+      "community_name": "CartaoPrevisao",
+      "norm_label": ".test_suggestion_endpoint_filters_by_query_insensitively()"
+    },
+    {
+      "label": ".test_suggestion_endpoint_requires_authentication()",
+      "file_type": "code",
+      "source_file": "tests/Feature/TransactionSuggestionTest.php",
+      "source_location": "L26",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "tests_feature_transactionsuggestiontest_transactionsuggestiontest_test_suggestion_endpoint_requires_authentication",
+      "community": 152,
+      "community_name": "CartaoPrevisao",
+      "norm_label": ".test_suggestion_endpoint_requires_authentication()"
+    },
+    {
+      "label": ".test_suggestion_endpoint_returns_suggestions_from_transactions_and_card_purchases()",
+      "file_type": "code",
+      "source_file": "tests/Feature/TransactionSuggestionTest.php",
+      "source_location": "L32",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "tests_feature_transactionsuggestiontest_transactionsuggestiontest_test_suggestion_endpoint_returns_suggestions_from_transactions_and_card_purchases",
+      "community": 152,
+      "community_name": "CartaoPrevisao",
+      "norm_label": ".test_suggestion_endpoint_returns_suggestions_from_transactions_and_card_purchases()"
+    },
+    {
+      "label": ".test_suggestion_service_isolates_users()",
+      "file_type": "code",
+      "source_file": "tests/Feature/TransactionSuggestionTest.php",
+      "source_location": "L122",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "tests_feature_transactionsuggestiontest_transactionsuggestiontest_test_suggestion_service_isolates_users",
+      "community": 152,
+      "community_name": "CartaoPrevisao",
+      "norm_label": ".test_suggestion_service_isolates_users()"
     },
     {
       "label": ".test_suggestion_service_sanitizes_category_with_user_categories()",
@@ -7100,7 +7052,7 @@
       "_origin": "ast",
       "id": "tests_feature_transactionsuggestiontest_transactionsuggestiontest_test_suggestion_service_sanitizes_category_with_user_categories",
       "community": 152,
-      "community_name": "CartaoParcela",
+      "community_name": "CartaoPrevisao",
       "norm_label": ".test_suggestion_service_sanitizes_category_with_user_categories()"
     },
     {
@@ -7822,66 +7774,6 @@
       "community": 17,
       "community_name": "TelegramWebhookController",
       "norm_label": ".parse()"
-    },
-    {
-      "label": ".setUp()",
-      "file_type": "code",
-      "source_file": "tests/Unit/WhatsappMessageParserTest.php",
-      "source_location": "L15",
-      "_callable": true,
-      "_origin": "ast",
-      "id": "tests_unit_whatsappmessageparsertest_whatsappmessageparsertest_setup",
-      "community": 17,
-      "community_name": "TelegramWebhookController",
-      "norm_label": ".setup()"
-    },
-    {
-      "label": ".test_parses_direct_saldo_command()",
-      "file_type": "code",
-      "source_file": "tests/Unit/WhatsappMessageParserTest.php",
-      "source_location": "L30",
-      "_callable": true,
-      "_origin": "ast",
-      "id": "tests_unit_whatsappmessageparsertest_whatsappmessageparsertest_test_parses_direct_saldo_command",
-      "community": 17,
-      "community_name": "TelegramWebhookController",
-      "norm_label": ".test_parses_direct_saldo_command()"
-    },
-    {
-      "label": ".test_parses_listar_and_ajuda_variations()",
-      "file_type": "code",
-      "source_file": "tests/Unit/WhatsappMessageParserTest.php",
-      "source_location": "L63",
-      "_callable": true,
-      "_origin": "ast",
-      "id": "tests_unit_whatsappmessageparsertest_whatsappmessageparsertest_test_parses_listar_and_ajuda_variations",
-      "community": 17,
-      "community_name": "TelegramWebhookController",
-      "norm_label": ".test_parses_listar_and_ajuda_variations()"
-    },
-    {
-      "label": ".test_parses_saldo_conta_corrente_variation()",
-      "file_type": "code",
-      "source_file": "tests/Unit/WhatsappMessageParserTest.php",
-      "source_location": "L21",
-      "_callable": true,
-      "_origin": "ast",
-      "id": "tests_unit_whatsappmessageparsertest_whatsappmessageparsertest_test_parses_saldo_conta_corrente_variation",
-      "community": 17,
-      "community_name": "TelegramWebhookController",
-      "norm_label": ".test_parses_saldo_conta_corrente_variation()"
-    },
-    {
-      "label": ".test_parses_slash_and_natural_saldo_questions()",
-      "file_type": "code",
-      "source_file": "tests/Unit/WhatsappMessageParserTest.php",
-      "source_location": "L38",
-      "_callable": true,
-      "_origin": "ast",
-      "id": "tests_unit_whatsappmessageparsertest_whatsappmessageparsertest_test_parses_slash_and_natural_saldo_questions",
-      "community": 17,
-      "community_name": "TelegramWebhookController",
-      "norm_label": ".test_parses_slash_and_natural_saldo_questions()"
     },
     {
       "label": "down()",
@@ -10082,13 +9974,37 @@
     {
       "label": "down()",
       "file_type": "code",
+      "source_file": "database/migrations/2026_10_31_140000_drop_legacy_study_tables.php",
+      "source_location": "L41",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "database_migrations_2026_10_31_140000_drop_legacy_study_tables_down",
+      "community": 30,
+      "community_name": "Illuminate\\Database\\Schema\\Blueprint",
+      "norm_label": "down()"
+    },
+    {
+      "label": "up()",
+      "file_type": "code",
+      "source_file": "database/migrations/2026_10_31_140000_drop_legacy_study_tables.php",
+      "source_location": "L14",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "database_migrations_2026_10_31_140000_drop_legacy_study_tables_up",
+      "community": 30,
+      "community_name": "Illuminate\\Database\\Schema\\Blueprint",
+      "norm_label": "up()"
+    },
+    {
+      "label": "down()",
+      "file_type": "code",
       "source_file": "database/migrations/2026_11_01_070000_add_google_auth_and_whitelist_tables.php",
       "source_location": "L47",
       "_callable": true,
       "_origin": "ast",
       "id": "database_migrations_2026_11_01_070000_add_google_auth_and_whitelist_tables_down",
       "community": 30,
-      "community_name": "Illuminate\\Database\\Migrations\\Migration",
+      "community_name": "Illuminate\\Database\\Schema\\Blueprint",
       "norm_label": "down()"
     },
     {
@@ -10100,7 +10016,7 @@
       "_origin": "ast",
       "id": "database_migrations_2026_11_01_070000_add_google_auth_and_whitelist_tables_up",
       "community": 30,
-      "community_name": "Illuminate\\Database\\Migrations\\Migration",
+      "community_name": "Illuminate\\Database\\Schema\\Blueprint",
       "norm_label": "up()"
     },
     {
@@ -10112,7 +10028,7 @@
       "_origin": "ast",
       "id": "database_migrations_2026_11_08_090000_add_alvo_horas_to_study_settings_down",
       "community": 30,
-      "community_name": "Illuminate\\Database\\Migrations\\Migration",
+      "community_name": "Illuminate\\Database\\Schema\\Blueprint",
       "norm_label": "down()"
     },
     {
@@ -10124,7 +10040,7 @@
       "_origin": "ast",
       "id": "database_migrations_2026_11_08_090000_add_alvo_horas_to_study_settings_up",
       "community": 30,
-      "community_name": "Illuminate\\Database\\Migrations\\Migration",
+      "community_name": "Illuminate\\Database\\Schema\\Blueprint",
       "norm_label": "up()"
     },
     {
@@ -10136,7 +10052,7 @@
       "_origin": "ast",
       "id": "database_migrations_2026_11_12_120000_create_study_guruja_metas_table_down",
       "community": 30,
-      "community_name": "Illuminate\\Database\\Migrations\\Migration",
+      "community_name": "Illuminate\\Database\\Schema\\Blueprint",
       "norm_label": "down()"
     },
     {
@@ -10148,31 +10064,7 @@
       "_origin": "ast",
       "id": "database_migrations_2026_11_12_120000_create_study_guruja_metas_table_up",
       "community": 30,
-      "community_name": "Illuminate\\Database\\Migrations\\Migration",
-      "norm_label": "up()"
-    },
-    {
-      "label": "down()",
-      "file_type": "code",
-      "source_file": "database/migrations/2026_11_18_000001_drop_fiscal_tables.php",
-      "source_location": "L15",
-      "_callable": true,
-      "_origin": "ast",
-      "id": "database_migrations_2026_11_18_000001_drop_fiscal_tables_down",
-      "community": 30,
-      "community_name": "Illuminate\\Database\\Migrations\\Migration",
-      "norm_label": "down()"
-    },
-    {
-      "label": "up()",
-      "file_type": "code",
-      "source_file": "database/migrations/2026_11_18_000001_drop_fiscal_tables.php",
-      "source_location": "L8",
-      "_callable": true,
-      "_origin": "ast",
-      "id": "database_migrations_2026_11_18_000001_drop_fiscal_tables_up",
-      "community": 30,
-      "community_name": "Illuminate\\Database\\Migrations\\Migration",
+      "community_name": "Illuminate\\Database\\Schema\\Blueprint",
       "norm_label": "up()"
     },
     {
@@ -11931,7 +11823,7 @@
       "label": ".computeEstimativas()",
       "file_type": "code",
       "source_file": "app/Services/GurujaMcpService.php",
-      "source_location": "L773",
+      "source_location": "L771",
       "_callable": true,
       "_origin": "ast",
       "id": "app_services_gurujamcpservice_gurujamcpservice_computeestimativas",
@@ -11979,7 +11871,7 @@
       "label": ".extractMetaList()",
       "file_type": "code",
       "source_file": "app/Services/GurujaMcpService.php",
-      "source_location": "L683",
+      "source_location": "L681",
       "_callable": true,
       "_origin": "ast",
       "id": "app_services_gurujamcpservice_gurujamcpservice_extractmetalist",
@@ -11991,7 +11883,7 @@
       "label": ".extractTextFromContent()",
       "file_type": "code",
       "source_file": "app/Services/GurujaMcpService.php",
-      "source_location": "L666",
+      "source_location": "L664",
       "_callable": true,
       "_origin": "ast",
       "id": "app_services_gurujamcpservice_gurujamcpservice_extracttextfromcontent",
@@ -12003,7 +11895,7 @@
       "label": ".extractToolJson()",
       "file_type": "code",
       "source_file": "app/Services/GurujaMcpService.php",
-      "source_location": "L638",
+      "source_location": "L636",
       "_callable": true,
       "_origin": "ast",
       "id": "app_services_gurujamcpservice_gurujamcpservice_extracttooljson",
@@ -12027,7 +11919,7 @@
       "label": ".fetchViaTwoStepTools()",
       "file_type": "code",
       "source_file": "app/Services/GurujaMcpService.php",
-      "source_location": "L507",
+      "source_location": "L505",
       "_callable": true,
       "_origin": "ast",
       "id": "app_services_gurujamcpservice_gurujamcpservice_fetchviatwosteptools",
@@ -12039,7 +11931,7 @@
       "label": ".findActiveMeta()",
       "file_type": "code",
       "source_file": "app/Services/GurujaMcpService.php",
-      "source_location": "L702",
+      "source_location": "L700",
       "_callable": true,
       "_origin": "ast",
       "id": "app_services_gurujamcpservice_gurujamcpservice_findactivemeta",
@@ -12051,7 +11943,7 @@
       "label": ".findTool()",
       "file_type": "code",
       "source_file": "app/Services/GurujaMcpService.php",
-      "source_location": "L591",
+      "source_location": "L589",
       "_callable": true,
       "_origin": "ast",
       "id": "app_services_gurujamcpservice_gurujamcpservice_findtool",
@@ -12123,7 +12015,7 @@
       "label": ".needsEstimativas()",
       "file_type": "code",
       "source_file": "app/Services/GurujaMcpService.php",
-      "source_location": "L747",
+      "source_location": "L745",
       "_callable": true,
       "_origin": "ast",
       "id": "app_services_gurujamcpservice_gurujamcpservice_needsestimativas",
@@ -12135,7 +12027,7 @@
       "label": ".normalizeDataInicio()",
       "file_type": "code",
       "source_file": "app/Services/GurujaMcpService.php",
-      "source_location": "L892",
+      "source_location": "L890",
       "_callable": true,
       "_origin": "ast",
       "id": "app_services_gurujamcpservice_gurujamcpservice_normalizedatainicio",
@@ -12147,7 +12039,7 @@
       "label": ".normalizeMetaPayload()",
       "file_type": "code",
       "source_file": "app/Services/GurujaMcpService.php",
-      "source_location": "L816",
+      "source_location": "L814",
       "_callable": true,
       "_origin": "ast",
       "id": "app_services_gurujamcpservice_gurujamcpservice_normalizemetapayload",
@@ -12183,7 +12075,7 @@
       "label": ".resolveTargetIdParamName()",
       "file_type": "code",
       "source_file": "app/Services/GurujaMcpService.php",
-      "source_location": "L617",
+      "source_location": "L615",
       "_callable": true,
       "_origin": "ast",
       "id": "app_services_gurujamcpservice_gurujamcpservice_resolvetargetidparamname",
@@ -12195,7 +12087,7 @@
       "label": ".saveMetaToDatabase()",
       "file_type": "code",
       "source_file": "app/Services/GurujaMcpService.php",
-      "source_location": "L905",
+      "source_location": "L903",
       "_callable": true,
       "_origin": "ast",
       "id": "app_services_gurujamcpservice_gurujamcpservice_savemetatodatabase",
@@ -12219,7 +12111,7 @@
       "label": ".selectRecentCompletedMetaIds()",
       "file_type": "code",
       "source_file": "app/Services/GurujaMcpService.php",
-      "source_location": "L725",
+      "source_location": "L723",
       "_callable": true,
       "_origin": "ast",
       "id": "app_services_gurujamcpservice_gurujamcpservice_selectrecentcompletedmetaids",
@@ -13020,18 +12912,6 @@
       "norm_label": "up()"
     },
     {
-      "label": ".resumo()",
-      "file_type": "code",
-      "source_file": "app/Http/Controllers/Api/TvWidgetController.php",
-      "source_location": "L14",
-      "_callable": true,
-      "_origin": "ast",
-      "id": "app_http_controllers_api_tvwidgetcontroller_tvwidgetcontroller_resumo",
-      "community": 5,
-      "community_name": "User",
-      "norm_label": ".resumo()"
-    },
-    {
       "label": ".bodyMetrics()",
       "file_type": "code",
       "source_file": "app/Models/User.php",
@@ -13150,42 +13030,6 @@
       "community": 5,
       "community_name": "User",
       "norm_label": ".workoutsessions()"
-    },
-    {
-      "label": ".setUp()",
-      "file_type": "code",
-      "source_file": "tests/Feature/CreditCardDeleteTest.php",
-      "source_location": "L23",
-      "_callable": true,
-      "_origin": "ast",
-      "id": "tests_feature_creditcarddeletetest_creditcarddeletetest_setup",
-      "community": 5,
-      "community_name": "User",
-      "norm_label": ".setup()"
-    },
-    {
-      "label": ".test_cannot_delete_active_credit_card()",
-      "file_type": "code",
-      "source_file": "tests/Feature/CreditCardDeleteTest.php",
-      "source_location": "L52",
-      "_callable": true,
-      "_origin": "ast",
-      "id": "tests_feature_creditcarddeletetest_creditcarddeletetest_test_cannot_delete_active_credit_card",
-      "community": 5,
-      "community_name": "User",
-      "norm_label": ".test_cannot_delete_active_credit_card()"
-    },
-    {
-      "label": ".test_ui_shows_delete_button_only_for_disabled_card()",
-      "file_type": "code",
-      "source_file": "tests/Feature/CreditCardDeleteTest.php",
-      "source_location": "L105",
-      "_callable": true,
-      "_origin": "ast",
-      "id": "tests_feature_creditcarddeletetest_creditcarddeletetest_test_ui_shows_delete_button_only_for_disabled_card",
-      "community": 5,
-      "community_name": "User",
-      "norm_label": ".test_ui_shows_delete_button_only_for_disabled_card()"
     },
     {
       "label": ".test_guruja_atualizar_renova_token_automaticamente_apos_401()",
@@ -13510,6 +13354,66 @@
       "community": 5,
       "community_name": "User",
       "norm_label": ".test_rejects_invalid_secret_token()"
+    },
+    {
+      "label": ".criar()",
+      "file_type": "code",
+      "source_file": "tests/Feature/TransacaoUpdateDateTest.php",
+      "source_location": "L16",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "tests_feature_transacaoupdatedatetest_transacaoupdatedatetest_criar",
+      "community": 5,
+      "community_name": "User",
+      "norm_label": ".criar()"
+    },
+    {
+      "label": ".payload()",
+      "file_type": "code",
+      "source_file": "tests/Feature/TransacaoUpdateDateTest.php",
+      "source_location": "L28",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "tests_feature_transacaoupdatedatetest_transacaoupdatedatetest_payload",
+      "community": 5,
+      "community_name": "User",
+      "norm_label": ".payload()"
+    },
+    {
+      "label": ".test_editar_sem_mudar_data_preserva_data_e_data_hora()",
+      "file_type": "code",
+      "source_file": "tests/Feature/TransacaoUpdateDateTest.php",
+      "source_location": "L39",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "tests_feature_transacaoupdatedatetest_transacaoupdatedatetest_test_editar_sem_mudar_data_preserva_data_e_data_hora",
+      "community": 5,
+      "community_name": "User",
+      "norm_label": ".test_editar_sem_mudar_data_preserva_data_e_data_hora()"
+    },
+    {
+      "label": ".test_modal_de_edicao_recebe_data_no_formato_do_input()",
+      "file_type": "code",
+      "source_file": "tests/Feature/TransacaoUpdateDateTest.php",
+      "source_location": "L64",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "tests_feature_transacaoupdatedatetest_transacaoupdatedatetest_test_modal_de_edicao_recebe_data_no_formato_do_input",
+      "community": 5,
+      "community_name": "User",
+      "norm_label": ".test_modal_de_edicao_recebe_data_no_formato_do_input()"
+    },
+    {
+      "label": ".test_mudar_data_acompanha_data_hora()",
+      "file_type": "code",
+      "source_file": "tests/Feature/TransacaoUpdateDateTest.php",
+      "source_location": "L52",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "tests_feature_transacaoupdatedatetest_transacaoupdatedatetest_test_mudar_data_acompanha_data_hora",
+      "community": 5,
+      "community_name": "User",
+      "norm_label": ".test_mudar_data_acompanha_data_hora()"
     },
     {
       "label": ".tearDown()",
@@ -14952,6 +14856,18 @@
       "norm_label": ".parcelas()"
     },
     {
+      "label": ".compra()",
+      "file_type": "code",
+      "source_file": "app/Models/CartaoParcela.php",
+      "source_location": "L20",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "app_models_cartaoparcela_cartaoparcela_compra",
+      "community": 77,
+      "community_name": "Cartao",
+      "norm_label": ".compra()"
+    },
+    {
       "label": ".calcularVencimentoParcela()",
       "file_type": "code",
       "source_file": "app/Services/CreditCardService.php",
@@ -15132,6 +15048,54 @@
       "norm_label": ".test_toggle_fechamento_endpoint()"
     },
     {
+      "label": ".setUp()",
+      "file_type": "code",
+      "source_file": "tests/Feature/CreditCardDeleteTest.php",
+      "source_location": "L23",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "tests_feature_creditcarddeletetest_creditcarddeletetest_setup",
+      "community": 77,
+      "community_name": "Cartao",
+      "norm_label": ".setup()"
+    },
+    {
+      "label": ".test_can_delete_credit_card_after_disabled()",
+      "file_type": "code",
+      "source_file": "tests/Feature/CreditCardDeleteTest.php",
+      "source_location": "L64",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "tests_feature_creditcarddeletetest_creditcarddeletetest_test_can_delete_credit_card_after_disabled",
+      "community": 77,
+      "community_name": "Cartao",
+      "norm_label": ".test_can_delete_credit_card_after_disabled()"
+    },
+    {
+      "label": ".test_cannot_delete_active_credit_card()",
+      "file_type": "code",
+      "source_file": "tests/Feature/CreditCardDeleteTest.php",
+      "source_location": "L52",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "tests_feature_creditcarddeletetest_creditcarddeletetest_test_cannot_delete_active_credit_card",
+      "community": 77,
+      "community_name": "Cartao",
+      "norm_label": ".test_cannot_delete_active_credit_card()"
+    },
+    {
+      "label": ".test_ui_shows_delete_button_only_for_disabled_card()",
+      "file_type": "code",
+      "source_file": "tests/Feature/CreditCardDeleteTest.php",
+      "source_location": "L105",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "tests_feature_creditcarddeletetest_creditcarddeletetest_test_ui_shows_delete_button_only_for_disabled_card",
+      "community": 77,
+      "community_name": "Cartao",
+      "norm_label": ".test_ui_shows_delete_button_only_for_disabled_card()"
+    },
+    {
       "label": ".criarCompraParcelada()",
       "file_type": "code",
       "source_file": "tests/Feature/CreditCardReconciliationTest.php",
@@ -15250,6 +15214,102 @@
       "community": 77,
       "community_name": "Cartao",
       "norm_label": ".test_warns_when_invoice_seems_to_belong_to_another_card()"
+    },
+    {
+      "label": ".setUp()",
+      "file_type": "code",
+      "source_file": "tests/Feature/TvWidgetEndpointTest.php",
+      "source_location": "L20",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "tests_feature_tvwidgetendpointtest_tvwidgetendpointtest_setup",
+      "community": 77,
+      "community_name": "Cartao",
+      "norm_label": ".setup()"
+    },
+    {
+      "label": ".test_accepts_valid_token_via_header()",
+      "file_type": "code",
+      "source_file": "tests/Feature/TvWidgetEndpointTest.php",
+      "source_location": "L65",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "tests_feature_tvwidgetendpointtest_tvwidgetendpointtest_test_accepts_valid_token_via_header",
+      "community": 77,
+      "community_name": "Cartao",
+      "norm_label": ".test_accepts_valid_token_via_header()"
+    },
+    {
+      "label": ".test_accepts_valid_token_via_query_string()",
+      "file_type": "code",
+      "source_file": "tests/Feature/TvWidgetEndpointTest.php",
+      "source_location": "L40",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "tests_feature_tvwidgetendpointtest_tvwidgetendpointtest_test_accepts_valid_token_via_query_string",
+      "community": 77,
+      "community_name": "Cartao",
+      "norm_label": ".test_accepts_valid_token_via_query_string()"
+    },
+    {
+      "label": ".test_computes_accurate_financial_metrics_for_tv()",
+      "file_type": "code",
+      "source_file": "tests/Feature/TvWidgetEndpointTest.php",
+      "source_location": "L75",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "tests_feature_tvwidgetendpointtest_tvwidgetendpointtest_test_computes_accurate_financial_metrics_for_tv",
+      "community": 77,
+      "community_name": "Cartao",
+      "norm_label": ".test_computes_accurate_financial_metrics_for_tv()"
+    },
+    {
+      "label": ".test_rejects_unauthorized_request_when_token_is_invalid()",
+      "file_type": "code",
+      "source_file": "tests/Feature/TvWidgetEndpointTest.php",
+      "source_location": "L29",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "tests_feature_tvwidgetendpointtest_tvwidgetendpointtest_test_rejects_unauthorized_request_when_token_is_invalid",
+      "community": 77,
+      "community_name": "Cartao",
+      "norm_label": ".test_rejects_unauthorized_request_when_token_is_invalid()"
+    },
+    {
+      "label": ".test_tv_action_rejects_empty_url()",
+      "file_type": "code",
+      "source_file": "tests/Feature/TvWidgetEndpointTest.php",
+      "source_location": "L150",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "tests_feature_tvwidgetendpointtest_tvwidgetendpointtest_test_tv_action_rejects_empty_url",
+      "community": 77,
+      "community_name": "Cartao",
+      "norm_label": ".test_tv_action_rejects_empty_url()"
+    },
+    {
+      "label": ".test_tv_action_rejects_invalid_key()",
+      "file_type": "code",
+      "source_file": "tests/Feature/TvWidgetEndpointTest.php",
+      "source_location": "L156",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "tests_feature_tvwidgetendpointtest_tvwidgetendpointtest_test_tv_action_rejects_invalid_key",
+      "community": 77,
+      "community_name": "Cartao",
+      "norm_label": ".test_tv_action_rejects_invalid_key()"
+    },
+    {
+      "label": ".test_tv_control_ui_loads_successfully()",
+      "file_type": "code",
+      "source_file": "tests/Feature/TvWidgetEndpointTest.php",
+      "source_location": "L143",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "tests_feature_tvwidgetendpointtest_tvwidgetendpointtest_test_tv_control_ui_loads_successfully",
+      "community": 77,
+      "community_name": "Cartao",
+      "norm_label": ".test_tv_control_ui_loads_successfully()"
     },
     {
       "label": "escapeHtml()",
@@ -16162,66 +16222,6 @@
       "community": 88,
       "community_name": "Transacao",
       "norm_label": ".test_statement_import_automatically_deduplicates_and_enriches_manual_entries()"
-    },
-    {
-      "label": ".setUp()",
-      "file_type": "code",
-      "source_file": "tests/Feature/TransactionSuggestionTest.php",
-      "source_location": "L20",
-      "_callable": true,
-      "_origin": "ast",
-      "id": "tests_feature_transactionsuggestiontest_transactionsuggestiontest_setup",
-      "community": 88,
-      "community_name": "Transacao",
-      "norm_label": ".setup()"
-    },
-    {
-      "label": ".test_suggestion_endpoint_filters_by_query_insensitively()",
-      "file_type": "code",
-      "source_file": "tests/Feature/TransactionSuggestionTest.php",
-      "source_location": "L85",
-      "_callable": true,
-      "_origin": "ast",
-      "id": "tests_feature_transactionsuggestiontest_transactionsuggestiontest_test_suggestion_endpoint_filters_by_query_insensitively",
-      "community": 88,
-      "community_name": "Transacao",
-      "norm_label": ".test_suggestion_endpoint_filters_by_query_insensitively()"
-    },
-    {
-      "label": ".test_suggestion_endpoint_requires_authentication()",
-      "file_type": "code",
-      "source_file": "tests/Feature/TransactionSuggestionTest.php",
-      "source_location": "L26",
-      "_callable": true,
-      "_origin": "ast",
-      "id": "tests_feature_transactionsuggestiontest_transactionsuggestiontest_test_suggestion_endpoint_requires_authentication",
-      "community": 88,
-      "community_name": "Transacao",
-      "norm_label": ".test_suggestion_endpoint_requires_authentication()"
-    },
-    {
-      "label": ".test_suggestion_endpoint_returns_suggestions_from_transactions_and_card_purchases()",
-      "file_type": "code",
-      "source_file": "tests/Feature/TransactionSuggestionTest.php",
-      "source_location": "L32",
-      "_callable": true,
-      "_origin": "ast",
-      "id": "tests_feature_transactionsuggestiontest_transactionsuggestiontest_test_suggestion_endpoint_returns_suggestions_from_transactions_and_card_purchases",
-      "community": 88,
-      "community_name": "Transacao",
-      "norm_label": ".test_suggestion_endpoint_returns_suggestions_from_transactions_and_card_purchases()"
-    },
-    {
-      "label": ".test_suggestion_service_isolates_users()",
-      "file_type": "code",
-      "source_file": "tests/Feature/TransactionSuggestionTest.php",
-      "source_location": "L122",
-      "_callable": true,
-      "_origin": "ast",
-      "id": "tests_feature_transactionsuggestiontest_transactionsuggestiontest_test_suggestion_service_isolates_users",
-      "community": 88,
-      "community_name": "Transacao",
-      "norm_label": ".test_suggestion_service_isolates_users()"
     },
     {
       "label": ".deletePhoto()",
@@ -17978,17 +17978,6 @@
       "norm_label": "mockery\\mockinterface"
     },
     {
-      "label": "BackupEstudosCommandTest.php",
-      "file_type": "code",
-      "source_file": "tests/Feature/BackupEstudosCommandTest.php",
-      "source_location": "L1",
-      "_origin": "ast",
-      "id": "tests_feature_backupestudoscommandtest",
-      "community": 122,
-      "community_name": "TestCase",
-      "norm_label": "backupestudoscommandtest.php"
-    },
-    {
       "label": "BodyTrackerTest.php",
       "file_type": "code",
       "source_file": "tests/Feature/BodyTrackerTest.php",
@@ -18077,6 +18066,17 @@
       "norm_label": "telegramofxdocumenttest.php"
     },
     {
+      "label": "TelegramWebhookRoutingTest.php",
+      "file_type": "code",
+      "source_file": "tests/Feature/TelegramWebhookRoutingTest.php",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "tests_feature_telegramwebhookroutingtest",
+      "community": 122,
+      "community_name": "TestCase",
+      "norm_label": "telegramwebhookroutingtest.php"
+    },
+    {
       "label": "TelegramWebhookTest.php",
       "file_type": "code",
       "source_file": "tests/Feature/TelegramWebhookTest.php",
@@ -18088,17 +18088,6 @@
       "norm_label": "telegramwebhooktest.php"
     },
     {
-      "label": "TransacaoUpdateDateTest.php",
-      "file_type": "code",
-      "source_file": "tests/Feature/TransacaoUpdateDateTest.php",
-      "source_location": "L1",
-      "_origin": "ast",
-      "id": "tests_feature_transacaoupdatedatetest",
-      "community": 122,
-      "community_name": "TestCase",
-      "norm_label": "transacaoupdatedatetest.php"
-    },
-    {
       "label": "TestCase.php",
       "file_type": "code",
       "source_file": "tests/TestCase.php",
@@ -18108,6 +18097,17 @@
       "community": 122,
       "community_name": "TestCase",
       "norm_label": "testcase.php"
+    },
+    {
+      "label": "WhatsappMessageParserTest.php",
+      "file_type": "code",
+      "source_file": "tests/Unit/WhatsappMessageParserTest.php",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "tests_unit_whatsappmessageparsertest",
+      "community": 122,
+      "community_name": "TestCase",
+      "norm_label": "whatsappmessageparsertest.php"
     },
     {
       "label": "avatars.js",
@@ -18458,19 +18458,8 @@
       "_origin": "ast",
       "id": "database_migrations_2026_04_24_184002_create_cartao_parcelas_table",
       "community": 134,
-      "community_name": "Illuminate\\Database\\Schema\\Blueprint",
+      "community_name": "Illuminate\\Database\\Migrations\\Migration",
       "norm_label": "2026_04_24_184002_create_cartao_parcelas_table.php"
-    },
-    {
-      "label": "2026_10_31_140000_drop_legacy_study_tables.php",
-      "file_type": "code",
-      "source_file": "database/migrations/2026_10_31_140000_drop_legacy_study_tables.php",
-      "source_location": "L1",
-      "_origin": "ast",
-      "id": "database_migrations_2026_10_31_140000_drop_legacy_study_tables",
-      "community": 134,
-      "community_name": "Illuminate\\Database\\Schema\\Blueprint",
-      "norm_label": "2026_10_31_140000_drop_legacy_study_tables.php"
     },
     {
       "label": "2026_11_15_150000_add_reforco_settings_and_session_fields.php",
@@ -18480,7 +18469,7 @@
       "_origin": "ast",
       "id": "database_migrations_2026_11_15_150000_add_reforco_settings_and_session_fields",
       "community": 134,
-      "community_name": "Illuminate\\Database\\Schema\\Blueprint",
+      "community_name": "Illuminate\\Database\\Migrations\\Migration",
       "norm_label": "2026_11_15_150000_add_reforco_settings_and_session_fields.php"
     },
     {
@@ -18491,19 +18480,30 @@
       "_origin": "ast",
       "id": "database_migrations_2026_11_16_060000_create_study_guruja_tokens_table",
       "community": 134,
-      "community_name": "Illuminate\\Database\\Schema\\Blueprint",
+      "community_name": "Illuminate\\Database\\Migrations\\Migration",
       "norm_label": "2026_11_16_060000_create_study_guruja_tokens_table.php"
     },
     {
-      "label": "Illuminate\\Database\\Schema\\Blueprint",
+      "label": "2026_11_18_000001_drop_fiscal_tables.php",
+      "file_type": "code",
+      "source_file": "database/migrations/2026_11_18_000001_drop_fiscal_tables.php",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "database_migrations_2026_11_18_000001_drop_fiscal_tables",
+      "community": 134,
+      "community_name": "Illuminate\\Database\\Migrations\\Migration",
+      "norm_label": "2026_11_18_000001_drop_fiscal_tables.php"
+    },
+    {
+      "label": "Illuminate\\Database\\Migrations\\Migration",
       "file_type": "code",
       "source_file": "",
       "source_location": "",
       "_origin": "ast",
-      "id": "illuminate_database_schema_blueprint",
+      "id": "illuminate_database_migrations_migration",
       "community": 134,
-      "community_name": "Illuminate\\Database\\Schema\\Blueprint",
-      "norm_label": "illuminate\\database\\schema\\blueprint"
+      "community_name": "Illuminate\\Database\\Migrations\\Migration",
+      "norm_label": "illuminate\\database\\migrations\\migration"
     },
     {
       "label": "estudos-ypt-plano.md",
@@ -18979,15 +18979,15 @@
       "norm_label": "convites.blade.php"
     },
     {
-      "label": "CartoesController.php",
+      "label": "TvWidgetController.php",
       "file_type": "code",
-      "source_file": "app/Http/Controllers/CartoesController.php",
+      "source_file": "app/Http/Controllers/Api/TvWidgetController.php",
       "source_location": "L1",
       "_origin": "ast",
-      "id": "app_http_controllers_cartoescontroller",
+      "id": "app_http_controllers_api_tvwidgetcontroller",
       "community": 152,
-      "community_name": "CartaoParcela",
-      "norm_label": "cartoescontroller.php"
+      "community_name": "CartaoPrevisao",
+      "norm_label": "tvwidgetcontroller.php"
     },
     {
       "label": "CategoriasController.php",
@@ -18997,7 +18997,7 @@
       "_origin": "ast",
       "id": "app_http_controllers_categoriascontroller",
       "community": 152,
-      "community_name": "CartaoParcela",
+      "community_name": "CartaoPrevisao",
       "norm_label": "categoriascontroller.php"
     },
     {
@@ -19008,7 +19008,7 @@
       "_origin": "ast",
       "id": "app_http_controllers_exportcontroller",
       "community": 152,
-      "community_name": "CartaoParcela",
+      "community_name": "CartaoPrevisao",
       "norm_label": "exportcontroller.php"
     },
     {
@@ -19019,7 +19019,7 @@
       "_origin": "ast",
       "id": "app_http_controllers_financascontroller",
       "community": 152,
-      "community_name": "CartaoParcela",
+      "community_name": "CartaoPrevisao",
       "norm_label": "financascontroller.php"
     },
     {
@@ -19030,7 +19030,7 @@
       "_origin": "ast",
       "id": "app_services_categorysanitizer",
       "community": 152,
-      "community_name": "CartaoParcela",
+      "community_name": "CartaoPrevisao",
       "norm_label": "categorysanitizer.php"
     },
     {
@@ -19041,7 +19041,7 @@
       "_origin": "ast",
       "id": "app_services_financialsummaryservice",
       "community": 152,
-      "community_name": "CartaoParcela",
+      "community_name": "CartaoPrevisao",
       "norm_label": "financialsummaryservice.php"
     },
     {
@@ -19052,30 +19052,8 @@
       "_origin": "ast",
       "id": "app_services_transactionsuggestionservice",
       "community": 152,
-      "community_name": "CartaoParcela",
+      "community_name": "CartaoPrevisao",
       "norm_label": "transactionsuggestionservice.php"
-    },
-    {
-      "label": "Barryvdh\\DomPDF\\Facade\\Pdf",
-      "file_type": "code",
-      "source_file": "",
-      "source_location": "",
-      "_origin": "ast",
-      "id": "barryvdh_dompdf_facade_pdf",
-      "community": 152,
-      "community_name": "CartaoParcela",
-      "norm_label": "barryvdh\\dompdf\\facade\\pdf"
-    },
-    {
-      "label": "Illuminate\\Support\\Facades\\Auth",
-      "file_type": "code",
-      "source_file": "",
-      "source_location": "",
-      "_origin": "ast",
-      "id": "illuminate_support_facades_auth",
-      "community": 152,
-      "community_name": "CartaoParcela",
-      "norm_label": "illuminate\\support\\facades\\auth"
     },
     {
       "label": "Illuminate\\Support\\Facades\\URL",
@@ -19085,7 +19063,7 @@
       "_origin": "ast",
       "id": "illuminate_support_facades_url",
       "community": 152,
-      "community_name": "CartaoParcela",
+      "community_name": "CartaoPrevisao",
       "norm_label": "illuminate\\support\\facades\\url"
     },
     {
@@ -19096,8 +19074,19 @@
       "_origin": "ast",
       "id": "tests_feature_financialsummaryandcardlimitstest",
       "community": 152,
-      "community_name": "CartaoParcela",
+      "community_name": "CartaoPrevisao",
       "norm_label": "financialsummaryandcardlimitstest.php"
+    },
+    {
+      "label": "TransactionSuggestionTest.php",
+      "file_type": "code",
+      "source_file": "tests/Feature/TransactionSuggestionTest.php",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "tests_feature_transactionsuggestiontest",
+      "community": 152,
+      "community_name": "CartaoPrevisao",
+      "norm_label": "transactionsuggestiontest.php"
     },
     {
       "label": "2026_04_24_190714_create_categorias_table.php",
@@ -19395,17 +19384,6 @@
       "community": 17,
       "community_name": "TelegramWebhookController",
       "norm_label": "whatsappmessageparser.php"
-    },
-    {
-      "label": "WhatsappMessageParserTest.php",
-      "file_type": "code",
-      "source_file": "tests/Unit/WhatsappMessageParserTest.php",
-      "source_location": "L1",
-      "_origin": "ast",
-      "id": "tests_unit_whatsappmessageparsertest",
-      "community": 17,
-      "community_name": "TelegramWebhookController",
-      "norm_label": "whatsappmessageparsertest.php"
     },
     {
       "label": "2026_10_24_200000_create_contas_and_update_transacoes_for_ofx.php",
@@ -20794,6 +20772,17 @@
       "norm_label": "runtimeexception"
     },
     {
+      "label": "2026_10_31_140000_drop_legacy_study_tables.php",
+      "file_type": "code",
+      "source_file": "database/migrations/2026_10_31_140000_drop_legacy_study_tables.php",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "database_migrations_2026_10_31_140000_drop_legacy_study_tables",
+      "community": 30,
+      "community_name": "Illuminate\\Database\\Schema\\Blueprint",
+      "norm_label": "2026_10_31_140000_drop_legacy_study_tables.php"
+    },
+    {
       "label": "2026_11_01_070000_add_google_auth_and_whitelist_tables.php",
       "file_type": "code",
       "source_file": "database/migrations/2026_11_01_070000_add_google_auth_and_whitelist_tables.php",
@@ -20801,7 +20790,7 @@
       "_origin": "ast",
       "id": "database_migrations_2026_11_01_070000_add_google_auth_and_whitelist_tables",
       "community": 30,
-      "community_name": "Illuminate\\Database\\Migrations\\Migration",
+      "community_name": "Illuminate\\Database\\Schema\\Blueprint",
       "norm_label": "2026_11_01_070000_add_google_auth_and_whitelist_tables.php"
     },
     {
@@ -20812,7 +20801,7 @@
       "_origin": "ast",
       "id": "database_migrations_2026_11_08_090000_add_alvo_horas_to_study_settings",
       "community": 30,
-      "community_name": "Illuminate\\Database\\Migrations\\Migration",
+      "community_name": "Illuminate\\Database\\Schema\\Blueprint",
       "norm_label": "2026_11_08_090000_add_alvo_horas_to_study_settings.php"
     },
     {
@@ -20823,30 +20812,19 @@
       "_origin": "ast",
       "id": "database_migrations_2026_11_12_120000_create_study_guruja_metas_table",
       "community": 30,
-      "community_name": "Illuminate\\Database\\Migrations\\Migration",
+      "community_name": "Illuminate\\Database\\Schema\\Blueprint",
       "norm_label": "2026_11_12_120000_create_study_guruja_metas_table.php"
     },
     {
-      "label": "2026_11_18_000001_drop_fiscal_tables.php",
-      "file_type": "code",
-      "source_file": "database/migrations/2026_11_18_000001_drop_fiscal_tables.php",
-      "source_location": "L1",
-      "_origin": "ast",
-      "id": "database_migrations_2026_11_18_000001_drop_fiscal_tables",
-      "community": 30,
-      "community_name": "Illuminate\\Database\\Migrations\\Migration",
-      "norm_label": "2026_11_18_000001_drop_fiscal_tables.php"
-    },
-    {
-      "label": "Illuminate\\Database\\Migrations\\Migration",
+      "label": "Illuminate\\Database\\Schema\\Blueprint",
       "file_type": "code",
       "source_file": "",
       "source_location": "",
       "_origin": "ast",
-      "id": "illuminate_database_migrations_migration",
+      "id": "illuminate_database_schema_blueprint",
       "community": 30,
-      "community_name": "Illuminate\\Database\\Migrations\\Migration",
-      "norm_label": "illuminate\\database\\migrations\\migration"
+      "community_name": "Illuminate\\Database\\Schema\\Blueprint",
+      "norm_label": "illuminate\\database\\schema\\blueprint"
     },
     {
       "label": "audio.js",
@@ -21905,17 +21883,6 @@
       "norm_label": "graphify"
     },
     {
-      "label": "TvWidgetController.php",
-      "file_type": "code",
-      "source_file": "app/Http/Controllers/Api/TvWidgetController.php",
-      "source_location": "L1",
-      "_origin": "ast",
-      "id": "app_http_controllers_api_tvwidgetcontroller",
-      "community": 5,
-      "community_name": "User",
-      "norm_label": "tvwidgetcontroller.php"
-    },
-    {
       "label": "auth.php",
       "file_type": "code",
       "source_file": "config/auth.php",
@@ -21949,17 +21916,6 @@
       "norm_label": "illuminate\\foundation\\auth\\user"
     },
     {
-      "label": "CreditCardDeleteTest.php",
-      "file_type": "code",
-      "source_file": "tests/Feature/CreditCardDeleteTest.php",
-      "source_location": "L1",
-      "_origin": "ast",
-      "id": "tests_feature_creditcarddeletetest",
-      "community": 5,
-      "community_name": "User",
-      "norm_label": "creditcarddeletetest.php"
-    },
-    {
       "label": "ManagersTest.php",
       "file_type": "code",
       "source_file": "tests/Feature/ManagersTest.php",
@@ -21971,15 +21927,15 @@
       "norm_label": "managerstest.php"
     },
     {
-      "label": "StudyRoomsTest.php",
+      "label": "TransacaoUpdateDateTest.php",
       "file_type": "code",
-      "source_file": "tests/Feature/StudyRoomsTest.php",
+      "source_file": "tests/Feature/TransacaoUpdateDateTest.php",
       "source_location": "L1",
       "_origin": "ast",
-      "id": "tests_feature_studyroomstest",
+      "id": "tests_feature_transacaoupdatedatetest",
       "community": 5,
       "community_name": "User",
-      "norm_label": "studyroomstest.php"
+      "norm_label": "transacaoupdatedatetest.php"
     },
     {
       "label": "workflows/graphify.md",
@@ -22797,39 +22753,6 @@
       "norm_label": "carbon"
     },
     {
-      "label": "StudySyncService.php",
-      "file_type": "code",
-      "source_file": "app/Services/StudySyncService.php",
-      "source_location": "L1",
-      "_origin": "ast",
-      "id": "app_services_studysyncservice",
-      "community": 77,
-      "community_name": "Cartao",
-      "norm_label": "studysyncservice.php"
-    },
-    {
-      "label": "Carbon\\Carbon",
-      "file_type": "code",
-      "source_file": "",
-      "source_location": "",
-      "_origin": "ast",
-      "id": "carbon_carbon",
-      "community": 77,
-      "community_name": "Cartao",
-      "norm_label": "carbon\\carbon"
-    },
-    {
-      "label": "Illuminate\\Support\\Facades\\Validator",
-      "file_type": "code",
-      "source_file": "",
-      "source_location": "",
-      "_origin": "ast",
-      "id": "illuminate_support_facades_validator",
-      "community": 77,
-      "community_name": "Cartao",
-      "norm_label": "illuminate\\support\\facades\\validator"
-    },
-    {
       "label": "CartaoCompraTest.php",
       "file_type": "code",
       "source_file": "tests/Feature/CartaoCompraTest.php",
@@ -22850,6 +22773,17 @@
       "community": 77,
       "community_name": "Cartao",
       "norm_label": "creditcardclosingtest.php"
+    },
+    {
+      "label": "CreditCardDeleteTest.php",
+      "file_type": "code",
+      "source_file": "tests/Feature/CreditCardDeleteTest.php",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "tests_feature_creditcarddeletetest",
+      "community": 77,
+      "community_name": "Cartao",
+      "norm_label": "creditcarddeletetest.php"
     },
     {
       "label": "CreditCardReconciliationTest.php",
@@ -23211,7 +23145,7 @@
       "_origin": "ast",
       "id": "app_console_commands_gurujaconnectcommand",
       "community": 83,
-      "community_name": "Illuminate\\Support\\Facades\\DB",
+      "community_name": "Carbon\\Carbon",
       "norm_label": "gurujaconnectcommand.php"
     },
     {
@@ -23222,8 +23156,19 @@
       "_origin": "ast",
       "id": "app_console_commands_gurujasynccommand",
       "community": 83,
-      "community_name": "Illuminate\\Support\\Facades\\DB",
+      "community_name": "Carbon\\Carbon",
       "norm_label": "gurujasynccommand.php"
+    },
+    {
+      "label": "CartoesController.php",
+      "file_type": "code",
+      "source_file": "app/Http/Controllers/CartoesController.php",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "app_http_controllers_cartoescontroller",
+      "community": 83,
+      "community_name": "Carbon\\Carbon",
+      "norm_label": "cartoescontroller.php"
     },
     {
       "label": "EstudosApiController.php",
@@ -23233,7 +23178,7 @@
       "_origin": "ast",
       "id": "app_http_controllers_estudosapicontroller",
       "community": 83,
-      "community_name": "Illuminate\\Support\\Facades\\DB",
+      "community_name": "Carbon\\Carbon",
       "norm_label": "estudosapicontroller.php"
     },
     {
@@ -23244,7 +23189,7 @@
       "_origin": "ast",
       "id": "app_http_controllers_estudoscontroller",
       "community": 83,
-      "community_name": "Illuminate\\Support\\Facades\\DB",
+      "community_name": "Carbon\\Carbon",
       "norm_label": "estudoscontroller.php"
     },
     {
@@ -23255,7 +23200,7 @@
       "_origin": "ast",
       "id": "app_http_controllers_mercadocontroller",
       "community": 83,
-      "community_name": "Illuminate\\Support\\Facades\\DB",
+      "community_name": "Carbon\\Carbon",
       "norm_label": "mercadocontroller.php"
     },
     {
@@ -23266,7 +23211,7 @@
       "_origin": "ast",
       "id": "app_http_controllers_telegramwebhookcontroller",
       "community": 83,
-      "community_name": "Illuminate\\Support\\Facades\\DB",
+      "community_name": "Carbon\\Carbon",
       "norm_label": "telegramwebhookcontroller.php"
     },
     {
@@ -23277,7 +23222,7 @@
       "_origin": "ast",
       "id": "app_services_creditcardreconciliationservice",
       "community": 83,
-      "community_name": "Illuminate\\Support\\Facades\\DB",
+      "community_name": "Carbon\\Carbon",
       "norm_label": "creditcardreconciliationservice.php"
     },
     {
@@ -23288,7 +23233,7 @@
       "_origin": "ast",
       "id": "app_services_databasesyncservice",
       "community": 83,
-      "community_name": "Illuminate\\Support\\Facades\\DB",
+      "community_name": "Carbon\\Carbon",
       "norm_label": "databasesyncservice.php"
     },
     {
@@ -23299,7 +23244,7 @@
       "_origin": "ast",
       "id": "app_services_fitnessaiservice",
       "community": 83,
-      "community_name": "Illuminate\\Support\\Facades\\DB",
+      "community_name": "Carbon\\Carbon",
       "norm_label": "fitnessaiservice.php"
     },
     {
@@ -23310,7 +23255,7 @@
       "_origin": "ast",
       "id": "app_services_geminiservice",
       "community": 83,
-      "community_name": "Illuminate\\Support\\Facades\\DB",
+      "community_name": "Carbon\\Carbon",
       "norm_label": "geminiservice.php"
     },
     {
@@ -23321,7 +23266,7 @@
       "_origin": "ast",
       "id": "app_services_gurujacomandoresumoservice",
       "community": 83,
-      "community_name": "Illuminate\\Support\\Facades\\DB",
+      "community_name": "Carbon\\Carbon",
       "norm_label": "gurujacomandoresumoservice.php"
     },
     {
@@ -23332,7 +23277,7 @@
       "_origin": "ast",
       "id": "app_services_gurujamcpservice",
       "community": 83,
-      "community_name": "Illuminate\\Support\\Facades\\DB",
+      "community_name": "Carbon\\Carbon",
       "norm_label": "gurujamcpservice.php"
     },
     {
@@ -23343,7 +23288,7 @@
       "_origin": "ast",
       "id": "app_services_statementimportservice",
       "community": 83,
-      "community_name": "Illuminate\\Support\\Facades\\DB",
+      "community_name": "Carbon\\Carbon",
       "norm_label": "statementimportservice.php"
     },
     {
@@ -23354,8 +23299,19 @@
       "_origin": "ast",
       "id": "app_services_studyroomservice",
       "community": 83,
-      "community_name": "Illuminate\\Support\\Facades\\DB",
+      "community_name": "Carbon\\Carbon",
       "norm_label": "studyroomservice.php"
+    },
+    {
+      "label": "StudySyncService.php",
+      "file_type": "code",
+      "source_file": "app/Services/StudySyncService.php",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "app_services_studysyncservice",
+      "community": 83,
+      "community_name": "Carbon\\Carbon",
+      "norm_label": "studysyncservice.php"
     },
     {
       "label": "TelegramService.php",
@@ -23365,7 +23321,7 @@
       "_origin": "ast",
       "id": "app_services_telegramservice",
       "community": 83,
-      "community_name": "Illuminate\\Support\\Facades\\DB",
+      "community_name": "Carbon\\Carbon",
       "norm_label": "telegramservice.php"
     },
     {
@@ -23376,8 +23332,30 @@
       "_origin": "ast",
       "id": "app_services_transactiondeduplicationservice",
       "community": 83,
-      "community_name": "Illuminate\\Support\\Facades\\DB",
+      "community_name": "Carbon\\Carbon",
       "norm_label": "transactiondeduplicationservice.php"
+    },
+    {
+      "label": "Barryvdh\\DomPDF\\Facade\\Pdf",
+      "file_type": "code",
+      "source_file": "",
+      "source_location": "",
+      "_origin": "ast",
+      "id": "barryvdh_dompdf_facade_pdf",
+      "community": 83,
+      "community_name": "Carbon\\Carbon",
+      "norm_label": "barryvdh\\dompdf\\facade\\pdf"
+    },
+    {
+      "label": "Carbon\\Carbon",
+      "file_type": "code",
+      "source_file": "",
+      "source_location": "",
+      "_origin": "ast",
+      "id": "carbon_carbon",
+      "community": 83,
+      "community_name": "Carbon\\Carbon",
+      "norm_label": "carbon\\carbon"
     },
     {
       "label": "cache.php",
@@ -23387,7 +23365,7 @@
       "_origin": "ast",
       "id": "config_cache",
       "community": 83,
-      "community_name": "Illuminate\\Support\\Facades\\DB",
+      "community_name": "Carbon\\Carbon",
       "norm_label": "cache.php"
     },
     {
@@ -23398,7 +23376,7 @@
       "_origin": "ast",
       "id": "config_database",
       "community": 83,
-      "community_name": "Illuminate\\Support\\Facades\\DB",
+      "community_name": "Carbon\\Carbon",
       "norm_label": "database.php"
     },
     {
@@ -23409,7 +23387,7 @@
       "_origin": "ast",
       "id": "config_session",
       "community": 83,
-      "community_name": "Illuminate\\Support\\Facades\\DB",
+      "community_name": "Carbon\\Carbon",
       "norm_label": "session.php"
     },
     {
@@ -23420,7 +23398,7 @@
       "_origin": "ast",
       "id": "illuminate_http_client_request",
       "community": 83,
-      "community_name": "Illuminate\\Support\\Facades\\DB",
+      "community_name": "Carbon\\Carbon",
       "norm_label": "illuminate\\http\\client\\request"
     },
     {
@@ -23431,8 +23409,19 @@
       "_origin": "ast",
       "id": "illuminate_support_carbon",
       "community": 83,
-      "community_name": "Illuminate\\Support\\Facades\\DB",
+      "community_name": "Carbon\\Carbon",
       "norm_label": "illuminate\\support\\carbon"
+    },
+    {
+      "label": "Illuminate\\Support\\Facades\\Auth",
+      "file_type": "code",
+      "source_file": "",
+      "source_location": "",
+      "_origin": "ast",
+      "id": "illuminate_support_facades_auth",
+      "community": 83,
+      "community_name": "Carbon\\Carbon",
+      "norm_label": "illuminate\\support\\facades\\auth"
     },
     {
       "label": "Illuminate\\Support\\Facades\\Cache",
@@ -23442,7 +23431,7 @@
       "_origin": "ast",
       "id": "illuminate_support_facades_cache",
       "community": 83,
-      "community_name": "Illuminate\\Support\\Facades\\DB",
+      "community_name": "Carbon\\Carbon",
       "norm_label": "illuminate\\support\\facades\\cache"
     },
     {
@@ -23453,7 +23442,7 @@
       "_origin": "ast",
       "id": "illuminate_support_facades_db",
       "community": 83,
-      "community_name": "Illuminate\\Support\\Facades\\DB",
+      "community_name": "Carbon\\Carbon",
       "norm_label": "illuminate\\support\\facades\\db"
     },
     {
@@ -23464,7 +23453,7 @@
       "_origin": "ast",
       "id": "illuminate_support_facades_http",
       "community": 83,
-      "community_name": "Illuminate\\Support\\Facades\\DB",
+      "community_name": "Carbon\\Carbon",
       "norm_label": "illuminate\\support\\facades\\http"
     },
     {
@@ -23475,7 +23464,7 @@
       "_origin": "ast",
       "id": "illuminate_support_facades_log",
       "community": 83,
-      "community_name": "Illuminate\\Support\\Facades\\DB",
+      "community_name": "Carbon\\Carbon",
       "norm_label": "illuminate\\support\\facades\\log"
     },
     {
@@ -23486,8 +23475,19 @@
       "_origin": "ast",
       "id": "illuminate_support_facades_storage",
       "community": 83,
-      "community_name": "Illuminate\\Support\\Facades\\DB",
+      "community_name": "Carbon\\Carbon",
       "norm_label": "illuminate\\support\\facades\\storage"
+    },
+    {
+      "label": "Illuminate\\Support\\Facades\\Validator",
+      "file_type": "code",
+      "source_file": "",
+      "source_location": "",
+      "_origin": "ast",
+      "id": "illuminate_support_facades_validator",
+      "community": 83,
+      "community_name": "Carbon\\Carbon",
+      "norm_label": "illuminate\\support\\facades\\validator"
     },
     {
       "label": "Illuminate\\Support\\Str",
@@ -23497,7 +23497,7 @@
       "_origin": "ast",
       "id": "illuminate_support_str",
       "community": 83,
-      "community_name": "Illuminate\\Support\\Facades\\DB",
+      "community_name": "Carbon\\Carbon",
       "norm_label": "illuminate\\support\\str"
     },
     {
@@ -23508,7 +23508,7 @@
       "_origin": "ast",
       "id": "illuminate_validation_validationexception",
       "community": 83,
-      "community_name": "Illuminate\\Support\\Facades\\DB",
+      "community_name": "Carbon\\Carbon",
       "norm_label": "illuminate\\validation\\validationexception"
     },
     {
@@ -23519,8 +23519,19 @@
       "_origin": "ast",
       "id": "pdo_mysql",
       "community": 83,
-      "community_name": "Illuminate\\Support\\Facades\\DB",
+      "community_name": "Carbon\\Carbon",
       "norm_label": "pdo\\mysql"
+    },
+    {
+      "label": "BackupEstudosCommandTest.php",
+      "file_type": "code",
+      "source_file": "tests/Feature/BackupEstudosCommandTest.php",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "tests_feature_backupestudoscommandtest",
+      "community": 83,
+      "community_name": "Carbon\\Carbon",
+      "norm_label": "backupestudoscommandtest.php"
     },
     {
       "label": "EstudosApiTest.php",
@@ -23530,7 +23541,7 @@
       "_origin": "ast",
       "id": "tests_feature_estudosapitest",
       "community": 83,
-      "community_name": "Illuminate\\Support\\Facades\\DB",
+      "community_name": "Carbon\\Carbon",
       "norm_label": "estudosapitest.php"
     },
     {
@@ -23541,7 +23552,7 @@
       "_origin": "ast",
       "id": "tests_feature_estudosgurujamcptest",
       "community": 83,
-      "community_name": "Illuminate\\Support\\Facades\\DB",
+      "community_name": "Carbon\\Carbon",
       "norm_label": "estudosgurujamcptest.php"
     },
     {
@@ -23552,7 +23563,7 @@
       "_origin": "ast",
       "id": "tests_feature_estudosgurujatest",
       "community": 83,
-      "community_name": "Illuminate\\Support\\Facades\\DB",
+      "community_name": "Carbon\\Carbon",
       "norm_label": "estudosgurujatest.php"
     },
     {
@@ -23563,8 +23574,19 @@
       "_origin": "ast",
       "id": "tests_feature_resumoestudoscommandtest",
       "community": 83,
-      "community_name": "Illuminate\\Support\\Facades\\DB",
+      "community_name": "Carbon\\Carbon",
       "norm_label": "resumoestudoscommandtest.php"
+    },
+    {
+      "label": "StudyRoomsTest.php",
+      "file_type": "code",
+      "source_file": "tests/Feature/StudyRoomsTest.php",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "tests_feature_studyroomstest",
+      "community": 83,
+      "community_name": "Carbon\\Carbon",
+      "norm_label": "studyroomstest.php"
     },
     {
       "label": "StudySyncTest.php",
@@ -23574,19 +23596,8 @@
       "_origin": "ast",
       "id": "tests_feature_studysynctest",
       "community": 83,
-      "community_name": "Illuminate\\Support\\Facades\\DB",
+      "community_name": "Carbon\\Carbon",
       "norm_label": "studysynctest.php"
-    },
-    {
-      "label": "TelegramWebhookRoutingTest.php",
-      "file_type": "code",
-      "source_file": "tests/Feature/TelegramWebhookRoutingTest.php",
-      "source_location": "L1",
-      "_origin": "ast",
-      "id": "tests_feature_telegramwebhookroutingtest",
-      "community": 83,
-      "community_name": "Illuminate\\Support\\Facades\\DB",
-      "norm_label": "telegramwebhookroutingtest.php"
     },
     {
       "label": "Throwable",
@@ -23596,7 +23607,7 @@
       "_origin": "ast",
       "id": "throwable",
       "community": 83,
-      "community_name": "Illuminate\\Support\\Facades\\DB",
+      "community_name": "Carbon\\Carbon",
       "norm_label": "throwable"
     },
     {
@@ -23607,7 +23618,7 @@
       "_origin": "ast",
       "id": "ziparchive",
       "community": 83,
-      "community_name": "Illuminate\\Support\\Facades\\DB",
+      "community_name": "Carbon\\Carbon",
       "norm_label": "ziparchive"
     },
     {
@@ -23686,17 +23697,6 @@
       "community": 88,
       "community_name": "Transacao",
       "norm_label": "transactiondeduplicationtest.php"
-    },
-    {
-      "label": "TransactionSuggestionTest.php",
-      "file_type": "code",
-      "source_file": "tests/Feature/TransactionSuggestionTest.php",
-      "source_location": "L1",
-      "_origin": "ast",
-      "id": "tests_feature_transactionsuggestiontest",
-      "community": 88,
-      "community_name": "Transacao",
-      "norm_label": "transactionsuggestiontest.php"
     },
     {
       "label": "BodyTrackerController.php",
@@ -27623,7 +27623,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "app/Services/GurujaMcpService.php",
-      "source_location": "L471",
+      "source_location": "L472",
       "weight": 1.0,
       "_origin": "ast",
       "source": "app_services_gurujamcpservice_gurujamcpservice_executefetchcurrentmeta",
@@ -27635,7 +27635,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "app/Services/GurujaMcpService.php",
-      "source_location": "L497",
+      "source_location": "L496",
       "weight": 1.0,
       "_origin": "ast",
       "source": "app_services_gurujamcpservice_gurujamcpservice_executefetchcurrentmeta",
@@ -27647,7 +27647,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "app/Services/GurujaMcpService.php",
-      "source_location": "L498",
+      "source_location": "L497",
       "weight": 1.0,
       "_origin": "ast",
       "source": "app_services_gurujamcpservice_gurujamcpservice_executefetchcurrentmeta",
@@ -27659,7 +27659,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "app/Services/GurujaMcpService.php",
-      "source_location": "L641",
+      "source_location": "L639",
       "weight": 1.0,
       "_origin": "ast",
       "source": "app_services_gurujamcpservice_gurujamcpservice_extracttooljson",
@@ -27695,7 +27695,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "app/Services/GurujaMcpService.php",
-      "source_location": "L516",
+      "source_location": "L514",
       "weight": 1.0,
       "_origin": "ast",
       "source": "app_services_gurujamcpservice_gurujamcpservice_fetchviatwosteptools",
@@ -27707,7 +27707,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "app/Services/GurujaMcpService.php",
-      "source_location": "L521",
+      "source_location": "L519",
       "weight": 1.0,
       "_origin": "ast",
       "source": "app_services_gurujamcpservice_gurujamcpservice_fetchviatwosteptools",
@@ -27719,7 +27719,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "app/Services/GurujaMcpService.php",
-      "source_location": "L522",
+      "source_location": "L520",
       "weight": 1.0,
       "_origin": "ast",
       "source": "app_services_gurujamcpservice_gurujamcpservice_fetchviatwosteptools",
@@ -27731,7 +27731,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "app/Services/GurujaMcpService.php",
-      "source_location": "L527",
+      "source_location": "L525",
       "weight": 1.0,
       "_origin": "ast",
       "source": "app_services_gurujamcpservice_gurujamcpservice_fetchviatwosteptools",
@@ -27743,7 +27743,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "app/Services/GurujaMcpService.php",
-      "source_location": "L537",
+      "source_location": "L535",
       "weight": 1.0,
       "_origin": "ast",
       "source": "app_services_gurujamcpservice_gurujamcpservice_fetchviatwosteptools",
@@ -27755,7 +27755,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "app/Services/GurujaMcpService.php",
-      "source_location": "L559",
+      "source_location": "L557",
       "weight": 1.0,
       "_origin": "ast",
       "source": "app_services_gurujamcpservice_gurujamcpservice_fetchviatwosteptools",
@@ -27767,7 +27767,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "app/Services/GurujaMcpService.php",
-      "source_location": "L563",
+      "source_location": "L561",
       "weight": 1.0,
       "_origin": "ast",
       "source": "app_services_gurujamcpservice_gurujamcpservice_fetchviatwosteptools",
@@ -27779,7 +27779,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "app/Services/GurujaMcpService.php",
-      "source_location": "L564",
+      "source_location": "L562",
       "weight": 1.0,
       "_origin": "ast",
       "source": "app_services_gurujamcpservice_gurujamcpservice_fetchviatwosteptools",
@@ -27791,7 +27791,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "app/Services/GurujaMcpService.php",
-      "source_location": "L579",
+      "source_location": "L577",
       "weight": 1.0,
       "_origin": "ast",
       "source": "app_services_gurujamcpservice_gurujamcpservice_fetchviatwosteptools",
@@ -27851,7 +27851,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "app/Services/GurujaMcpService.php",
-      "source_location": "L829",
+      "source_location": "L827",
       "weight": 1.0,
       "_origin": "ast",
       "source": "app_services_gurujamcpservice_gurujamcpservice_normalizemetapayload",
@@ -58186,7 +58186,7 @@
       "relation": "references",
       "confidence": "EXTRACTED",
       "source_file": "app/Services/GurujaMcpService.php",
-      "source_location": "L905",
+      "source_location": "L903",
       "weight": 1.0,
       "context": "parameter_type",
       "_origin": "ast",
@@ -73884,7 +73884,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "app/Services/GurujaMcpService.php",
-      "source_location": "L507",
+      "source_location": "L505",
       "weight": 1.0,
       "_origin": "ast",
       "source": "app_services_gurujamcpservice_gurujamcpservice",
@@ -73895,7 +73895,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "app/Services/GurujaMcpService.php",
-      "source_location": "L591",
+      "source_location": "L589",
       "weight": 1.0,
       "_origin": "ast",
       "source": "app_services_gurujamcpservice_gurujamcpservice",
@@ -73906,7 +73906,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "app/Services/GurujaMcpService.php",
-      "source_location": "L617",
+      "source_location": "L615",
       "weight": 1.0,
       "_origin": "ast",
       "source": "app_services_gurujamcpservice_gurujamcpservice",
@@ -73917,7 +73917,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "app/Services/GurujaMcpService.php",
-      "source_location": "L638",
+      "source_location": "L636",
       "weight": 1.0,
       "_origin": "ast",
       "source": "app_services_gurujamcpservice_gurujamcpservice",
@@ -73928,7 +73928,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "app/Services/GurujaMcpService.php",
-      "source_location": "L666",
+      "source_location": "L664",
       "weight": 1.0,
       "_origin": "ast",
       "source": "app_services_gurujamcpservice_gurujamcpservice",
@@ -73939,7 +73939,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "app/Services/GurujaMcpService.php",
-      "source_location": "L683",
+      "source_location": "L681",
       "weight": 1.0,
       "_origin": "ast",
       "source": "app_services_gurujamcpservice_gurujamcpservice",
@@ -73950,7 +73950,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "app/Services/GurujaMcpService.php",
-      "source_location": "L702",
+      "source_location": "L700",
       "weight": 1.0,
       "_origin": "ast",
       "source": "app_services_gurujamcpservice_gurujamcpservice",
@@ -73961,7 +73961,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "app/Services/GurujaMcpService.php",
-      "source_location": "L725",
+      "source_location": "L723",
       "weight": 1.0,
       "_origin": "ast",
       "source": "app_services_gurujamcpservice_gurujamcpservice",
@@ -73972,7 +73972,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "app/Services/GurujaMcpService.php",
-      "source_location": "L747",
+      "source_location": "L745",
       "weight": 1.0,
       "_origin": "ast",
       "source": "app_services_gurujamcpservice_gurujamcpservice",
@@ -73983,7 +73983,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "app/Services/GurujaMcpService.php",
-      "source_location": "L773",
+      "source_location": "L771",
       "weight": 1.0,
       "_origin": "ast",
       "source": "app_services_gurujamcpservice_gurujamcpservice",
@@ -74005,7 +74005,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "app/Services/GurujaMcpService.php",
-      "source_location": "L816",
+      "source_location": "L814",
       "weight": 1.0,
       "_origin": "ast",
       "source": "app_services_gurujamcpservice_gurujamcpservice",
@@ -74016,7 +74016,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "app/Services/GurujaMcpService.php",
-      "source_location": "L892",
+      "source_location": "L890",
       "weight": 1.0,
       "_origin": "ast",
       "source": "app_services_gurujamcpservice_gurujamcpservice",
@@ -74027,7 +74027,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "app/Services/GurujaMcpService.php",
-      "source_location": "L905",
+      "source_location": "L903",
       "weight": 1.0,
       "_origin": "ast",
       "source": "app_services_gurujamcpservice_gurujamcpservice",
@@ -80265,7 +80265,7 @@
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "app/Services/GurujaMcpService.php",
-      "source_location": "L802",
+      "source_location": "L800",
       "weight": 1.0,
       "_origin": "ast",
       "source": "app_services_gurujamcpservice_gurujamcpservice_computeestimativas",
