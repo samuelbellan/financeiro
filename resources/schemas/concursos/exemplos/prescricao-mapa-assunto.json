@@ -1,0 +1,56 @@
+{
+  "schema_versao": "1",
+  "assunto": {
+    "disciplina": "Direito Civil",
+    "assunto": "Prescrição e Decadência (arts. 189 a 211)"
+  },
+  "material": [
+    { "arquivo": "Prescricao e Decadencia (arts. 189 a 211).pdf", "titulo": "Prescrição e Decadência (arts. 189 a 211)" }
+  ],
+  "subtopicos": [
+    {
+      "subtopico": { "id": "causas-interruptivas" },
+      "nome": "Causas interruptivas da prescrição (art. 202)",
+      "ordem_estudo": 2,
+      "prerequisitos": ["causas-impeditivas-suspensivas"],
+      "material": [
+        { "arquivo": "Prescricao e Decadencia (arts. 189 a 211).pdf", "pagina_inicio": 9, "pagina_fim": 12, "secao": "Interrupção da prescrição" }
+      ],
+      "ficha": {
+        "como_cobrado": {
+          "estilo": "Caso prático curto com uma conduta do devedor ou do credor; pede para classificar o efeito sobre o prazo.",
+          "palavras_gatilho": ["renegociação", "reconheceu a dívida", "protesto", "interrompe", "suspende"],
+          "distracoes": ["valores e datas das parcelas, irrelevantes para a classificação"],
+          "exemplos": ["3796866"]
+        },
+        "como_resolver": {
+          "gatilho": "O enunciado descreve um ATO (do credor ou do devedor), não uma SITUAÇÃO pessoal.",
+          "algoritmo": [
+            { "passo": "Separar ato de situação.", "porque": "Ato aponta para interrupção (art. 202); situação pessoal aponta para impedimento ou suspensão (arts. 197 a 199)." },
+            { "passo": "Conferir se o ato está no rol do art. 202.", "porque": "O rol é a fonte das alternativas corretas." },
+            { "passo": "Lembrar que a interrupção ocorre uma única vez.", "porque": "É a pegadinha clássica quando há dois atos interruptivos." }
+          ],
+          "variacoes": [
+            { "nivel": "M", "descricao": "Reconhecimento extrajudicial embutido em narrativa de renegociação.", "exemplos": ["3796866"] }
+          ]
+        },
+        "armadilhas": [
+          { "descricao": "Trocar interrupção por suspensão.", "erro_explorado": "Confundir os efeitos (zera o prazo × para o prazo).", "exemplos": ["3796866"] }
+        ],
+        "teoria": [
+          {
+            "conceito": "Interrupção: o prazo recomeça integralmente e ocorre uma só vez.",
+            "nivel_dominio": "aplicar",
+            "dispositivos": ["cc-2002/art-202/inc-VI"],
+            "exemplos": ["3796866"]
+          }
+        ],
+        "questao_modelo": { "id_externo": "3796866", "por_que_representa": "Caso típico da FGV: conduta do devedor disfarçada em narrativa, com o distrator suspensão × interrupção." },
+        "evolucao_banca": "[INFERÊNCIA SOBRE A BANCA] A FGV prefere casos narrativos a perguntas de literalidade neste subtópico."
+      }
+    }
+  ],
+  "flashcards": [
+    { "frente": "Renegociar a dívida interrompe ou suspende a prescrição?", "verso": "Interrompe: é reconhecimento do direito pelo devedor (CC art. 202, VI). Só pode ocorrer uma vez.", "subtopico": "causas-interruptivas" }
+  ]
+}

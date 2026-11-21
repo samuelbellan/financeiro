@@ -87,6 +87,7 @@ class GoogleAuthAndWhitelistTest extends TestCase
         $user = User::where('email', 'amigo@gmail.com')->first();
         $this->assertNotNull($user);
         $this->assertSame('google-999', $user->google_id);
+        $this->assertSame(['estudos', 'concursos'], $user->modulos);
         $this->assertFalse($user->is_admin);
     }
 

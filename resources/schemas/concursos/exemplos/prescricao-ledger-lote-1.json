@@ -1,0 +1,35 @@
+{
+  "schema_versao": "1",
+  "assunto": {
+    "disciplina": "Direito Civil",
+    "assunto": "Prescrição e Decadência (arts. 189 a 211)"
+  },
+  "lote": { "numero": 1, "parte": 1, "total_partes": 1 },
+  "questoes": [
+    {
+      "id_externo": "3796866",
+      "gabarito_conferido": "D",
+      "subtopicos": [{ "id": "causas-interruptivas" }],
+      "tipologia": "interpretacao_caso",
+      "dificuldade": "M",
+      "ponto_cobrado": "Renegociação da dívida pelo devedor é ato inequívoco de reconhecimento do direito e interrompe a prescrição.",
+      "dispositivos": ["cc-2002/art-202/inc-VI"],
+      "distrator_principal": { "letra": "C", "mecanismo": "troca interrupção (prazo recomeça do zero) por suspensão (prazo apenas para)" },
+      "comando": "correta"
+    },
+    {
+      "id_externo": "3811601",
+      "gabarito_conferido": "E",
+      "subtopicos": [
+        { "id": "causas-impeditivas-suspensivas" },
+        { "novo": "Prescrição e solidariedade", "justificativa": "A questão testa se a suspensão em favor de um codevedor solidário se estende aos demais; não cabe nas duas listas aprovadas." }
+      ],
+      "tipologia": "interpretacao_caso",
+      "dificuldade": "A",
+      "ponto_cobrado": "Não corre prescrição contra absolutamente incapaz (menor de 16), mas corre contra o pródigo, que é relativamente incapaz.",
+      "dispositivos": ["cc-2002/art-198/inc-I", "cc-2002/art-201"],
+      "distrator_principal": { "letra": "A", "mecanismo": "equipara o relativamente incapaz (pródigo) ao absolutamente incapaz" },
+      "comando": "correta"
+    }
+  ]
+}

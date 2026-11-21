@@ -19,6 +19,7 @@ class DatabaseSyncTest extends TestCase
         $this->user = User::factory()->create([
             'email' => 'test@example.com',
         ]);
+        $this->user->forceFill(['is_owner' => true, 'is_admin' => true])->save();
     }
 
     public function test_sync_status_requires_authentication(): void
@@ -51,6 +52,33 @@ class DatabaseSyncTest extends TestCase
             'success' => false,
             'message' => 'Direção de sincronização inválida.',
         ]);
+    }
+
+    public function test_non_owner_cannot_check_sync_status(): void
+    {
+        $outro = User::factory()->create();
+
+        $this->actingAs($outro)->getJson(route('sync.status'))->assertStatus(403);
+    }
+
+    public function test_admin_that_is_not_owner_cannot_run_sync(): void
+    {
+        $gestor = User::factory()->create();
+        $gestor->forceFill(['is_admin' => true])->save();
+
+        $this->mock(DatabaseSyncService::class)->shouldNotReceive('sync', 'push', 'pull');
+
+        $this->actingAs($gestor)->postJson(route('sync.run'), ['direction' => 'both'])
+            ->assertStatus(403);
+    }
+
+    public function test_sync_button_is_hidden_for_non_owner(): void
+    {
+        $outro = User::factory()->create();
+
+        $this->actingAs($outro)->get(route('home'))
+            ->assertOk()
+            ->assertDontSee('openSyncModal()', false);
     }
 
     public function test_sync_command_is_registered_and_shows_help(): void

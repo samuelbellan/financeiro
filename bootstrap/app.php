@@ -12,6 +12,10 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->trustProxies(at: '*');
+        $middleware->alias([
+            'owner' => \App\Http\Middleware\EnsureUserIsOwner::class,
+            'modulos' => \App\Http\Middleware\EnsureModuloPermitido::class,
+        ]);
         $middleware->validateCsrfTokens(except: [
             'webhook/whatsapp',
             'webhook/telegram',

@@ -1,0 +1,84 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://financeiro.local/schemas/concursos/ledger.schema.json",
+  "title": "Ledger de um lote (Gemini → sistema)",
+  "description": "Classificação de cada questão do lote. SEM contagens, SEM percentuais: o sistema calcula. Pode vir em várias partes se a resposta for cortada.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_versao", "assunto", "lote", "questoes"],
+  "properties": {
+    "schema_versao": { "$ref": "comum.schema.json#/$defs/schema_versao" },
+    "assunto": { "$ref": "comum.schema.json#/$defs/assunto_ref" },
+    "lote": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["numero", "parte", "total_partes"],
+      "properties": {
+        "numero": { "type": "integer", "minimum": 1 },
+        "parte": { "type": "integer", "minimum": 1 },
+        "total_partes": { "type": "integer", "minimum": 1 }
+      }
+    },
+    "questoes": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id_externo", "gabarito_conferido", "subtopicos", "tipologia", "dificuldade", "ponto_cobrado"],
+        "properties": {
+          "id_externo": { "$ref": "comum.schema.json#/$defs/id_externo" },
+          "gabarito_conferido": {
+            "description": "Gabarito que o Gemini usou. O validador rejeita se divergir do PDF.",
+            "$ref": "comum.schema.json#/$defs/gabarito"
+          },
+          "subtopicos": {
+            "description": "O primeiro é o principal. Máx. 3.",
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 3,
+            "items": { "$ref": "comum.schema.json#/$defs/subtopico_ref" }
+          },
+          "tipologia": { "$ref": "comum.schema.json#/$defs/tipologia" },
+          "dificuldade": { "$ref": "comum.schema.json#/$defs/dificuldade" },
+          "ponto_cobrado": {
+            "description": "A regra exata que a questão testa, em uma frase. Ex.: 'Reconhecimento do direito pelo devedor (renegociação) interrompe a prescrição'.",
+            "type": "string",
+            "minLength": 10,
+            "maxLength": 300
+          },
+          "dispositivos": {
+            "description": "Somente IDs presentes em contexto.dispositivos_validos.",
+            "type": "array",
+            "items": { "$ref": "comum.schema.json#/$defs/dispositivo_id" },
+            "uniqueItems": true
+          },
+          "distrator_principal": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["letra", "mecanismo"],
+            "properties": {
+              "letra": { "$ref": "comum.schema.json#/$defs/letra" },
+              "mecanismo": {
+                "description": "Que erro o distrator explora. Ex.: 'troca interrupção por suspensão'.",
+                "type": "string",
+                "maxLength": 300
+              }
+            }
+          },
+          "comando": {
+            "description": "Comando do enunciado.",
+            "enum": ["correta", "incorreta", "exceto", "julgue", "calcule", "outro"]
+          },
+          "flags": {
+            "type": "array",
+            "uniqueItems": true,
+            "items": { "enum": ["anulada", "desatualizada", "conferir_vigencia", "duplicada", "fora_do_assunto", "ilegivel"] }
+          },
+          "duplicada_de": { "$ref": "comum.schema.json#/$defs/id_externo" },
+          "observacoes": { "type": "string", "maxLength": 500 }
+        }
+      }
+    }
+  }
+}

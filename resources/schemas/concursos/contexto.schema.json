@@ -1,0 +1,60 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://financeiro.local/schemas/concursos/contexto.schema.json",
+  "title": "Contexto de um lote (sistema → Gemini)",
+  "description": "Gerado PELO SISTEMA e colado no prompt do Gemini junto com o PDF. Garante que o Gemini use a lista fechada de subtópicos e os IDs de dispositivo válidos.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_versao", "assunto", "lote", "subtopicos_aprovados", "questoes"],
+  "properties": {
+    "schema_versao": { "$ref": "comum.schema.json#/$defs/schema_versao" },
+    "gerado_em": { "type": "string", "format": "date-time" },
+    "assunto": { "$ref": "comum.schema.json#/$defs/assunto_ref" },
+    "lote": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["numero", "total_questoes"],
+      "properties": {
+        "numero": { "type": "integer", "minimum": 1 },
+        "total_questoes": { "type": "integer", "minimum": 1 }
+      }
+    },
+    "subtopicos_aprovados": {
+      "description": "Vazio no primeiro lote de um assunto: aí o Gemini só propõe (subtopico.novo).",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "nome"],
+        "properties": {
+          "id": { "$ref": "comum.schema.json#/$defs/slug" },
+          "nome": { "type": "string" },
+          "descricao": { "type": "string" }
+        }
+      }
+    },
+    "dispositivos_validos": {
+      "description": "IDs de dispositivos das normas ligadas ao assunto. Vazio se o assunto não é normativo ou a norma ainda não foi importada.",
+      "type": "array",
+      "items": { "$ref": "comum.schema.json#/$defs/dispositivo_id" }
+    },
+    "questoes": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id_externo", "banca", "ano", "tipo", "gabarito"],
+        "properties": {
+          "id_externo": { "$ref": "comum.schema.json#/$defs/id_externo" },
+          "banca": { "type": "string" },
+          "orgao": { "type": "string" },
+          "cargo": { "type": "string" },
+          "ano": { "type": "integer", "minimum": 1980, "maximum": 2100 },
+          "tipo": { "enum": ["ME", "CE"] },
+          "gabarito": { "$ref": "comum.schema.json#/$defs/gabarito" }
+        }
+      }
+    }
+  }
+}

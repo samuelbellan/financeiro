@@ -58,7 +58,7 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 Route::get('/auth/google', [AuthController::class, 'redirectToGoogle'])->name('auth.google');
 Route::get('/auth/google/callback', [AuthController::class, 'handleGoogleCallback'])->name('auth.google.callback');
 
-Route::middleware('auth')->group(function () {
+Route::middleware(['auth', 'modulos'])->group(function () {
     Route::get('/home', [HomeController::class, 'index'])->name('home');
 
     // Gestão de Convites / Whitelist Google (Admin)
@@ -68,8 +68,11 @@ Route::middleware('auth')->group(function () {
     Route::post('/admin/usuarios/{user}/gestor', [\App\Http\Controllers\Admin\AllowedEmailController::class, 'toggleManager'])->name('admin.usuarios.gestor');
 
     // Sincronização Nuvem Neon
-    Route::get('/sync/status', [DatabaseSyncController::class, 'status'])->name('sync.status');
-    Route::post('/sync/run', [DatabaseSyncController::class, 'sync'])->name('sync.run');
+    // Só o dono: a sincronização lê e grava o banco inteiro, de todos os usuários.
+    Route::middleware('owner')->group(function () {
+        Route::get('/sync/status', [DatabaseSyncController::class, 'status'])->name('sync.status');
+        Route::post('/sync/run', [DatabaseSyncController::class, 'sync'])->name('sync.run');
+    });
     
     // Finanças de Casa & Supermercado
     Route::get('/financas', [FinancasController::class, 'index'])->name('financas.index');

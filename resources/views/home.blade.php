@@ -36,6 +36,7 @@
                 <div class="nav-section">
                     <p class="nav-section-title">Sistemas</p>
 
+                    @if (auth()->user()->podeAcessar('financas'))
                     <a href="{{ route('financas.index') }}" class="nav-item">
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <line x1="12" y1="1" x2="12" y2="23"></line>
@@ -43,7 +44,9 @@
                         </svg>
                         <span>Finanças de Casa</span>
                     </a>
+                    @endif
 
+                    @if (auth()->user()->podeAcessar('financas'))
                     <a href="{{ route('financas.mercado.index') }}" class="nav-item">
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <circle cx="9" cy="21" r="1"></circle>
@@ -52,7 +55,9 @@
                         </svg>
                         <span>Supermercado & NFs</span>
                     </a>
+                    @endif
 
+                    @if (auth()->user()->podeAcessar('estudos'))
                     <a href="{{ route('estudos.index') }}" class="nav-item">
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <circle cx="12" cy="12" r="10"></circle>
@@ -60,7 +65,9 @@
                         </svg>
                         <span>Horas de Estudo</span>
                     </a>
+                    @endif
 
+                    @if (auth()->user()->podeAcessar('salario'))
                     <a href="{{ route('salary.index') }}" class="nav-item">
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
@@ -68,13 +75,16 @@
                         </svg>
                         <span>Projetor Salarial</span>
                     </a>
+                    @endif
 
+                    @if (auth()->user()->podeAcessar('treinos'))
                     <a href="{{ route('treinos.index') }}" class="nav-item">
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M6 5v14M18 5v14M2 9v6M22 9v6M6 12h12"></path>
                         </svg>
                         <span>Treinos & Exercícios</span>
                     </a>
+                    @endif
 
                     @if(auth()->user()->is_admin)
                     <a href="{{ route('admin.convites') }}" class="nav-item" style="color: #60a5fa;">
@@ -109,6 +119,7 @@
                     </div>
                     <span style="font-size: 0.65rem; background: rgba(16, 185, 129, 0.2); padding: 0.15rem 0.4rem; border-radius: 4px; font-weight: 700;">WI-FI</span>
                 </button>
+                @if (Auth::user()->is_owner)
                 <button type="button" class="btn-sync-sidebar" onclick="openSyncModal()" title="Sincronizar dados com a nuvem Neon">
                     <div style="display: flex; align-items: center; gap: 0.5rem;">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -118,6 +129,7 @@
                     </div>
                     <span id="syncSidebarDot" class="sync-indicator-dot" title="Status da conexão com a nuvem"></span>
                 </button>
+                @endif
 
                 <div class="user-info">
                     <div class="user-avatar">{{ strtoupper(substr(Auth::user()->name, 0, 1)) }}</div>
@@ -167,6 +179,7 @@
 
             <div class="content-body">
                 <div class="cards-grid">
+                    @if (auth()->user()->podeAcessar('financas'))
                     <div class="info-card">
                         <div class="card-icon card-icon-blue">
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -178,7 +191,9 @@
                         <p>Controle suas receitas, despesas e planeje seu futuro financeiro.</p>
                         <a href="{{ route('financas.index') }}" class="card-link">Acessar →</a>
                     </div>
+                    @endif
 
+                    @if (auth()->user()->podeAcessar('financas'))
                     <div class="info-card">
                         <div class="card-icon card-icon-green" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);">
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -191,7 +206,9 @@
                         <p>Detalhamento de gastos de mercado por notas fiscais, itens e fotos.</p>
                         <a href="{{ route('financas.mercado.index') }}" class="card-link">Acessar →</a>
                     </div>
+                    @endif
 
+                    @if (auth()->user()->podeAcessar('estudos'))
                     <div class="info-card">
                         <div class="card-icon card-icon-green" style="background: linear-gradient(135deg, #8b5cf6 0%, #3b82f6 100%);">
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -203,11 +220,13 @@
                         <p>Cronômetro por matéria estilo YPT, funciona offline e sincroniza entre aparelhos.</p>
                         <a href="{{ route('estudos.index') }}" class="card-link">Acessar →</a>
                     </div>
+                    @endif
 
 
 
 
 
+                                        @if (auth()->user()->podeAcessar('salario'))
                                         <div class="info-card">
                         <div class="card-icon card-icon-green" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);">
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -219,7 +238,9 @@
                         <p>Simulador e projetor salarial TJMS com plano de carreira, tributos e auxílios.</p>
                         <a href="{{ route('salary.index') }}" class="card-link">Acessar →</a>
                     </div>
+                                        @endif
 
+                    @if (auth()->user()->podeAcessar('treinos'))
                     <div class="info-card">
                         <div class="card-icon card-icon-blue" style="background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);">
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -230,6 +251,7 @@
                         <p>Acompanhamento completo de musculação, corrida, alongamento, composição corporal e PRs.</p>
                         <a href="{{ route('treinos.index') }}" class="card-link">Acessar →</a>
                     </div>
+                    @endif
 
                     @if(auth()->user()->is_admin)
                     <div class="info-card">
@@ -251,7 +273,9 @@
         </main>
     </div>
 
+    @if (Auth::user()->is_owner)
     @include('components.sync-modal')
+    @endif
     @include('components.celular-modal')
 </body>
 </html>
