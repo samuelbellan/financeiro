@@ -20,6 +20,12 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // Migrações do módulo de concursos (banco Postgres local). Só são carregadas onde o
+        // módulo está ligado: na nuvem (CONCURSOS_ENABLED=false) o php artisan migrate as ignora.
+        if (config('concursos.enabled')) {
+            $this->loadMigrationsFrom(database_path('migrations/concursos'));
+        }
+
         // *.ts.net = Tailscale Funnel: o acesso externo é sempre HTTPS, mesmo que o proxy
         // não envie X-Forwarded-Proto ao repassar para o php artisan serve local.
         if (config('app.env') === 'production'

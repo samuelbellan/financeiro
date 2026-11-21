@@ -70,11 +70,47 @@ O arquivo `exemplos/edital-ufms-152-2026-cargo-523.json` ainda não tem `assunto
 
 1. No filtro do TEC, abra cada disciplina do edital e copie a árvore de assuntos.
 2. Peça ao Gemini: *"Para cada tópico deste edital, preencha `assuntos_sugeridos` com os assuntos do TEC (lista anexa) que o cobrem, escritos exatamente como o TEC escreve. Não invente assuntos que não estejam na lista. Devolva o JSON completo seguindo edital.schema.json."*
+   Pode ser só o nome do assunto (`"Crase"`) em vez de `{disciplina, assunto}`: o sistema cria o assunto como "a confirmar" e preenche a disciplina sozinho quando o primeiro caderno do TEC daquele assunto for importado. O nome precisa ser **idêntico** ao que o TEC imprime no caderno; se divergir, a importação do caderno cria outro assunto e o do edital continua sem questões (aparece na curadoria).
 3. Os tópicos com `sem_questoes_tec: true` (Estatuto, Regimento e Código de Ética da UFMS, Manual de Atos) ficam sem assunto. Eles serão cobertos por lei seca e questões inéditas.
+
+## Cadernos do TEC: questões + árvore de assuntos
+
+O PDF do caderno imprime só a **folha** do assunto ("Vacância (arts. 33 a 35…)"), e o edital costuma estar ligado a um nível acima ("Lei nº 8.112/1990 - Estatuto…"). Por isso, cada caderno entra em dois passos:
+
+1. Importe os PDFs, em qualquer quantidade e ordem. Partes repetidas não duplicam.
+
+   ```powershell
+   php artisan concursos:importar-pdf "C:\...\1.pdf" "C:\...\2.pdf"
+   ```
+
+2. Copie a lista **Assuntos** da página do caderno no TEC para um `.txt`. A hierarquia vem da indentação; as contagens e os links são ignorados. Guarde o arquivo em `storage/concursos/arvores/`, que fica fora do git. Depois importe:
+
+   ```powershell
+   php artisan concursos:importar-arvore storage\concursos\arvores\legislacao.txt
+   ```
+
+   O comando mostra quantas questões cada tópico do edital passou a alcançar.
+
+## Pacotes do Gemini: ida e volta
+
+1. Gere os pacotes. Rodar de novo depois de importar mais PDFs gera só os lotes das questões novas.
+
+   ```powershell
+   php artisan concursos:gerar-pacotes
+   ```
+
+2. No Gemini, use uma conversa por pacote. Anexe o pacote e os arquivos de `_anexar-sempre`.
+3. Salve as 3 respostas (ledger, resoluções parte 1 e parte 2) numa pasta. O nome não importa, porque o tipo e o lote são lidos do conteúdo. Depois importe a pasta inteira:
+
+   ```powershell
+   php artisan concursos:importar-gemini "C:\...\Concurso UFMS\Gemini"
+   ```
+
+   O arquivo inteiro é recusado se a questão não for do lote, se o gabarito divergir do PDF, se a alternativa correta da resolução estiver errada ou se o subtópico não existir. Subtópicos `novo` ficam pendentes para a curadoria. Arquivos vazios são pulados, e reimportar sobrescreve.
 
 ## Validar um arquivo antes de importar
 
-Enquanto o importador não existe, dá para validar com Python:
+O importador já valida sozinho. Para validar à mão com Python:
 
 ```powershell
 pip install jsonschema

@@ -157,6 +157,23 @@ Route::middleware(['auth', 'modulos'])->group(function () {
     Route::post('/estudos/api-tokens', [EstudosApiController::class, 'createToken'])->name('estudos.api-tokens.store');
     Route::delete('/estudos/api-tokens', [EstudosApiController::class, 'revokeTokens'])->name('estudos.api-tokens.destroy');
 
+    // Módulo novo de concursos (banco concursos_pgsql; só onde CONCURSOS_ENABLED=true)
+    Route::middleware(\App\Http\Middleware\EnsureConcursosHabilitado::class)->prefix('concursos/questoes')->name('concursos.questoes.')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Concursos\QuestoesController::class, 'index'])->name('index');
+        Route::get('/resolver', [\App\Http\Controllers\Concursos\QuestoesController::class, 'resolver'])->name('resolver');
+        Route::get('/{questao}', [\App\Http\Controllers\Concursos\QuestoesController::class, 'show'])->whereNumber('questao')->name('show');
+        Route::post('/{questao}/responder', [\App\Http\Controllers\Concursos\QuestoesController::class, 'responder'])->whereNumber('questao')->name('responder');
+        Route::post('/tentativas/{tentativa}/motivo', [\App\Http\Controllers\Concursos\QuestoesController::class, 'motivo'])->whereNumber('tentativa')->name('motivo');
+    });
+    Route::middleware(\App\Http\Middleware\EnsureConcursosHabilitado::class)->prefix('concursos')->name('concursos.')->group(function () {
+        Route::get('/meta', [\App\Http\Controllers\Concursos\MetaController::class, 'meta'])->name('meta');
+        Route::post('/meta/atividades/{atividade}/feita', [\App\Http\Controllers\Concursos\MetaController::class, 'feita'])->whereNumber('atividade')->name('meta.feita');
+        Route::post('/meta/atividades/{atividade}/adiar', [\App\Http\Controllers\Concursos\MetaController::class, 'adiar'])->whereNumber('atividade')->name('meta.adiar');
+        Route::get('/perfil', [\App\Http\Controllers\Concursos\MetaController::class, 'perfil'])->name('perfil');
+        Route::post('/perfil', [\App\Http\Controllers\Concursos\MetaController::class, 'salvarPerfil'])->name('perfil.salvar');
+    });
+
+
 
 
     // Compatibilidade com rota antiga
