@@ -233,6 +233,7 @@ async function toggleSubject(subjectId, tipo = null, extra = {}) {
         tipo,
         reforco_grau: reforcoGrau,
         reforco_limite_min: reforcoLimitMin,
+        atividade_ref: extra.atividadeRef ?? null,
         device_id: await getMeta('device_id'),
         deleted_at: null,
         created_at: iso(at),
@@ -1415,6 +1416,45 @@ async function receiveGurujaCommand() {
     } catch (error) {
         alert(`Não consegui salvar o comando (${error.message}). Entre no app e tente de novo.`);
     }
+}
+
+/**
+ * Chegou da meta do módulo de concursos (#concursos={d, t, r, p, pt}): disciplina, tipo, referência da
+ * atividade ("concursos:123") e a prova. Cria o D-Day da prova se faltar, acha (ou cria) a matéria e
+ * liga o cronômetro já com o tipo. A referência volta ao módulo pela API e só calibra o tempo da meta.
+ */
+async function receiveConcursosStudy() {
+    if (!location.hash.startsWith('#concursos=')) return;
+    let p;
+    try { p = JSON.parse(decodeURIComponent(location.hash.slice(11))); } catch { p = null; }
+    history.replaceState(null, '', location.pathname + location.search);
+    if (!p?.d || !/^concursos:\d{1,12}$/.test(p.r ?? '')) return;
+    state.tab = 'timer';
+
+    if (/^\d{4}-\d{2}-\d{2}$/.test(p.p ?? '') && !state.ddays.some((x) => !x.deleted_at && x.data === p.p)) {
+        await persist('ddays', { id: uuid(), titulo: String(p.pt || 'Prova').slice(0, 80), data: p.p, deleted_at: null, created_at: iso(nowMs()) });
+    }
+
+    const nome = String(p.d).trim().slice(0, 60);
+    let subjectId = gurujaSubjectFor(nome);
+    if (!subjectId) {
+        const used = new Set(state.subjects.map((s) => s.cor));
+        subjectId = uuid();
+        await persist('subjects', {
+            id: subjectId, nome, cor: PALETTE.find((c) => !used.has(c)) ?? PALETTE[0],
+            ordem: Math.max(-1, ...state.subjects.map((s) => s.ordem)) + 1,
+            arquivada_em: null, deleted_at: null, created_at: iso(nowMs()),
+        });
+    }
+
+    const tipo = ['teoria', 'questoes', 'revisao'].includes(p.t) ? p.t : null;
+    const running = runningSession();
+    if (running?.subject_id === subjectId) {
+        await persist('sessions', { ...running, tipo: tipo ?? running.tipo, atividade_ref: p.r });
+        render();
+        return openFocus();
+    }
+    await toggleSubject(subjectId, tipo, { atividadeRef: p.r });
 }
 
 /** Trata retorno de autorização do conector MCP da Guruja via hash (#guruja-conectado ou #guruja-erro=...). */
@@ -3490,6 +3530,8 @@ async function boot() {
     setInterval(tick, 1000);
     await checkSuspicious();
     sync.start();
+    receiveConcursosStudy();
+    window.addEventListener('hashchange', receiveConcursosStudy);
     refreshGuruja(true).then(() => {
         receiveGurujaCommand();
         checkGurujaAuthRedirect();

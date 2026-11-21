@@ -340,6 +340,20 @@ class StudySyncTest extends TestCase
             ->assertJsonPath('changes.sessions.0.reforco_grau', 'medio');
     }
 
+    public function test_session_stores_concursos_activity_reference(): void
+    {
+        $subject = $this->makeSubject();
+        $session = $this->makeSession($subject['id'], ['tipo' => 'questoes', 'atividade_ref' => 'concursos:42']);
+
+        $this->sync(['subjects' => [$subject], 'sessions' => [$session]])
+            ->assertOk()
+            ->assertJsonPath('rejected', [])
+            ->assertJsonPath('changes.sessions.0.atividade_ref', 'concursos:42');
+
+        $bad = $this->makeSession($subject['id'], ['atividade_ref' => 'outra-coisa', 'inicio' => '2026-10-30T16:00:00.000Z', 'fim' => '2026-10-30T17:00:00.000Z']);
+        $this->sync(['sessions' => [$bad]])->assertOk()->assertJsonPath('rejected.0.id', $bad['id']);
+    }
+
     public function test_settings_store_theme(): void
     {
         $base = ['virada_hora' => 3, 'limite_suspeita_min' => 180, 'timezone' => 'America/Sao_Paulo'];

@@ -286,6 +286,7 @@ class EstudosApiController extends Controller
                 'fim_local' => $fim?->setTimezone($timezone)->format('Y-m-d H:i'),
                 'minutos_no_dia' => $minutes,
                 'tipo' => $row->tipo ?? null,
+                'atividade_ref' => $row->atividade_ref ?? null,
                 'origem' => $row->origem,
                 'status' => $row->status,
                 'em_andamento' => $fim === null && $row->deleted_at === null,

@@ -7,6 +7,13 @@
     $feitos = $atividades->filter(fn ($x) => $x['a']->status === 'feita')->sum(fn ($x) => $x['a']->minutos);
     $prova = $perfil->cargo->edital->data_prova;
     $faltam = $prova ? (int) today()->diffInDays($prova, false) : null;
+    $edital = $perfil->cargo->edital;
+    // Link para o cronômetro do /estudos (na nuvem): matéria, tipo, atividade e a prova (vira D-Day).
+    $cronometro = fn ($a) => $estudosUrl . '/estudos#concursos=' . rawurlencode(json_encode([
+        'd' => $a->topico ? mb_substr($a->topico->disciplina->nome, 0, 60) : 'Revisão de erros',
+        't' => $a->tipo, 'r' => "concursos:{$a->id}",
+        'p' => $prova?->toDateString(), 'pt' => mb_substr("Prova {$edital->orgao}", 0, 80),
+    ], JSON_UNESCAPED_UNICODE));
 @endphp
 
 @section('css')
@@ -43,6 +50,15 @@
         @endif
     </div>
 
+    <p class="muted small" style="margin:-4px 0 16px">
+        @if ($ritmo['calibrado'])
+            Ritmo usado na meta: {{ number_format($ritmo['valor'], 1, ',', '') }} min por questão, medido pelo seu cronômetro em {{ $ritmo['amostras'] }} atividades.
+        @else
+            Ritmo usado na meta: {{ number_format($ritmo['valor'], 1, ',', '') }} min por questão (padrão). Use ⏱ Cronometrar: depois de 3 atividades a meta se ajusta ao seu ritmo.
+        @endif
+        @unless ($tempoLigado) <br>Para o tempo voltar do /estudos, defina CONCURSOS_ESTUDOS_TOKEN no .env deste PC. @endunless
+    </p>
+
     @if ($atividades->isEmpty())
         <div class="card">
             @if ($meta->minutos_orcamento === 0)
@@ -70,7 +86,8 @@
                     @endif
                 </h2>
             </div>
-            <span class="min">{{ $a->minutos }} min @if ($x['feitas'] !== null)· {{ $x['feitas'] }}/{{ count($a->questao_ids) }}@endif</span>
+            <span class="min">{{ $a->minutos }} min @if ($x['feitas'] !== null)· {{ $x['feitas'] }}/{{ count($a->questao_ids) }}@endif
+                @if ($a->minutos_reais)<br><span title="cronometrado no /estudos">⏱ {{ (int) round($a->minutos_reais) }} min reais</span>@endif</span>
             <p class="motivo">{{ $a->motivo }}</p>
             @if ($a->status === 'pendente')
                 <div class="botoes">
@@ -79,6 +96,7 @@
                     @else
                         <form method="POST" action="{{ route('concursos.meta.feita', $a) }}">@csrf<button class="btn main">Estudei a teoria</button></form>
                     @endif
+                    <a class="btn" href="{{ $cronometro($a) }}" target="estudos" rel="noopener" title="Abre o cronômetro do /estudos já nesta matéria e tipo">⏱ Cronometrar</a>
                     <form method="POST" action="{{ route('concursos.meta.adiar', $a) }}">@csrf<button class="btn">Adiar</button></form>
                 </div>
             @endif

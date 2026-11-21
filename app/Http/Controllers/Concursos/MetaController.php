@@ -7,6 +7,7 @@ use App\Models\Concursos\EditalCargo;
 use App\Models\Concursos\MetaAtividade;
 use App\Models\Concursos\Perfil;
 use App\Services\Concursos\MotorMeta;
+use App\Services\Concursos\TempoEstudosSync;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -15,13 +16,14 @@ use Illuminate\View\View;
 /** Perfil do aluno (o que já viu, quanto tempo tem) e a meta do dia gerada pelo motor. */
 class MetaController extends Controller
 {
-    public function meta(Request $request, MotorMeta $motor): View|RedirectResponse
+    public function meta(Request $request, MotorMeta $motor, TempoEstudosSync $tempo): View|RedirectResponse
     {
         $perfil = Perfil::where('user_id', $request->user()->id)->first();
         if (!$perfil) {
             return redirect()->route('concursos.perfil')->with('status', 'Antes da primeira meta, conte o que você já estudou e quanto tempo tem por dia.');
         }
 
+        $tempo->talvez(); // tempo cronometrado no /estudos: calibra a meta (antes de gerar a de hoje)
         $meta = $motor->metaDoDia($perfil, today());
         $meta->load('atividades.topico.disciplina', 'atividades.meta');
         $userId = $request->user()->id;
@@ -41,6 +43,9 @@ class MetaController extends Controller
             'atividades' => $atividades,
             'perfil' => $perfil->load('cargo.edital'),
             'tipos' => MetaAtividade::TIPOS,
+            'ritmo' => $motor->minutosPorQuestao($userId, today()),
+            'estudosUrl' => rtrim((string) config('services.estudos.cloud_url'), '/') ?: url(''),
+            'tempoLigado' => $tempo->configurado(),
         ]);
     }
 

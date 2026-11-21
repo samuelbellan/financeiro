@@ -132,6 +132,7 @@ class StudySyncService
                 }],
                 'reforco_limite_min' => 'nullable|integer|min:1|max:240',
                 'reforco_grau' => 'nullable|in:leve,medio,intenso',
+                'atividade_ref' => ['nullable', 'string', 'regex:/^concursos:\d{1,12}$/'],
                 'device_id' => 'nullable|uuid',
                 'deleted_at' => 'nullable|date',
             ]);
@@ -180,6 +181,7 @@ class StudySyncService
                 'tipo' => $data['tipo'] ?? null,
                 'reforco_limite_min' => $data['reforco_limite_min'] ?? null,
                 'reforco_grau' => $data['reforco_grau'] ?? null,
+                'atividade_ref' => $data['atividade_ref'] ?? null,
                 'device_id' => $data['device_id'] ?? $deviceId,
             ], $deleted];
             // Sessões importadas têm horários fictícios: não geram conflito.

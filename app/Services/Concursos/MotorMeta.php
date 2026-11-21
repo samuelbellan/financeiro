@@ -178,17 +178,18 @@ class MotorMeta
             return $atividades;
         }
 
-        // 2) Revisão de erros vencida.
-        $mq = $this->cfg['minutos_por_questao'];
+        // 2) Revisão de erros vencida. Minutos por questão: o padrão, ou o seu ritmo real no cronômetro.
+        $mq = $this->minutosPorQuestao($perfil->user_id, $data)['valor'];
+        $cabem = fn (float $min) => (int) floor($min / $mq);
         $vencidas = array_values(array_diff($this->revisoesVencidas($perfil->user_id, $data), $usadas));
-        $maxRevisao = intdiv((int) ($orcamento * $this->cfg['revisao_max_pct'] / 100), $mq);
+        $maxRevisao = $cabem($orcamento * $this->cfg['revisao_max_pct'] / 100);
         if ($vencidas && $maxRevisao > 0 && $restante > 0) {
-            $lote = array_slice($vencidas, 0, min($maxRevisao, intdiv($restante, $mq)));
+            $lote = array_slice($vencidas, 0, min($maxRevisao, $cabem($restante)));
             if ($lote) {
-                $atividades[] = ['tipo' => 'revisao', 'topico_id' => null, 'questao_ids' => $lote, 'minutos' => count($lote) * $mq,
+                $atividades[] = ['tipo' => 'revisao', 'topico_id' => null, 'questao_ids' => $lote, 'minutos' => (int) round(count($lote) * $mq),
                     'motivo' => count($vencidas) . ' questão(ões) que você errou ou chutou chegaram no dia de rever (intervalos de 1, 3, 7, 15 e 30 dias).'
                         . (count($vencidas) > count($lote) ? ' As outras ficam para amanhã.' : '')];
-                $restante -= count($lote) * $mq;
+                $restante -= (int) round(count($lote) * $mq);
                 array_push($usadas, ...$lote);
             }
         }
@@ -223,18 +224,43 @@ class MotorMeta
                 continue;
             }
 
-            $n = min($bloco, intdiv($restante, $mq));
+            $n = min($bloco, $cabem($restante));
             $escolhidas = $this->escolher($ix['questoes'], $usadas, $ultimas, $n, $perfil->user_id, $data);
             if (count($escolhidas) < min(3, $n)) {
                 continue;
             }
             $atividades[] = ['tipo' => 'questoes', 'topico_id' => $t->id, 'questao_ids' => $escolhidas,
-                'minutos' => count($escolhidas) * $mq, 'motivo' => $base . $situacao];
-            $restante -= count($escolhidas) * $mq;
+                'minutos' => (int) round(count($escolhidas) * $mq), 'motivo' => $base . $situacao];
+            $restante -= (int) round(count($escolhidas) * $mq);
             array_push($usadas, ...$escolhidas);
         }
 
         return $atividades;
+    }
+
+    /**
+     * Minutos por questão usados na meta. Com 3+ atividades de questões concluídas e cronometradas
+     * no /estudos nos últimos 21 dias, vale a mediana do seu ritmo real (entre 1,5 e 8 min);
+     * senão, o padrão do config. É só tamanho de meta: o tempo nunca entra no domínio.
+     *
+     * @return array{valor: float, calibrado: bool, amostras: int}
+     */
+    public function minutosPorQuestao(int $userId, CarbonInterface $data): array
+    {
+        $ritmos = MetaAtividade::whereIn('tipo', ['questoes', 'revisao'])->where('status', 'feita')
+            ->where('minutos_reais', '>', 0)
+            ->whereHas('meta', fn ($q) => $q->where('user_id', $userId)
+                ->whereDate('data', '>=', $data->copy()->subDays(21)->toDateString())
+                ->whereDate('data', '<', $data->toDateString()))
+            ->get(['minutos_reais', 'questao_ids'])
+            ->filter(fn ($a) => count($a->questao_ids ?? []) > 0)
+            ->map(fn ($a) => (float) $a->minutos_reais / count($a->questao_ids))
+            ->sort()->values();
+        if ($ritmos->count() < 3) {
+            return ['valor' => (float) $this->cfg['minutos_por_questao'], 'calibrado' => false, 'amostras' => $ritmos->count()];
+        }
+
+        return ['valor' => round(min(8.0, max(1.5, (float) $ritmos->median())), 1), 'calibrado' => true, 'amostras' => $ritmos->count()];
     }
 
     /**

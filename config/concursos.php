@@ -16,6 +16,12 @@ return [
         ? '.venv-concursos/Scripts/python.exe'
         : '.venv-concursos/bin/python')),
 
+    // Ligação com o cronômetro do /estudos (na nuvem, em services.estudos.cloud_url).
+    // O token é o da API de leitura, criado em /estudos → Dados → Token da API.
+    'estudos' => [
+        'token' => env('CONCURSOS_ESTUDOS_TOKEN'),
+    ],
+
     // Motor da meta do dia (determinístico). Ver App\Services\Concursos\MotorMeta.
     'motor' => [
         'minutos_por_questao' => 3,
