@@ -114,6 +114,30 @@ return [
             'sslmode' => env('CLOUD_DB_SSLMODE', 'require'),
         ],
 
+        // Banco do módulo de concursos (questões, curadoria, progresso dos alunos).
+        // Postgres local no PC servidor; nos testes vira SQLite em memória (CONCURSOS_DB_DRIVER=sqlite).
+        'concursos_pgsql' => env('CONCURSOS_DB_DRIVER', 'pgsql') === 'sqlite'
+            ? [
+                'driver' => 'sqlite',
+                'database' => env('CONCURSOS_DB_DATABASE', ':memory:'),
+                'prefix' => '',
+                'foreign_key_constraints' => true,
+            ]
+            : [
+                'driver' => 'pgsql',
+                'url' => env('CONCURSOS_DB_URL'),
+                'host' => env('CONCURSOS_DB_HOST', '127.0.0.1'),
+                'port' => env('CONCURSOS_DB_PORT', '5432'),
+                'database' => env('CONCURSOS_DB_DATABASE', 'concursos'),
+                'username' => env('CONCURSOS_DB_USERNAME', 'concursos'),
+                'password' => env('CONCURSOS_DB_PASSWORD', ''),
+                'charset' => 'utf8',
+                'prefix' => '',
+                'prefix_indexes' => true,
+                'search_path' => 'public',
+                'sslmode' => env('CONCURSOS_DB_SSLMODE', 'prefer'),
+            ],
+
         'sqlsrv' => [
             'driver' => 'sqlsrv',
             'url' => env('DB_URL'),

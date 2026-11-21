@@ -52,7 +52,23 @@ class AuthController extends Controller
             ]);
         }
 
-        return Socialite::driver('google')->redirect();
+        return $this->googleDriver()->redirect();
+    }
+
+    /**
+     * Acesso pelo endereço público (Tailscale Funnel, *.ts.net): o Google precisa devolver o
+     * usuário para o MESMO host, senão o cookie de sessão não casa e o login falha.
+     * Nos demais hosts vale o GOOGLE_REDIRECT_URI do .env, como antes.
+     */
+    private function googleDriver()
+    {
+        $driver = Socialite::driver('google');
+
+        if (str_ends_with(request()->getHost(), '.ts.net') && method_exists($driver, 'redirectUrl')) {
+            $driver->redirectUrl(url('/auth/google/callback'));
+        }
+
+        return $driver;
     }
 
     /**
@@ -61,7 +77,7 @@ class AuthController extends Controller
     public function handleGoogleCallback(Request $request): RedirectResponse
     {
         try {
-            $googleUser = Socialite::driver('google')->user();
+            $googleUser = $this->googleDriver()->user();
         } catch (\Throwable $e) {
             Log::warning('Falha no callback do Google OAuth: ' . $e->getMessage());
             return redirect()->route('login')->withErrors([
@@ -106,6 +122,8 @@ class AuthController extends Controller
                 'password' => null,
                 'is_admin' => false,
             ]);
+            // Convidado novo só enxerga os módulos de estudo; o dono amplia depois se quiser.
+            $user->forceFill(['modulos' => config('modulos.padrao_convidado')])->save();
         }
 
         Auth::login($user, remember: true);

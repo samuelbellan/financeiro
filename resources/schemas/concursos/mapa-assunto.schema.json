@@ -1,0 +1,262 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://financeiro.local/schemas/concursos/mapa-assunto.schema.json",
+  "title": "Mapa consolidado de um assunto (Gemini → sistema)",
+  "description": "Substitui o 'Caderno Consolidado' em PDF. Conteúdo qualitativo apenas: NENHUMA contagem, percentual ou n/N (o sistema calcula a partir dos ledgers). Toda questão citada é por id_externo.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_versao", "assunto", "subtopicos"],
+  "properties": {
+    "schema_versao": { "$ref": "comum.schema.json#/$defs/schema_versao" },
+    "assunto": { "$ref": "comum.schema.json#/$defs/assunto_ref" },
+    "material": {
+      "description": "Arquivos de teoria do TEC usados na análise.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["arquivo", "titulo"],
+        "properties": {
+          "arquivo": { "type": "string", "description": "Nome do arquivo PDF como foi enviado." },
+          "titulo": { "type": "string" }
+        }
+      }
+    },
+    "subtopicos": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["subtopico", "nome", "ficha"],
+        "properties": {
+          "subtopico": { "$ref": "comum.schema.json#/$defs/subtopico_ref" },
+          "nome": { "type": "string" },
+          "ordem_estudo": { "type": "integer", "minimum": 1 },
+          "prerequisitos": {
+            "type": "array",
+            "items": { "$ref": "comum.schema.json#/$defs/slug" }
+          },
+          "material": {
+            "description": "Trechos do material de teoria que cobrem o subtópico.",
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["arquivo", "pagina_inicio", "pagina_fim"],
+              "properties": {
+                "arquivo": { "type": "string" },
+                "pagina_inicio": { "type": "integer", "minimum": 1 },
+                "pagina_fim": { "type": "integer", "minimum": 1 },
+                "secao": { "type": "string" }
+              }
+            }
+          },
+          "ficha": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["como_cobrado", "como_resolver", "armadilhas", "teoria"],
+            "properties": {
+              "como_cobrado": {
+                "description": "Bloco A [OBSERVADO NO LOTE].",
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "estilo": { "$ref": "comum.schema.json#/$defs/texto_longo" },
+                  "palavras_gatilho": { "type": "array", "items": { "type": "string" } },
+                  "dados_fornecidos": { "type": "array", "items": { "type": "string" } },
+                  "dados_omitidos": { "type": "array", "items": { "type": "string" } },
+                  "distracoes": { "type": "array", "items": { "type": "string" } },
+                  "exemplos": { "$ref": "comum.schema.json#/$defs/lista_ids" }
+                }
+              },
+              "como_resolver": {
+                "description": "Bloco B.",
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["gatilho", "algoritmo"],
+                "properties": {
+                  "gatilho": { "$ref": "comum.schema.json#/$defs/texto_curto" },
+                  "dados_criticos": { "type": "array", "items": { "type": "string" } },
+                  "algoritmo": {
+                    "description": "Passos (ou critério de decisão, em temas teóricos), cada um com o porquê.",
+                    "type": "array",
+                    "minItems": 1,
+                    "items": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": ["passo"],
+                      "properties": {
+                        "passo": { "type": "string" },
+                        "porque": { "type": "string" }
+                      }
+                    }
+                  },
+                  "variacoes": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": ["nivel", "descricao"],
+                      "properties": {
+                        "nivel": { "$ref": "comum.schema.json#/$defs/dificuldade" },
+                        "descricao": { "type": "string" },
+                        "exemplos": { "$ref": "comum.schema.json#/$defs/lista_ids" }
+                      }
+                    }
+                  },
+                  "atalhos": { "type": "array", "items": { "type": "string" } }
+                }
+              },
+              "armadilhas": {
+                "description": "Bloco C.",
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": ["descricao"],
+                  "properties": {
+                    "descricao": { "type": "string" },
+                    "erro_explorado": { "type": "string" },
+                    "exemplos": { "$ref": "comum.schema.json#/$defs/lista_ids" }
+                  }
+                }
+              },
+              "teoria": {
+                "description": "Bloco D, em ordem de importância.",
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": ["conceito", "nivel_dominio"],
+                  "properties": {
+                    "conceito": { "type": "string" },
+                    "explicacao": { "$ref": "comum.schema.json#/$defs/texto_longo" },
+                    "nivel_dominio": { "enum": ["reconhecer", "aplicar", "calcular"] },
+                    "dispositivos": {
+                      "type": "array",
+                      "items": { "$ref": "comum.schema.json#/$defs/dispositivo_id" }
+                    },
+                    "exemplos": { "$ref": "comum.schema.json#/$defs/lista_ids" },
+                    "conferir_vigencia": { "type": "boolean" }
+                  }
+                }
+              },
+              "pontos_divergencia": { "type": "array", "items": { "type": "string" } },
+              "questao_modelo": {
+                "description": "Bloco E. A resolução completa vai no resolucoes.json; aqui só o porquê da escolha.",
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["id_externo", "por_que_representa"],
+                "properties": {
+                  "id_externo": { "$ref": "comum.schema.json#/$defs/id_externo" },
+                  "por_que_representa": { "type": "string" }
+                }
+              },
+              "evolucao_banca": {
+                "description": "Bloco F. Tudo aqui é [INFERÊNCIA SOBRE A BANCA].",
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    },
+    "transversal": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "erros_induzidos": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["descricao"],
+            "properties": {
+              "descricao": { "type": "string" },
+              "exemplos": { "$ref": "comum.schema.json#/$defs/lista_ids" }
+            }
+          }
+        },
+        "padroes_redacao": { "type": "array", "items": { "type": "string" } },
+        "diferencas_bancas": { "type": "string" },
+        "lacunas_provaveis": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "cheat_sheet": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "checklists": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["subtopico", "passos"],
+            "properties": {
+              "subtopico": { "$ref": "comum.schema.json#/$defs/slug" },
+              "passos": { "type": "array", "minItems": 1, "maxItems": 10, "items": { "type": "string" } }
+            }
+          }
+        },
+        "erros_fatais": {
+          "type": "array",
+          "maxItems": 20,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["descricao"],
+            "properties": {
+              "descricao": { "type": "string" },
+              "exemplos": { "$ref": "comum.schema.json#/$defs/lista_ids" }
+            }
+          }
+        },
+        "tabelas_memoria": { "type": "array", "items": { "type": "string", "description": "Tabela em Markdown." } }
+      }
+    },
+    "ineditas": {
+      "description": "Questões autorais (INÉDITAS). Viram questões com fonte='inedita'.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["subtopico", "tipo", "enunciado", "alternativas", "gabarito", "comentario"],
+        "properties": {
+          "subtopico": { "$ref": "comum.schema.json#/$defs/slug" },
+          "tipo": { "enum": ["ME", "CE"] },
+          "enunciado": { "type": "string" },
+          "alternativas": {
+            "type": "array",
+            "minItems": 2,
+            "maxItems": 5,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["letra", "texto"],
+              "properties": {
+                "letra": { "$ref": "comum.schema.json#/$defs/letra" },
+                "texto": { "type": "string" }
+              }
+            }
+          },
+          "gabarito": { "$ref": "comum.schema.json#/$defs/gabarito" },
+          "comentario": { "type": "string" }
+        }
+      }
+    },
+    "flashcards": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["frente", "verso", "subtopico"],
+        "properties": {
+          "frente": { "type": "string", "maxLength": 500 },
+          "verso": { "type": "string", "maxLength": 1500 },
+          "subtopico": { "$ref": "comum.schema.json#/$defs/slug" }
+        }
+      }
+    }
+  }
+}

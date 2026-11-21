@@ -1,0 +1,195 @@
+{
+  "schema_versao": "1",
+  "edital": {
+    "orgao": "UFMS",
+    "numero": "PROGEP/UFMS nº 152/2026",
+    "banca": "Fapec",
+    "data_publicacao": "2026-10-29",
+    "data_prova": "2027-01-17",
+    "duracao_min": 240,
+    "tipo_questao": "ME5"
+  },
+  "cargo": {
+    "codigo": "523",
+    "nome": "Analista em Educação/Administração e Informação/Gestão Pública",
+    "vagas": 29,
+    "nivel": "superior"
+  },
+  "areas": [
+    {
+      "nome": "Língua Portuguesa",
+      "n_questoes": 15,
+      "pontos_por_questao": 1,
+      "disciplinas": [
+        {
+          "nome": "Língua Portuguesa",
+          "topicos": [
+            { "ordem": "1", "texto": "Compreensão e interpretação de textos." },
+            { "ordem": "2", "texto": "Gêneros e tipos textuais." },
+            { "ordem": "3", "texto": "Funções da linguagem." },
+            { "ordem": "4", "texto": "Coesão e coerência textual." },
+            { "ordem": "5", "texto": "Significação de palavras e expressões: sinonímia, antonímia, polissemia, paronímia, homonímia e formas variantes. Sentido próprio e figurado das palavras." },
+            { "ordem": "6", "texto": "Ortografia oficial, incluindo emprego das letras, do hífen e de letras maiúsculas e minúsculas, conforme o Acordo Ortográfico da Língua Portuguesa." },
+            { "ordem": "7", "texto": "Acentuação gráfica." },
+            { "ordem": "8", "texto": "Classes de palavras: identificação, classificação, flexão e emprego." },
+            { "ordem": "9", "texto": "Estrutura e formação de palavras." },
+            { "ordem": "10", "texto": "Sintaxe da oração e do período. Termos essenciais, integrantes e acessórios da oração." },
+            { "ordem": "11", "texto": "Período composto por coordenação e subordinação. Orações reduzidas." },
+            { "ordem": "12", "texto": "Concordância verbal e nominal." },
+            { "ordem": "13", "texto": "Regência verbal e nominal." },
+            { "ordem": "14", "texto": "Emprego do sinal indicativo de crase." },
+            { "ordem": "15", "texto": "Emprego dos tempos e modos verbais." },
+            { "ordem": "16", "texto": "Colocação pronominal." },
+            { "ordem": "17", "texto": "Pontuação." }
+          ]
+        }
+      ]
+    },
+    {
+      "nome": "Língua Inglesa",
+      "n_questoes": 5,
+      "pontos_por_questao": 1,
+      "disciplinas": [
+        {
+          "nome": "Língua Inglesa",
+          "topicos": [
+            { "ordem": "1", "texto": "Compreensão e interpretação de texto (sentido global do texto, localização de determinada ideia, palavras cognatas)." },
+            { "ordem": "2", "texto": "Conhecimento de vocabulário fundamental e de aspectos gramaticais em nível funcional, ou seja, como acessório à compreensão do texto." }
+          ]
+        }
+      ]
+    },
+    {
+      "nome": "Legislação",
+      "n_questoes": 10,
+      "pontos_por_questao": 2,
+      "disciplinas": [
+        {
+          "nome": "Legislação",
+          "topicos": [
+            { "ordem": "1", "texto": "Constituição da República Federativa do Brasil de 1988: Administração Pública (arts. 37 a 41).", "normas": ["CF/88 arts. 37 a 41"] },
+            { "ordem": "2", "texto": "Regime Jurídico dos Servidores Públicos Civis da União, das Autarquias e das Fundações Públicas Federais (Lei nº 8.112, de 11 de dezembro de 1990, e suas alterações).", "normas": ["Lei 8.112/1990"] },
+            { "ordem": "3", "texto": "Processo Administrativo no âmbito da Administração Pública Federal (Lei nº 9.784, de 29 de janeiro de 1999, e suas alterações).", "normas": ["Lei 9.784/1999"] },
+            { "ordem": "4", "texto": "Marco Legal de Ciência, Tecnologia e Inovação (Decreto nº 9.283, de 7 de fevereiro de 2018, e suas alterações).", "normas": ["Decreto 9.283/2018"] },
+            { "ordem": "5", "texto": "Estatuto da Universidade Federal de Mato Grosso do Sul (Resolução nº 93-Coun/UFMS, de 28 de maio de 2021).", "normas": ["Resolução 93-Coun/UFMS/2021"], "sem_questoes_tec": true },
+            { "ordem": "6", "texto": "Regimento Geral da Universidade Federal de Mato Grosso do Sul (Resolução nº 137-Coun/UFMS, de 29 de outubro de 2021).", "normas": ["Resolução 137-Coun/UFMS/2021"], "sem_questoes_tec": true },
+            { "ordem": "7", "texto": "Código de Ética Profissional dos Servidores da UFMS (Resolução nº 426-Coun/UFMS, de 1º de abril de 2026).", "normas": ["Resolução 426-Coun/UFMS/2026"], "sem_questoes_tec": true }
+          ]
+        }
+      ]
+    },
+    {
+      "nome": "Raciocínio Lógico",
+      "n_questoes": 10,
+      "pontos_por_questao": 2,
+      "disciplinas": [
+        {
+          "nome": "Raciocínio Lógico",
+          "topicos": [
+            { "ordem": "1", "texto": "Lógica proposicional: proposições, valores lógicos, sentenças abertas, conectivos lógicos, tabelas-verdade, tautologia, contradição e contingência." },
+            { "ordem": "2", "texto": "Negação de proposições." },
+            { "ordem": "3", "texto": "Equivalências e implicações lógicas." },
+            { "ordem": "4", "texto": "Argumentação lógica: validade de argumentos, inferências e conclusões." },
+            { "ordem": "5", "texto": "Diagramas lógicos e operações com conjuntos." },
+            { "ordem": "6", "texto": "Raciocínio sequencial: sequências numéricas, alfabéticas e figurais." },
+            { "ordem": "7", "texto": "Orientação espacial e temporal." },
+            { "ordem": "8", "texto": "Resolução de problemas envolvendo relações entre pessoas, objetos, lugares e situações hipotéticas." },
+            { "ordem": "9", "texto": "Princípio fundamental da contagem. Análise combinatória: arranjos, permutações e combinações." },
+            { "ordem": "10", "texto": "Probabilidade." },
+            { "ordem": "11", "texto": "Razões, proporções e porcentagem." },
+            { "ordem": "12", "texto": "Resolução de problemas lógico-matemáticos e compreensão de processos dedutivos que, a partir de um conjunto de hipóteses, conduzem validamente a conclusões determinadas." }
+          ]
+        }
+      ]
+    },
+    {
+      "nome": "Conhecimentos Específicos",
+      "n_questoes": 20,
+      "pontos_por_questao": 2,
+      "disciplinas": [
+        {
+          "nome": "Administração Pública e Organização Administrativa",
+          "topicos": [
+            { "ordem": "1.1", "texto": "Evolução da Administração Pública; modelos patrimonialista, burocrático e gerencial; Nova Gestão Pública." },
+            { "ordem": "1.2", "texto": "Administração direta e indireta; centralização, descentralização, desconcentração e delegação." },
+            { "ordem": "1.3", "texto": "Funções administrativas: planejamento, organização, direção e controle; estruturas organizacionais e departamentalização." },
+            { "ordem": "1.4", "texto": "Gestão por resultados; eficiência, eficácia e efetividade." }
+          ]
+        },
+        {
+          "nome": "Planejamento, Governança e Políticas Públicas",
+          "topicos": [
+            { "ordem": "2.1", "texto": "Planejamento estratégico, tático e operacional; análise dos ambientes interno e externo; análise SWOT; objetivos, metas e indicadores de desempenho; monitoramento e avaliação de resultados." },
+            { "ordem": "2.2", "texto": "Governança pública; transparência, prestação de contas e responsabilização; integridade, gestão de riscos e controles internos. Decreto nº 9.203/2017.", "normas": ["Decreto 9.203/2017"] },
+            { "ordem": "2.3", "texto": "Ciclo de políticas públicas: formação da agenda, formulação, implementação, monitoramento e avaliação; participação e controle social." }
+          ]
+        },
+        {
+          "nome": "Gestão da Qualidade, de Processos e de Projetos",
+          "topicos": [
+            { "ordem": "3.1", "texto": "Gestão da qualidade; ciclo PDCA; fluxograma, diagrama de causa e efeito, diagrama de Pareto, matriz GUT e ferramenta 5W2H." },
+            { "ordem": "3.2", "texto": "Gestão de processos: conceitos, identificação, mapeamento, análise, padronização e melhoria." },
+            { "ordem": "3.3", "texto": "Fundamentos de gestão de projetos: escopo, atividades, cronograma, recursos, responsabilidades e riscos; elaboração, execução, monitoramento e avaliação de projetos." }
+          ]
+        },
+        {
+          "nome": "Organização da Educação Superior",
+          "topicos": [
+            { "ordem": "4.1", "texto": "Constituição Federal, art. 207: autonomia universitária e indissociabilidade entre ensino, pesquisa e extensão.", "normas": ["CF/88 art. 207"] },
+            { "ordem": "4.2", "texto": "Lei nº 9.394/1996: Título V, Capítulo IV – Da Educação Superior.", "normas": ["Lei 9.394/1996 Título V Cap. IV"] }
+          ]
+        },
+        {
+          "nome": "Gestão de Pessoas e Comportamento Organizacional",
+          "topicos": [
+            { "ordem": "5.1", "texto": "Planejamento e organização do trabalho; gestão por competências; recrutamento e seleção; capacitação e desenvolvimento; avaliação de desempenho." },
+            { "ordem": "5.2", "texto": "Cultura e clima organizacional; liderança, motivação, comunicação e trabalho em equipe; negociação e administração de conflitos." },
+            { "ordem": "5.3", "texto": "Aprendizagem organizacional, gestão do conhecimento e qualidade de vida no trabalho." }
+          ]
+        },
+        {
+          "nome": "Orçamento e Administração Financeira Pública",
+          "topicos": [
+            { "ordem": "6.1", "texto": "Fundamentos e princípios do orçamento público; Plano Plurianual – PPA; Lei de Diretrizes Orçamentárias – LDO; Lei Orçamentária Anual – LOA; ciclo orçamentário." },
+            { "ordem": "6.2", "texto": "Receitas e despesas públicas: classificações e estágios; empenho, liquidação e pagamento; créditos adicionais; restos a pagar; despesas de exercícios anteriores e suprimento de fundos." },
+            { "ordem": "6.3", "texto": "Execução orçamentária e financeira; responsabilidade fiscal. Lei nº 4.320/1964 e Lei Complementar nº 101/2000.", "normas": ["Lei 4.320/1964", "LC 101/2000"] }
+          ]
+        },
+        {
+          "nome": "Administração de Recursos Materiais e Patrimoniais",
+          "topicos": [
+            { "ordem": "7.1", "texto": "Classificação e especificação de materiais; gestão de estoques: níveis de estoque, estoque de segurança, ponto de reposição, giro e classificação ABC." },
+            { "ordem": "7.2", "texto": "Recebimento, conferência, armazenamento e distribuição." },
+            { "ordem": "7.3", "texto": "Bens de consumo e permanentes; registro, identificação, inventário, guarda, responsabilidade, movimentação e conservação de bens públicos." }
+          ]
+        },
+        {
+          "nome": "Licitações e Contratos Administrativos",
+          "topicos": [
+            { "ordem": "8.1", "texto": "Lei nº 14.133/2021: princípios, objetivos e agentes públicos; planejamento das contratações; estudo técnico preliminar, termo de referência e estimativa de preços.", "normas": ["Lei 14.133/2021"] },
+            { "ordem": "8.2", "texto": "Modalidades, critérios de julgamento e fases da licitação; contratação direta: dispensa e inexigibilidade.", "normas": ["Lei 14.133/2021"] },
+            { "ordem": "8.3", "texto": "Formalização, execução, gestão e fiscalização de contratos; alterações contratuais, recebimento do objeto, infrações e sanções administrativas.", "normas": ["Lei 14.133/2021"] },
+            { "ordem": "8.4", "texto": "Sustentabilidade nas contratações públicas.", "normas": ["Lei 14.133/2021"] }
+          ]
+        },
+        {
+          "nome": "Informação, Documentação e Governo Digital",
+          "topicos": [
+            { "ordem": "9.1", "texto": "Gestão de documentos: produção, classificação, tramitação, avaliação, guarda e recuperação." },
+            { "ordem": "9.2", "texto": "Manual de Atos Oficiais da UFMS: elaboração, estrutura e padronização dos atos e das correspondências oficiais.", "normas": ["Manual de Atos Oficiais da UFMS"], "sem_questoes_tec": true },
+            { "ordem": "9.3", "texto": "Dados, informação e conhecimento; qualidade da informação; sistemas de informações gerenciais; interpretação de tabelas, gráficos e indicadores." },
+            { "ordem": "9.4", "texto": "Segurança da informação: confidencialidade, integridade e disponibilidade." },
+            { "ordem": "9.5", "texto": "Lei nº 12.527/2011; Lei nº 13.709/2018; Lei nº 14.129/2021.", "normas": ["Lei 12.527/2011", "Lei 13.709/2018", "Lei 14.129/2021"] }
+          ]
+        },
+        {
+          "nome": "Direitos dos Usuários e Qualidade dos Serviços Públicos",
+          "topicos": [
+            { "ordem": "10.1", "texto": "Lei nº 13.460/2017: participação, proteção e defesa dos direitos dos usuários; princípios e diretrizes do atendimento; Carta de Serviços ao Usuário.", "normas": ["Lei 13.460/2017"] },
+            { "ordem": "10.2", "texto": "Manifestações dos usuários; ouvidorias públicas; conselhos de usuários e avaliação dos serviços públicos.", "normas": ["Lei 13.460/2017"] }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,93 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://financeiro.local/schemas/concursos/edital.schema.json",
+  "title": "Edital verticalizado (um cargo por arquivo)",
+  "description": "Estrutura extraída do PDF do edital para UM cargo. Revisada pelo curador antes de confirmar.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_versao", "edital", "cargo", "areas"],
+  "properties": {
+    "schema_versao": { "$ref": "comum.schema.json#/$defs/schema_versao" },
+    "edital": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["orgao", "numero", "banca", "data_prova"],
+      "properties": {
+        "orgao": { "type": "string", "examples": ["UFMS"] },
+        "numero": { "type": "string", "examples": ["PROGEP/UFMS nº 152/2026"] },
+        "banca": { "type": "string", "examples": ["Fapec"] },
+        "data_publicacao": { "type": "string", "format": "date" },
+        "data_prova": { "type": "string", "format": "date" },
+        "duracao_min": { "type": "integer", "minimum": 30 },
+        "tipo_questao": { "enum": ["ME5", "ME4", "CE", "misto"], "description": "ME5 = múltipla escolha A-E." },
+        "nota_minima": { "type": "string", "description": "Regra de eliminação, em texto." }
+      }
+    },
+    "cargo": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["codigo", "nome"],
+      "properties": {
+        "codigo": { "type": "string", "examples": ["523"] },
+        "nome": { "type": "string" },
+        "vagas": { "type": "integer", "minimum": 0 },
+        "nivel": { "enum": ["superior", "medio", "fundamental"] }
+      }
+    },
+    "areas": {
+      "description": "Blocos do quadro de provas (ex.: Legislação 10 questões × 2 pontos).",
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["nome", "n_questoes", "pontos_por_questao", "disciplinas"],
+        "properties": {
+          "nome": { "type": "string" },
+          "n_questoes": { "type": "integer", "minimum": 1 },
+          "pontos_por_questao": { "type": "number", "exclusiveMinimum": 0 },
+          "minimo_pontos": { "type": "number", "minimum": 0 },
+          "disciplinas": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["nome", "topicos"],
+              "properties": {
+                "nome": { "type": "string", "description": "Como o edital chama (ex.: 'Orçamento e Administração Financeira Pública')." },
+                "topicos": {
+                  "type": "array",
+                  "minItems": 1,
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": ["ordem", "texto"],
+                    "properties": {
+                      "ordem": { "type": "string", "description": "Numeração hierárquica: '6', '6.2'.", "pattern": "^[0-9]+(\\.[0-9]+)*$" },
+                      "texto": { "type": "string", "description": "Texto literal do edital para o tópico." },
+                      "normas": {
+                        "type": "array",
+                        "description": "Normas citadas pelo tópico, com recorte quando houver (ex.: 'CF/88 arts. 37 a 41').",
+                        "items": { "type": "string" }
+                      },
+                      "assuntos_sugeridos": {
+                        "type": "array",
+                        "description": "Sugestão de mapeamento para assuntos canônicos do TEC. O curador confirma.",
+                        "items": { "$ref": "comum.schema.json#/$defs/assunto_ref" }
+                      },
+                      "sem_questoes_tec": {
+                        "type": "boolean",
+                        "description": "true quando o tópico é norma local/própria (ex.: Estatuto UFMS) e não deve existir no TEC."
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

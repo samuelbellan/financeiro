@@ -1,0 +1,24 @@
+{
+  "schema_versao": "1",
+  "gerado_em": "2026-11-21T10:00:00-04:00",
+  "assunto": {
+    "disciplina": "Direito Civil",
+    "assunto": "Prescrição e Decadência (arts. 189 a 211)"
+  },
+  "lote": { "numero": 1, "total_questoes": 2 },
+  "subtopicos_aprovados": [
+    { "id": "causas-interruptivas", "nome": "Causas interruptivas da prescrição (art. 202)", "descricao": "Atos que zeram o prazo; ocorre uma única vez." },
+    { "id": "causas-impeditivas-suspensivas", "nome": "Causas impeditivas e suspensivas (arts. 197 a 201)", "descricao": "Situações em que o prazo não começa ou fica parado." }
+  ],
+  "dispositivos_validos": [
+    "cc-2002/art-197/inc-I",
+    "cc-2002/art-198/inc-I",
+    "cc-2002/art-201",
+    "cc-2002/art-202/inc-VI",
+    "cc-2002/art-204"
+  ],
+  "questoes": [
+    { "id_externo": "3796866", "banca": "FGV", "orgao": "AMAZUL", "cargo": "Advogado", "ano": 2026, "tipo": "ME", "gabarito": "D" },
+    { "id_externo": "3811601", "banca": "FGV", "orgao": "MPE GO", "cargo": "Promotor de Justiça", "ano": 2026, "tipo": "ME", "gabarito": "E" }
+  ]
+}

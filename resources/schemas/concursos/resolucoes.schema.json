@@ -1,0 +1,80 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://financeiro.local/schemas/concursos/resolucoes.schema.json",
+  "title": "Resoluções de um lote (Gemini → sistema)",
+  "description": "Explicação da questão e de CADA alternativa. Arquivo separado do ledger para não estourar a resposta. O gabarito é dado, não decidido: a IA explica por que ele está certo.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_versao", "assunto", "lote", "questoes"],
+  "properties": {
+    "schema_versao": { "$ref": "comum.schema.json#/$defs/schema_versao" },
+    "assunto": { "$ref": "comum.schema.json#/$defs/assunto_ref" },
+    "lote": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["numero", "parte", "total_partes"],
+      "properties": {
+        "numero": { "type": "integer", "minimum": 1 },
+        "parte": { "type": "integer", "minimum": 1 },
+        "total_partes": { "type": "integer", "minimum": 1 }
+      }
+    },
+    "questoes": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id_externo", "gabarito_conferido", "resumo", "alternativas"],
+        "properties": {
+          "id_externo": { "$ref": "comum.schema.json#/$defs/id_externo" },
+          "gabarito_conferido": { "$ref": "comum.schema.json#/$defs/gabarito" },
+          "resumo": {
+            "description": "A sacada da questão em 1-3 frases.",
+            "type": "string",
+            "minLength": 10,
+            "maxLength": 800
+          },
+          "fundamentacao": {
+            "description": "Explicação completa (Markdown simples).",
+            "$ref": "comum.schema.json#/$defs/texto_longo"
+          },
+          "dispositivos": {
+            "type": "array",
+            "items": { "$ref": "comum.schema.json#/$defs/dispositivo_id" },
+            "uniqueItems": true
+          },
+          "alternativas": {
+            "description": "Uma entrada por alternativa (5 em A-E; 2 em C/E). Exatamente uma com correta=true, e ela deve ser o gabarito.",
+            "type": "array",
+            "minItems": 2,
+            "maxItems": 5,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["letra", "correta", "explicacao"],
+              "properties": {
+                "letra": { "$ref": "comum.schema.json#/$defs/letra" },
+                "correta": { "type": "boolean" },
+                "explicacao": { "type": "string", "minLength": 5, "maxLength": 1500 },
+                "palavras_alteradas": {
+                  "description": "Trechos que a banca trocou em relação ao texto da norma (para destaque). Ex.: [{\"banca\": \"suspensão\", \"norma\": \"interrupção\"}].",
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": ["banca", "norma"],
+                    "properties": {
+                      "banca": { "type": "string", "maxLength": 200 },
+                      "norma": { "type": "string", "maxLength": 200 }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

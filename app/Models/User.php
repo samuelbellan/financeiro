@@ -31,7 +31,21 @@ class User extends Authenticatable
             'password' => 'hashed',
             'is_admin' => 'boolean',
             'is_owner' => 'boolean',
+            'modulos' => 'array',
         ];
+    }
+
+    /**
+     * Pode abrir o módulo? O dono sempre pode; modulos = null libera todos.
+     * Chaves válidas em config/modulos.php.
+     */
+    public function podeAcessar(string $modulo): bool
+    {
+        if ($this->is_owner || $this->modulos === null) {
+            return true;
+        }
+
+        return in_array($modulo, $this->modulos, true);
     }
 
     /**

@@ -1,0 +1,37 @@
+{
+  "schema_versao": "1",
+  "assunto": {
+    "disciplina": "Direito Civil",
+    "assunto": "Prescrição e Decadência (arts. 189 a 211)"
+  },
+  "lote": { "numero": 1, "parte": 1, "total_partes": 1 },
+  "questoes": [
+    {
+      "id_externo": "3796866",
+      "gabarito_conferido": "D",
+      "resumo": "Propor renegociação é reconhecer a dívida. Reconhecimento do direito pelo devedor interrompe a prescrição: o prazo volta a correr do zero.",
+      "fundamentacao": "O art. 202, VI, do CC prevê que a prescrição se interrompe por qualquer ato inequívoco, ainda que extrajudicial, que importe reconhecimento do direito pelo devedor. Ao procurar o credor e propor novo parcelamento do saldo, Emmanuel reconheceu o débito. A interrupção só pode ocorrer uma vez.",
+      "dispositivos": ["cc-2002/art-202/inc-VI"],
+      "alternativas": [
+        { "letra": "A", "correta": false, "explicacao": "Renúncia à prescrição pressupõe prescrição já consumada (art. 191). Aqui o prazo ainda corria." },
+        { "letra": "B", "correta": false, "explicacao": "O prazo de cobrança de dívida é prescricional, não decadencial; e decadência legal, em regra, não se suspende (art. 207)." },
+        { "letra": "C", "correta": false, "explicacao": "Suspensão decorre das causas dos arts. 197 a 199 (situações pessoais). Reconhecimento da dívida é causa de interrupção.", "palavras_alteradas": [{ "banca": "suspensão", "norma": "interrupção" }] },
+        { "letra": "D", "correta": true, "explicacao": "Ato inequívoco de reconhecimento do direito pelo devedor interrompe a prescrição (art. 202, VI)." },
+        { "letra": "E", "correta": false, "explicacao": "Não se trata de decadência convencional; o prazo é prescricional." }
+      ]
+    },
+    {
+      "id_externo": "3811601",
+      "gabarito_conferido": "E",
+      "resumo": "Diná tem 5 anos (absolutamente incapaz): contra ela não corre prescrição. Raquel, pródiga, é relativamente incapaz: contra ela a prescrição corre normalmente.",
+      "dispositivos": ["cc-2002/art-198/inc-I", "cc-2002/art-201"],
+      "alternativas": [
+        { "letra": "A", "correta": false, "explicacao": "O pródigo é relativamente incapaz; o art. 198, I, protege só os absolutamente incapazes." },
+        { "letra": "B", "correta": false, "explicacao": "A suspensão é pessoal; não se estende automaticamente ao codevedor solidário." },
+        { "letra": "C", "correta": false, "explicacao": "Morte e interdição não são causas de interrupção (art. 202)." },
+        { "letra": "D", "correta": false, "explicacao": "Inverte a regra: é contra Diná (menor de 16) que a prescrição não corre." },
+        { "letra": "E", "correta": true, "explicacao": "A prescrição fica suspensa só em relação à herdeira menor e continua correndo contra Raquel." }
+      ]
+    }
+  ]
+}

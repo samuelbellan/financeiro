@@ -20,7 +20,11 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        if (config('app.env') === 'production' || request()->header('x-forwarded-proto') === 'https') {
+        // *.ts.net = Tailscale Funnel: o acesso externo é sempre HTTPS, mesmo que o proxy
+        // não envie X-Forwarded-Proto ao repassar para o php artisan serve local.
+        if (config('app.env') === 'production'
+            || request()->header('x-forwarded-proto') === 'https'
+            || str_ends_with(request()->getHost(), '.ts.net')) {
             URL::forceScheme('https');
         }
     }

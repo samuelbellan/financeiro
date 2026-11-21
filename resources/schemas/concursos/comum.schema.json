@@ -1,0 +1,88 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://financeiro.local/schemas/concursos/comum.schema.json",
+  "title": "Definições comuns do contrato de concursos",
+  "$defs": {
+    "schema_versao": {
+      "description": "Versão do contrato. Mudanças incompatíveis sobem o número.",
+      "const": "1"
+    },
+    "slug": {
+      "description": "Identificador em minúsculas, sem acento, com hífens. Ex.: causas-suspensivas.",
+      "type": "string",
+      "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+      "maxLength": 80
+    },
+    "id_externo": {
+      "description": "Número da questão no TEC (o que aparece em tecconcursos.com.br/questoes/NUMERO).",
+      "type": "string",
+      "pattern": "^[0-9]{1,12}$"
+    },
+    "gabarito": {
+      "description": "Letra para múltipla escolha; Certo/Errado para C/E.",
+      "enum": ["A", "B", "C", "D", "E", "Certo", "Errado"]
+    },
+    "letra": {
+      "enum": ["A", "B", "C", "D", "E", "Certo", "Errado"]
+    },
+    "dificuldade": {
+      "description": "B = 1 passo/conceito direto; M = 2-3 passos ou distinguir conceitos próximos; A = 4+ passos, pegadinha de norma ou raciocínio inverso.",
+      "enum": ["B", "M", "A"]
+    },
+    "tipologia": {
+      "enum": [
+        "calculo_direto",
+        "calculo_multietapas",
+        "conceito_teorico",
+        "literalidade_norma",
+        "pegadinha_excecao",
+        "raciocinio_inverso",
+        "interpretacao_caso",
+        "classificacao_enquadramento",
+        "assertiva_certo_errado"
+      ]
+    },
+    "dispositivo_id": {
+      "description": "ID estável de dispositivo de norma: <norma>/<nivel>-<numero>[/<nivel>-<numero>...]. Ex.: cc-2002/art-202/inc-VI, cpc-2015/art-1003/par-5, nbc-tg-03/item-12.",
+      "type": "string",
+      "pattern": "^[a-z0-9]+(-[a-z0-9]+)*(/(art|par|inc|ali|item)-[0-9A-Za-z]+(-[A-Za-z])?)+$"
+    },
+    "assunto_ref": {
+      "description": "Assunto canônico, exatamente como o TEC escreve: 'Disciplina - Assunto'.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["disciplina", "assunto"],
+      "properties": {
+        "disciplina": { "type": "string", "minLength": 2, "maxLength": 150 },
+        "assunto": { "type": "string", "minLength": 2, "maxLength": 250 }
+      }
+    },
+    "subtopico_ref": {
+      "description": "Um subtópico da lista aprovada (id) OU a proposta de um novo, que fica pendente até a curadoria.",
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["id"],
+          "properties": { "id": { "$ref": "#/$defs/slug" } }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["novo", "justificativa"],
+          "properties": {
+            "novo": { "type": "string", "minLength": 3, "maxLength": 120 },
+            "justificativa": { "type": "string", "minLength": 10, "maxLength": 500 }
+          }
+        }
+      ]
+    },
+    "lista_ids": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/id_externo" },
+      "uniqueItems": true
+    },
+    "texto_curto": { "type": "string", "minLength": 1, "maxLength": 600 },
+    "texto_longo": { "type": "string", "minLength": 1, "maxLength": 12000 }
+  }
+}
