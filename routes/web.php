@@ -171,6 +171,10 @@ Route::middleware(['auth', 'modulos'])->group(function () {
         Route::post('/meta/atividades/{atividade}/adiar', [\App\Http\Controllers\Concursos\MetaController::class, 'adiar'])->whereNumber('atividade')->name('meta.adiar');
         Route::get('/perfil', [\App\Http\Controllers\Concursos\MetaController::class, 'perfil'])->name('perfil');
         Route::post('/perfil', [\App\Http\Controllers\Concursos\MetaController::class, 'salvarPerfil'])->name('perfil.salvar');
+        Route::get('/curadoria', [\App\Http\Controllers\Concursos\CuradoriaController::class, 'index'])->name('curadoria');
+        Route::get('/curadoria/assuntos/{assunto}', [\App\Http\Controllers\Concursos\CuradoriaController::class, 'assunto'])->whereNumber('assunto')->name('curadoria.assunto');
+        Route::post('/curadoria/assuntos/{assunto}/aprovar-todos', [\App\Http\Controllers\Concursos\CuradoriaController::class, 'aprovarTodos'])->whereNumber('assunto')->name('curadoria.aprovar-todos');
+        Route::post('/curadoria/subtopicos/{subtopico}', [\App\Http\Controllers\Concursos\CuradoriaController::class, 'acao'])->whereNumber('subtopico')->name('curadoria.acao');
     });
 
 

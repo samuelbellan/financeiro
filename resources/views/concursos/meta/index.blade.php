@@ -40,6 +40,9 @@
         <h1>Meta de {{ ['', 'segunda', 'terça', 'quarta', 'quinta', 'sexta', 'sábado', 'domingo'][$meta->data->format('N')] }}, {{ $meta->data->format('d/m') }}</h1>
         <a class="btn" href="{{ route('concursos.questoes.index') }}">Questões avulsas</a>
         <a class="btn" href="{{ route('concursos.perfil') }}">Perfil</a>
+        @if (auth()->user()->is_admin || auth()->user()->is_owner)
+            <a class="btn" href="{{ route('concursos.curadoria') }}">Curadoria</a>
+        @endif
     </div>
 
     <div class="card resumo">

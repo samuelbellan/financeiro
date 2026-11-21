@@ -39,6 +39,7 @@
         .alerta a { color: inherit; font-weight: 600; }
         .bar { height: 6px; background: var(--line); border-radius: 99px; overflow: hidden; }
         .bar > span { display: block; height: 100%; background: var(--ok); }
+        .visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
         @yield('css')
     </style>
 </head>
