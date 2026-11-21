@@ -51,6 +51,7 @@ const state = {
     proj: { mode: 'quando', ritmo: 'semana', janela: 30, manualHoras: 4, folgas: [], inicioHoras: null, alvoHoras: null, dataAlvo: null },
     focusOpen: false,
     focusView: 'classico', // 'classico' ou 'sala' (sala de estudo com os colegas); lembrado neste aparelho
+    focusActivity: null, // { sessionId, subjectId, key } da atividade da Guruja em foco
     roomId: null, // sala mostrada na tela "sala" (lembrada neste aparelho)
     avatarStage: null,
     sync: { state: 'idle', pending: 0 },
@@ -200,6 +201,7 @@ function openSessionNoteDialog(session) {
 async function toggleSubject(subjectId, tipo = null, extra = {}) {
     const at = nowMs();
     const running = runningSession();
+    const prevRest = running ? null : restInfo();
     if (running) {
         await stopSession(running, at);
         const stopped = { ...running, fim: iso(Math.max(at, toMs(running.inicio))) };
@@ -210,9 +212,19 @@ async function toggleSubject(subjectId, tipo = null, extra = {}) {
         || Boolean(extra.reforco_limite_min);
     const reforcoGrau = isRef ? (extra.reforco_grau ?? state.settings?.reforco_padrao_grau ?? 'medio') : null;
     const reforcoLimitMin = isRef ? (extra.reforco_limite_min ?? reforcoLimitMinutes(state.settings, reforcoGrau)) : null;
+    const newId = uuid();
+    const inheritedKey = !extra.gurujaKey
+        && prevRest
+        && state.focusActivity?.sessionId === prevRest.session.id
+        && state.focusActivity?.subjectId === subjectId
+        ? state.focusActivity.key
+        : null;
+    const activityKey = extra.gurujaKey || inheritedKey || null;
+    state.focusActivity = activityKey ? { sessionId: newId, subjectId, key: activityKey } : null;
+    await setMeta('focus_activity', state.focusActivity);
 
     await persist('sessions', {
-        id: uuid(),
+        id: newId,
         subject_id: subjectId,
         inicio: iso(at),
         fim: null,
@@ -501,7 +513,8 @@ function renderFocus() {
             <div><small><span class="dot"></span>${esc(subject?.nome ?? 'Matéria')}</small><b data-live="current-subject">--</b></div>
             <div><small>Hoje</small><b data-live="total">--</b></div>
         </div>
-        <button type="button" class="focus-btn" data-action="toggle" data-id="${running.subject_id}" aria-label="Pausar">❚❚</button>`
+        <button type="button" class="focus-btn" data-action="toggle" data-id="${running.subject_id}" aria-label="Pausar">❚❚</button>
+        ${renderFocusCommand(running)}`
         : `
         <button type="button" class="focus-close" data-action="focus-close" aria-label="Sair do modo foco">✕</button>
         ${avatarBlock(todayTotals().totalMs, 150, false)}
@@ -513,7 +526,48 @@ function renderFocus() {
         </div>
         <button type="button" class="focus-btn" data-action="toggle" data-id="${rest.session.subject_id}" aria-label="Retomar ${esc(subject?.nome ?? '')}">▶</button>
         <p class="focus-hint">Toque em ▶ para retomar ${esc(subject?.nome ?? 'a matéria')}</p>
+        ${renderFocusCommand(rest.session)}
         <button type="button" class="btn ghost focus-other" data-action="pick-subject">Começar outra matéria</button>`);
+}
+
+function gurujaActivityByKey(key) {
+    const meta = guruja.data?.meta;
+    if (!meta || !key) return null;
+    if (key.startsWith('R:')) {
+        const r = (meta.reforcos ?? []).find((x) => gjKey({ ...x, tipo: 'Reforço' }) === key);
+        return r ? { ...r, tipo: 'Reforço' } : null;
+    }
+    return (meta.atividades ?? []).find((a) => gjKey(a) === key) ?? null;
+}
+
+function renderFocusCommand(session) {
+    if (!session || state.focusActivity?.sessionId !== session.id) return '';
+    const key = state.focusActivity.key;
+    const a = gurujaActivityByKey(key);
+    if (!a) return '';
+    const isRef = a.tipo === 'Reforço';
+    const raw = !isRef ? guruja.data?.comandos?.[key] : null;
+    const comando = typeof raw === 'string' ? { texto: raw, resumo: null } : raw;
+    let body = '';
+    if (isRef) {
+        body = a.instrucao
+            ? `<p>${esc(a.instrucao)}</p>`
+            : '<p class="gj-cmd-empty">Sem instrução para este reforço.</p>';
+    } else if (comando?.resumo) {
+        body = `<p class="gj-resumo">${esc(comando.resumo)}</p>
+            <details><summary>Comando completo</summary><p>${esc(comando.texto)}</p></details>`;
+    } else if (comando?.texto) {
+        body = `${guruja.resumindo === key ? '<p class="gj-cmd-empty">Resumindo com o Gemini…</p>' : ''}<p>${esc(comando.texto)}</p>`;
+    } else {
+        body = '<p class="gj-cmd-empty">Sem comando salvo para esta atividade.</p>';
+    }
+    return `<section class="focus-cmd" aria-label="Comando da atividade">
+        <div class="focus-cmd-head">
+            ${a.tipo ? `<span class="gj-tipo" style="--t:${GJ_TIPO_COR[a.tipo] ?? 'var(--muted)'}">${esc(a.tipo)}</span>` : ''}
+            <b>${esc(a.titulo ?? '')}</b>
+        </div>
+        <div class="focus-cmd-body">${body}</div>
+    </section>`;
 }
 
 // Mesa vazia (com relógio quando a pessoa já estudou hoje), como na sala de estudo do YPT.
@@ -790,7 +844,7 @@ async function refreshGuruja(force = false) {
         guruja.data = data;
         if (changed) {
             await setMeta('guruja', data);
-            if (state.tab === 'timer' && !dialog.open && !gjDrag.li) render();
+            if ((state.tab === 'timer' || state.focusOpen) && !dialog.open && !gjDrag.li) render();
         }
     } catch { /* offline: fica a última foto */ } finally {
         guruja.loading = false;
@@ -1077,7 +1131,7 @@ function gurujaItem(a, done) {
         }
         if (!done) {
             const grauAttr = isRef ? ` data-grau="${esc(selectedGrau)}"` : '';
-            body += `<div class="gj-actions"><button type="button" class="gj-study" data-action="guruja-study" data-id="${esc(a.disciplina ?? '')}" data-tipo="${esc(a.tipo ?? '')}"${grauAttr}>▶ Estudar ${esc(a.disciplina ?? '')}</button>
+            body += `<div class="gj-actions"><button type="button" class="gj-study" data-action="guruja-study" data-id="${esc(a.disciplina ?? '')}" data-tipo="${esc(a.tipo ?? '')}" data-key="${esc(code)}"${grauAttr}>▶ Estudar ${esc(a.disciplina ?? '')}</button>
                 <button type="button" class="gj-feita" data-action="guruja-feita" data-id="${esc(code)}">✓ Concluí</button></div>`;
         } else if (marcada) {
             body += `<button type="button" class="gj-desfazer" data-action="guruja-desfazer" data-id="${esc(code)}">↺ Desfazer (voltar para pendentes)</button>`;
@@ -1231,7 +1285,7 @@ function gurujaSubjectFor(disciplina) {
     return bestScore >= 0.5 ? best : null;
 }
 
-async function gurujaStudy(disciplina, gurujaTipo, grau = null) {
+async function gurujaStudy(disciplina, gurujaTipo, grau = null, gurujaKey = null) {
     const subjectId = gurujaSubjectFor(disciplina);
     // A sessão já nasce com o tipo da atividade (pré-marcado ao parar; dá para trocar no diálogo).
     const tipo = gurujaStudyType(gurujaTipo);
@@ -1248,9 +1302,11 @@ async function gurujaStudy(disciplina, gurujaTipo, grau = null) {
                 updates.reforco_limite_min = reforcoLimitMin;
             }
             if (Object.keys(updates).length) await persist('sessions', { ...running, ...updates });
+            state.focusActivity = gurujaKey ? { sessionId: running.id, subjectId: id, key: gurujaKey } : null;
+            await setMeta('focus_activity', state.focusActivity);
             return openFocus();
         }
-        await toggleSubject(id, tipo, { reforco_grau: reforcoGrau, reforco_limite_min: reforcoLimitMin });
+        await toggleSubject(id, tipo, { reforco_grau: reforcoGrau, reforco_limite_min: reforcoLimitMin, gurujaKey });
     };
     if (subjectId) return start(subjectId);
     const subjects = [...activeSubjects()].sort((a, b) => a.nome.localeCompare(b.nome, 'pt-BR', { sensitivity: 'base' }));
@@ -3141,7 +3197,7 @@ root.addEventListener('click', async (event) => {
             if (opening) summarizeGurujaCommand(id);
         },
         'guruja-help': () => openGurujaHelp(),
-        'guruja-study': () => gurujaStudy(id, button.dataset.tipo, button.dataset.grau),
+        'guruja-study': () => gurujaStudy(id, button.dataset.tipo, button.dataset.grau, button.dataset.key || null),
         'guruja-reforco-grau': () => {
             const key = button.dataset.key;
             const grau = button.dataset.grau;
@@ -3412,6 +3468,7 @@ async function boot() {
     state.widgetAuto = (await getMeta('widget_auto')) ?? true;
     state.widgetHintSeen = Boolean(await getMeta('widget_hint_seen'));
     state.focusView = (await getMeta('focus_view')) ?? 'classico';
+    state.focusActivity = (await getMeta('focus_activity')) ?? null;
     state.roomId = (await getMeta('room_id')) ?? null;
     restAlert.notified = (await getMeta('rest_alert')) ?? null;
     guruja.data = (await getMeta('guruja')) ?? null;
