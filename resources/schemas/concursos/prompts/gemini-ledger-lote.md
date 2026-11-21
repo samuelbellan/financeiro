@@ -52,7 +52,7 @@ Tudo vem do pacote:
 7. **ponto_cobrado:** a regra exata que a questão testa, em UMA frase.
 8. **dispositivos:** artigos que fundamentam o gabarito, no formato
    `codigo-da-norma/art-N[/par-N][/inc-ROMANO][/ali-letra]`, ex.: `lei-8112-1990/art-20/par-2`,
-   `cf-1988/art-37/inc-XXI`, `lei-9784-1999/art-54`. Parágrafo único = `par-unico`;
+   `cf-1988/art-37/inc-XXI`, `lei-9784-1999/art-54`. Parágrafo único = `par-unico`; só o caput = `/caput` (ex.: `lei-9784-1999/art-59/caput`);
    artigo com letra = `art-18-A`. **Só preencha se tiver certeza do artigo**; na dúvida, omita o campo.
 9. **distrator_principal:** a alternativa errada mais tentadora e o erro que ela explora
    (ex.: "troca prazo de 5 por 3 anos"). Em Certo/Errado, use a letra contrária ao gabarito.

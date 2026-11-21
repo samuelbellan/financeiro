@@ -43,9 +43,9 @@
       ]
     },
     "dispositivo_id": {
-      "description": "ID estável de dispositivo de norma: <norma>/<nivel>-<numero>[/<nivel>-<numero>...]. Ex.: cc-2002/art-202/inc-VI, cpc-2015/art-1003/par-5, nbc-tg-03/item-12.",
+      "description": "ID estável de dispositivo de norma: <norma>/<nivel>-<numero>[/<nivel>-<numero>...]. Ex.: cc-2002/art-202/inc-VI, cpc-2015/art-1003/par-5, lei-9784-1999/art-59/caput, nbc-tg-03/item-12.",
       "type": "string",
-      "pattern": "^[a-z0-9]+(-[a-z0-9]+)*(/(art|par|inc|ali|item)-[0-9A-Za-z]+(-[A-Za-z])?)+$"
+      "pattern": "^[a-z0-9]+(-[a-z0-9]+)*(/(art|par|inc|ali|item)-[0-9A-Za-z]+(-[A-Za-z])?|/caput)+$"
     },
     "assunto_ref": {
       "description": "Assunto canônico, exatamente como o TEC escreve: 'Disciplina - Assunto'.",
