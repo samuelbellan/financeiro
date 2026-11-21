@@ -34,3 +34,7 @@ check_db*.php
 # Holerites reais: dados pessoais, só na máquina local
 /database/dumps/holerites_tjms.json
 /storage/framework/photo_media/
+
+# Módulo de concursos: PDFs/JSONs importados (conteúdo do TEC, não pode ir para o repositório público)
+/storage/concursos/
+/.venv-concursos/

@@ -73,8 +73,13 @@
                       },
                       "assuntos_sugeridos": {
                         "type": "array",
-                        "description": "Sugestão de mapeamento para assuntos canônicos do TEC. O curador confirma.",
-                        "items": { "$ref": "comum.schema.json#/$defs/assunto_ref" }
+                        "description": "Sugestão de mapeamento para assuntos canônicos do TEC. O curador confirma. Pode ser {disciplina, assunto} ou só o nome do assunto como o TEC escreve; sem disciplina, o sistema a completa quando a primeira questão do assunto for importada.",
+                        "items": {
+                          "oneOf": [
+                            { "$ref": "comum.schema.json#/$defs/assunto_ref" },
+                            { "type": "string", "minLength": 2, "maxLength": 250 }
+                          ]
+                        }
                       },
                       "sem_questoes_tec": {
                         "type": "boolean",

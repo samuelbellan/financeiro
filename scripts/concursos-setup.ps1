@@ -98,6 +98,16 @@ New-Item -ItemType Directory -Force -Path $BackupDir | Out-Null
 php artisan config:clear | Out-Null
 if ($LASTEXITCODE -ne 0) { throw "O Laravel não conseguiu ler o .env depois da alteração. Confira as linhas CONCURSOS_*." }
 
+# --- 2b. Python para ler os PDFs do TEC (pdfplumber num venv do projeto) -------
+$venvPy = Join-Path $Projeto ".venv-concursos\Scripts\python.exe"
+if (-not (Test-Path $venvPy)) {
+    python -m venv (Join-Path $Projeto ".venv-concursos")
+    if ($LASTEXITCODE -ne 0) { throw "Não consegui criar o venv Python (.venv-concursos)." }
+}
+& $venvPy -m pip install -q -r (Join-Path $Projeto "scripts\requirements-concursos.txt")
+if ($LASTEXITCODE -ne 0) { throw "Falha ao instalar o pdfplumber no .venv-concursos." }
+Write-Host "Leitor de PDF (pdfplumber) pronto." -ForegroundColor Green
+
 # --- 3. Backup diário -----------------------------------------------------------
 $log = Join-Path $Projeto "storage\logs\concursos-backup.log"
 $acao = New-ScheduledTaskAction -Execute "cmd.exe" `

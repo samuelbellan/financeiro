@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://financeiro.local/schemas/concursos/contexto.schema.json",
   "title": "Contexto de um lote (sistema → Gemini)",
-  "description": "Gerado PELO SISTEMA e colado no prompt do Gemini junto com o PDF. Garante que o Gemini use a lista fechada de subtópicos e os IDs de dispositivo válidos.",
+  "description": "Gerado PELO SISTEMA (php artisan concursos:gerar-pacotes) e anexado no Gemini junto com o prompt. Traz o texto das questões de UM assunto, a lista fechada de subtópicos e os IDs de dispositivo válidos.",
   "type": "object",
   "additionalProperties": false,
   "required": ["schema_versao", "assunto", "lote", "subtopicos_aprovados", "questoes"],
@@ -52,7 +52,18 @@
           "cargo": { "type": "string" },
           "ano": { "type": "integer", "minimum": 1980, "maximum": 2100 },
           "tipo": { "enum": ["ME", "CE"] },
-          "gabarito": { "$ref": "comum.schema.json#/$defs/gabarito" }
+          "gabarito": { "$ref": "comum.schema.json#/$defs/gabarito" },
+          "assunto_tec": { "description": "Assunto do TEC em que a questão está (quando o lote agrupa sub-assuntos).", "type": "string" },
+          "enunciado": { "type": "string" },
+          "alternativas": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["letra", "texto"],
+              "properties": { "letra": { "type": "string" }, "texto": { "type": "string" } }
+            }
+          }
         }
       }
     }

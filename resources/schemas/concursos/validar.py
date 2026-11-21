@@ -47,7 +47,28 @@ def main(arquivos):
             print(f"     {onde}: {e.message[:300]}")
     return 1 if falhou else 0
 
+def modo_json(tipo: str, caminho: str) -> int:
+    """Usado pelo sistema: valida UM arquivo contra o tipo dado e imprime {"ok": bool, "erros": [...]}."""
+    saida = {"ok": False, "erros": []}
+    if f"{tipo}.schema.json" not in SCHEMAS:
+        saida["erros"].append(f"tipo desconhecido: {tipo}")
+    else:
+        try:
+            dados = json.loads(pathlib.Path(caminho).read_text(encoding="utf-8"))
+            erros = sorted(Draft202012Validator(SCHEMAS[f"{tipo}.schema.json"], registry=REG).iter_errors(dados),
+                           key=lambda e: list(e.absolute_path))
+            saida["erros"] = [("/".join(str(x) for x in e.absolute_path) or "(raiz)") + ": " + e.message[:300] for e in erros[:50]]
+            saida["ok"] = not erros
+        except json.JSONDecodeError as e:
+            saida["erros"].append(f"JSON inválido na linha {e.lineno}, coluna {e.colno}: {e.msg}")
+        except OSError as e:
+            saida["erros"].append(f"não consegui ler o arquivo: {e}")
+    sys.stdout.buffer.write(json.dumps(saida, ensure_ascii=False).encode("utf-8"))
+    return 0 if saida["ok"] else 1
+
 if __name__ == "__main__":
+    if len(sys.argv) == 4 and sys.argv[1] == "--tipo":
+        sys.exit(modo_json(sys.argv[2], sys.argv[3]))
     if len(sys.argv) < 2:
         print(__doc__)
         sys.exit(2)

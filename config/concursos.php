@@ -11,6 +11,24 @@ return [
 
     'connection' => 'concursos_pgsql',
 
+    // Python com pdfplumber (scripts/requirements-concursos.txt), usado para ler os PDFs do TEC.
+    'python' => env('CONCURSOS_PYTHON', base_path(PHP_OS_FAMILY === 'Windows'
+        ? '.venv-concursos/Scripts/python.exe'
+        : '.venv-concursos/bin/python')),
+
+    // Motor da meta do dia (determinístico). Ver App\Services\Concursos\MotorMeta.
+    'motor' => [
+        'minutos_por_questao' => 3,
+        'questoes_por_bloco' => 10,
+        'minutos_teoria' => 40,
+        'revisao_max_pct' => 30,          // revisão de erros ocupa no máximo isso do dia
+        'revisao_intervalos' => [1, 3, 7, 15, 30], // dias até rever, por acerto seguido
+        'janela_dias' => 60,              // tentativas consideradas no domínio
+        'rede_minimo' => 10,              // rede de segurança: com 10+ questões...
+        'rede_acerto' => 0.5,             // ...e acerto abaixo disso, sugere Teoria
+        'prior' => ['nao_vi' => 0.1, 'vi_parte' => 0.4, 'vi_tudo' => 0.6, '' => 0.3], // '' = não declarou
+    ],
+
     'backup' => [
         // Pasta sincronizada com o Google Drive onde o pg_dump diário é salvo.
         'dir' => env('CONCURSOS_BACKUP_DIR'),
