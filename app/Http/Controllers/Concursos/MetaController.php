@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Concursos\EditalCargo;
 use App\Models\Concursos\MetaAtividade;
 use App\Models\Concursos\Perfil;
+use App\Services\Concursos\JornadaMeta;
 use App\Services\Concursos\MotorMeta;
 use App\Services\Concursos\TempoEstudosSync;
 use Illuminate\Http\RedirectResponse;
@@ -16,7 +17,7 @@ use Illuminate\View\View;
 /** Perfil do aluno (o que já viu, quanto tempo tem) e a meta do dia gerada pelo motor. */
 class MetaController extends Controller
 {
-    public function meta(Request $request, MotorMeta $motor, TempoEstudosSync $tempo): View|RedirectResponse
+    public function meta(Request $request, MotorMeta $motor, TempoEstudosSync $tempo, JornadaMeta $jornada): View|RedirectResponse
     {
         $perfil = Perfil::where('user_id', $request->user()->id)->first();
         if (!$perfil) {
@@ -38,8 +39,14 @@ class MetaController extends Controller
             return ['a' => $a, 'feitas' => $feitas];
         });
 
+        // Calendário: um dia passado da semana pode ser aberto para ver o que foi feito (só leitura).
+        $j = $jornada->calcular($perfil, today());
+        $diaSel = collect($j['semana'])->first(fn ($x) => $x['data']->toDateString() === $request->query('dia') && !$x['hoje'] && $x['data']->isPast());
+
         return view('concursos.meta.index', [
             'meta' => $meta,
+            'jornada' => $j,
+            'diaSel' => $diaSel,
             'atividades' => $atividades,
             'perfil' => $perfil->load('cargo.edital'),
             'tipos' => MetaAtividade::TIPOS,
