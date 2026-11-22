@@ -20,7 +20,7 @@ class GerarPacotesCommand extends Command
 {
     protected $signature = 'concursos:gerar-pacotes
         {--disciplina= : só esta disciplina (nome exato do TEC)}
-        {--assunto= : só este assunto e seus sub-assuntos (nome exato)}
+        {--assunto=* : só estes assuntos e seus sub-assuntos (nome exato; pode repetir)}
         {--max=40 : questões por lote, no máximo}
         {--min=10 : sub-assunto com até isso de questões é agrupado com os irmãos}
         {--minimo-lote=5 : lote menor que isso fica esperando mais questões}
@@ -37,8 +37,13 @@ class GerarPacotesCommand extends Command
         }
 
         $raizes = null;
-        if ($nome = $this->option('assunto')) {
-            $raizes = Assunto::where('nome', $nome)->pluck('id')->all();
+        if ($nomes = $this->option('assunto')) {
+            $achados = Assunto::whereIn('nome', $nomes)->pluck('nome', 'id');
+            if ($faltando = array_diff($nomes, $achados->all())) {
+                $this->error('Não encontrei no banco: ' . implode('; ', $faltando));
+                return self::FAILURE;
+            }
+            $raizes = $achados->keys()->all();
         } elseif ($nome = $this->option('disciplina')) {
             $d = Disciplina::where('nome', $nome)->first();
             $raizes = $d ? Assunto::where('disciplina_id', $d->id)->whereNull('parent_id')->pluck('id')->all() : [];

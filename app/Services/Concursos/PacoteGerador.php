@@ -56,8 +56,18 @@ class PacoteGerador
         $raizes ??= Assunto::whereNull('parent_id')->whereNull('unido_em_id')->orderBy('disciplina_id')->orderBy('id')->pluck('id')->all();
 
         $plano = [];
+        $vistas = [];
         foreach ($raizes as $id) {
-            array_push($plano, ...$this->unidades($id));
+            // Raízes que se sobrepõem (uma dentro da outra) não podem mandar a mesma questão duas vezes.
+            foreach ($this->unidades($id) as $u) {
+                $u['questoes'] = array_values(array_filter($u['questoes'], fn ($q) => !isset($vistas[$q])));
+                foreach ($u['questoes'] as $q) {
+                    $vistas[$q] = true;
+                }
+                if ($u['questoes']) {
+                    $plano[] = $u;
+                }
+            }
         }
 
         return array_values(array_filter($plano, fn ($u) => count($u['questoes']) >= $this->minimoLote));
