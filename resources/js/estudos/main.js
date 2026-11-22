@@ -1330,6 +1330,8 @@ async function gurujaStudy(disciplina, gurujaTipo, grau = null, gurujaKey = null
 
 // Favorito (bookmarklet) para o portal da Guruja: com a atividade aberta na aba "Comandos", lê o texto do
 // quadro do comando e o código ("Código: XXX.123.456") da janela e abre /estudos#gj-cmd=... nesta conta.
+// O código é lido por textContent: o portal esconde esse rótulo em algumas larguras de tela, e innerText
+// ignora elementos ocultos.
 function gurujaBookmarklet() {
     const app = location.origin;
     const code = `(()=>{const f=[...document.querySelectorAll('iframe')].find(i=>i.title==='command');`
@@ -1339,7 +1341,7 @@ function gurujaBookmarklet() {
         + `let t='';try{t=f.contentDocument.body.innerText.trim()}catch(e){}`
         + `if(!t&&f.srcdoc){const d=new DOMParser().parseFromString(f.srcdoc,'text/html');t=(d.body.innerText||d.body.textContent||'').trim()}`
         + `if(!t){alert('Comando vazio ou ainda carregando.');return}`
-        + `let n=f,m=null;while(n&&!(m=(n.innerText||'').match(/C\\u00f3digo:\\s*([A-Z]{2,10}\\.\\d+\\.\\d+)/)))n=n.parentElement;`
+        + `let n=f,m=null;while(n&&!(m=(n.textContent||'').match(/C\\u00f3digo:\\s*([A-Z]{2,10}\\.\\d+\\.\\d+)/)))n=n.parentElement;`
         + `if(!m){alert('N\\u00e3o achei o c\\u00f3digo da atividade.');return}`
         + `window.open('${app}/estudos#gj-cmd='+encodeURIComponent(JSON.stringify({c:m[1],t:t.slice(0,9000)})),'estudos_gj')})()`;
     return `javascript:${encodeURIComponent(code)}`;
