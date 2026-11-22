@@ -116,6 +116,59 @@ class EstudosGurujaTest extends TestCase
         $this->assertSame('Faça o teste das aulas 00 a 02', $json['texto']);
     }
 
+    public function test_comando_pode_ser_substituido_editado_resumido_de_novo_e_apagado(): void
+    {
+        config(['services.gemini.key' => 'chave-teste']);
+        Http::fakeSequence('generativelanguage.googleapis.com/*')
+            ->push(['candidates' => [['content' => ['parts' => [['text' => '• resumo 1']]]]]])
+            ->push(['candidates' => [['content' => ['parts' => [['text' => 'Aqui está o resumo:\n• resumo 2']]]]]])
+            ->push(['candidates' => [['content' => ['parts' => [['text' => '• resumo 3']]]]]]);
+        $user = User::factory()->create();
+        $this->actingAs($user);
+        $codigo = 'TINFO.1154.34221';
+        $salvo = fn () => DB::table('study_guruja_comandos')->where('codigo', $codigo)->first();
+
+        $this->postJson('/estudos/guruja/comando', ['codigo' => $codigo, 'texto' => 'texto errado'])->assertOk();
+        // Texto novo substitui o antigo e o resumo é refeito (a introdução antes do "•" some).
+        $this->postJson('/estudos/guruja/comando', ['codigo' => $codigo, 'texto' => 'texto certo'])
+            ->assertOk()->assertJson(['texto' => 'texto certo', 'resumo' => '• resumo 2']);
+        $this->assertSame('texto certo', $salvo()->texto);
+
+        // Resumo escrito à mão: grava como está, sem chamar a IA.
+        $this->postJson('/estudos/guruja/comando', ['codigo' => $codigo, 'texto' => 'texto certo', 'resumo' => '• meu resumo'])
+            ->assertOk()->assertJson(['resumo' => '• meu resumo']);
+        Http::assertSentCount(2);
+
+        // ↻ Novo resumo: chama a IA mesmo com o texto igual.
+        $this->postJson('/estudos/guruja/comando', ['codigo' => $codigo, 'texto' => 'texto certo', 'resumir' => true])
+            ->assertOk()->assertJson(['resumo' => '• resumo 3']);
+        Http::assertSentCount(3);
+
+        // Apagar só mexe no do próprio usuário.
+        $outro = User::factory()->create();
+        $this->actingAs($outro)->deleteJson('/estudos/guruja/comando', ['codigo' => $codigo])->assertOk();
+        $this->assertNotNull($salvo());
+        $this->actingAs($user)->deleteJson('/estudos/guruja/comando', ['codigo' => 'x; drop'])->assertUnprocessable();
+        $this->deleteJson('/estudos/guruja/comando', ['codigo' => $codigo])->assertOk();
+        $this->assertNull($salvo());
+        $this->assertSame([], (array) $this->getJson('/estudos/guruja')->json('comandos'));
+    }
+
+    public function test_texto_novo_fica_salvo_mesmo_se_o_gemini_falhar(): void
+    {
+        config(['services.gemini.key' => 'chave-teste']);
+        Http::fake(['generativelanguage.googleapis.com/*' => Http::response('erro', 503)]);
+        $this->actingAs(User::factory()->create());
+        DB::table('study_guruja_comandos')->insert(['user_id' => auth()->id(), 'codigo' => 'AUD.3709.112600',
+            'texto' => 'antigo', 'resumo' => '• antigo', 'created_at' => now(), 'updated_at' => now()]);
+
+        $this->postJson('/estudos/guruja/comando', ['codigo' => 'AUD.3709.112600', 'texto' => 'novo'])
+            ->assertOk()->assertJson(['texto' => 'novo', 'resumo' => null]);
+        $row = DB::table('study_guruja_comandos')->where('codigo', 'AUD.3709.112600')->first();
+        $this->assertSame('novo', $row->texto);
+        $this->assertNull($row->resumo);
+    }
+
     public function test_estimativas_e_instrucao_dos_reforcos_persistem_entre_envios(): void
     {
         $user = User::factory()->create();

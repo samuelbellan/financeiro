@@ -147,6 +147,7 @@ Route::middleware(['auth', 'modulos'])->group(function () {
     Route::post('/estudos/guruja/ordem', [EstudosController::class, 'gurujaOrdem'])->name('estudos.guruja.ordem');
     Route::post('/estudos/guruja/comando', [EstudosController::class, 'gurujaComando'])->name('estudos.guruja.comando');
     Route::get('/estudos/token', [EstudosController::class, 'token'])->name('estudos.token');
+    Route::delete('/estudos/guruja/comando', [EstudosController::class, 'gurujaComandoApagar'])->name('estudos.guruja.comando.apagar');
     Route::get('/estudos/salas', [StudyRoomsController::class, 'index'])->name('estudos.salas');
     Route::post('/estudos/salas', [StudyRoomsController::class, 'store'])->name('estudos.salas.store');
     Route::post('/estudos/salas/entrar', [StudyRoomsController::class, 'join'])->name('estudos.salas.join');
