@@ -1130,6 +1130,12 @@ function gurujaItem(a, done) {
         } else {
             body = '<p class="gj-cmd-empty">Sem comando salvo. No portal, abra esta atividade na aba <b>Comandos</b> e clique no favorito <b>Enviar comando</b>.</p>';
         }
+        if (!isRef && code) {
+            body += `<div class="gj-cmd-tools">
+                <button type="button" data-action="guruja-cmd-edit" data-id="${esc(code)}">✎ ${comando ? 'Editar' : 'Colar comando'}</button>
+                ${comando ? `<button type="button" data-action="guruja-cmd-delete" data-id="${esc(code)}">🗑 Apagar</button>` : ''}
+            </div>`;
+        }
         if (!done) {
             const grauAttr = isRef ? ` data-grau="${esc(selectedGrau)}"` : '';
             body += `<div class="gj-actions"><button type="button" class="gj-study" data-action="guruja-study" data-id="${esc(a.disciplina ?? '')}" data-tipo="${esc(a.tipo ?? '')}" data-key="${esc(code)}"${grauAttr}>▶ Estudar ${esc(a.disciplina ?? '')}</button>
@@ -1364,18 +1370,13 @@ function openGurujaHelp() {
     });
 }
 
-/** Chegou de um clique no favorito (#gj-cmd=...): salva o comando no servidor e limpa o endereço. */
-/** Salva o comando de uma atividade; o servidor devolve o texto e o resumo do Gemini (ou null). */
-async function postGurujaCommand(codigo, texto) {
+/** POST/DELETE em /estudos/guruja/comando, renovando o token CSRF vencido (casca da PWA em cache). */
+async function sendGurujaCommand(method, body) {
     const send = (token) => fetch(config.gurujaComandoUrl, {
-        method: 'POST',
+        method,
         credentials: 'same-origin',
         headers: { Accept: 'application/json', 'Content-Type': 'application/json', 'X-CSRF-TOKEN': token },
-        body: JSON.stringify({
-            codigo,
-            texto,
-            titulo: guruja.data?.meta?.atividades?.find((a) => a.codigo_atividade === codigo)?.titulo ?? null,
-        }),
+        body: JSON.stringify(body),
     });
     let response = await send(config.csrf);
     if (response.status === 419) {
@@ -1383,9 +1384,88 @@ async function postGurujaCommand(codigo, texto) {
         if (fresh.ok) response = await send((await fresh.json()).token);
     }
     if (!response.ok) throw new Error(`Erro ${response.status}`);
-    const saved = await response.json();
+    return response.json();
+}
+
+/**
+ * Salva o comando de uma atividade; o servidor devolve o texto e o resumo do Gemini (ou null).
+ * extra.resumo (string) grava um resumo escrito à mão sem chamar a IA; extra.resumir força um resumo novo.
+ */
+async function postGurujaCommand(codigo, texto, extra = {}) {
+    const saved = await sendGurujaCommand('POST', {
+        codigo,
+        texto,
+        titulo: guruja.data?.meta?.atividades?.find((a) => a.codigo_atividade === codigo)?.titulo ?? null,
+        ...extra,
+    });
     if (guruja.data) guruja.data.comandos = { ...(guruja.data.comandos ?? {}), [codigo]: { texto: saved.texto, resumo: saved.resumo } };
     return saved;
+}
+
+async function deleteGurujaCommand(codigo) {
+    await sendGurujaCommand('DELETE', { codigo });
+    if (guruja.data?.comandos) {
+        const { [codigo]: _removido, ...resto } = guruja.data.comandos;
+        guruja.data.comandos = resto;
+    }
+}
+
+/** Editar / colar / apagar o comando (e o resumo) de uma atividade, direto no card. */
+function openGurujaCommandEditor(codigo) {
+    const raw = guruja.data?.comandos?.[codigo];
+    const atual = typeof raw === 'string' ? { texto: raw, resumo: null } : (raw ?? { texto: '', resumo: null });
+    const titulo = guruja.data?.meta?.atividades?.find((a) => gjKey(a) === codigo)?.titulo ?? codigo;
+    openDialog(`<h3>${atual.texto ? 'Editar comando' : 'Colar comando'}</h3>
+        <p class="hint">${esc(titulo)} · ${esc(codigo)}</p>
+        <label>Comando
+            <textarea name="texto" rows="9" maxlength="10000" required>${esc(atual.texto ?? '')}</textarea>
+        </label>
+        <label>Resumo
+            <textarea name="resumo" rows="5" maxlength="2000" placeholder="Vazio: o Gemini resume ao salvar">${esc(atual.resumo ?? '')}</textarea>
+        </label>
+        <p class="hint">Se você mudar só o comando, o resumo é refeito pelo Gemini.</p>
+        <p class="form-error"></p>
+        <div class="actions">
+            <button type="submit" value="save" class="btn">Salvar</button>
+            <button type="submit" value="cancel" class="btn ghost" formnovalidate>Cancelar</button>
+            ${atual.texto ? '<button type="submit" value="resumir" class="btn ghost">↻ Novo resumo</button>' : ''}
+            ${atual.texto ? '<button type="submit" value="delete" class="btn danger" formnovalidate>Apagar</button>' : ''}
+        </div>`, async (action, form) => {
+        const submit = dialog.querySelector(`button[value="${action}"]`);
+        const busy = (on) => dialog.querySelectorAll('button').forEach((b) => { b.disabled = on; });
+        try {
+            if (action === 'delete') {
+                if (!confirm('Apagar o comando salvo desta atividade?')) return null;
+                busy(true);
+                await deleteGurujaCommand(codigo);
+                return null;
+            }
+            const texto = String(form.get('texto') ?? '').trim();
+            const resumo = String(form.get('resumo') ?? '').trim();
+            if (!texto) return 'Escreva o comando.';
+            busy(true);
+            if (submit) submit.textContent = 'Salvando…';
+            if (action === 'resumir' || !resumo) {
+                // Pedido explícito ou resumo deixado vazio: o Gemini resume de novo.
+                guruja.resumindo = codigo;
+                await postGurujaCommand(codigo, texto, { resumir: true });
+            } else if (resumo !== (atual.resumo ?? '').trim()) {
+                // Resumo escrito à mão: grava como está, sem IA.
+                await postGurujaCommand(codigo, texto, { resumo });
+            } else {
+                // Resumo intocado: se o comando mudou, o servidor refaz o resumo.
+                await postGurujaCommand(codigo, texto);
+            }
+            guruja.resumindo = null;
+            guruja.open.add(codigo);
+            return null;
+        } catch (error) {
+            guruja.resumindo = null;
+            busy(false);
+            if (submit) submit.textContent = action === 'resumir' ? '↻ Novo resumo' : 'Salvar';
+            return `Não consegui salvar (${error.message}).`;
+        }
+    });
 }
 
 /** Comando salvo antes do resumo existir: ao abrir a atividade, pede o resumo (uma vez por sessão). */
@@ -1408,14 +1488,21 @@ async function receiveGurujaCommand() {
     try { payload = JSON.parse(decodeURIComponent(location.hash.slice(8))); } catch { payload = null; }
     history.replaceState(null, '', location.pathname + location.search);
     if (!payload?.c || !payload?.t) return;
+    // Mostra já o texto novo (o Gemini pode levar dezenas de segundos): antes ficava o comando antigo na tela.
+    if (guruja.data) guruja.data.comandos = { ...(guruja.data.comandos ?? {}), [payload.c]: { texto: payload.t.trim(), resumo: null } };
+    guruja.open.add(payload.c);
+    guruja.resumindo = payload.c;
+    state.tab = 'timer';
+    render();
     try {
         await postGurujaCommand(payload.c, payload.t);
-        guruja.open.add(payload.c);
-        state.tab = 'timer';
+        guruja.resumindo = null;
         await refreshGuruja(true);
         render();
         root.querySelector(`[data-action="guruja-item"][data-id="${CSS.escape(payload.c)}"]`)?.scrollIntoView({ block: 'center' });
     } catch (error) {
+        guruja.resumindo = null;
+        render();
         alert(`Não consegui salvar o comando (${error.message}). Entre no app e tente de novo.`);
     }
 }
@@ -3239,6 +3326,12 @@ root.addEventListener('click', async (event) => {
             if (opening) summarizeGurujaCommand(id);
         },
         'guruja-help': () => openGurujaHelp(),
+        'guruja-cmd-edit': () => openGurujaCommandEditor(id),
+        'guruja-cmd-delete': async () => {
+            if (!confirm('Apagar o comando salvo desta atividade?')) return;
+            try { await deleteGurujaCommand(id); } catch (error) { alert(`Não consegui apagar (${error.message}).`); }
+            render();
+        },
         'guruja-study': () => gurujaStudy(id, button.dataset.tipo, button.dataset.grau, button.dataset.key || null),
         'guruja-reforco-grau': () => {
             const key = button.dataset.key;

@@ -21,6 +21,9 @@ use Illuminate\Support\Facades\Log;
  */
 class EstudosController extends Controller
 {
+    /** Código de atividade da Guruja (ex.: DTRIB.3886.115658). */
+    protected const CODIGO_RULE = ['required', 'string', 'max:40', 'regex:/^[A-Z]{2,10}\.\d{1,6}\.\d{1,9}$/'];
+
     public function index()
     {
         if ($redirect = $this->cloudRedirect()) {
@@ -74,20 +77,52 @@ class EstudosController extends Controller
     public function gurujaComando(Request $request, GurujaComandoResumoService $resumos): JsonResponse
     {
         $data = $request->validate([
-            'codigo' => ['required', 'string', 'max:40', 'regex:/^[A-Z]{2,10}\.\d{1,6}\.\d{1,9}$/'],
+            'codigo' => self::CODIGO_RULE,
             'texto' => 'required|string|max:10000',
             'titulo' => 'nullable|string|max:300',
+            // Presente = resumo escrito à mão na edição (vazio apaga o resumo); a IA não é chamada.
+            'resumo' => 'sometimes|nullable|string|max:2000',
+            // Força um resumo novo do Gemini mesmo com o texto igual.
+            'resumir' => 'sometimes|boolean',
         ]);
         $texto = trim($data['texto']);
-        $atual = DB::table('study_guruja_comandos')->where('user_id', Auth::id())->where('codigo', $data['codigo'])->first();
+        $chave = ['user_id' => Auth::id(), 'codigo' => $data['codigo']];
+        $atual = DB::table('study_guruja_comandos')->where($chave)->first();
+        $salvar = fn (?string $resumo) => DB::table('study_guruja_comandos')->updateOrInsert($chave,
+            ['texto' => $texto, 'resumo' => $resumo, 'updated_at' => now(), 'created_at' => $atual->created_at ?? now()]);
+
+        if ($request->has('resumo')) {
+            $resumo = trim((string) $data['resumo']) ?: null;
+            $salvar($resumo);
+
+            return response()->json(['ok' => true, 'texto' => $texto, 'resumo' => $resumo]);
+        }
         // Mesmo texto já resumido: não chama a IA de novo.
-        $resumo = ($atual && $atual->texto === $texto && $atual->resumo) ? $atual->resumo : $resumos->resumir($texto, $data['titulo'] ?? null);
-        DB::table('study_guruja_comandos')->updateOrInsert(
-            ['user_id' => Auth::id(), 'codigo' => $data['codigo']],
-            ['texto' => $texto, 'resumo' => $resumo, 'updated_at' => now(), 'created_at' => $atual->created_at ?? now()],
-        );
+        if ($atual && $atual->texto === $texto && $atual->resumo && !($data['resumir'] ?? false)) {
+            $salvar($atual->resumo);
+
+            return response()->json(['ok' => true, 'texto' => $texto, 'resumo' => $atual->resumo]);
+        }
+        // Grava o texto novo antes de chamar a IA (que pode levar dezenas de segundos ou falhar):
+        // o comando trocado nunca se perde, mesmo que a página feche no meio.
+        $salvar(null);
+        $resumo = $resumos->resumir($texto, $data['titulo'] ?? null);
+        if ($resumo) {
+            $salvar($resumo);
+        }
 
         return response()->json(['ok' => true, 'texto' => $texto, 'resumo' => $resumo]);
+    }
+
+    /**
+     * Apaga o comando salvo de uma atividade (o card volta a pedir o favorito "Enviar comando").
+     */
+    public function gurujaComandoApagar(Request $request): JsonResponse
+    {
+        $data = $request->validate(['codigo' => self::CODIGO_RULE]);
+        DB::table('study_guruja_comandos')->where('user_id', Auth::id())->where('codigo', $data['codigo'])->delete();
+
+        return response()->json(['ok' => true]);
     }
 
     /**
