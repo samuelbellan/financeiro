@@ -2,7 +2,7 @@
 
 Uso:  python validar.py arquivo1.json [arquivo2.json ...]
       python validar.py exemplos/*.json
-O schema é escolhido pelo nome do arquivo (edital-, -contexto-, -ledger-, -resolucoes-, -mapa-assunto).
+O schema é escolhido pelo nome do arquivo (edital-, -contexto-, -ledger-, -resolucoes-, -mapa-assunto, -ineditas).
 """
 import json, sys, pathlib
 from jsonschema import Draft202012Validator
@@ -12,7 +12,7 @@ BASE = pathlib.Path(__file__).resolve().parent
 SCHEMAS = {p.name: json.loads(p.read_text(encoding="utf-8")) for p in BASE.glob("*.schema.json")}
 REG = Registry().with_resources([(s["$id"], Resource.from_contents(s)) for s in SCHEMAS.values()])
 PARES = [("edital", "edital"), ("contexto", "contexto"), ("ledger", "ledger"),
-         ("resolucoes", "resolucoes"), ("mapa-assunto", "mapa-assunto")]
+         ("resolucoes", "resolucoes"), ("mapa-assunto", "mapa-assunto"), ("ineditas", "ineditas")]
 
 def schema_para(nome: str):
     for chave, alvo in PARES:

@@ -23,7 +23,6 @@
 @section('content')
     <div class="top">
         <h1>Resolver questões</h1>
-        <a class="btn" href="{{ route('concursos.meta') }}">Meta do dia</a>
         @if (Route::has('concursos.page'))
             <a class="btn" href="{{ route('concursos.page', ['page' => 'inicio.html']) }}">App antigo</a>
         @endif

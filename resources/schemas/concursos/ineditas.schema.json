@@ -1,0 +1,101 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://financeiro.local/schemas/concursos/ineditas.schema.json",
+  "title": "Questões inéditas de uma norma (Gemini → sistema)",
+  "description": "Para tópicos do edital sem questões no TEC (normas próprias do órgão). O Gemini lê o TEXTO DA NORMA anexado e escreve questões no estilo da banca, cada uma com gabarito e resolução. Aqui o gabarito vem do Gemini (não há PDF): o sistema confere a coerência e marca a questão como inédita.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_versao", "topico", "norma", "questoes"],
+  "properties": {
+    "schema_versao": { "$ref": "comum.schema.json#/$defs/schema_versao" },
+    "topico": {
+      "description": "O tópico do edital, como no pedido: área e numeração.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["area", "ordem"],
+      "properties": {
+        "area": { "type": "string", "minLength": 2, "maxLength": 150 },
+        "ordem": { "type": "string", "minLength": 1, "maxLength": 20 }
+      }
+    },
+    "norma": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["codigo", "titulo"],
+      "properties": {
+        "codigo": { "$ref": "comum.schema.json#/$defs/slug" },
+        "titulo": { "type": "string", "minLength": 3, "maxLength": 250 }
+      }
+    },
+    "questoes": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 40,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["enunciado", "alternativas", "gabarito", "dificuldade", "ponto_cobrado", "resolucao"],
+        "properties": {
+          "enunciado": { "type": "string", "minLength": 20, "maxLength": 4000 },
+          "alternativas": {
+            "description": "Exatamente 5, de A a E, nessa ordem.",
+            "type": "array",
+            "minItems": 5,
+            "maxItems": 5,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["letra", "texto"],
+              "properties": {
+                "letra": { "enum": ["A", "B", "C", "D", "E"] },
+                "texto": { "type": "string", "minLength": 1, "maxLength": 1500 }
+              }
+            }
+          },
+          "gabarito": { "enum": ["A", "B", "C", "D", "E"] },
+          "dificuldade": { "$ref": "comum.schema.json#/$defs/dificuldade" },
+          "tipologia": { "$ref": "comum.schema.json#/$defs/tipologia" },
+          "ponto_cobrado": { "type": "string", "minLength": 10, "maxLength": 300 },
+          "dispositivos": {
+            "type": "array",
+            "items": { "$ref": "comum.schema.json#/$defs/dispositivo_id" },
+            "uniqueItems": true
+          },
+          "distrator_principal": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["letra", "mecanismo"],
+            "properties": {
+              "letra": { "enum": ["A", "B", "C", "D", "E"] },
+              "mecanismo": { "type": "string", "maxLength": 300 }
+            }
+          },
+          "resolucao": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["resumo", "alternativas"],
+            "properties": {
+              "resumo": { "type": "string", "minLength": 10, "maxLength": 800 },
+              "fundamentacao": { "$ref": "comum.schema.json#/$defs/texto_longo" },
+              "alternativas": {
+                "type": "array",
+                "minItems": 5,
+                "maxItems": 5,
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": ["letra", "correta", "explicacao"],
+                  "properties": {
+                    "letra": { "enum": ["A", "B", "C", "D", "E"] },
+                    "correta": { "type": "boolean" },
+                    "explicacao": { "type": "string", "minLength": 5, "maxLength": 1500 }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

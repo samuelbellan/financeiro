@@ -109,6 +109,9 @@
             @if ($cls)<span title="dificuldade estimada">{{ ['B' => 'fácil', 'M' => 'média', 'A' => 'difícil'][$cls->dificuldade] ?? '' }}</span>@endif
             @if ($q->urlTec())<a href="{{ $q->urlTec() }}" target="_blank" rel="noopener">ver no TEC ↗</a>@endif
         </div>
+        @if ($q->fonte === 'inedita')
+            <div class="alerta">Questão inédita, escrita por IA no estilo da banca a partir do texto de {{ $q->prova ?: 'uma norma' }}. O gabarito não é oficial: na dúvida, confira na norma.</div>
+        @endif
 
         @if ($cls?->temFlag('ilegivel'))
             <div class="alerta">Esta questão tem figura ou tabela que não veio no PDF. <a href="{{ $q->urlTec() }}" target="_blank" rel="noopener">Abra no TEC</a> para ver antes de responder.</div>
@@ -191,10 +194,13 @@
                 @if ($cls?->temFlag('ilegivel'))
                     <div class="alerta">A resolução foi escrita sem a figura: confira no TEC.</div>
                 @endif
-                <p class="small muted" style="margin:12px 0 0">Resolução gerada por IA a partir do gabarito oficial. Viu algum erro? <a href="{{ $q->urlTec() }}" target="_blank" rel="noopener">Compare com os comentários do TEC</a>.</p>
+                @if ($q->urlTec())
+                    <p class="small muted" style="margin:12px 0 0">Resolução gerada por IA a partir do gabarito oficial. Viu algum erro? <a href="{{ $q->urlTec() }}" target="_blank" rel="noopener">Compare com os comentários do TEC</a>.</p>
+                @endif
             @else
                 <h2>Resolução</h2>
-                <p class="muted" style="margin:0">Esta questão ainda não tem resolução comentada. <a href="{{ $q->urlTec() }}" target="_blank" rel="noopener">Veja os comentários no TEC ↗</a></p>
+                <p class="muted" style="margin:0">Esta questão ainda não tem resolução comentada.
+                    @if ($q->urlTec())<a href="{{ $q->urlTec() }}" target="_blank" rel="noopener">Veja os comentários no TEC ↗</a>@endif</p>
             @endif
         </div>
     @endif

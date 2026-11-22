@@ -28,7 +28,7 @@
 @section('content')
     <div class="top">
         <h1>Perfil de estudo</h1>
-        @if ($perfil)<a class="btn" href="{{ route('concursos.meta') }}">← Meta do dia</a>@endif
+
     </div>
 
     @if (!$cargo)

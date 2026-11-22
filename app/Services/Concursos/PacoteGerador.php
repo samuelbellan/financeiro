@@ -153,6 +153,7 @@ class PacoteGerador
             ->join('questoes as q', 'q.id', '=', 'qa.questao_id')
             ->leftJoin('lote_questao as lq', 'lq.questao_id', '=', 'q.id')
             ->where('qa.principal', true)->where('q.anulada', false)->whereNull('lq.questao_id')
+            ->where('q.fonte', 'tec') // inéditas já chegam classificadas e resolvidas
             ->orderBy('q.id')
             ->get(['qa.assunto_id', 'q.id'])
             ->each(function ($r) {

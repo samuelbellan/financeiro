@@ -40,11 +40,38 @@
         .bar { height: 6px; background: var(--line); border-radius: 99px; overflow: hidden; }
         .bar > span { display: block; height: 100%; background: var(--ok); }
         .visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+        .menu { display: flex; gap: 4px; overflow-x: auto; margin: -4px 0 16px; padding-bottom: 4px; scrollbar-width: none; }
+        .menu a { flex: none; padding: 7px 12px; border-radius: 99px; text-decoration: none; color: var(--muted); font-size: 14px; font-weight: 600; }
+        .menu a:hover { color: var(--ink); background: var(--card); }
+        .menu a[aria-current=page] { color: var(--accent-ink); background: var(--accent); }
         @yield('css')
     </style>
 </head>
 <body>
 <div class="wrap">
+    @unless (View::hasSection('semmenu'))
+        @php
+            // rota => [rótulo, prefixo das rotas que acendem o item]
+            $itensMenu = [
+                'concursos.meta' => ['Meta do dia', 'concursos.meta'],
+                'concursos.questoes.index' => ['Questões', 'concursos.questoes.'],
+                'concursos.painel' => ['Desempenho', 'concursos.painel'],
+                'concursos.simulados' => ['Simulados', 'concursos.simulado'],
+                'concursos.perfil' => ['Perfil', 'concursos.perfil'],
+            ];
+            if (auth()->user()?->is_admin || auth()->user()?->is_owner) {
+                $itensMenu['concursos.curadoria'] = ['Curadoria', 'concursos.curadoria'];
+            }
+            $rotaAtual = request()->route()?->getName() ?? '';
+        @endphp
+        <nav class="menu" aria-label="Módulo de concursos">
+            @foreach ($itensMenu as $rota => [$nome, $prefixo])
+                @if (Route::has($rota))
+                    <a href="{{ route($rota) }}" @if (str_starts_with($rotaAtual, $prefixo)) aria-current="page" @endif>{{ $nome }}</a>
+                @endif
+            @endforeach
+        </nav>
+    @endunless
     @if (session('status'))
         <div class="flash" role="status">{{ session('status') }}</div>
     @endif

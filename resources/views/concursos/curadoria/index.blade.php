@@ -15,7 +15,6 @@
 @section('content')
     <div class="top">
         <h1>Curadoria dos subtópicos</h1>
-        <a class="btn" href="{{ route('concursos.meta') }}">Meta do dia</a>
     </div>
 
     <div class="card">

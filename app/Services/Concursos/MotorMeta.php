@@ -81,7 +81,8 @@ class MotorMeta
         $saida = collect();
         foreach ($areas as $area) {
             $topicos = $area->disciplinas->flatMap->topicos;
-            $ids = $topicos->mapWithKeys(fn ($t) => [$t->id => $t->sem_questoes_tec ? [] : $t->questoesQuery()->where('anulada', false)->orderBy('id')->pluck('id')->all()]);
+            // Tópico "sem questões no TEC" (norma própria) ainda pode ter questões inéditas ligadas.
+            $ids = $topicos->mapWithKeys(fn ($t) => [$t->id => $t->questoesQuery()->where('anulada', false)->orderBy('id')->pluck('id')->all()]);
             $contagens = $ids->map(fn ($l, $tid) => max(count($l), $tec[$tid] ?? 0));
             // Suavização: tópico sem questão no banco (caderno ainda não baixado) não some do mapa.
             $k = max(1.0, $contagens->avg() * 0.2);

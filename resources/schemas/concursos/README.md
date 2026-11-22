@@ -108,6 +108,19 @@ O PDF do caderno imprime só a **folha** do assunto ("Vacância (arts. 33 a 35�
 
    O arquivo inteiro é recusado se a questão não for do lote, se o gabarito divergir do PDF, se a alternativa correta da resolução estiver errada ou se o subtópico não existir. Subtópicos `novo` ficam pendentes para a curadoria. Arquivos vazios são pulados, e reimportar sobrescreve.
 
+## Questões inéditas (normas sem questões no TEC)
+
+Estatuto, Regimento Geral, Código de Ética e Manual de Atos da UFMS quase não têm questões no TEC. Para eles, o Gemini lê o texto da norma e escreve questões no estilo da FAPEC, cada uma com gabarito e resolução. O prompt é `prompts/gemini-ineditas.md`.
+
+1. Abra uma conversa nova por norma. Anexe o texto oficial da norma, `ineditas.schema.json` e `comum.schema.json`.
+2. Cada resposta traz 10 questões. Para mais 10, responda "mais 10". Salve cada resposta num `.txt` e importe:
+
+   ```powershell
+   php artisan concursos:importar-ineditas "C:\...\Inéditas"
+   ```
+
+As questões entram como fonte `inedita`, ligadas ao tópico do edital, e passam a aparecer na meta e nos simulados. Como o gabarito não é oficial, o importador confere a coerência (uma única correta, igual ao gabarito) e a tela avisa que a questão é inédita.
+
 ## Validar um arquivo antes de importar
 
 O importador já valida sozinho. Para validar à mão com Python:
