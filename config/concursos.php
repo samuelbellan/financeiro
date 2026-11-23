@@ -42,6 +42,9 @@ return [
         'raw' => env('CONCURSOS_LEIS_RAW', 'https://raw.githubusercontent.com/ctresb/leis/main/'),
         'web' => 'https://github.com/ctresb/leis/blob/main/',
         'dir' => storage_path('concursos/leis'),
+        // Cópia completa do repositório (git clone --depth 1). Com ela, o app lê tudo do disco,
+        // abre qualquer norma federal pelo número e navega pelo acervo inteiro.
+        'local' => env('CONCURSOS_LEIS_LOCAL'),
         'catalogo' => [
             'cf' => ['sigla' => 'CF', 'nome' => 'Constituição Federal de 1988', 'path' => 'constituicao.md'],
             // O ADCT está no mesmo arquivo da CF; os artigos dele ficam com âncora "adct-art-N".

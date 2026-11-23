@@ -188,6 +188,8 @@ Route::middleware(['auth', 'modulos'])->group(function () {
         Route::get('/material', [\App\Http\Controllers\Concursos\MaterialController::class, 'index'])->name('material.index');
         Route::post('/material', [\App\Http\Controllers\Concursos\MaterialController::class, 'store'])->name('material.store');
         Route::get('/material/{material}', [\App\Http\Controllers\Concursos\MaterialController::class, 'show'])->whereNumber('material')->name('material.show');
+        Route::get('/material/{material}/refazer', [\App\Http\Controllers\Concursos\RefazerController::class, 'index'])->whereNumber('material')->name('material.refazer');
+        Route::post('/material/questoes/{questao}/responder', [\App\Http\Controllers\Concursos\RefazerController::class, 'responder'])->whereNumber('questao')->name('material.questoes.responder');
         Route::post('/material/{material}/secoes', [\App\Http\Controllers\Concursos\MaterialController::class, 'storeSecao'])->whereNumber('material')->name('material.secoes.store');
         Route::post('/material/secoes/{secao}/pontos', [\App\Http\Controllers\Concursos\MaterialController::class, 'storePonto'])->whereNumber('secao')->name('material.pontos.store');
         Route::put('/material/pontos/{ponto}', [\App\Http\Controllers\Concursos\MaterialController::class, 'updatePonto'])->whereNumber('ponto')->name('material.pontos.update');
@@ -195,6 +197,9 @@ Route::middleware(['auth', 'modulos'])->group(function () {
         Route::post('/material/pontos/{ponto}/status', [\App\Http\Controllers\Concursos\MaterialController::class, 'status'])->whereNumber('ponto')->name('material.pontos.status');
         Route::delete('/material/pontos/{ponto}', [\App\Http\Controllers\Concursos\MaterialController::class, 'destroyPonto'])->whereNumber('ponto')->name('material.pontos.destroy');
         Route::get('/legislacao', [\App\Http\Controllers\Concursos\LeisController::class, 'index'])->name('leis.index');
+        Route::get('/legislacao/buscar', [\App\Http\Controllers\Concursos\LeisController::class, 'buscar'])->name('leis.buscar');
+        Route::get('/legislacao/acervo', [\App\Http\Controllers\Concursos\LeisController::class, 'acervo'])->name('leis.acervo');
+        Route::get('/jurisprudencia/{tipo}/{numero}', [\App\Http\Controllers\Concursos\LeisController::class, 'juris'])->where(['tipo' => '[a-z]+', 'numero' => '\d{1,6}'])->name('juris.show');
         Route::get('/legislacao/{lei}', [\App\Http\Controllers\Concursos\LeisController::class, 'show'])->where('lei', '[a-z][a-z0-9]*')->name('leis.show');
         Route::get('/legislacao/{lei}/artigos/{artigo}', [\App\Http\Controllers\Concursos\LeisController::class, 'artigo'])->where(['lei' => '[a-z][a-z0-9]*', 'artigo' => '\d+(-[A-Za-z])?'])->name('leis.artigo');
     });

@@ -1,6 +1,6 @@
 @extends('concursos.layout')
 
-@section('title', $lei['sigla'])
+@section('title', $lei['sigla'] ?? $lei['nome'])
 
 @section('content')
 <div class="card">

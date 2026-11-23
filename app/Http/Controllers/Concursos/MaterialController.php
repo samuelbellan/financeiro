@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Concursos;
 use App\Http\Controllers\Controller;
 use App\Models\Concursos\Material;
 use App\Models\Concursos\MaterialPonto;
+use App\Models\Concursos\MaterialQuestao;
 use App\Models\Concursos\MaterialSecao;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -60,7 +61,11 @@ class MaterialController extends Controller
             'dominado' => $todos->where('status', 'dominado')->count(),
         ];
 
-        return view('concursos.material.show', compact('material', 'resumo'));
+        $qPorPonto = MaterialQuestao::where('material_id', $material->id)->whereNotNull('ponto_id')
+            ->selectRaw('ponto_id, count(*) as n')->groupBy('ponto_id')->pluck('n', 'ponto_id');
+        $totalQuestoes = MaterialQuestao::where('material_id', $material->id)->count();
+
+        return view('concursos.material.show', compact('material', 'resumo', 'qPorPonto', 'totalQuestoes'));
     }
 
     public function storeSecao(Request $request, Material $material): RedirectResponse

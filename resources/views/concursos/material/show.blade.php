@@ -89,6 +89,9 @@
         <button type="button" class="chip" data-filtro="revisando" aria-pressed="false">Revisando<b data-conta="revisando">{{ $resumo['revisando'] }}</b></button>
         <button type="button" class="chip" data-filtro="dominado" aria-pressed="false">Dominado<b data-conta="dominado">{{ $resumo['dominado'] }}</b></button>
         <input type="search" class="busca" placeholder="Buscar (ex.: decadência, art. 133)" aria-label="Buscar no material">
+        @if ($totalQuestoes)
+            <a class="btn main no-print" href="{{ route('concursos.material.refazer', $material) }}">Refazer erradas ({{ $totalQuestoes }})</a>
+        @endif
         <button type="button" class="btn no-print" onclick="window.print()">Imprimir / PDF</button>
     </div>
 </header>
@@ -145,6 +148,9 @@
                     <button type="submit" name="status" value="{{ $valor }}" aria-pressed="{{ $p->status === $valor ? 'true' : 'false' }}">{{ $nome }}</button>
                 @endforeach
             </form>
+            @if ($n = $qPorPonto[$p->id] ?? 0)
+                <a class="btn" href="{{ route('concursos.material.refazer', [$material, 'ponto' => $p->id, 'situacao' => 'todas', 'iniciar' => 1]) }}">Refazer {{ $n === 1 ? 'a questão' : "as {$n} questões" }}</a>
+            @endif
         </div>
         <details class="edit">
             <summary>Editar</summary>
@@ -252,7 +258,6 @@
     }));
 
     const dlg = document.querySelector('dialog.art');
-    const base = @json(url('/concursos/legislacao'));
     dlg.querySelector('[data-fechar]').addEventListener('click', () => dlg.close());
     dlg.addEventListener('click', e => { if (e.target === dlg) dlg.close(); });
     document.addEventListener('click', async e => {
@@ -265,10 +270,10 @@
         corpo.textContent = 'Carregando…';
         dlg.showModal();
         try {
-            const resp = await fetch(`${base}/${a.dataset.lei}/artigos/${encodeURIComponent(a.dataset.art)}`, { headers: { 'Accept': 'application/json' } });
-            const r = await resp.json();
-            if (!resp.ok) { corpo.textContent = r.erro ?? 'Artigo não encontrado no texto da lei.'; return; }
-            dlg.querySelector('#art-titulo').textContent = `${r.lei}, ${r.rotulo}`;
+            const resp = await fetch(a.dataset.json, { headers: { 'Accept': 'application/json' } });
+            const r = await resp.json().catch(() => ({}));
+            if (!resp.ok) { corpo.textContent = r.erro ?? 'Texto não encontrado no acervo.'; return; }
+            dlg.querySelector('#art-titulo').textContent = r.titulo;
             corpo.innerHTML = r.html;
         } catch (err) {
             corpo.textContent = 'Não consegui carregar o artigo.';
