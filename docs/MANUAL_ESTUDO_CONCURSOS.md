@@ -117,7 +117,30 @@ Depois de atualizar o código no PC:
 ```
 composer install
 npm install && npm run build
-php artisan migrate --database=concursos_pgsql --path=database/migrations/concursos
+php artisan migrate --path=database/migrations/concursos
 ```
 
+(Sem `--database=concursos_pgsql`: cada migration já usa a conexão de concursos, e o histórico do que já rodou fica na conexão padrão. Com o `--database`, o Laravel acha que nada rodou e tenta recriar as tabelas.)
+
 Os materiais que já existiam são convertidos para livro ao abrir pela primeira vez (ou de uma vez com `php artisan concursos:material-livro`). Para os cadernos do TEC, o fluxo continua o mesmo (`scripts/concursos/converter_tec.py` e `concursos:importar-material ... --questoes=...`): as questões novas caem no capítulo do assunto delas.
+
+### Resumo teórico com as questões erradas grifadas
+
+Um resumo em Markdown (ex.: um módulo do professor convertido) pode entrar no topo dos capítulos do livro, com os trechos que respondem às alternativas das questões erradas grifados e explicados na margem:
+
+- **verde**: trecho que sustenta o gabarito (ou o item CERTO);
+- **rosa**: trecho que derruba a alternativa que você marcou (ou o item ERRADO);
+- **azul**: trecho de outra alternativa errada.
+
+Arquivos em `storage/concursos/materiais/` (fora do git): o `.md` e um plano `.plano.json` com o material, as seções do Markdown → capítulo de destino e os destaques (`q` = id da questão, `letra`, `trecho` exato do resumo, `por_que`). Aplicar:
+
+```
+php artisan concursos:material-base storage/concursos/materiais/ctbg-modulo1.plano.json
+```
+
+Pode rodar de novo (o texto entra uma vez por capítulo; grifos e notas são refeitos). Trecho que não for achado aparece como aviso. Se você já tinha uma nota sua no mesmo trecho, ela fica em cima e as questões vêm embaixo.
+
+- Vários módulos no mesmo capítulo: cada um entra depois do anterior, sempre antes de "Meus pontos de erro".
+- Seção sem capítulo correspondente: em `capitulo`, ponha um título em vez do número e um capítulo novo é criado no fim do livro.
+- Plano só com `destaques` (sem `secoes` nem `arquivo`) procura o trecho no livro inteiro; uma nota que já existe ganha as linhas novas, sem perder as antigas.
+- Corrigiu o Markdown depois? `--refazer` troca o texto do módulo no mesmo lugar; em seguida rode de novo os planos de destaques para os grifos voltarem.
