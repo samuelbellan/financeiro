@@ -454,7 +454,7 @@ function renderCurrent() {
     if (running) {
         const subject = subjectById(running.subject_id);
         chip.style.setProperty('--c', subject?.cor ?? '#888');
-        chip.innerHTML = `<span class="dot"></span><span class="name">${esc(subject?.nome ?? 'Matéria')}</span> <b data-live="current-subject">--</b>`;
+        chip.innerHTML = `<span class="dot"></span><span class="name">${esc(focusSubjectLabel(running, subject))}</span> <b data-live="current-subject">--</b>`;
     } else if (rest) {
         chip.style.setProperty('--c', 'var(--muted)');
         chip.innerHTML = `<span class="name">Descanso</span> <b data-live="rest">--</b>`;
@@ -511,7 +511,7 @@ function renderFocus() {
         ${reforcoProgressHtml}
         <p class="focus-time" data-live="session">--</p>
         <div class="focus-sub">
-            <div><small><span class="dot"></span>${esc(subject?.nome ?? 'Matéria')}</small><b data-live="current-subject">--</b></div>
+            <div><small><span class="dot"></span>${esc(focusSubjectLabel(running, subject))}</small><b data-live="current-subject">--</b></div>
             <div><small>Hoje</small><b data-live="total">--</b></div>
         </div>
         <button type="button" class="focus-btn" data-action="toggle" data-id="${running.subject_id}" aria-label="Pausar">❚❚</button>
@@ -522,7 +522,7 @@ function renderFocus() {
         <p class="focus-label">Descanso${esc(restLimitText())}</p>
         <p class="focus-time rest" data-live="rest">--</p>
         <div class="focus-sub">
-            <div><small><span class="dot"></span>${esc(subject?.nome ?? 'Matéria')}</small><b data-live="current-subject">--</b></div>
+            <div><small><span class="dot"></span>${esc(focusSubjectLabel(rest.session, subject))}</small><b data-live="current-subject">--</b></div>
             <div><small>Hoje</small><b data-live="total">--</b></div>
         </div>
         <button type="button" class="focus-btn" data-action="toggle" data-id="${rest.session.subject_id}" aria-label="Retomar ${esc(subject?.nome ?? '')}">▶</button>
@@ -539,6 +539,17 @@ function gurujaActivityByKey(key) {
         return r ? { ...r, tipo: 'Reforço' } : null;
     }
     return (meta.atividades ?? []).find((a) => gjKey(a) === key) ?? null;
+}
+
+// No foco, a matéria com tipo de estudo (Revisão, Mapeamento…) mostra só o tempo de hoje daquela atividade.
+function focusSubjectLabel(session, subject) {
+    const nome = subject?.nome ?? 'Matéria';
+    return session?.tipo ? `${nome} · ${studyTypeName(session.tipo)}` : nome;
+}
+
+function focusSubjectMs(stats, session) {
+    if (session.tipo) return stats.bySubjectType[session.subject_id]?.[session.tipo] ?? 0;
+    return stats.bySubject[session.subject_id] ?? 0;
 }
 
 function renderFocusCommand(session) {
@@ -2414,7 +2425,7 @@ function tick() {
     const set = (sel, text) => root.querySelectorAll(sel).forEach((el) => { el.textContent = text; });
     updateAvatars(stats.totalMs);
     const current = running ?? restInfo()?.session;
-    if (current) set('[data-live="current-subject"]', formatDuration(stats.bySubject[current.subject_id] ?? 0, { seconds: true }));
+    if (current) set('[data-live="current-subject"]', formatDuration(focusSubjectMs(stats, current), { seconds: true }));
     const rest = running ? null : restInfo();
     if (rest) set('[data-live="rest"]', formatDuration(rest.sinceMs, { seconds: true }));
     // Descanso passou do limite ou outra aba/aparelho mudou o estado: atualiza cabeçalho, foco e faixa.
