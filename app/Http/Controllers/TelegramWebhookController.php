@@ -27,8 +27,10 @@ use Barryvdh\DomPDF\Facade\Pdf;
 class TelegramWebhookController extends Controller
 {
     /**
-     * Por que o último encaminhamento ao projeto local falhou: 'offline' (sem URL
-     * ou ping sem resposta) ou 'error' (timeout/erro no meio, o local pode ter salvo).
+     * Por que o último encaminhamento ao projeto local falhou:
+     * - 'offline': sem URL ou ping sem resposta
+     * - 'unauthorized': projeto local rejeitou o secret token (401/403)
+     * - 'error': timeout ou erro no meio (o local pode ter salvo)
      */
     protected ?string $localForwardFailure = null;
 
@@ -127,9 +129,11 @@ class TelegramWebhookController extends Controller
         // ── 3.2. Notas fiscais ficam só no projeto local ─────────────────────
         // A Nuvem nunca processa nem guarda foto de NF: sem o local, avisa e para.
         if ($photos && $this->isCloudInstance($request)) {
-            $aviso = $this->localForwardFailure === 'error'
-                ? "⚠️ *Nota fiscal não confirmada*\n\nO projeto local não respondeu a tempo (ele pode ainda estar processando). Confira em Mercado no projeto local antes de reenviar. Nada foi salvo na nuvem."
-                : "🔌 *Projeto local offline*\n\nA nota fiscal *não* foi salva: notas de mercado ficam só no projeto local. Ligue o PC e o túnel (ngrok) e reenvie a foto.";
+            $aviso = match ($this->localForwardFailure) {
+                'unauthorized' => "🔐 *Erro de autenticação com o projeto local*\n\nO projeto local recusou a nota fiscal (401). Verifique se `TELEGRAM_WEBHOOK_SECRET` no `.env` local é idêntico ao configurado na Nuvem (Render). Nada foi salvo.",
+                'error'        => "⚠️ *Nota fiscal não confirmada*\n\nO projeto local não respondeu a tempo (ele pode ainda estar processando). Confira em Mercado no projeto local antes de reenviar. Nada foi salvo na nuvem.",
+                default        => "🔌 *Projeto local offline*\n\nA nota fiscal *não* foi salva: notas de mercado ficam só no projeto local. Ligue o PC e o túnel (ngrok) e reenvie a foto.",
+            };
             $this->telegram->sendMessage($chatId, $aviso);
             Log::warning('[Telegram Webhook] Foto de NF recusada na Nuvem (somente local).', [
                 'motivo' => $this->localForwardFailure,
@@ -1005,6 +1009,10 @@ class TelegramWebhookController extends Controller
                     'handled_by'=> 'local',
                     'response'  => $forward->json(),
                 ]);
+            } elseif (in_array($forward->status(), [401, 403], true)) {
+                Log::warning('[Telegram Webhook] Projeto local rejeitou o secret token (HTTP ' . $forward->status() . '). Verifique TELEGRAM_WEBHOOK_SECRET entre Nuvem e Local.');
+                $this->localForwardFailure = 'unauthorized';
+                return null;
             } else {
                 Log::warning('[Telegram Webhook] Projeto local retornou status ' . $forward->status() . '. Fazendo fallback para a Nuvem.');
             }
