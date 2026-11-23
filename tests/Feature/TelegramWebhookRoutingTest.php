@@ -227,4 +227,25 @@ class TelegramWebhookRoutingTest extends TestCase
             ->assertStatus(200)
             ->assertJson(['skipped' => 'nota_fiscal_local_only']);
     }
+
+    public function test_cloud_reports_auth_error_when_local_rejects_secret(): void
+    {
+        $this->configCloud();
+        Http::fake([
+            'https://remote-local-pc.ngrok-free.dev/webhook/telegram/ping' => Http::response(['ok' => true], 200),
+            'https://remote-local-pc.ngrok-free.dev/webhook/telegram' => Http::response(['error' => 'Unauthorized'], 401),
+        ]);
+
+        $this->mock(TelegramService::class, function (MockInterface $mock) {
+            $mock->shouldReceive('sendMessage')->once()
+                ->withArgs(fn ($chat, $msg) => str_contains($msg, 'TELEGRAM_WEBHOOK_SECRET'))
+                ->andReturn(true);
+            $mock->shouldNotReceive('getFile');
+        });
+
+        $this->withHeaders(['X-Telegram-Bot-Api-Secret-Token' => 'secret123'])
+            ->postJson(route('webhook.telegram'), $this->nfPhotoPayload(20012))
+            ->assertStatus(200)
+            ->assertJson(['skipped' => 'nota_fiscal_local_only']);
+    }
 }

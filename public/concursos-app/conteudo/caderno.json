@@ -1,0 +1,133 @@
+{
+  "titulo": "Lei de Acesso à Informação",
+  "sigla": "LAI",
+  "lei": "lai",
+  "questoes": [
+    {
+      "secao": "Disposições gerais",
+      "nivel": "Fácil",
+      "ref": "Art. 1º, parágrafo único, I e II",
+      "enunciado": "De acordo com a Lei nº 12.527/2011 (Lei de Acesso à Informação), subordinam-se ao regime dessa lei:",
+      "alternativas": [
+        "Apenas os órgãos da administração direta do Poder Executivo federal.",
+        "Os órgãos públicos da administração direta dos três Poderes, incluindo as Cortes de Contas, e do Ministério Público, além das autarquias, fundações públicas, empresas públicas e sociedades de economia mista.",
+        "Apenas as empresas públicas e as sociedades de economia mista.",
+        "Somente os órgãos do Poder Legislativo, incluídas as Cortes de Contas.",
+        "Apenas a União e os Estados, excluídos os Municípios."
+      ],
+      "gabarito": "B",
+      "comentarios": [
+        "Incorreta. A lei alcança os três Poderes e o Ministério Público, nas três esferas, e não só o Executivo federal.",
+        "Correta. É o que diz o art. 1º, parágrafo único, I e II: órgãos da administração direta dos Poderes Executivo, Legislativo (incluindo as Cortes de Contas) e Judiciário e do Ministério Público, além das autarquias, fundações públicas, empresas públicas, sociedades de economia mista e demais entidades controladas.",
+        "Incorreta. As estatais estão incluídas, mas não são as únicas (art. 1º, parágrafo único, II).",
+        "Incorreta. O Legislativo está incluído, mas não sozinho (art. 1º, parágrafo único, I).",
+        "Incorreta. O art. 1º fala em União, Estados, Distrito Federal e Municípios."
+      ]
+    },
+    {
+      "secao": "Disposições gerais",
+      "nivel": "Médio",
+      "ref": "Art. 3º, I a V",
+      "enunciado": "Analise as assertivas abaixo, sobre as diretrizes da Lei de Acesso à Informação, e assinale a alternativa correta:\n\nI. Observância da publicidade como preceito geral e do sigilo como exceção.\n\nII. Divulgação de informações de interesse público apenas mediante solicitação.\n\nIII. Desenvolvimento do controle social da administração pública.",
+      "alternativas": [
+        "Está correta apenas a assertiva I.",
+        "Estão corretas apenas as assertivas I e II.",
+        "Estão corretas apenas as assertivas I e III.",
+        "Estão corretas apenas as assertivas II e III.",
+        "Todas as assertivas estão corretas."
+      ],
+      "gabarito": "C",
+      "comentarios": [
+        "Essa combinação não confere com a análise das afirmativas.\n\nI — correta. Art. 3º, I: publicidade como preceito geral e sigilo como exceção. II — incorreta. O texto da lei é outro: divulgação de informações de interesse público, independentemente de solicitações (Art. 3º, II). III — correta. Art. 3º, V: desenvolvimento do controle social da administração pública.",
+        "Essa combinação não confere com a análise das afirmativas.\n\nI — correta. Art. 3º, I: publicidade como preceito geral e sigilo como exceção. II — incorreta. O texto da lei é outro: divulgação de informações de interesse público, independentemente de solicitações (Art. 3º, II). III — correta. Art. 3º, V: desenvolvimento do controle social da administração pública.",
+        "É a combinação correta.\n\nI — correta. Art. 3º, I: publicidade como preceito geral e sigilo como exceção. II — incorreta. O texto da lei é outro: divulgação de informações de interesse público, independentemente de solicitações (Art. 3º, II). III — correta. Art. 3º, V: desenvolvimento do controle social da administração pública.",
+        "Essa combinação não confere com a análise das afirmativas.\n\nI — correta. Art. 3º, I: publicidade como preceito geral e sigilo como exceção. II — incorreta. O texto da lei é outro: divulgação de informações de interesse público, independentemente de solicitações (Art. 3º, II). III — correta. Art. 3º, V: desenvolvimento do controle social da administração pública.",
+        "Essa combinação não confere com a análise das afirmativas.\n\nI — correta. Art. 3º, I: publicidade como preceito geral e sigilo como exceção. II — incorreta. O texto da lei é outro: divulgação de informações de interesse público, independentemente de solicitações (Art. 3º, II). III — correta. Art. 3º, V: desenvolvimento do controle social da administração pública."
+      ]
+    },
+    {
+      "secao": "Pedido de acesso",
+      "nivel": "Médio",
+      "ref": "Art. 11, § 1º",
+      "enunciado": "Pela Lei de Acesso à Informação, quando não for possível conceder o acesso imediato à informação disponível, o órgão que receber o pedido deverá responder em prazo não superior a:",
+      "alternativas": [
+        "5 dias.",
+        "10 dias.",
+        "15 dias.",
+        "20 dias.",
+        "30 dias."
+      ],
+      "gabarito": "D",
+      "comentarios": [
+        "Incorreta. O texto da lei é outro: o órgão ou entidade que receber o pedido deverá, em prazo não superior a 20 (vinte) dias, responder (Art. 11, § 1º).",
+        "Incorreta. 10 dias é o prazo da prorrogação, mediante justificativa (art. 11, § 2º), não o prazo inicial.",
+        "Incorreta. O texto da lei é outro: o órgão ou entidade que receber o pedido deverá, em prazo não superior a 20 (vinte) dias, responder (Art. 11, § 1º).",
+        "Correta. Art. 11, § 1º: prazo não superior a 20 dias.",
+        "Incorreta. Somando a prorrogação de 10 dias, o prazo máximo chega a 30 dias, mas o prazo inicial é de 20 (art. 11, §§ 1º e 2º)."
+      ]
+    },
+    {
+      "secao": "Pedido de acesso",
+      "nivel": "Fácil",
+      "ref": "Art. 12",
+      "enunciado": "Conforme a Lei de Acesso à Informação, o serviço de busca e de fornecimento de informação:",
+      "alternativas": [
+        "É sempre cobrado, conforme tabela do órgão.",
+        "É gratuito, podendo ser cobrado exclusivamente o valor necessário ao ressarcimento dos custos de reprodução de documentos.",
+        "É gratuito apenas para servidores públicos.",
+        "É cobrado por hora de pesquisa realizada pelo servidor.",
+        "É gratuito apenas quando o pedido for feito pela internet."
+      ],
+      "gabarito": "B",
+      "comentarios": [
+        "Incorreta. A regra é a gratuidade (art. 12).",
+        "Correta. Art. 12: o serviço é gratuito; o § 1º permite cobrar só o ressarcimento dos custos quando houver reprodução de documentos.",
+        "Incorreta. A gratuidade vale para qualquer interessado (art. 12).",
+        "Incorreta. Não há cobrança por hora; só o ressarcimento dos custos de reprodução (art. 12, § 1º).",
+        "Incorreta. A lei não faz essa distinção (art. 12)."
+      ]
+    },
+    {
+      "secao": "Restrições de acesso",
+      "nivel": "Médio",
+      "ref": "Art. 24, § 1º, I a III",
+      "enunciado": "Segundo a Lei de Acesso à Informação, os prazos máximos de restrição de acesso à informação classificada como ultrassecreta, secreta e reservada são, respectivamente:",
+      "alternativas": [
+        "25, 15 e 5 anos.",
+        "20, 10 e 5 anos.",
+        "30, 20 e 10 anos.",
+        "25, 10 e 5 anos.",
+        "15, 10 e 5 anos."
+      ],
+      "gabarito": "A",
+      "comentarios": [
+        "Correta. Art. 24, § 1º: ultrassecreta, 25 anos; secreta, 15 anos; reservada, 5 anos.",
+        "Incorreta. O texto da lei é outro: ultrassecreta: 25 (vinte e cinco) anos; secreta: 15 (quinze) anos; e reservada: 5 (cinco) anos (Art. 24, § 1º).",
+        "Incorreta. O texto da lei é outro: ultrassecreta: 25 (vinte e cinco) anos; secreta: 15 (quinze) anos; e reservada: 5 (cinco) anos (Art. 24, § 1º).",
+        "Incorreta. A secreta é de 15 anos, não de 10 (art. 24, § 1º, II).",
+        "Incorreta. O texto da lei é outro: ultrassecreta: 25 (vinte e cinco) anos; secreta: 15 (quinze) anos; e reservada: 5 (cinco) anos (Art. 24, § 1º)."
+      ]
+    },
+    {
+      "secao": "Restrições de acesso",
+      "nivel": "Difícil",
+      "ref": "Art. 24, § 1º",
+      "enunciado": "De acordo com a Lei de Acesso à Informação, os prazos máximos de restrição de acesso à informação classificada vigoram a partir:",
+      "alternativas": [
+        "Da data do pedido de acesso.",
+        "Da data da publicação do ato de classificação.",
+        "Da data de sua produção.",
+        "Do primeiro dia do exercício seguinte ao da classificação.",
+        "Da data em que a autoridade toma posse."
+      ],
+      "gabarito": "C",
+      "comentarios": [
+        "Incorreta. O texto da lei é outro: os prazos vigoram a partir da data de sua produção (Art. 24, § 1º).",
+        "Incorreta. O texto da lei é outro: os prazos vigoram a partir da data de sua produção (Art. 24, § 1º).",
+        "Correta. Art. 24, § 1º: os prazos vigoram a partir da data de produção da informação.",
+        "Incorreta. O texto da lei é outro: os prazos vigoram a partir da data de sua produção (Art. 24, § 1º).",
+        "Incorreta. O texto da lei é outro: os prazos vigoram a partir da data de sua produção (Art. 24, § 1º)."
+      ]
+    }
+  ]
+}

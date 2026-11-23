@@ -10,6 +10,7 @@ use App\Http\Controllers\CategoriasController;
 use App\Http\Controllers\ExportController;
 use App\Http\Controllers\TelegramWebhookController;
 use App\Http\Controllers\EstudosController;
+use App\Http\Controllers\ConcursosController;
 use App\Http\Controllers\StudyRoomsController;
 use App\Http\Controllers\SalaryController;
 use App\Http\Controllers\MercadoController;
@@ -159,7 +160,7 @@ Route::middleware(['auth', 'modulos'])->group(function () {
     Route::delete('/estudos/api-tokens', [EstudosApiController::class, 'revokeTokens'])->name('estudos.api-tokens.destroy');
 
     // Módulo novo de concursos (banco concursos_pgsql; só onde CONCURSOS_ENABLED=true)
-    Route::middleware(\App\Http\Middleware\EnsureConcursosHabilitado::class)->prefix('concursos/questoes')->name('concursos.questoes.')->group(function () {
+    Route::middleware([\App\Http\Middleware\EnsureConcursosHabilitado::class, \App\Http\Middleware\EnsurePlanoConcursos::class])->prefix('concursos/questoes')->name('concursos.questoes.')->group(function () {
         Route::get('/', [\App\Http\Controllers\Concursos\QuestoesController::class, 'index'])->name('index');
         Route::get('/resolver', [\App\Http\Controllers\Concursos\QuestoesController::class, 'resolver'])->name('resolver');
         Route::get('/{questao}', [\App\Http\Controllers\Concursos\QuestoesController::class, 'show'])->whereNumber('questao')->name('show');
@@ -167,23 +168,47 @@ Route::middleware(['auth', 'modulos'])->group(function () {
         Route::post('/tentativas/{tentativa}/motivo', [\App\Http\Controllers\Concursos\QuestoesController::class, 'motivo'])->whereNumber('tentativa')->name('motivo');
     });
     Route::middleware(\App\Http\Middleware\EnsureConcursosHabilitado::class)->prefix('concursos')->name('concursos.')->group(function () {
-        Route::get('/meta', [\App\Http\Controllers\Concursos\MetaController::class, 'meta'])->name('meta');
-        Route::post('/meta/atividades/{atividade}/feita', [\App\Http\Controllers\Concursos\MetaController::class, 'feita'])->whereNumber('atividade')->name('meta.feita');
-        Route::post('/meta/atividades/{atividade}/adiar', [\App\Http\Controllers\Concursos\MetaController::class, 'adiar'])->whereNumber('atividade')->name('meta.adiar');
-        Route::get('/perfil', [\App\Http\Controllers\Concursos\MetaController::class, 'perfil'])->name('perfil');
-        Route::post('/perfil', [\App\Http\Controllers\Concursos\MetaController::class, 'salvarPerfil'])->name('perfil.salvar');
-        Route::get('/painel', [\App\Http\Controllers\Concursos\PainelController::class, 'index'])->name('painel');
-        Route::get('/simulados', [\App\Http\Controllers\Concursos\SimuladosController::class, 'index'])->name('simulados');
-        Route::post('/simulados', [\App\Http\Controllers\Concursos\SimuladosController::class, 'store'])->name('simulados.store');
-        Route::get('/simulados/{simulado}', [\App\Http\Controllers\Concursos\SimuladosController::class, 'show'])->whereNumber('simulado')->name('simulados.show');
-        Route::post('/simulados/{simulado}/respostas', [\App\Http\Controllers\Concursos\SimuladosController::class, 'salvar'])->whereNumber('simulado')->name('simulados.salvar');
-        Route::post('/simulados/{simulado}/entregar', [\App\Http\Controllers\Concursos\SimuladosController::class, 'entregar'])->whereNumber('simulado')->name('simulados.entregar');
+        Route::get('/meta', [\App\Http\Controllers\Concursos\MetaController::class, 'meta'])->name('meta')->middleware(\App\Http\Middleware\EnsurePlanoConcursos::class);
+        Route::post('/meta/atividades/{atividade}/feita', [\App\Http\Controllers\Concursos\MetaController::class, 'feita'])->whereNumber('atividade')->name('meta.feita')->middleware(\App\Http\Middleware\EnsurePlanoConcursos::class);
+        Route::post('/meta/atividades/{atividade}/adiar', [\App\Http\Controllers\Concursos\MetaController::class, 'adiar'])->whereNumber('atividade')->name('meta.adiar')->middleware(\App\Http\Middleware\EnsurePlanoConcursos::class);
+        Route::get('/perfil', [\App\Http\Controllers\Concursos\MetaController::class, 'perfil'])->name('perfil')->middleware(\App\Http\Middleware\EnsurePlanoConcursos::class);
+        Route::post('/perfil', [\App\Http\Controllers\Concursos\MetaController::class, 'salvarPerfil'])->name('perfil.salvar')->middleware(\App\Http\Middleware\EnsurePlanoConcursos::class);
+        Route::get('/painel', [\App\Http\Controllers\Concursos\PainelController::class, 'index'])->name('painel')->middleware(\App\Http\Middleware\EnsurePlanoConcursos::class);
+        Route::get('/simulados', [\App\Http\Controllers\Concursos\SimuladosController::class, 'index'])->name('simulados')->middleware(\App\Http\Middleware\EnsurePlanoConcursos::class);
+        Route::post('/simulados', [\App\Http\Controllers\Concursos\SimuladosController::class, 'store'])->name('simulados.store')->middleware(\App\Http\Middleware\EnsurePlanoConcursos::class);
+        Route::get('/simulados/{simulado}', [\App\Http\Controllers\Concursos\SimuladosController::class, 'show'])->whereNumber('simulado')->name('simulados.show')->middleware(\App\Http\Middleware\EnsurePlanoConcursos::class);
+        Route::post('/simulados/{simulado}/respostas', [\App\Http\Controllers\Concursos\SimuladosController::class, 'salvar'])->whereNumber('simulado')->name('simulados.salvar')->middleware(\App\Http\Middleware\EnsurePlanoConcursos::class);
+        Route::post('/simulados/{simulado}/entregar', [\App\Http\Controllers\Concursos\SimuladosController::class, 'entregar'])->whereNumber('simulado')->name('simulados.entregar')->middleware(\App\Http\Middleware\EnsurePlanoConcursos::class);
         Route::get('/curadoria', [\App\Http\Controllers\Concursos\CuradoriaController::class, 'index'])->name('curadoria');
         Route::get('/curadoria/assuntos/{assunto}', [\App\Http\Controllers\Concursos\CuradoriaController::class, 'assunto'])->whereNumber('assunto')->name('curadoria.assunto');
         Route::post('/curadoria/assuntos/{assunto}/aprovar-todos', [\App\Http\Controllers\Concursos\CuradoriaController::class, 'aprovarTodos'])->whereNumber('assunto')->name('curadoria.aprovar-todos');
         Route::post('/curadoria/subtopicos/{subtopico}', [\App\Http\Controllers\Concursos\CuradoriaController::class, 'acao'])->whereNumber('subtopico')->name('curadoria.acao');
+
+        // Material de resumo (cadernos de erros) e lei seca do acervo ctresb/leis
+        Route::get('/material', [\App\Http\Controllers\Concursos\MaterialController::class, 'index'])->name('material.index');
+        Route::post('/material', [\App\Http\Controllers\Concursos\MaterialController::class, 'store'])->name('material.store');
+        Route::get('/material/{material}', [\App\Http\Controllers\Concursos\MaterialController::class, 'show'])->whereNumber('material')->name('material.show');
+        Route::post('/material/{material}/secoes', [\App\Http\Controllers\Concursos\MaterialController::class, 'storeSecao'])->whereNumber('material')->name('material.secoes.store');
+        Route::post('/material/secoes/{secao}/pontos', [\App\Http\Controllers\Concursos\MaterialController::class, 'storePonto'])->whereNumber('secao')->name('material.pontos.store');
+        Route::put('/material/pontos/{ponto}', [\App\Http\Controllers\Concursos\MaterialController::class, 'updatePonto'])->whereNumber('ponto')->name('material.pontos.update');
+        Route::post('/material/pontos/{ponto}/errei', [\App\Http\Controllers\Concursos\MaterialController::class, 'errei'])->whereNumber('ponto')->name('material.pontos.errei');
+        Route::post('/material/pontos/{ponto}/status', [\App\Http\Controllers\Concursos\MaterialController::class, 'status'])->whereNumber('ponto')->name('material.pontos.status');
+        Route::delete('/material/pontos/{ponto}', [\App\Http\Controllers\Concursos\MaterialController::class, 'destroyPonto'])->whereNumber('ponto')->name('material.pontos.destroy');
+        Route::get('/legislacao', [\App\Http\Controllers\Concursos\LeisController::class, 'index'])->name('leis.index');
+        Route::get('/legislacao/{lei}', [\App\Http\Controllers\Concursos\LeisController::class, 'show'])->where('lei', '[a-z][a-z0-9]*')->name('leis.show');
+        Route::get('/legislacao/{lei}/artigos/{artigo}', [\App\Http\Controllers\Concursos\LeisController::class, 'artigo'])->where(['lei' => '[a-z][a-z0-9]*', 'artigo' => '\d+(-[A-Za-z])?'])->name('leis.artigo');
     });
 
+    // Sistema - Estudo para Concursos (Questões, Simulados, Flashcards, Lei Seca e Edital)
+    Route::get('/concursos',[ConcursosController::class, 'index'])->name('concursos.index');
+    Route::get('/concursos/__estado', [ConcursosController::class, 'getState'])->name('concursos.state.get');
+    Route::post('/concursos/__estado', [ConcursosController::class, 'saveState'])->name('concursos.state.save');
+    Route::get('/concursos/{page}', [ConcursosController::class, 'page'])
+        ->where('page', '(inicio|caderno|simulados|flashcards|refazer|resumos|leis)\.html')
+        ->name('concursos.page');
+    Route::get('/concursos/{path}', [ConcursosController::class, 'asset'])
+        ->where('path', '(css|js|dados|leis)/.+|icone\.svg')
+        ->name('concursos.asset');
 
 
 

@@ -32,7 +32,14 @@ class User extends Authenticatable
             'is_admin' => 'boolean',
             'is_owner' => 'boolean',
             'modulos' => 'array',
+            'concursos_plano' => 'boolean',
         ];
+    }
+
+    /** Segue o planejamento dirigido do concurso? Sem ele, o módulo de concursos mostra só Resumos e Leis. */
+    public function temPlanoConcursos(): bool
+    {
+        return (bool) ($this->concursos_plano ?? true);
     }
 
     /**

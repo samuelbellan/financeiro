@@ -1,0 +1,407 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Flashcards — Estudo para Concursos</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Literata:opsz,wght@7..72,400;7..72,600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/texto-lei.css">
+<link rel="stylesheet" href="css/meus-cards.css">
+<style>
+/* Cores do site (inicio.html) + a ficha pautada: papel, pauta azul, margem vermelha e grifo amarelo. */
+:root{
+ --pri:#5b3fd0;--pri-l:#e7e3f8;--bg:#f4f4f7;--line:#e6e6ec;--tx:#2b2b33;--mut:#6b6b78;
+ --paper:#fff;--ink:#1f2430;--rule:#dbe4f3;--margin:#c8463d;--grifo:#fde68a;
+ --ok:#0f7a55;--ok-l:#e3f5ed;--no:#b5352a;--no-l:#fbe9e7;--mid:#9a6512;--mid-l:#fdf3e1;
+ --lh:2rem;
+ --serif:Literata,Georgia,"Times New Roman",serif;
+ --sans:Inter,"Segoe UI",system-ui,sans-serif;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.5 var(--sans)}
+main{max-width:46rem;margin:0 auto;padding:1.25rem 1rem 3rem}
+a{color:var(--pri)}
+button,select,input{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--pri);outline-offset:2px}
+.vh{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+h1{font-size:1.5rem;line-height:1.2;margin:.25rem 0 0}
+
+.sub{margin:.25rem 0 0;color:var(--mut);font-size:.875rem}
+/* Seletor de lei: um botão por lei, com o que há para hoje. */
+.leis{display:grid;grid-template-columns:repeat(auto-fit,minmax(8.25rem,1fr));gap:.5rem;margin:1rem 0 0}
+.leis button{display:flex;flex-direction:column;align-items:flex-start;gap:.125rem;text-align:left;border:1px solid var(--line);
+ border-radius:8px;background:var(--paper);padding:.5rem .75rem;cursor:pointer;min-width:0}
+.leis button:hover{border-color:var(--pri)}
+.leis button[aria-pressed=true]{border-color:var(--pri);box-shadow:inset 0 0 0 1px var(--pri);background:var(--pri-l)}
+.leis .sg{font-weight:700;font-size:.9375rem}
+.leis button[aria-pressed=true] .sg{color:var(--pri)}
+.leis .nm{font-size:.75rem;color:var(--mut);line-height:1.25}
+.leis .ct{font-size:.75rem;color:var(--tx);font-variant-numeric:tabular-nums;margin-top:.125rem}
+.leis .ct b{color:var(--pri)}
+.controls{display:flex;flex-wrap:wrap;gap:.5rem .75rem;align-items:center;margin:1rem 0 0}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;background:var(--paper);padding:2px}
+.seg button{border:0;background:none;border-radius:6px;padding:.375rem .875rem;font-weight:600;color:var(--mut);cursor:pointer}
+.seg button[aria-pressed=true]{background:var(--pri);color:#fff}
+select{flex:1 1 14rem;min-width:0;border:1px solid var(--line);border-radius:8px;background:var(--paper);padding:.4rem .6rem}
+.check{display:flex;align-items:center;gap:.4rem;font-size:.875rem;color:var(--mut);cursor:pointer}
+.check input{accent-color:var(--pri);width:1rem;height:1rem}
+
+.status{margin:1.25rem 0 .5rem;font-size:.9375rem}
+.status b{font-variant-numeric:tabular-nums}
+.progress{height:3px;background:var(--line);border-radius:2px;overflow:hidden}
+.progress i{display:block;height:100%;width:0;background:var(--pri);transition:width .25s}
+
+/* ---------- a ficha ---------- */
+.ficha{margin-top:1rem;background:var(--paper);border:1px solid #d9dbe3;border-radius:4px;box-shadow:0 1px 2px #1f24300f;display:flex;flex-direction:column;min-height:21rem}
+.ficha-head{display:flex;justify-content:space-between;align-items:baseline;gap:1rem;padding:.75rem 1.5rem .5rem;border-bottom:2px solid var(--margin);font-size:.8125rem;color:var(--mut)}
+.ficha-head .sec{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ficha-head .art{font-family:var(--serif);font-weight:600;font-size:.9375rem;color:var(--ink);white-space:nowrap}
+.ficha-body{flex:1;padding:calc(var(--lh)/2) 1.5rem var(--lh);font-family:var(--serif);color:var(--ink);line-height:var(--lh);
+ background:repeating-linear-gradient(to bottom,transparent 0,transparent calc(var(--lh) - 1px),var(--rule) calc(var(--lh) - 1px),var(--rule) var(--lh));
+ background-position:0 calc(var(--lh)/2)}
+.ficha-body p{margin:0}
+.ctx{font-family:var(--sans);font-size:.8125rem;color:var(--mut)}
+.q{font-size:1.25rem;font-weight:600}
+.flipped .q{font-size:1rem;font-weight:400;color:var(--mut)}
+.lei{font-size:1.125rem}
+.gap{display:inline-block;min-width:4.5em;border-bottom:2px solid var(--ink);line-height:1.2}
+.a{font-size:1.1875rem;margin-top:var(--lh)!important}
+mark{color:inherit;background:linear-gradient(var(--grifo),var(--grifo)) no-repeat 0 60%/100% 70%;padding:0 .1em;box-decoration-break:clone;-webkit-box-decoration-break:clone}
+.flipped mark{animation:grifar .45s ease-out both}
+@keyframes grifar{from{background-size:0 70%}to{background-size:100% 70%}}
+@media (prefers-reduced-motion:reduce){.flipped mark{animation:none}.progress i{transition:none}}
+.trap{margin-top:var(--lh)!important;font-family:var(--sans);font-size:.875rem;line-height:var(--lh);border-left:3px solid var(--margin);padding-left:.75rem}
+.trap strong{color:var(--margin)}
+.fonte{margin:var(--lh) 0 0;font-size:.9375rem;color:#4a4f5c;padding-left:.75rem;border-left:3px solid var(--rule)}
+.fonte span{display:block;font-family:var(--sans);font-size:.75rem;color:var(--mut)}
+.fonte p{margin:0}
+/* Caput que introduz incisos e alíneas: mesmo texto da lei, em tom mais baixo que o trecho citado. */
+.cap{color:var(--mut);font-size:.9375rem}
+.ficha-body > .cap{font-size:1rem}
+
+.ficha-foot{padding:1rem 1.5rem 1.25rem;border-top:1px solid var(--line)}
+.btn{border:1px solid var(--line);background:var(--paper);border-radius:8px;padding:.5rem 1rem;font-weight:600;cursor:pointer}
+.btn:hover{background:var(--pri-l)}
+.btn:disabled{opacity:.45;cursor:default;background:var(--paper)}
+.btn.pri{background:var(--pri);border-color:var(--pri);color:#fff}
+.btn.pri:hover{filter:brightness(1.1)}
+.reveal{width:100%;padding:.75rem}
+.rate{display:grid;grid-template-columns:repeat(4,1fr);gap:.5rem}
+.rate button{border:1px solid var(--line);border-radius:8px;background:var(--paper);padding:.5rem .25rem;cursor:pointer;font-weight:700}
+.rate button span{display:block;font-weight:400;font-size:.75rem;color:var(--mut)}
+.rate .r1{color:var(--no)}.rate .r1:hover{background:var(--no-l)}
+.rate .r2{color:var(--mid)}.rate .r2:hover{background:var(--mid-l)}
+.rate .r3{color:var(--ok)}.rate .r3:hover{background:var(--ok-l)}
+.rate .r4{color:var(--pri)}.rate .r4:hover{background:var(--pri-l)}
+.nav{display:flex;justify-content:space-between;gap:.5rem}
+.nav .mid{margin-right:auto}
+.hint{margin:.625rem 0 0;font-size:.75rem;color:var(--mut);text-align:center}
+.hint kbd{font:inherit;border:1px solid var(--line);border-bottom-width:2px;border-radius:4px;padding:0 .3em;background:var(--paper)}
+
+.empty{margin:auto 0;text-align:center;padding:2rem 0}
+.empty h2{font-family:var(--serif);font-size:1.375rem;margin:0 0 .5rem}
+.empty p{margin:0 auto 1.25rem;max-width:30rem;color:var(--mut)}
+.empty .btn{margin:.25rem}
+
+.undo{border:0;background:none;color:var(--pri);font-weight:600;cursor:pointer;padding:.25rem 0}
+.undo[hidden],.ficha[hidden],.lista[hidden],.lista-ctl[hidden],.toast[hidden],#dia[hidden]{display:none}
+.toast{margin:0;font-size:.875rem;flex:1;text-align:center}
+
+/* Estrela, menu "⋯", aviso no card, anotação e histórico */
+.ficha{position:relative}
+.ficha-head .acts{display:flex;align-items:baseline;gap:.25rem;flex:none}
+.ficha-head .art{margin-right:.25rem}
+.ic{border:0;background:none;cursor:pointer;color:var(--mut);font-size:1.125rem;line-height:1;padding:.125rem .375rem;border-radius:4px}
+.ic:hover{color:var(--pri);background:var(--pri-l)}
+.fav[aria-pressed=true]{color:#c98a00}
+.menu{position:absolute;right:1rem;top:2.25rem;z-index:5;display:flex;flex-direction:column;min-width:15rem;padding:.25rem;
+ background:var(--paper);border:1px solid var(--line);border-radius:8px;box-shadow:0 6px 16px #1f243026}
+.menu button{border:0;background:none;text-align:left;padding:.5rem .75rem;border-radius:6px;cursor:pointer;font-size:.875rem;color:var(--tx)}
+.menu button:hover,.menu button:focus-visible{background:var(--pri-l)}
+.info{font-family:var(--sans);font-size:.875rem;line-height:1.5;color:var(--tx);background:var(--pri-l);border-radius:6px;padding:.375rem .75rem;margin:0 0 calc(var(--lh)/2)!important}
+.erq{font-family:var(--sans);font-size:.8125rem;line-height:1.5;color:var(--no);border-left:3px solid var(--no);padding-left:.625rem;margin:0 0 calc(var(--lh)/2)!important}
+.erq a{color:inherit;font-weight:600}
+/* Cards de "Meus erros" (js/meus-cards.js): as duas alternativas confundidas (A × B) ou os itens a julgar. */
+.mc-ab{list-style:none;margin:calc(var(--lh)/2) 0 0;padding:0;display:grid;gap:.375rem;font-family:var(--sans);font-size:.9375rem;line-height:1.5}
+.mc-ab li{border:1px solid var(--line);border-radius:8px;padding:.375rem .625rem;background:var(--paper,#fff)}
+.mc-ab b{display:inline-block;min-width:1.25rem;color:var(--pri);font-weight:700}
+.erq-frente{background:var(--no-l);border-radius:0 8px 8px 0;padding:.4375rem .75rem!important;font-size:.875rem}
+.erq-verso{margin-top:var(--lh)!important;margin-bottom:0!important}
+.erq-verso ul{margin:.25rem 0 0;padding-left:1.125rem}
+.erq-verso li+li{margin-top:.375rem}
+.erq-det{display:block;color:var(--tx)}
+.erq-det .m{display:block;color:var(--no)}
+.erq-det .pq{display:block;color:var(--mut)}
+/* Onde o assunto caiu (cards do MCASP, que vêm de questões). */
+.cob{font-family:var(--sans);font-size:.8125rem;line-height:1.5;color:var(--mut);border-left:3px solid var(--pri);padding-left:.625rem;margin:0 0 calc(var(--lh)/2)!important}
+.cob a{color:var(--pri);font-weight:600}
+.q1{color:var(--no)}.q2{color:var(--mid)}.q3{color:var(--ok)}.q4{color:var(--pri)}
+.nota{margin-top:var(--lh)!important;font-family:var(--sans);font-size:.875rem;line-height:var(--lh);border-left:3px solid #c98a00;padding-left:.75rem;white-space:pre-wrap}
+.nota strong{color:#8a5d00}
+.nota-ed{margin-top:var(--lh);font-family:var(--sans)}
+.nota-ed textarea{display:block;width:100%;min-height:6rem;font:inherit;font-size:.9375rem;line-height:1.5;border:1px solid var(--line);border-radius:6px;padding:.5rem .625rem;background:var(--paper);color:var(--tx);resize:vertical}
+.nota-ed .bts{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:.5rem}
+.hist{margin-top:var(--lh);padding-top:.5rem;border-top:1px dashed var(--line);font-family:var(--sans);font-size:.8125rem;line-height:1.6;color:var(--tx);background:var(--paper)}
+.hist h3{margin:0 0 .25rem;font-size:.75rem;text-transform:uppercase;letter-spacing:.04em;color:var(--mut)}
+.hist ol{margin:.25rem 0 0;padding-left:1.25rem}
+.hist .mut{color:var(--mut)}
+
+/* Lista de cards */
+.lista-ctl{display:flex;flex-wrap:wrap;gap:.5rem;margin:.75rem 0 0}
+.lista-ctl input{flex:2 1 15rem;min-width:0;border:1px solid var(--line);border-radius:8px;background:var(--paper);padding:.4rem .6rem}
+.lista-ctl #dia{flex:0 1 10rem}
+.lista-ctl select{flex:1 1 11rem}
+.lista{margin-top:1rem}
+.lista ul{list-style:none;margin:0;padding:0;border:1px solid var(--line);border-radius:8px;background:var(--paper);overflow:hidden}
+.lista li+li{border-top:1px solid var(--line)}
+.lista li button{display:grid;grid-template-columns:7rem minmax(0,1fr) auto;gap:.25rem .875rem;align-items:baseline;width:100%;text-align:left;border:0;background:none;padding:.625rem .875rem;cursor:pointer;color:var(--tx)}
+.lista li button:hover{background:var(--pri-l)}
+.lista .la{font-family:var(--serif);font-weight:600;font-size:.875rem;color:var(--ink)}
+.lista .estrela{color:#c98a00}
+.lista .lt{font-size:.875rem;line-height:1.4}
+.lista .lt small{display:block;margin-top:.125rem;color:var(--mut);font-size:.75rem}
+.lista .ls{font-size:.75rem;color:var(--mut);white-space:nowrap;text-align:right;line-height:1.4}
+.lista .mais{display:block;margin:.75rem auto 0}
+.lista .vazio{color:var(--mut);text-align:center;padding:2rem 1rem;background:var(--paper);border:1px solid var(--line);border-radius:8px;margin:0}
+.below{display:flex;justify-content:space-between;align-items:center;gap:1rem;margin-top:.75rem;min-height:1.75rem}
+.warn{background:var(--no-l);color:var(--no);border-radius:8px;padding:.5rem .75rem;font-size:.875rem;margin:1rem 0 0}
+details{margin-top:2rem;font-size:.875rem;color:var(--mut)}
+summary{cursor:pointer;font-weight:600}
+.cfg{display:flex;flex-wrap:wrap;gap:1rem;align-items:center;margin-top:.75rem}
+.cfg input{width:4.5rem;border:1px solid var(--line);border-radius:6px;padding:.25rem .5rem;color:var(--tx)}
+.foot{font-size:.75rem;color:var(--mut);margin:1.25rem 0 0}
+
+/* ---------- janela fixa ----------
+   A página cabe na tela e não rola: barra, seletores e status ficam no alto, a ficha ocupa o resto
+   e o rodapé dela (Mostrar resposta / avaliação) fica sempre à vista. Se o texto da lei for maior
+   que a ficha, só o papel rola por dentro — a pauta acompanha o texto e uma sombra sobre o rodapé
+   avisa que há mais abaixo. Na Lista, quem rola é a própria lista. */
+html,body{height:100%}
+body{display:flex;flex-direction:column;height:100dvh}
+main{flex:1 1 auto;min-height:0;width:100%;display:flex;flex-direction:column;padding:1rem 1rem .75rem}
+main>*{flex:none}
+header{display:flex;flex-wrap:wrap;align-items:baseline;gap:0 .75rem}
+h1{margin:0}
+.sub{margin:0}
+.leis{margin-top:.75rem}
+.controls{margin-top:.75rem}
+.status{margin:.875rem 0 .5rem}
+.ficha{flex:1 1 0;min-height:14rem;margin-top:.75rem}
+.ficha-body{min-height:0;overflow-y:auto;overscroll-behavior:contain;background-attachment:local;scrollbar-width:thin;scrollbar-color:var(--rule) transparent}
+.ficha-foot{position:relative;transition:box-shadow .2s}
+.ficha.rola .ficha-foot{box-shadow:0 -12px 14px -12px #1f243038}
+.ficha .empty{min-height:100%;display:flex;flex-direction:column;justify-content:center}
+.lista{flex:1 1 0;min-height:10rem;overflow-y:auto;overscroll-behavior:contain;margin-top:.75rem;border-radius:8px}
+.below{margin-top:.5rem}
+/* Sem "Desfazer" nem "Ver card anterior" à vista, a faixa some e o papel ganha a altura dela. */
+.below:not(:has(>:not([hidden]))){min-height:0;margin-top:0}
+/* Ajustes: no canto do título, abrem por cima da página em vez de empurrar a ficha. */
+header{position:relative}
+details{margin:0 0 0 auto}
+summary{padding:.25rem .5rem;border-radius:6px;list-style-position:inside}
+summary:hover{color:var(--pri);background:var(--pri-l)}
+details[open] summary{color:var(--pri)}
+.painel{position:absolute;z-index:10;right:0;top:calc(100% + .375rem);width:min(30rem,100%);max-height:calc(100dvh - 8rem);overflow-y:auto;
+ padding:.875rem 1rem;background:var(--paper);border:1px solid var(--line);border-radius:8px;box-shadow:0 6px 16px #1f243026}
+.painel .cfg{margin-top:0}
+.foot{margin:.75rem 0 0}
+.ficha-foot{padding:.75rem 1.5rem .875rem}
+.hint{margin-top:.5rem}
+@media (prefers-reduced-motion:reduce){.ficha-foot{transition:none}}
+/* Telas mais baixas: os nomes das leis saem (a sigla basta) para sobrar papel. */
+@media (max-height:820px){
+ .leis .nm{display:none}
+ .leis button{padding:.375rem .75rem}
+}
+/* Tela baixa demais para uma janela fixa (celular deitado): volta a página comum, que rola. */
+@media (max-height:539px){
+ html,body{height:auto}
+ body{display:block;height:auto}
+ main{display:block}
+ .ficha{min-height:21rem}
+ .ficha-body{overflow:visible}
+ .lista{overflow:visible}
+}
+
+/* ---------- desktop largo: duas colunas ----------
+   Em telas estreitas os dois blocos somem (display:contents) e a página fica como antes.
+   A partir de 1100px a lateral recebe título, leis, modo, filtros e progresso; a ficha ganha o resto da largura. */
+.lado,.palco{display:contents}
+@media (min-width:1100px) and (min-height:540px){
+ main{display:grid;grid-template-columns:20rem minmax(0,1fr);grid-template-rows:minmax(0,1fr);column-gap:2.5rem;
+  max-width:94rem;padding:1.25rem 2rem 1rem}
+ .lado{display:flex;flex-direction:column;min-height:0}
+ .lado>*{flex:none}
+ .palco{display:flex;flex-direction:column;min-height:0;min-width:0}
+ .palco>*{flex:none}
+ /* Título e "Ajustes" na mesma linha; o painel abre por cima da página, alinhado à esquerda da coluna,
+    sem ser cortado por ela. */
+ header{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:baseline;gap:.125rem .5rem}
+ header h1{grid-column:1;grid-row:1}
+ header details{grid-column:2;grid-row:1;position:static;margin:0}
+ header .sub{grid-column:1/-1;grid-row:2}
+ .painel{left:0;right:auto;width:28rem;padding:1rem 1.25rem}
+ .painel .cfg{display:grid;grid-template-columns:1fr;gap:.75rem}
+ .painel .cfg label{display:flex;justify-content:space-between;align-items:center;gap:1rem;color:var(--tx)}
+ .painel #reset{justify-self:start;color:var(--no)}
+ .painel .foot{margin-top:1rem;padding-top:.75rem;border-top:1px solid var(--line);line-height:1.5}
+ /* Leis em lista: sigla e contagem na mesma linha, nome por extenso embaixo. */
+ .leis{grid-template-columns:1fr;gap:.375rem;margin-top:1rem}
+ .leis button{display:grid;grid-template-columns:minmax(0,1fr) auto;column-gap:.5rem;align-items:baseline;padding:.5rem .75rem}
+ .leis .sg{grid-column:1;grid-row:1}
+ .leis .ct{grid-column:2;grid-row:1;margin:0;white-space:nowrap}
+ .leis .nm{grid-column:1/-1;grid-row:2}
+ .controls{flex-direction:column;align-items:stretch;gap:.625rem;margin-top:1.25rem}
+ .seg{display:flex}.seg button{flex:1 1 auto;padding:.4rem .5rem}
+ select{flex:none;width:100%}
+ .status{margin:1.25rem 0 .5rem;font-size:.875rem;color:var(--tx)}
+ .ficha{margin-top:0;flex:1 1 0}
+ .lista-ctl{margin:0 0 .75rem}
+ .lista{margin-top:0;flex:1 1 0}
+ /* Papel mais largo: mais respiro nas margens, texto um pouco maior. */
+ .ficha-head{padding:.875rem 2.5rem .625rem}
+ .ficha-body{padding-left:2.5rem;padding-right:2.5rem}
+ .ficha-foot{padding:.875rem 2.5rem 1rem}
+ .q{font-size:1.375rem}.lei{font-size:1.1875rem}.a{font-size:1.25rem}
+ .rate button{padding:.625rem .25rem}
+}
+@media (min-width:1100px) and (max-height:820px){.leis .nm{display:block}}
+
+@media (max-width:520px){
+ :root{--lh:1.75rem}
+ h1{font-size:1.25rem}
+ .seg{width:100%}.seg button{flex:1 1 auto;padding:.375rem .5rem;font-size:.875rem;white-space:nowrap}
+ /* As cinco leis numa só fileira compacta (sigla e contagem), em vez de três linhas de botões. */
+ .leis{grid-template-columns:repeat(5,minmax(0,1fr));gap:.25rem}
+ .leis button{padding:.375rem .375rem;align-items:center;text-align:center}
+ .leis .sg{font-size:.875rem;white-space:nowrap}
+ .leis .ct{font-size:.6875rem;white-space:nowrap}
+ .leis .nm{display:none}
+ main{padding:.75rem .75rem .5rem}
+ header .sub{display:none}
+ .controls{gap:.375rem .75rem;margin-top:.5rem}
+ .ficha{min-height:12rem}
+ .ficha-head,.ficha-body,.ficha-foot{padding-left:1rem;padding-right:1rem}
+ .q{font-size:1.125rem}.lei{font-size:1.0625rem}.a{font-size:1.0625rem}
+ .rate{grid-template-columns:1fr 1fr}
+ .lista li button{grid-template-columns:minmax(0,1fr) auto}
+ .lista .lt{grid-column:1/-1;grid-row:2}
+ .menu{right:.5rem;left:.5rem;min-width:0}
+ .hint{display:none}
+}
+/* ---------- muitas leis sem rolar a página ----------
+   Com 11 leis + "Todas", cada botão vira uma linha só (sigla à esquerda, contagem à direita) e o nome
+   por extenso fica no title. No desktop as leis ocupam duas colunas na lateral; se ainda faltar altura,
+   só a lateral rola por dentro, nunca a página. */
+.leis .nm{display:none}
+.leis{grid-template-columns:repeat(auto-fill,minmax(8rem,1fr));gap:.375rem}
+.leis button{flex-direction:row;justify-content:space-between;align-items:baseline;gap:.5rem;padding:.3125rem .625rem}
+.leis .sg{font-size:.875rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.leis .ct{margin:0;white-space:nowrap}
+.ficha{min-height:11rem}
+@media (min-width:1100px) and (min-height:540px){
+ .lado{overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:var(--line) transparent;padding-right:.25rem}
+ .leis{grid-template-columns:1fr 1fr;gap:.375rem;margin-top:.875rem}
+ .leis button{display:flex;padding:.375rem .625rem}
+ .leis .nm{display:none}
+ .controls{margin-top:1rem;gap:.5rem}
+ .status{margin:1rem 0 .5rem}
+}
+@media (max-width:520px){
+ .leis{grid-template-columns:repeat(4,minmax(0,1fr));gap:.25rem}
+ .leis button{flex-direction:column;align-items:center;gap:0;padding:.25rem}
+}
+</style>
+<link rel="stylesheet" href="css/edital.css">
+<link rel="stylesheet" href="css/nav.css">
+</head>
+<body>
+<script src="js/armazenamento.js"></script>
+<script src="js/config.js"></script>
+<script src="js/nav.js"></script>
+<script src="js/carregar.js"></script>
+<script src="js/historico.js"></script>
+<script src="js/erros-questoes.js"></script>
+<script src="js/meus-cards.js"></script>
+<main>
+<aside class="lado" aria-label="Escolha do estudo">
+<header>
+ <h1>Flashcards</h1>
+ <p class="sub" id="sub"></p>
+ <details>
+  <summary>Ajustes</summary>
+  <div class="painel">
+   <div class="cfg">
+    <label>Cards novos por dia, em cada lei <input type="number" id="novos" min="0" max="200" step="1"></label>
+    <label>Revisões por dia, em cada lei <input type="number" id="revs" min="0" max="999" step="1"></label>
+    <button type="button" class="btn" id="reset">Apagar progresso</button>
+   </div>
+   <p class="foot" id="foot"></p>
+  </div>
+ </details>
+</header>
+
+<div class="leis" id="leis" role="group" aria-label="Lei para estudar"></div>
+
+<div class="controls">
+ <div class="seg" role="group" aria-label="Modo de estudo">
+  <button type="button" id="mRev" aria-pressed="true">Revisão de hoje</button>
+  <button type="button" id="mLiv" aria-pressed="false">Estudar livre</button>
+  <button type="button" id="mLis" aria-pressed="false">Lista</button>
+ </div>
+ <label for="sec" class="vh">Seção da lei</label>
+ <select id="sec"></select>
+ <label class="check"><input type="checkbox" id="num"> Só prazos, quóruns e números</label>
+ <label class="check"><input type="checkbox" id="soFav"> Só favoritos</label>
+</div>
+
+<p class="status" id="status" aria-live="polite"></p>
+<div class="progress" aria-hidden="true"><i id="bar"></i></div>
+<div id="warn"></div>
+</aside>
+
+<div class="palco">
+<div class="lista-ctl" id="listaCtl" hidden>
+ <label for="busca" class="vh">Buscar nos cards</label>
+ <input type="search" id="busca" placeholder="Buscar: texto, resposta ou &quot;art. 21&quot;" autocomplete="off">
+ <label for="filtro" class="vh">Filtrar cards</label>
+ <select id="filtro">
+  <option value="todos">Todos os cards</option>
+  <option value="fav">Favoritos</option>
+  <option value="novos">Ainda não vistos</option>
+  <option value="revisao">Já vistos (em revisão)</option>
+  <option value="hoje">Respondidos hoje</option>
+  <option value="dia">Respondidos em um dia…</option>
+  <option value="errados">Que já errei</option>
+  <option value="fora">Suspensos e adiados</option>
+  <option value="nota">Com anotação</option>
+ </select>
+ <label for="dia" class="vh">Dia</label>
+ <input type="date" id="dia" hidden>
+ <label for="ordem" class="vh">Ordem</label>
+ <select id="ordem">
+  <option value="lei">Ordem da lei</option>
+  <option value="prox">Próxima revisão</option>
+  <option value="erros">Mais erros</option>
+ </select>
+</div>
+
+<section class="ficha" id="fc" aria-live="polite" aria-label="Flashcard"></section>
+<section class="lista" id="lista" aria-label="Lista de cards" hidden></section>
+<div class="below">
+ <button type="button" class="undo" id="antBtn" hidden>← Ver card anterior</button>
+ <p class="toast" id="toast" role="status" hidden><span id="toastMsg"></span> <button type="button" class="undo" id="toastUndo">Desfazer</button></p>
+ <button type="button" class="undo" id="undo" hidden>Desfazer a última resposta</button>
+</div>
+</div>
+
+</main>
+<script src="js/edital.js"></script>
+<script src="js/texto-lei.js"></script>
+<script src="js/ref-lei.js"></script>
+<script src="js/flashcards.js"></script>
+</body>
+</html>

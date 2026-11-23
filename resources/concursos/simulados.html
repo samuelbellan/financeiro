@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Simulados — Estudo para Concursos</title>
+<link rel="stylesheet" href="css/questoes-base.css">
+<link rel="stylesheet" href="css/simulados.css">
+<link rel="stylesheet" href="css/texto-lei.css">
+<link rel="stylesheet" href="css/edital.css">
+<link rel="stylesheet" href="css/nav.css">
+<link rel="stylesheet" href="css/questoes.css">
+</head>
+<body>
+<script src="js/armazenamento.js"></script>
+<script src="js/config.js"></script>
+<script src="js/nav.js"></script>
+<script src="js/carregar.js"></script>
+<script src="js/historico.js"></script>
+<main id="picker" class="sp" aria-labelledby="spTitulo">
+ <div class="sp-in">
+  <header class="sp-cab"><div><h1 id="spTitulo">Simulados</h1><p id="spResumo"></p></div><button type="button" id="spNotas" class="sp-btn">Notas</button></header>
+  <div id="spGrupos"></div>
+ </div>
+</main>
+<div class="top">
+ <a class="sim-voltar" href="#" id="voltar">‹ Simulados</a>
+ <div class="pager"><button class="nav-arrow" id="pp" aria-label="Página anterior">‹</button> Pág. <input id="pg" type="number" min="1"> de <span id="tot"></span> <button class="nav-arrow" id="np" aria-label="Próxima página">›</button></div>
+ <div class="stats"><span>Respondidas <b id="sA">0</b></span><span class="ok">Acertos <b id="sC">0</b></span><span class="no">Erros <b id="sE">0</b> <span class="pct" id="sPct">0% de acertos</span></span><button id="notas" type="button" class="sim-back">Notas</button><button id="reset" type="button">zerar</button></div>
+ <div class="sim-filter"><label>Simulado <select id="sourceFilter"><option value="all">Todos os simulados</option></select></label><label>Área <select id="areaFilter"><option value="all">Todas as áreas</option></select></label><label>Buscar <input id="search" type="search" placeholder="enunciado ou alternativa" aria-label="Buscar no enunciado ou alternativa"></label></div>
+</div>
+<div class="wrap">
+ <button class="side l" id="pv" aria-label="Anterior">◀</button><button class="side r" id="nx" aria-label="Próxima">▶</button>
+ <div class="card">
+  <div class="head"><div class="hl"><div class="qn" id="qn"></div><div><div class="pills" id="pills"></div><div class="hist" id="hist"></div></div></div><div class="icons">SIMULADO</div></div>
+  <div class="mid"><div class="body"><div class="meta"><span id="qid"></span><span class="tag hide" id="tag"></span></div><div class="sim-source" id="sourceLabel"></div><p class="stem" id="stem"></p><img class="question-figure" id="questionFigure" hidden alt="Figura original da questão"><div id="opts"></div></div>
+  <div class="sol" id="sol"></div></div>
+  <div class="foot"><button class="btn main" id="ans" disabled>Responder</button>
+   <div class="ctrl"><button id="b1" title="Primeira">⏮</button><button id="b2" title="Anterior">⏪</button><button id="b3" title="Aleatória">🔀</button><button id="b6" title="Próxima não respondida">⇥</button><button id="b4" title="Próxima">⏩</button><button id="b5" title="Última">⏭</button></div>
+   <button class="btn alt" id="sbtn">Ver solução e comentários</button></div>
+ </div>
+</div>
+<script src="js/fundamento.js"></script>
+<script src="js/texto-lei.js"></script>
+<script src="js/edital.js"></script>
+<script type="module" src="js/simulados.js"></script>
+<script src="js/questoes-fit.js"></script>
+<script src="js/questoes-dia.js" data-origem="simulados"></script>
+</body>
+</html>

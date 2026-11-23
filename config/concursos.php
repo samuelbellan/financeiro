@@ -35,6 +35,30 @@ return [
         'prior' => ['nao_vi' => 0.1, 'vi_parte' => 0.4, 'vi_tudo' => 0.6, '' => 0.3], // '' = não declarou
     ],
 
+    // Leis em Markdown do projeto ctresb/leis (github.com/ctresb/leis). O repositório inteiro tem
+    // vários GB, então só as leis do catálogo são baixadas (sob demanda) e guardadas em `dir`.
+    // No material de resumo, [[ctn 98]] vira link para o artigo; a chave é a sigla do catálogo.
+    'leis' => [
+        'raw' => env('CONCURSOS_LEIS_RAW', 'https://raw.githubusercontent.com/ctresb/leis/main/'),
+        'web' => 'https://github.com/ctresb/leis/blob/main/',
+        'dir' => storage_path('concursos/leis'),
+        'catalogo' => [
+            'cf' => ['sigla' => 'CF', 'nome' => 'Constituição Federal de 1988', 'path' => 'constituicao.md'],
+            // O ADCT está no mesmo arquivo da CF; os artigos dele ficam com âncora "adct-art-N".
+            'adct' => ['sigla' => 'ADCT', 'nome' => 'Ato das Disposições Constitucionais Transitórias', 'path' => 'constituicao.md', 'de' => 'cf', 'prefixo' => 'adct-'],
+            'ctn' => ['sigla' => 'CTN', 'nome' => 'Código Tributário Nacional (Lei 5.172/1966)', 'path' => 'federal/leis-ordinarias/1966/lei-5172-1966-10-25.md'],
+            'ec132' => ['sigla' => 'EC 132/2023', 'nome' => 'Emenda Constitucional 132/2023 (Reforma Tributária)', 'path' => 'federal/emendas-constitucionais/2023/emc-132-2023-12-20.md'],
+            'lc87' => ['sigla' => 'LC 87/1996', 'nome' => 'Lei Kandir (ICMS)', 'path' => 'federal/leis-complementares/1996/lcp-87-1996-09-13.md'],
+            'lc116' => ['sigla' => 'LC 116/2003', 'nome' => 'Lei Complementar 116/2003 (ISS)', 'path' => 'federal/leis-complementares/2003/lcp-116-2003-07-31.md'],
+            'lc123' => ['sigla' => 'LC 123/2006', 'nome' => 'Estatuto da Microempresa (Simples Nacional)', 'path' => 'federal/leis-complementares/2006/lcp-123-2006-12-14.md'],
+            // LC 214/2025 (IBS/CBS) fica de fora: no acervo só existe o texto das partes vetadas promulgadas.
+            'lef' => ['sigla' => 'LEF', 'nome' => 'Lei de Execução Fiscal (Lei 6.830/1980)', 'path' => 'federal/leis-ordinarias/1980/lei-6830-1980-09-22.md'],
+            'lei11101' => ['sigla' => 'Lei 11.101/2005', 'nome' => 'Lei de Falências e Recuperação Judicial', 'path' => 'federal/leis-ordinarias/2005/lei-11101-2005-02-09.md'],
+            'lei9492' => ['sigla' => 'Lei 9.492/1997', 'nome' => 'Lei de Protesto de Títulos', 'path' => 'federal/leis-ordinarias/1997/lei-9492-1997-09-10.md'],
+            'ctb' => ['sigla' => 'CTB', 'nome' => 'Código de Trânsito Brasileiro (Lei 9.503/1997)', 'path' => 'federal/leis-ordinarias/1997/lei-9503-1997-09-23.md'],
+        ],
+    ],
+
     'backup' => [
         // Pasta sincronizada com o Google Drive onde o pg_dump diário é salvo.
         'dir' => env('CONCURSOS_BACKUP_DIR'),
