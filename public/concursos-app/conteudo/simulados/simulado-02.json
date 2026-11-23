@@ -1,0 +1,85 @@
+{
+  "nome": "Simulado 2 · Exemplo — Direito Tributário (CTN)",
+  "questoes": [
+    {
+      "area": "Direito Tributário",
+      "tema": "CTN — Conceito e espécies de tributo (arts. 3º a 5º)",
+      "fontes": ["ctn"],
+      "enunciado": "Conforme o Código Tributário Nacional, tributo é toda prestação pecuniária compulsória, em moeda ou cujo valor nela se possa exprimir, que:",
+      "alternativas": [
+        "Constitua sanção de ato ilícito, instituída em lei e cobrada mediante atividade administrativa discricionária.",
+        "Não constitua sanção de ato ilícito, instituída em lei e cobrada mediante atividade administrativa plenamente vinculada.",
+        "Não constitua sanção de ato ilícito, instituída por decreto e cobrada mediante atividade administrativa vinculada.",
+        "Constitua sanção de ato ilícito, instituída em lei e cobrada mediante atividade administrativa plenamente vinculada.",
+        "Não constitua sanção de ato ilícito, instituída em contrato e cobrada mediante atividade administrativa discricionária."
+      ],
+      "gabarito": "B",
+      "comentario": "Art. 3º do CTN: tributo é toda prestação pecuniária compulsória, em moeda ou cujo valor nela se possa exprimir, que não constitua sanção de ato ilícito, instituída em lei e cobrada mediante atividade administrativa plenamente vinculada. Multa é sanção de ato ilícito: por isso não é tributo."
+    },
+    {
+      "area": "Direito Tributário",
+      "tema": "CTN — Conceito e espécies de tributo (arts. 3º a 5º)",
+      "fontes": ["ctn"],
+      "enunciado": "Segundo o CTN, o tributo cuja obrigação tem por fato gerador uma situação independente de qualquer atividade estatal específica, relativa ao contribuinte, é:",
+      "alternativas": [
+        "A taxa.",
+        "A contribuição de melhoria.",
+        "O imposto.",
+        "O empréstimo compulsório.",
+        "A tarifa."
+      ],
+      "gabarito": "C",
+      "comentario": "Art. 16 do CTN: imposto é o tributo cuja obrigação tem por fato gerador uma situação independente de qualquer atividade estatal específica, relativa ao contribuinte. A taxa (art. 77) e a contribuição de melhoria (art. 81) dependem de uma atuação do Estado."
+    },
+    {
+      "area": "Direito Tributário",
+      "tema": "CTN — Taxas e contribuição de melhoria (arts. 77 a 82)",
+      "fontes": ["ctn"],
+      "enunciado": "De acordo com o CTN, as taxas têm como fato gerador:",
+      "alternativas": [
+        "A valorização imobiliária decorrente de obra pública.",
+        "Uma situação independente de qualquer atividade estatal específica.",
+        "O exercício regular do poder de polícia, ou a utilização, efetiva ou potencial, de serviço público específico e divisível.",
+        "A utilização apenas efetiva de serviço público geral e indivisível.",
+        "O capital das empresas que utilizam o serviço público."
+      ],
+      "gabarito": "C",
+      "comentario": "Art. 77 do CTN: a taxa tem como fato gerador o exercício regular do poder de polícia, ou a utilização, efetiva ou potencial, de serviço público específico e divisível, prestado ao contribuinte ou posto à sua disposição. O parágrafo único proíbe calcular a taxa em função do capital das empresas."
+    },
+    {
+      "area": "Direito Tributário",
+      "tema": "CTN — Crédito tributário (arts. 142, 151 e 156)",
+      "fontes": ["ctn"],
+      "enunciado": "Analise as assertivas abaixo, de acordo com o Código Tributário Nacional:\n\nI. O parcelamento suspende a exigibilidade do crédito tributário.\n\nII. A remissão extingue o crédito tributário.\n\nIII. A moratória extingue o crédito tributário.",
+      "alternativas": [
+        "Está correta apenas a assertiva I.",
+        "Está correta apenas a assertiva II.",
+        "Estão corretas apenas as assertivas I e II.",
+        "Estão corretas apenas as assertivas II e III.",
+        "Todas as assertivas estão corretas."
+      ],
+      "gabarito": "C",
+      "comentario": "O parcelamento suspende a exigibilidade (art. 151, VI) e a remissão extingue o crédito (art. 156, IV). A moratória não extingue: ela suspende a exigibilidade (art. 151, I).",
+      "itens": [
+        ["I", true, "Art. 151, VI, do CTN."],
+        ["II", true, "Art. 156, IV, do CTN."],
+        ["III", false, "Art. 151, I: a moratória suspende a exigibilidade, não extingue o crédito."]
+      ]
+    },
+    {
+      "area": "Direito Tributário",
+      "tema": "CTN — Crédito tributário (arts. 142, 151 e 156)",
+      "fontes": ["ctn"],
+      "enunciado": "Conforme o art. 142 do CTN, a atividade administrativa de lançamento é:",
+      "alternativas": [
+        "Discricionária e facultativa.",
+        "Vinculada e facultativa.",
+        "Discricionária e obrigatória.",
+        "Vinculada e obrigatória, sob pena de responsabilidade funcional.",
+        "Delegável ao próprio contribuinte, sem revisão da autoridade."
+      ],
+      "gabarito": "D",
+      "comentario": "Art. 142, § 1º, do CTN: a atividade administrativa de lançamento é vinculada e obrigatória, sob pena de responsabilidade funcional. O caput diz que compete privativamente à autoridade administrativa constituir o crédito tributário pelo lançamento."
+    }
+  ]
+}

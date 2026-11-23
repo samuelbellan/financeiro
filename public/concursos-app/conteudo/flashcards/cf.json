@@ -1,0 +1,48 @@
+{
+  "lei": "cf",
+  "sigla": "CF",
+  "curto": "Constituição",
+  "nome": "Constituição Federal de 1988",
+  "cards": [
+    {
+      "secao": "Princípios fundamentais",
+      "art": "Art. 1º, I a V",
+      "frente": "Quais são os cinco fundamentos da República Federativa do Brasil?",
+      "verso": "Soberania, cidadania, dignidade da pessoa humana, valores sociais do trabalho e da livre iniciativa e pluralismo político."
+    },
+    {
+      "secao": "Princípios fundamentais",
+      "art": "Art. 2º",
+      "tipo": "lacuna",
+      "texto": "Art. 2º São Poderes da União, [[independentes e harmônicos]] entre si, o Legislativo, o Executivo e o Judiciário.",
+      "contexto": "Relação entre os Poderes",
+      "armadilha": "A prova costuma trocar por “autônomos e soberanos”."
+    },
+    {
+      "secao": "Direitos e garantias fundamentais",
+      "art": "Art. 5º, XI",
+      "frente": "Em que casos é possível entrar na casa sem o consentimento do morador?",
+      "verso": "Flagrante delito, desastre ou para prestar socorro (a qualquer hora); por determinação judicial, só durante o dia."
+    },
+    {
+      "secao": "Administração pública",
+      "art": "Art. 37",
+      "frente": "Quais são os princípios do caput do art. 37 da Constituição?",
+      "verso": "Legalidade, impessoalidade, moralidade, publicidade e eficiência (LIMPE)."
+    },
+    {
+      "secao": "Administração pública",
+      "art": "Art. 37, III",
+      "tipo": "lacuna",
+      "texto": "III - o prazo de validade do concurso público será de [[até dois anos]], prorrogável uma vez, por igual período;",
+      "contexto": "Validade do concurso público",
+      "armadilha": "Prorroga uma vez só, e pelo mesmo período (não “por até dois anos”)."
+    },
+    {
+      "secao": "Organização do Estado",
+      "art": "Art. 18, § 4º",
+      "frente": "Como se cria, incorpora, funde ou desmembra um Município?",
+      "verso": "Por lei estadual, no período fixado por lei complementar federal, com plebiscito prévio nas populações dos Municípios envolvidos."
+    }
+  ]
+}

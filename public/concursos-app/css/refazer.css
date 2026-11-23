@@ -1,0 +1,315 @@
+/* Refazer erros (refazer.html + js/refazer.js). Mesmas cores do resto do site. */
+:root{--pri:#5b3fd0;--pri-l:#e7e3f8;--bg:#f4f4f7;--card:#fff;--line:#e6e6ec;--tx:#2b2b33;--mut:#6b6b78;
+ --ok:#0f7a55;--ok-l:#e3f5ed;--no:#b5352a;--no-l:#fbe9e7;--mid:#9a6512;--mid-l:#fdf3e1}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.5 Inter,"Segoe UI",system-ui,sans-serif}
+main{max-width:50rem;margin:0 auto;padding:1.25rem 1rem 3rem}
+button,select,input,textarea{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--pri);outline-offset:2px}
+h1{font-size:1.5rem;line-height:1.2;margin:.25rem 0 0}
+h2{font-size:1rem;margin:0 0 .5rem}
+.sub{margin:.25rem 0 1rem;color:var(--mut);font-size:.875rem}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:1rem 1.25rem;margin:0 0 1rem}
+.btn{border:1px solid var(--line);background:#fff;border-radius:8px;padding:.5rem 1rem;cursor:pointer;font-weight:600}
+.btn:hover{border-color:var(--pri)}
+.btn.main{background:var(--pri);border-color:var(--pri);color:#fff}
+.btn.main:hover{filter:brightness(.92)}
+.btn:disabled{opacity:.45;cursor:not-allowed;filter:none}
+.link{border:0;background:none;color:var(--pri);cursor:pointer;padding:0;font-weight:600}
+.link:hover{text-decoration:underline}
+
+/* Início */
+.num{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:.625rem .75rem}
+.num b{display:block;font-size:1.5rem;line-height:1.1;font-variant-numeric:tabular-nums}
+.num span{font-size:.75rem;color:var(--mut)}
+.num.hoje b{color:var(--pri)}
+.cfg{display:flex;flex-wrap:wrap;gap:.75rem 1.25rem;align-items:center;margin:.75rem 0 0;font-size:.875rem}
+.cfg label{display:flex;gap:.375rem;align-items:center}
+.cfg select{border:1px solid var(--line);border-radius:6px;padding:.25rem .5rem;background:#fff}
+.how{margin:0;padding-left:1.125rem;font-size:.875rem}
+.how li{margin:.25rem 0}
+.rows{margin:0;padding:0;list-style:none}
+.rows li{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:.75rem;align-items:baseline;padding:.375rem 0;border-top:1px solid var(--line);font-size:.875rem}
+.rows li:first-child{border-top:0}
+.rows .n{color:var(--no);font-weight:700;font-variant-numeric:tabular-nums}
+.rows .d{color:var(--pri);font-size:.75rem;font-weight:600}
+.bar{display:grid;grid-template-columns:minmax(0,13rem) 1fr 2rem;gap:.5rem;align-items:center;font-size:.8125rem;margin:.25rem 0}
+.bar div{height:.625rem;background:var(--line);border-radius:5px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--mid)}
+/* ---------- Início: painel com todos os indicadores à vista ----------
+   Trilha das caixas no alto (a sequência real que cada questão percorre), sessão / assuntos / causas embaixo,
+   e as regras do aluno numa coluna própria à direita, que rola sozinha. */
+.vh{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.rf-cab{display:flex;justify-content:space-between;align-items:flex-end;gap:1rem}
+.rf-como{position:relative;font-size:.875rem;margin-bottom:.625rem}
+.rf-como>summary{cursor:pointer;color:var(--pri);font-weight:600;list-style:none}
+.rf-como>summary::-webkit-details-marker{display:none}
+.rf-como>summary:hover{text-decoration:underline}
+.rf-como[open]>.how{position:absolute;right:0;top:calc(100% + .375rem);z-index:5;width:min(30rem,90vw);background:var(--card);border:1px solid var(--line);border-radius:10px;box-shadow:0 12px 32px rgba(30,20,80,.18);padding:.75rem 1rem .75rem 2rem}
+.rf-painel{display:grid;gap:1rem;grid-template-columns:repeat(3,minmax(0,1fr)) minmax(20rem,25rem);grid-template-rows:auto minmax(0,1fr);
+ grid-template-areas:"tr tr tr rg" "ss as ca rg"}
+.rf-painel>.card{margin:0;min-height:0}
+.rf-trilha{grid-area:tr}.rf-sessao{grid-area:ss}.rf-assuntos{grid-area:as}.rf-causas{grid-area:ca}.rf-regras{grid-area:rg}
+.rf-sessao,.rf-assuntos,.rf-causas{overflow:auto}
+/* Trilha */
+.tr-linha{list-style:none;margin:.25rem 0 0;padding:0;display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:.375rem}
+.tr-est{position:relative;padding:.625rem .75rem .5rem;border-radius:8px;background:var(--bg)}
+.tr-est::before{content:"";position:absolute;left:0;right:0;top:0;height:4px;border-radius:8px 8px 0 0;background:var(--cor)}
+.tr-est:not(:last-child)::after{content:"";position:absolute;right:-.3125rem;top:50%;width:.5rem;height:.5rem;border:solid #b8b8c2;border-width:2px 2px 0 0;transform:translate(25%,-50%) rotate(45deg);z-index:1}
+.tr-est b{display:block;font-size:1.875rem;line-height:1.1;font-variant-numeric:tabular-nums;color:var(--tx)}
+.tr-est span{display:block;font-size:.8125rem;font-weight:600;color:var(--tx)}
+.tr-est small{display:block;font-size:.75rem;color:var(--pri);font-weight:600;min-height:1.1em}
+.tr-nova{background:#fff;border:1px dashed #c9c9d0}
+.tr-nova b,.tr-nova span{color:var(--mut)}
+.tr-chaves{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:.375rem;margin-top:.375rem;font-size:.8125rem;color:var(--mut)}
+.tr-chave{text-align:center;padding-top:.625rem;position:relative}
+.tr-chave::before{content:"";position:absolute;left:.75rem;right:.75rem;top:0;height:.375rem;border:2px solid #cfcfd8;border-top:0;border-radius:0 0 6px 6px}
+.tr-chave b{color:var(--tx);font-size:.9375rem}
+.tr-ch-nova::before{display:none}
+.tr-ch-apr{grid-column:2/5}
+.tr-ch-dom{grid-column:5/7}
+.tr-ch-dom::before{border-color:var(--ok)}
+.tr-ch-dom b{color:var(--ok)}
+.tr-nota{margin:.375rem 0 0;font-size:.75rem}
+/* Sessão de hoje */
+.rf-sessao{display:flex;flex-direction:column}
+.ss-hoje{margin:0 0 .375rem;font-size:.9375rem}
+.ss-hoje b{font-size:2.25rem;line-height:1;color:var(--pri);font-variant-numeric:tabular-nums;margin-right:.25rem}
+.rf-sessao .dica{margin:0}
+.rf-sessao .cfg{flex-direction:column;align-items:flex-start;gap:.5rem}
+.ss-acao{margin:0;padding-top:1rem}
+.ss-acao .btn{width:100%;padding:.625rem 1rem}
+/* Por assunto */
+.ass{width:100%;border-collapse:collapse;font-size:.875rem}
+.ass th,.ass td{padding:.375rem 0;text-align:left;border-top:1px solid var(--line);vertical-align:top}
+.ass thead th{border-top:0;padding-top:0;font-size:.75rem;font-weight:600;color:var(--mut)}
+.ass tbody th{font-weight:500;padding-right:.75rem}
+.ass .nm{text-align:right;padding-right:.75rem;font-variant-numeric:tabular-nums;width:1%;white-space:nowrap}
+.ass tbody .nm{font-weight:700;color:var(--no)}
+.ass tbody .nm+.nm{color:var(--mut);font-weight:500}
+.ass tbody .nm.hj{color:var(--pri);font-weight:700}
+.ass td:last-child{width:1%;text-align:right}
+.ass-bar{display:block;height:3px;margin-top:.25rem;border-radius:2px;background:var(--no);opacity:.35}
+/* Por que você erra */
+.rf-causas .bar{grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"l n" "b b";gap:.125rem .5rem;margin:0 0 .625rem}
+.rf-causas .bar>span{grid-area:l}.rf-causas .bar>b{grid-area:n;font-variant-numeric:tabular-nums}.rf-causas .bar>div{grid-area:b}
+.causa-dica{margin:.75rem 0 0;padding:.5rem .75rem;border-radius:8px;background:var(--mid-l);font-size:.8125rem;line-height:1.45}
+.causa-dica b{color:var(--mid)}
+/* Suas regras: coluna própria; só a lista rola. */
+.rf-regras{display:flex;flex-direction:column;overflow:hidden}
+.rf-regras h2{margin:0}
+.rg-tot{font-weight:400;color:var(--mut)}
+.rf-regras-corpo{flex:1;min-height:0;overflow:auto;margin:0 -.5rem 0 0;padding-right:.5rem}
+.rf-regras .regra-sub{margin:.125rem 0 0}
+@media (max-width:1100px){
+ .rf-painel{grid-template-columns:minmax(0,1fr) minmax(0,1fr);grid-template-rows:none;grid-template-areas:"tr tr" "ss as" "ca rg"}
+ .tr-linha,.tr-chaves{grid-template-columns:repeat(3,minmax(0,1fr))}
+ .tr-chaves{display:none}
+}
+
+/* Suas regras: o caderno do aluno, com a linguagem da ficha dos flashcards (margem vermelha, pauta azul, Literata). */
+.regras{--margem:#c8463d;--pauta:#dbe4f3;--tinta:#1f2430;margin-top:.25rem}
+.regra-sub{margin:.25rem 0 0}
+.regra-ctl{margin:.5rem 0 0}
+.regra-q{width:100%;height:2.125rem;border:1px solid var(--line);border-radius:8px;padding:0 .625rem;background:#fff}
+.regra-n{margin:.375rem 0 0;font-size:.75rem;color:var(--mut)}.regra-n:empty{display:none}
+html.rf-fixa .regra-ctl{position:sticky;top:0;z-index:1;background:#fff;padding:.5rem 0;box-shadow:0 1px 0 var(--line)}
+.regra-grupo{margin-top:.875rem}
+.regra-grupo>summary{display:flex;align-items:baseline;gap:.375rem;cursor:pointer;list-style:none;padding:.125rem 0 .3125rem;border-bottom:1px solid var(--line);color:var(--pri);font-weight:700;font-size:.875rem}
+.regra-grupo>summary::-webkit-details-marker{display:none}
+.regra-grupo>summary::before{content:"";flex:none;width:.4375rem;height:.4375rem;border:solid currentColor;border-width:0 2px 2px 0;transform:translateY(-.125rem) rotate(45deg);transition:transform .15s}
+.regra-grupo:not([open])>summary::before{transform:translateY(0) rotate(-45deg)}
+.regra-grupo>summary:hover .rg-nome{text-decoration:underline}
+.rg-n{margin-left:auto;font-weight:600;font-size:.75rem;color:var(--mut);font-variant-numeric:tabular-nums}
+.regra-lista{list-style:none;margin:.375rem 0 0 .1875rem;padding:0 0 0 .875rem;border-left:2px solid var(--margem)}
+.regra-i{padding:.5rem 0;border-top:1px solid var(--pauta)}
+.regra-i:first-child{border-top:0;padding-top:.25rem}
+.regra-txt{margin:0;font-family:Literata,Georgia,"Times New Roman",serif;font-size:1rem;line-height:1.55;color:var(--tinta);overflow-wrap:anywhere;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:4;line-clamp:4;overflow:hidden}
+.regra-txt.aberta{display:block;-webkit-line-clamp:unset;line-clamp:unset}
+.regra-tema{margin:.25rem 0 0;font-size:.75rem;line-height:1.45;color:var(--mut)}
+.regra-mais{font-size:.75rem;margin-top:.125rem}
+@media (prefers-reduced-motion:reduce){.regra-grupo>summary::before{transition:none}}
+.vazio{text-align:center;padding:2rem 1rem}
+
+/* Sessão */
+.prog{height:.375rem;background:var(--line);border-radius:4px;overflow:hidden;margin:0 0 .75rem}
+.prog i{display:block;height:100%;background:var(--pri);transition:width .2s}
+.pill{display:inline-block;border-radius:99px;background:var(--pri-l);color:var(--pri);padding:.0625rem .625rem;font-size:.75rem;font-weight:600}
+.pill.re{background:var(--mid-l);color:var(--mid)}
+.stem{white-space:pre-wrap;font-size:1rem;line-height:1.55;margin:.5rem 0 1rem}
+.stem p{margin:0 0 .8em}.stem p:last-child{margin-bottom:0}
+.stem.longo p{break-inside:avoid}
+.passo{font-size:.8125rem;font-weight:700;color:var(--pri);margin:0 0 .25rem}
+textarea{width:100%;min-height:4.5rem;border:1px solid var(--line);border-radius:8px;padding:.5rem .625rem;resize:vertical;background:#fff}
+.opts{display:grid;gap:.5rem;margin:0 0 1rem}
+.op{display:grid;grid-template-columns:2rem 1fr;gap:.5rem;text-align:left;border:1px solid var(--line);border-radius:10px;background:#fff;padding:.625rem .75rem;cursor:pointer}
+.op:hover:not(:disabled){border-color:var(--pri)}
+.op .l{width:1.75rem;height:1.75rem;border-radius:50%;border:1px solid var(--line);display:grid;place-items:center;font-weight:700;font-size:.8125rem}
+.op.sel{border-color:var(--pri);background:var(--pri-l)}
+.op.sel .l{background:var(--pri);color:#fff;border-color:var(--pri)}
+.op.certa{border-color:var(--ok);background:var(--ok-l)}
+.op.certa .l{background:var(--ok);color:#fff;border-color:var(--ok)}
+.op.errada{border-color:var(--no);background:var(--no-l)}
+.op.errada .l{background:var(--no);color:#fff;border-color:var(--no)}
+.op:disabled{cursor:default}
+.op-linha{display:grid;grid-template-columns:auto minmax(0,1fr);align-items:center;gap:.25rem}
+/* ✂ riscar alternativa, como no Simulados e no Caderno */
+.cut{width:1.75rem;height:2.125rem;padding:0;border:0;background:transparent;color:#9a9aa4;font-size:1.125rem;line-height:1;border-radius:6px;display:grid;place-items:center;cursor:pointer}
+.cut:hover,.cut:focus-visible{color:var(--pri);background:var(--pri-l)}
+.cut[aria-pressed=true]{color:var(--no);background:var(--no-l)}
+.op.riscada{opacity:.62;cursor:default}
+.op.riscada:hover{border-color:var(--line)}
+.op.riscada .l{border-color:#c9c9d0;color:#aaa;background:#f7f7f8}
+.op.riscada .t{text-decoration:line-through;text-decoration-thickness:2px;color:#999}
+.op .e{grid-column:2;font-size:.8125rem;color:var(--tx);border-top:1px dashed var(--line);margin-top:.25rem;padding-top:.25rem;white-space:pre-wrap}
+.conf{display:flex;flex-wrap:wrap;gap:.5rem;align-items:center;margin:0 0 1rem}
+.conf>span{font-size:.875rem;font-weight:600;margin-right:.25rem}
+.chip{border:1px solid var(--line);background:#fff;border-radius:99px;padding:.25rem .875rem;cursor:pointer;font-size:.875rem}
+.chip:hover{border-color:var(--pri)}
+.chip[aria-pressed=true]{background:var(--pri);border-color:var(--pri);color:#fff}
+.veredito{border-radius:10px;padding:.625rem .875rem;margin:0 0 1rem;font-weight:600}
+.veredito.ok{background:var(--ok-l);color:var(--ok)}
+.veredito.no{background:var(--no-l);color:var(--no)}
+.veredito small{display:block;font-weight:400;color:var(--tx);margin-top:.125rem}
+.bloco{border-left:3px solid var(--pri);background:var(--bg);border-radius:0 8px 8px 0;padding:.5rem .75rem;margin:.5rem 0;font-size:.875rem}
+.bloco b{display:block;font-size:.75rem;color:var(--pri)}
+.bloco p{margin:.125rem 0}
+.eco{border-left:3px solid var(--mid);background:var(--mid-l)}
+.eco b{color:var(--mid)}
+.itens{margin:.25rem 0;padding:0;list-style:none;font-size:.875rem}
+.itens li{padding:.125rem 0}
+.itens .v{font-weight:700}
+.itens .v.ok{color:var(--ok)}.itens .v.no{color:var(--no)}
+.acao{display:flex;flex-wrap:wrap;gap:.5rem;justify-content:space-between;align-items:center;margin-top:1rem}
+.dica{font-size:.8125rem;color:var(--mut)}
+.res{display:grid;grid-template-columns:repeat(auto-fit,minmax(9rem,1fr));gap:.5rem;margin:0 0 1rem}
+@media(max-width:640px){.bar{grid-template-columns:minmax(0,8rem) 1fr 2rem}}
+@media(prefers-reduced-motion:reduce){.prog i{transition:none}}
+.bloco .fd{margin:.125rem 0;padding-left:1.125rem}
+.bloco details{margin-top:.25rem}
+.bloco summary{cursor:pointer;font-weight:600;color:var(--pri)}
+.sim-base{border-left:3px solid var(--pri);background:var(--bg);border-radius:0 8px 8px 0;padding:.5rem .75rem;margin:.5rem 0;font-size:.875rem}
+.sim-base b{display:block;font-size:.75rem;color:var(--pri)}
+.sim-base p{margin:.125rem 0}
+.sim-base .fd{margin:.125rem 0;padding-left:1.125rem}
+.sim-base details{margin-top:.25rem}
+.sim-base summary{cursor:pointer;font-weight:600;color:var(--pri)}
+.sim-base blockquote{margin:.125rem 0 .375rem;padding:.25rem .625rem;border-left:3px solid var(--line);font-size:.8125rem;font-style:italic}
+.bloco p{white-space:pre-line}
+
+/* ---------- Tela inteira, sem rolagem da página (js/refazer.js põe a classe rf-fixa em <html>) ----------
+   A página ocupa exatamente a janela; o que não couber rola dentro do próprio painel (coluna ou cartão). */
+html.rf-fixa,html.rf-fixa body{height:100%;overflow:hidden}
+html.rf-fixa body{display:flex;flex-direction:column;height:100dvh}
+html.rf-fixa #rf{flex:1;min-height:0;width:100%;max-width:88rem;display:flex;flex-direction:column;padding:.75rem 1rem;overflow:hidden}
+html.rf-fixa #rf>*{flex:none}
+html.rf-fixa #rf>h1{font-size:1.25rem}
+html.rf-fixa .sub{margin:.125rem 0 .625rem}
+html.rf-fixa .nums,html.rf-fixa .res{margin-bottom:.75rem}
+/* Início e resultado: cartões em colunas; cada coluna rola por dentro. */
+html.rf-fixa #rf>.rf-grade{flex:1;min-height:0;display:flex;gap:1rem}
+html.rf-fixa #rf>.rf-painel{flex:1;min-height:0}
+.rf-col{flex:1;min-width:0;min-height:0;overflow:auto;display:flex;flex-direction:column;gap:.75rem}
+.rf-col:empty{display:none}
+.rf-col>.card,.rf-fim>.card{margin:0;flex:none}
+html.rf-fixa #rf>.rf-fim{display:grid;grid-template-columns:repeat(auto-fit,minmax(18rem,1fr));align-content:start;overflow:auto}
+.rf-fimacao{margin:.75rem 0 0}
+/* Questão: enunciado à esquerda, alternativas à direita. Correção: questão à esquerda, explicação à direita e,
+   no pé, o diagnóstico com o botão de seguir. */
+html.rf-fixa #rf>.rf-q,html.rf-fixa #rf>.rf-fb{flex:1;min-height:0;margin:0;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:0 1.25rem}
+html.rf-fixa #rf>.rf-fb{grid-template-rows:minmax(0,1fr) auto}
+.rf-esq,.rf-dir{min-width:0;min-height:0;overflow:auto;padding-right:.25rem}
+.rf-esq .stem{margin-top:0}
+.rf-dir>.bloco:first-child,.rf-dir>.sim-base:first-child{margin-top:0}
+.rf-pe{grid-column:1/-1;display:flex;gap:1rem;align-items:flex-end;border-top:1px solid var(--line);margin-top:.5rem;padding-top:.5rem}
+.rf-diag{flex:1;min-width:0}
+.rf-diag .conf{margin-bottom:.5rem}
+.rf-diag textarea{min-height:2.5rem;height:2.5rem}
+.rf-pe .acao{flex:none;margin:0;flex-direction:column;align-items:flex-end;gap:.25rem}
+html.rf-fixa .prog{margin-bottom:.375rem}
+html.rf-fixa #rf>p{margin:0 0 .375rem}
+html.rf-fixa .rf-q .opts,html.rf-fixa .rf-q .conf{margin-bottom:.75rem}
+/* ---------- Sessão: largura toda, topo em faixa, questão e correção sem rolagem da página ---------- */
+html.rf-fixa #rf[data-tela=sessao]{max-width:none;padding:.75rem 1.5rem}
+.ss-cab{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:1.5rem;align-items:center;margin:0 0 .75rem}
+.ss-prog{display:flex;align-items:center;gap:1rem;min-width:0}
+.ss-num{font-size:.875rem;white-space:nowrap}
+.ss-num b{font-size:1.125rem;font-variant-numeric:tabular-nums}
+html.rf-fixa .ss-prog .prog,.ss-prog .prog{flex:1;min-width:6rem;margin:0;height:.5rem}
+.ss-placar{display:flex;gap:1rem;font-size:.8125rem;color:var(--mut);white-space:nowrap;font-variant-numeric:tabular-nums}
+.ss-placar .ok{color:var(--ok);font-weight:600}
+.ss-placar .no{color:var(--no);font-weight:600}
+.ss-tema{display:flex;align-items:center;gap:.5rem;min-width:0;max-width:36rem;font-size:.8125rem;color:var(--mut)}
+.ss-ass{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+/* Questão: enunciado em dois terços (duas colunas de leitura se for longo), alternativas no terço da direita. */
+html.rf-fixa #rf>.rf-q{grid-template-columns:minmax(0,2fr) minmax(24rem,1fr);gap:0 2.5rem}
+.rf-q .stem{font-size:1.0625rem;line-height:1.6}
+.rf-q .stem:not(.longo){max-width:46rem}
+.stem.longo{columns:2 22rem;column-gap:2.5rem;column-rule:1px solid var(--line)}
+.rf-q .rf-dir{border-left:1px solid var(--line);padding-left:2rem}
+/* Correção: três colunas fixas (enunciado | veredito, alternativas e item a item | regra, comentário, base e lei).
+   Nada se parte entre colunas; a que não couber rola sozinha. No pé, o diagnóstico e a sua regra, compactos. */
+html.rf-fixa #rf>.rf-fb{grid-template-columns:minmax(0,1fr) minmax(0,1fr) minmax(0,1.15fr);grid-template-areas:"q m d" "pe pe pe";gap:0 1.5rem;padding:.75rem 1rem}
+.rf-fb>.rf-esq{grid-area:q}.rf-fb>.rf-meio{grid-area:m}.rf-fb>.rf-dir{grid-area:d}.rf-fb>.rf-pe{grid-area:pe}
+.rf-meio{min-width:0;min-height:0;overflow:auto;padding-right:.25rem}
+.rf-fb>.rf-esq,.rf-fb>.rf-meio{border-right:1px solid var(--line);padding-right:1.5rem}
+.rf-fb .stem{font-size:.9375rem;color:#3d3d47}
+.rf-meio .veredito{margin-top:0}
+.rf-meio .opts{margin-bottom:.75rem}
+.bloco.lei{font-size:.8125rem;line-height:1.45}
+.rf-diag{display:flex;gap:2rem;align-items:flex-start}
+.rf-causa{flex:0 1 auto;max-width:50%}
+.rf-causa .conf{margin:0;gap:.375rem}
+.rf-causa .chip{font-size:.8125rem;padding:.1875rem .75rem}
+.rf-sua{flex:1;min-width:16rem}
+.rf-sua textarea{min-height:2.5rem;height:2.5rem}
+html.rf-fixa .rf-fb .rf-pe{margin-top:.375rem;padding-top:.375rem}
+.tem-mais{-webkit-mask-image:linear-gradient(to bottom,#000 calc(100% - 3rem),transparent);mask-image:linear-gradient(to bottom,#000 calc(100% - 3rem),transparent)}
+@media (max-width:1300px) and (min-width:900px){
+ html.rf-fixa #rf>.rf-fb{grid-template-columns:minmax(0,1fr) minmax(0,1fr);grid-template-areas:"q d" "m d" "pe pe";grid-template-rows:minmax(12rem,1fr) minmax(12rem,1fr) auto;overflow:auto}
+ .rf-fb>.rf-meio{border-right:0;padding-right:.25rem}
+ .rf-diag{flex-wrap:wrap;gap:.5rem 1.5rem}
+ .rf-causa{max-width:none}
+}
+
+/* Janela estreita: uma coluna só; a área da página rola por dentro. */
+@media (max-width:899px){
+ html.rf-fixa #rf{overflow:auto}
+ html.rf-fixa .regra-ctl{top:-.75rem;padding-top:1.25rem} /* encosta no topo da área que rola, por cima do padding dela */
+ html.rf-fixa #rf>.rf-grade{flex:none;flex-direction:column;display:flex}
+ html.rf-fixa #rf>.rf-painel{flex:none;display:flex;flex-direction:column}
+ .rf-sessao,.rf-assuntos,.rf-causas,.rf-regras,.rf-regras-corpo{overflow:visible}
+ .rf-col{overflow:visible;flex:none}
+ html.rf-fixa #rf>.rf-q,html.rf-fixa #rf>.rf-fb{flex:none;display:block}
+ .rf-esq,.rf-dir,.rf-meio{overflow:visible}
+ .ss-cab{grid-template-columns:1fr;gap:.5rem}
+ .rf-q .rf-dir{border-left:0;padding-left:0}
+ .rf-fb>.rf-esq,.rf-fb>.rf-meio{border-right:0;padding-right:0}
+ .stem.longo{columns:auto}
+ .rf-diag{display:block}
+ .rf-causa{max-width:none}
+ .rf-pe{display:block}
+}
+.sim-base .fd-abrir{font:inherit;font-weight:600;text-align:left;vertical-align:top}
+
+/* Cards montados com os erros da sessão (js/meus-cards.js), no painel "Seu padrão de erro hoje". */
+.rf-padrao .mc{border:1px solid var(--line);border-left:4px solid var(--pri);border-radius:8px;padding:.5rem .75rem;margin-top:.5rem;font-size:.875rem}
+.rf-padrao .mc summary{cursor:pointer;font-weight:600;line-height:1.45}
+.rf-padrao .mc-tipo{display:block;font-size:.6875rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--pri)}
+.rf-padrao .mc-ab{margin:.375rem 0 0;padding-left:0;list-style:none;display:grid;gap:.25rem}
+.rf-padrao .mc-ab li{background:var(--bg);border-radius:6px;padding:.25rem .5rem}
+.rf-padrao .mc-ab b{color:var(--pri);margin-right:.25rem}
+.rf-padrao .mc-v{margin:.375rem 0 0}
+.rf-padrao .mc-ctx{display:block;font-weight:400;font-size:.8125rem;color:var(--mut);margin-top:.25rem}
+.rf-padrao .mc summary .mp-no{font-weight:400;margin-top:.375rem}
+
+/* Janela média (~1100–1400px): botões de confiança numa linha só e cabeçalho em duas faixas alinhadas. */
+@media (max-width:1400px) and (min-width:900px){
+ html.rf-fixa #rf>.rf-q{grid-template-columns:minmax(0,1fr) minmax(27rem,30rem);gap:0 1.5rem}
+ .rf-q .rf-dir{padding-left:1.25rem}
+ .rf-q .conf{flex-wrap:nowrap;gap:.375rem}
+ .rf-q .conf>span{margin-right:0;white-space:nowrap}
+ .rf-q .conf .chip{padding:.25rem .625rem;white-space:nowrap}
+ .ss-cab{grid-template-columns:auto minmax(0,1fr);gap:.5rem 1.25rem}
+ .ss-tema{grid-column:1/-1;max-width:none}
+}

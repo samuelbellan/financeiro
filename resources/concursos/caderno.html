@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Caderno de questões — Estudo para Concursos</title>
+<link rel="stylesheet" href="css/questoes-base.css">
+<link rel="stylesheet" href="css/edital.css">
+<link rel="stylesheet" href="css/nav.css">
+<link rel="stylesheet" href="css/questoes.css">
+<link rel="stylesheet" href="css/texto-lei.css">
+</head>
+<body>
+<script src="js/armazenamento.js"></script>
+<script src="js/config.js"></script>
+<script src="js/nav.js"></script>
+<script src="js/carregar.js"></script>
+<script src="js/historico.js"></script>
+<div class="top">
+ <div class="pager"><button class="nav-arrow" id="pp" aria-label="Página anterior">‹</button> Pág. <input id="pg" type="number" min="1"> de <span id="tot"></span> <button class="nav-arrow" id="np" aria-label="Próxima página">›</button></div>
+ <div class="stats"><span>Respondidas <b id="sA">0</b></span><span class="ok">Acertos <b id="sC">0</b></span><span class="no">Erros <b id="sE">0</b> <span class="pct" id="sPct">0% de acertos</span></span><button id="areaBtn" type="button">por área</button><button id="reset">zerar</button></div>
+ <label>Organizar: <select id="flt"><option value="all">Todas as questões</option><option value="todo">Não respondidas</option><option value="err">Que errei</option><option value="rev" hidden>Revisão sugerida</option></select></label>
+</div>
+<div class="area-modal" id="areaModal" hidden role="dialog" aria-modal="true" aria-labelledby="areaTitle"><div class="area-box"><div class="area-head"><div><h2 id="areaTitle">Desempenho por área</h2><p>Marque uma ou mais áreas para estudar só as questões delas. Percentuais sobre as questões respondidas.</p></div><button class="area-close" id="areaClose" type="button" aria-label="Fechar">×</button></div><div class="area-list" id="areaSummary"></div><div class="area-foot"><span id="areaPicked"></span><button type="button" id="areaClear">Limpar</button><button type="button" id="areaGo">Estudar selecionadas</button></div></div></div>
+<div class="wrap">
+ <button class="side l" id="pv" aria-label="Anterior">◀</button><button class="side r" id="nx" aria-label="Próxima">▶</button>
+ <div class="card">
+  <div class="head"><div class="hl"><div class="qn" id="qn"></div><div><div class="pills" id="pills"></div><div class="hist" id="hist"></div></div></div><div class="icons">＋ ⤴ ◆</div></div>
+  <div class="mid"><div class="body"><div class="meta"><span id="qid"></span><span class="tag" id="tag"></span></div><p class="stem" id="stem"></p><div id="studyLaw"></div><div id="opts"></div></div>
+  <div class="sol" id="sol"></div></div>
+  <div class="foot"><button class="btn main" id="ans" disabled>Responder</button>
+   <div class="ctrl"><button id="b1" title="Primeira">⏮</button><button id="b2" title="Anterior">⏪</button><button id="b3" title="Aleatória">🔀</button><button id="b6" title="Próxima não respondida">⇥</button><button id="b4" title="Próxima">⏩</button><button id="b5" title="Última">⏭</button></div>
+   <button class="btn alt" id="sbtn">Ver solução e comentários</button></div>
+ </div>
+</div>
+<script src="js/texto-lei.js"></script>
+<script src="js/edital.js"></script>
+<script type="module" src="js/caderno.js"></script>
+<script src="js/questoes-fit.js"></script>
+<script src="js/questoes-dia.js" data-origem="caderno"></script>
+</body>
+</html>
+
+
+

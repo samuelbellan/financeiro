@@ -1,0 +1,53 @@
+/* Resumos dos erros (resumos.html + js/resumos.js). Usa as cores e os cartões de refazer.css. */
+/* A página ocupa exatamente a janela e não rola: js/resumos.js reparte o conteúdo em páginas que cabem em #rsPag. */
+html.rs-fixa,html.rs-fixa body{height:100%;overflow:hidden}
+html.rs-fixa body{display:flex;flex-direction:column;height:100dvh}
+html.rs-fixa #rs{flex:1;min-height:0;width:100%;max-width:76rem;display:flex;flex-direction:column;padding:.75rem 1rem .5rem}
+.rs-topo{flex:none;display:flex;align-items:center;justify-content:space-between;gap:.75rem;flex-wrap:wrap;margin:0 0 .5rem}
+.rs-topo h1{font-size:1.25rem;margin:0}
+.rs-sel{display:flex;align-items:center;gap:.5rem;font-size:.8125rem;font-weight:600;color:var(--mut)}
+.rs-sel select{max-width:60vw;padding:.3125rem .5rem;border:1px solid var(--line);border-radius:8px;background:var(--card);color:var(--tx);font-weight:600}
+/* Janela larga: resumo à esquerda, questões erradas do tópico à direita (a coluna lateral rola por dentro). */
+.rs-duas{display:grid;grid-template-columns:minmax(0,1fr) minmax(19rem,27rem);gap:1rem;height:100%}
+.rs-esq{min-width:0;min-height:0;overflow:hidden}
+.rs-lado{min-height:0;overflow:auto;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:.75rem .875rem}
+.rs-lado .rs-sub{margin:0;padding:0;border:0}
+/* Área da página: a sobra só rola (aqui dentro) se um único cartão for mais alto que a janela. */
+#rsPag{flex:1;min-height:0;overflow:auto}
+.rs-onde{margin:0 0 .25rem;font-size:.75rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--pri)}
+.rs-abre{margin:0 0 .5rem;color:var(--mut);font-size:.875rem}
+#rsPag .rs-top{margin:0}
+.rs-top h2{font-size:1.125rem;margin:0 0 .5rem;display:flex;gap:.5rem;align-items:baseline;flex-wrap:wrap}
+.rs-n{font-size:.75rem;font-weight:600;color:var(--no);background:var(--no-l);border-radius:999px;padding:.0625rem .5rem}
+.rs-n.ok{color:var(--ok);background:var(--ok-l)}
+.rs-txt p{margin:0;line-height:1.55}
+.rs-txt p.vazio{height:.625rem;padding:0}   /* padding: refazer.css também tem .vazio */
+/* Texto exato da lei (linhas "> lei art" do build) e, depois dele, a explicação com rótulo em negrito. */
+.rs-lei{margin:.375rem 0 .25rem;padding:.4375rem .75rem;border-left:4px solid var(--pri);background:var(--card);border-radius:0 8px 8px 0;font-family:Georgia,'Times New Roman',serif;font-size:.9375rem}
+.rs-lei p{line-height:1.5}
+.rs-lei p+p{margin-top:.1875rem}
+.rs-lei .rs-lei-rot{font-family:system-ui,sans-serif;font-size:.6875rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--pri);margin-bottom:.125rem}
+.rs-txt p.rs-rot b{font-weight:700}
+/* Artigo em que o aluno errou questão: o trecho ganha a cor de erro e a lista das questões. */
+.rs-lei.rs-errei{border-left-color:var(--no);background:var(--no-l)}
+.rs-lei.rs-errei .rs-lei-rot{color:var(--no)}
+.rs-lei .rs-errei-tag{font-family:system-ui,sans-serif;font-size:.8125rem;font-weight:600;color:var(--no);margin:0 0 .25rem}
+.rs-lei .rs-errei-tag a{color:inherit}
+.rs-txt p.rs-simples b{color:var(--ok)}
+.rs-txt p.rs-prova b{color:var(--no)}
+.rs-sub{margin:.75rem 0 0;padding-top:.5rem;border-top:1px dashed var(--line);font-weight:600;color:var(--pri);font-size:.875rem}
+.rs-txt+.rs-sub{margin-top:.75rem}
+.rs-top h2+.rs-sub{margin-top:0;padding-top:0;border-top:0}
+.rs-lista{list-style:none;margin:.5rem 0 0;padding:0;display:grid;gap:.5rem}
+.rs-q{border:1px solid var(--line);border-left:4px solid var(--no);border-radius:8px;padding:.5rem .75rem;font-size:.875rem}
+.rs-q.feita{border-left-color:var(--ok)}
+.rs-q a{font-weight:600;color:var(--pri);text-decoration:none}
+.rs-q a:hover{text-decoration:underline}
+.rs-stem{margin:.125rem 0 .375rem;color:var(--mut)}
+.rs-q p{margin:.25rem 0 0}
+.rs-q .m{color:var(--no)}
+.rs-q .c{color:var(--ok)}
+.rs-tag{font-size:.6875rem;font-weight:700;color:var(--ok);background:var(--ok-l);border-radius:999px;padding:.0625rem .4375rem;margin-left:.375rem}
+.rs-nav{flex:none;display:flex;align-items:center;justify-content:space-between;gap:.75rem;padding:.5rem 0 0}
+#rsCont{font-size:.8125rem;color:var(--mut);font-variant-numeric:tabular-nums}
+@media print{.sn,.rs-topo,.rs-nav{display:none}}

@@ -1,0 +1,144 @@
+{
+  "nome": "Simulado 1 · Exemplo — Constituição, Administração Pública e LRF",
+  "questoes": [
+    {
+      "area": "Constituição Federal",
+      "tema": "CF — Princípios fundamentais (art. 1º)",
+      "fontes": ["cf"],
+      "enunciado": "De acordo com a Constituição Federal, são fundamentos da República Federativa do Brasil, exceto:",
+      "alternativas": [
+        "A soberania.",
+        "A cidadania.",
+        "A dignidade da pessoa humana.",
+        "A independência nacional.",
+        "O pluralismo político."
+      ],
+      "gabarito": "D",
+      "comentario": "O art. 1º da CF lista cinco fundamentos: soberania, cidadania, dignidade da pessoa humana, valores sociais do trabalho e da livre iniciativa e pluralismo político. A independência nacional é um princípio das relações internacionais (art. 4º, I), não um fundamento.",
+      "por_alternativa": [
+        "Errada: a soberania é fundamento (art. 1º, I).",
+        "Errada: a cidadania é fundamento (art. 1º, II).",
+        "Errada: a dignidade da pessoa humana é fundamento (art. 1º, III).",
+        "Certa: a independência nacional rege as relações internacionais (art. 4º, I); não está no art. 1º.",
+        "Errada: o pluralismo político é fundamento (art. 1º, V)."
+      ]
+    },
+    {
+      "area": "Constituição Federal",
+      "tema": "CF — Direitos e garantias fundamentais (art. 5º)",
+      "fontes": ["cf"],
+      "enunciado": "Segundo o art. 5º, XI, da Constituição Federal, a casa é asilo inviolável do indivíduo. Nela é possível entrar sem o consentimento do morador:",
+      "alternativas": [
+        "Em caso de flagrante delito, a qualquer hora.",
+        "Por determinação judicial, a qualquer hora do dia ou da noite.",
+        "Por ordem da autoridade policial, durante o dia.",
+        "Apenas para prestar socorro, durante a noite.",
+        "Por determinação administrativa, durante o dia."
+      ],
+      "gabarito": "A",
+      "comentario": "Art. 5º, XI, da CF: ninguém pode entrar na casa sem consentimento do morador, salvo em caso de flagrante delito ou desastre, ou para prestar socorro, ou, durante o dia, por determinação judicial. Flagrante, desastre e socorro valem a qualquer hora; a ordem judicial só vale durante o dia."
+    },
+    {
+      "area": "Constituição Federal",
+      "tema": "CF — Administração pública (art. 37)",
+      "fontes": ["cf"],
+      "enunciado": "Analise as assertivas abaixo e assinale a alternativa correta de acordo com a Constituição Federal:\n\nI. O prazo de validade do concurso público será de até dois anos, prorrogável uma vez, por igual período.\n\nII. A investidura em cargo em comissão declarado em lei de livre nomeação e exoneração depende de concurso público de provas e títulos.\n\nIII. A publicidade dos atos dos órgãos públicos deverá ter caráter educativo, informativo ou de orientação social.",
+      "alternativas": [
+        "Está correta apenas a assertiva I.",
+        "Estão corretas apenas as assertivas I e II.",
+        "Estão corretas apenas as assertivas I e III.",
+        "Estão corretas apenas as assertivas II e III.",
+        "Todas as assertivas estão corretas."
+      ],
+      "gabarito": "C",
+      "comentario": "I e III repetem o art. 37, III, e o art. 37, § 1º, da CF. A II está errada: o art. 37, II, ressalva justamente as nomeações para cargo em comissão de livre nomeação e exoneração, que não dependem de concurso.",
+      "itens": [
+        ["I", true, "Art. 37, III, da CF."],
+        ["II", false, "Art. 37, II: o cargo em comissão de livre nomeação e exoneração é a exceção ao concurso."],
+        ["III", true, "Art. 37, § 1º, da CF."]
+      ]
+    },
+    {
+      "area": "Constituição Federal",
+      "tema": "CF — Administração pública (art. 37)",
+      "fontes": ["cf"],
+      "enunciado": "Conforme o caput do art. 37 da Constituição Federal, a administração pública direta e indireta obedecerá aos princípios de:",
+      "alternativas": [
+        "Legalidade, impessoalidade, moralidade, publicidade e eficiência.",
+        "Legalidade, imparcialidade, moralidade, publicidade e economicidade.",
+        "Legalidade, impessoalidade, motivação, publicidade e eficiência.",
+        "Supremacia do interesse público, moralidade, publicidade e eficiência.",
+        "Legalidade, impessoalidade, moralidade, razoabilidade e eficiência."
+      ],
+      "gabarito": "A",
+      "comentario": "O caput do art. 37 da CF traz cinco princípios: legalidade, impessoalidade, moralidade, publicidade e eficiência (o famoso LIMPE). Motivação, razoabilidade e supremacia do interesse público são princípios da doutrina e de outras leis, não do caput do art. 37."
+    },
+    {
+      "area": "Constituição Federal",
+      "tema": "CF — Organização do Estado (arts. 2º e 18)",
+      "fontes": ["cf"],
+      "enunciado": "De acordo com a Constituição Federal, a criação, a incorporação, a fusão e o desmembramento de Municípios far-se-ão por:",
+      "alternativas": [
+        "Lei complementar federal, após consulta prévia às populações envolvidas.",
+        "Lei estadual, dentro do período determinado por lei complementar federal, com consulta prévia por plebiscito.",
+        "Lei municipal, aprovada pela Câmara de Vereadores de cada Município envolvido.",
+        "Decreto do Governador, após referendo das populações envolvidas.",
+        "Lei ordinária federal, dispensada a consulta às populações envolvidas."
+      ],
+      "gabarito": "B",
+      "comentario": "Art. 18, § 4º, da CF: a criação, a incorporação, a fusão e o desmembramento de Municípios far-se-ão por lei estadual, dentro do período determinado por lei complementar federal, e dependem de consulta prévia, mediante plebiscito, às populações dos Municípios envolvidos."
+    },
+    {
+      "area": "Responsabilidade Fiscal",
+      "tema": "LRF — Despesa com pessoal (arts. 19 e 20)",
+      "fontes": ["lrf"],
+      "enunciado": "Segundo a Lei de Responsabilidade Fiscal, a despesa total com pessoal dos Municípios não poderá exceder, em cada período de apuração, o seguinte percentual da receita corrente líquida:",
+      "alternativas": [
+        "49%.",
+        "50%.",
+        "54%.",
+        "60%.",
+        "6%."
+      ],
+      "gabarito": "D",
+      "comentario": "Art. 19, III, da LRF: Municípios, 60% da receita corrente líquida. Os 54% (Executivo) e os 6% (Legislativo) são a repartição desse limite (art. 20, III); 50% é o limite da União (art. 19, I).",
+      "por_alternativa": [
+        "Errada: 49% é a parte do Executivo na esfera estadual (art. 20, II, c).",
+        "Errada: 50% é o limite da União (art. 19, I).",
+        "Errada: 54% é a parte do Executivo municipal (art. 20, III, b), não o limite global.",
+        "Certa: art. 19, III.",
+        "Errada: 6% é a parte do Legislativo municipal (art. 20, III, a)."
+      ]
+    },
+    {
+      "area": "Responsabilidade Fiscal",
+      "tema": "LRF — Despesa com pessoal (arts. 19 e 20)",
+      "fontes": ["lrf"],
+      "enunciado": "Na esfera municipal, a repartição do limite global da despesa com pessoal prevista na Lei de Responsabilidade Fiscal é de:",
+      "alternativas": [
+        "6% para o Legislativo, incluído o Tribunal de Contas do Município, quando houver, e 54% para o Executivo.",
+        "10% para o Legislativo e 50% para o Executivo.",
+        "3% para o Legislativo, 3% para o Tribunal de Contas e 54% para o Executivo.",
+        "6% para o Legislativo, excluído o Tribunal de Contas do Município, e 54% para o Executivo.",
+        "4% para o Legislativo e 56% para o Executivo."
+      ],
+      "gabarito": "A",
+      "comentario": "Art. 20, III, da LRF: na esfera municipal, 6% para o Legislativo, incluído o Tribunal de Contas do Município, quando houver, e 54% para o Executivo."
+    },
+    {
+      "area": "Responsabilidade Fiscal",
+      "tema": "LRF — Disposições preliminares (arts. 1º e 2º)",
+      "fontes": ["lrf"],
+      "enunciado": "De acordo com a Lei de Responsabilidade Fiscal, a responsabilidade na gestão fiscal pressupõe:",
+      "alternativas": [
+        "A ação planejada e sigilosa, em que se previnem riscos e corrigem desvios capazes de afetar o equilíbrio das contas públicas.",
+        "A ação planejada e transparente, em que se previnem riscos e corrigem desvios capazes de afetar o equilíbrio das contas públicas.",
+        "A ação imediata e discricionária do gestor, dispensado o cumprimento de metas de resultados.",
+        "O equilíbrio das contas públicas apenas ao final de cada mandato.",
+        "A proibição de qualquer operação de crédito pelo ente da Federação."
+      ],
+      "gabarito": "B",
+      "comentario": "Art. 1º, § 1º, da LRF: a responsabilidade na gestão fiscal pressupõe a ação planejada e transparente, em que se previnem riscos e corrigem desvios capazes de afetar o equilíbrio das contas públicas, mediante o cumprimento de metas e a obediência a limites e condições."
+    }
+  ]
+}

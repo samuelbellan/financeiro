@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Lei seca — Estudo para Concursos</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Literata:opsz,wght@7..72,400;7..72,600;7..72,700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/texto-lei.css">
+<link rel="stylesheet" href="css/edital.css">
+<link rel="stylesheet" href="css/lei-seca.css">
+<link rel="stylesheet" href="css/nav.css">
+</head>
+<body>
+<script src="js/armazenamento.js"></script>
+<script src="js/config.js"></script>
+<script src="js/nav.js"></script>
+<div class="ls-app">
+  <aside class="ls-lado" aria-label="Escolher lei, sumário e marcações">
+    <div class="ls-topo-lado">
+      <label class="ls-campo"><span>Lei</span><select id="lsLei"></select></label>
+      <button type="button" id="lsOcultar" class="ls-ocultar" title="Ocultar a barra lateral ( \ )" aria-label="Ocultar a barra lateral">«</button>
+    </div>
+    <form id="lsIr" class="ls-ir" autocomplete="off">
+      <input id="lsArt" type="text" inputmode="numeric" placeholder="Ir para o art. (ex.: 37, 18-A)" aria-label="Ir para o artigo">
+      <button type="submit">Ir</button>
+    </form>
+    <div id="lsLegenda" class="ls-leg" hidden role="group" aria-label="O que mostrar no texto">
+      <span class="ls-leg-t">Mostrar no texto</span>
+      <button type="button" class="ls-leg-b" data-tp="man" aria-pressed="true"><i class="ls-leg-c ls-leg-man"></i>Manual</button>
+      <button type="button" class="ls-leg-b" data-tp="lei" aria-pressed="true"><i class="ls-leg-c ls-leg-lei"></i>Lei transcrita</button>
+      <button type="button" class="ls-leg-b" data-tp="nota" aria-pressed="true"><i class="ls-leg-c ls-leg-nota"></i>Notas</button>
+      <button type="button" class="ls-leg-b" data-tp="lanc" aria-pressed="true"><i class="ls-leg-c ls-leg-lanc"></i>Lançamentos</button>
+    </div>
+    <div class="ls-abas" role="tablist">
+      <button type="button" role="tab" class="ls-aba" data-p="sum" aria-selected="true">Sumário</button>
+      <button type="button" role="tab" class="ls-aba" data-p="marcas" aria-selected="false">Marcações <span id="lsNMarcas"></span></button>
+    </div>
+    <nav id="lsSum" class="ls-painel" aria-label="Sumário da lei"></nav>
+    <div id="lsMarcas" class="ls-painel" hidden></div>
+    <p class="ls-dica">Selecione um trecho para marcar. Atalhos com o texto selecionado: <kbd>1</kbd>–<kbd>4</kbd> cores, <kbd>S</kbd> sublinhar, <kbd>N</kbd> negrito, <kbd>A</kbd> anotar, <kbd>Del</kbd> apagar. Links em azul abrem o artigo citado; o botão <b>STF</b> ao lado do artigo mostra a jurisprudência do Supremo sobre ele (laranja: tem súmula vinculante).</p>
+  </aside>
+  <div id="lsFundo" class="ls-fundo"></div>
+  <main id="lsTexto" class="ls-texto">
+    <button type="button" id="lsMenu" class="ls-menu" aria-label="Mostrar a barra lateral: lei, sumário e marcações" title="Mostrar a barra lateral ( \ )">☰ Sumário e marcações</button>
+    <article id="lsDoc" class="ls-doc"></article>
+  </main>
+</div>
+
+<div id="lsBarra" class="ls-barra" role="toolbar" aria-label="Marcar trecho selecionado" hidden>
+  <button type="button" class="ls-bt ls-bt-am" data-acao="am" title="Grifar de amarelo (1)" aria-label="Grifar de amarelo"></button>
+  <button type="button" class="ls-bt ls-bt-vd" data-acao="vd" title="Grifar de verde (2)" aria-label="Grifar de verde"></button>
+  <button type="button" class="ls-bt ls-bt-az" data-acao="az" title="Grifar de azul (3)" aria-label="Grifar de azul"></button>
+  <button type="button" class="ls-bt ls-bt-rs" data-acao="rs" title="Grifar de rosa (4)" aria-label="Grifar de rosa"></button>
+  <i class="ls-sep" aria-hidden="true"></i>
+  <button type="button" class="ls-bt" data-acao="sub" title="Sublinhar (S)" aria-label="Sublinhar"><u>S</u></button>
+  <button type="button" class="ls-bt" data-acao="neg" title="Negrito (N)" aria-label="Negrito"><b>N</b></button>
+  <button type="button" class="ls-bt" data-acao="nota" title="Grifar e anotar (A)" aria-label="Anotar">✎</button>
+  <i class="ls-sep" aria-hidden="true"></i>
+  <button type="button" class="ls-bt" data-acao="apagar" title="Apagar marcações do trecho (Del)" aria-label="Apagar marcações">⌫</button>
+  <button type="button" class="ls-bt" data-acao="copiar" title="Copiar" aria-label="Copiar">⧉</button>
+</div>
+<div id="lsPop" class="ls-pop" hidden></div>
+
+<dialog id="lsModal" class="ls-modal" aria-labelledby="lsModalTit">
+  <header class="ls-modal-topo">
+    <button type="button" id="lsModalVoltar" class="ls-mb" aria-label="Voltar para a citação anterior" hidden>←</button>
+    <b id="lsModalTit"></b>
+    <button type="button" id="lsModalIr" class="ls-mb" hidden></button>
+    <button type="button" id="lsModalX" class="ls-mb ls-mx" aria-label="Fechar">×</button>
+  </header>
+  <div id="lsModalCorpo" class="ls-doc ls-modal-corpo"></div>
+</dialog>
+
+<dialog id="lsNota" class="ls-dnota">
+  <form method="dialog">
+    <p class="ls-nota-trecho"></p>
+    <label>Nota<textarea rows="4" placeholder="Ex.: cai na prova como pegadinha de prazo"></textarea></label>
+    <div class="ls-dnota-bt"><button value="cancelar" formnovalidate>Cancelar</button><button value="ok" class="ls-pri">Salvar</button></div>
+  </form>
+</dialog>
+
+<script src="js/edital.js"></script>
+<script src="js/texto-lei.js"></script>
+<script src="js/ref-lei.js"></script>
+<script src="js/lei-seca.js"></script>
+</body>
+</html>

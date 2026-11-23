@@ -1,0 +1,28 @@
+{
+  "lei": "lrf",
+  "sigla": "LRF",
+  "curto": "Responsabilidade Fiscal",
+  "nome": "Lei de Responsabilidade Fiscal (LC nº 101/2000)",
+  "cards": [
+    {
+      "secao": "Disposições preliminares",
+      "art": "Art. 1º, § 1º",
+      "frente": "O que pressupõe a responsabilidade na gestão fiscal?",
+      "verso": "A ação planejada e transparente, que previne riscos e corrige desvios capazes de afetar o equilíbrio das contas públicas."
+    },
+    {
+      "secao": "Despesa com pessoal",
+      "art": "Art. 19, III",
+      "tipo": "lacuna",
+      "texto": "III - Municípios: [[60%]] (sessenta por cento).",
+      "contexto": "Limite da despesa total com pessoal, sobre a receita corrente líquida",
+      "armadilha": "Estados também têm 60%; a União tem 50%."
+    },
+    {
+      "secao": "Despesa com pessoal",
+      "art": "Art. 20, III",
+      "frente": "Como se reparte o limite de pessoal na esfera municipal?",
+      "verso": "6% para o Legislativo (incluído o Tribunal de Contas do Município, quando houver) e 54% para o Executivo."
+    }
+  ]
+}

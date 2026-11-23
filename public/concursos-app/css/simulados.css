@@ -1,0 +1,43 @@
+/* Só dos Simulados (simulados.html); a base está em questoes-base.css. */
+.question-figure[hidden]{display:none}.stem{white-space:pre-line}
+.sim-filter{display:flex;flex-wrap:wrap;align-items:center;gap:7px;color:var(--mut);font-size:13px}.sim-filter label{display:flex;align-items:center;gap:6px}.sim-filter input{height:32px;border:1px solid var(--line);border-radius:6px;background:#fff;padding:0 9px;font:inherit;min-width:170px}.sim-filter select{max-width:250px}.sim-back{font-weight:700}.sim-source{font-size:11px;color:var(--mut);margin-top:4px}.stem{white-space:pre-line}.question-figure{display:block;max-width:min(100%,520px);max-height:270px;margin:0 auto 18px;border:1px solid var(--line);border-radius:6px}.sim-warning{border-left:4px solid #f59e0b;background:#fff8e6;color:#684600;border-radius:5px;padding:10px 13px;margin:12px 0;line-height:1.6;font-size:14px}.sim-refs{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}.sim-refs a{display:inline-block;background:var(--pri-l);color:var(--pri);border-radius:6px;padding:6px 10px;font-size:13px;text-decoration:none}.sim-refs a:hover{text-decoration:underline}.sim-empty{padding:24px;text-align:center;color:var(--mut)}.top .stats{flex-wrap:wrap}.top .stats button.sim-back{color:var(--pri)}.nota-ok{color:var(--q-ok);font-weight:700}.nota-no{color:var(--q-no);font-weight:700}.qd-dlg .nota-regra{font-size:.8125rem;color:var(--q-mut);margin:.75rem 0;line-height:1.5}.qd-dlg td.nota{font-size:.9375rem;font-weight:700}dialog#notasDlg{width:min(980px,calc(100vw - 32px))}#notasDlg td{white-space:nowrap}#notasDlg tbody th{min-width:150px;white-space:normal}#notasDlg td{vertical-align:middle}#notasDlg td.sitc,#notasDlg th.sitc{text-align:center}
+/* Tela inicial: escolha do simulado. Com body.picking, a barra e o cartão de questão ficam escondidos. */
+body.picking .top,body.picking .wrap{display:none}body:not(.picking) #picker{display:none}
+.sp{flex:1;min-height:0;overflow:auto;width:100%}.sp-in{max-width:var(--q-max,1120px);margin:0 auto;padding:1.25rem 1rem 2.5rem}
+.sp-cab{display:flex;justify-content:space-between;align-items:flex-end;gap:1rem;flex-wrap:wrap;margin-bottom:1.5rem}.sp-cab h1{margin:0;font-size:1.5rem;letter-spacing:-.01em}.sp-cab p{margin:.25rem 0 0;color:var(--q-mut);font-size:.875rem}
+.sp-btn{height:2.125rem;padding:0 .875rem;border:1px solid var(--q-line);border-radius:8px;background:var(--q-surface);color:var(--q-tx);font-size:.875rem;font-weight:500}.sp-btn:hover{border-color:var(--pri);color:var(--pri)}
+.sp-g{margin:0 0 1.75rem}.sp-g h2{margin:0;font-size:1rem}.sp-g>p{margin:.2rem 0 .75rem;color:var(--q-mut);font-size:.8125rem}
+.sp-lista{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:.75rem}
+.sp-card{display:grid;grid-template-columns:auto 1fr;gap:.625rem .75rem;padding:1rem;border:1px solid var(--q-line);border-radius:12px;background:var(--q-surface);color:var(--q-tx);text-decoration:none;transition:border-color .15s,box-shadow .15s}
+.sp-card:hover,.sp-card:focus-visible{border-color:var(--pri);box-shadow:0 2px 12px #5b3fd01f;outline:none}
+.sp-n{width:2.5rem;height:2.5rem;border-radius:10px;background:var(--pri-l);color:var(--pri);font-weight:700;display:grid;place-items:center;font-variant-numeric:tabular-nums}
+.sp-card.feito .sp-n{background:var(--q-ok-l);color:var(--q-ok)}.sp-card.todos .sp-n{font-size:1.125rem}
+.sp-t b{display:block;font-size:.9375rem;line-height:1.3}.sp-t small{display:block;color:var(--q-mut);font-size:.8125rem;line-height:1.35;margin-top:.125rem}
+.sp-bar{grid-column:1/-1;height:6px;border-radius:99px;background:#efeef4;overflow:hidden}.sp-bar i{display:block;height:100%;background:var(--pri)}.sp-card.feito .sp-bar i{background:var(--q-ok)}
+.sp-pe{grid-column:1/-1;display:flex;justify-content:space-between;align-items:baseline;gap:.5rem;font-size:.8125rem}.sp-meta{color:var(--q-mut);font-variant-numeric:tabular-nums}.sp-go{font-weight:600;color:var(--pri);white-space:nowrap}
+.top .sim-voltar{font-weight:600;color:var(--pri);text-decoration:none;font-size:.875rem;white-space:nowrap}.top .sim-voltar:hover{text-decoration:underline}
+@media (prefers-reduced-motion:reduce){.sp-card{transition:none}}
+.sit-b{display:inline-block;padding:3px 10px;border-radius:999px;font-size:12px;font-weight:600;white-space:nowrap}.sit-ok{background:#e3f3ec;color:var(--q-ok)}.sit-no{background:#fbe9e7;color:var(--q-no)}.sit-and{background:#efedf6;color:#5b5675}.sit-n{font-size:11px;color:var(--q-mut);margin-top:3px}
+/* Base do conhecimento: de onde vem a resposta, logo abaixo do veredito. */
+.sim-base{border-left:3px solid var(--pri);background:var(--bg);border-radius:0 8px 8px 0;padding:8px 12px;margin:10px 0;font-size:13px}
+.sim-base b{display:block;font-size:12px;color:var(--pri)}
+.sim-base p{margin:3px 0}
+.sim-base .sim-refs{display:inline}
+.sim-base .sim-refs a+a::before{content:" · ";color:var(--mut)}
+.sim-base .fd{margin:3px 0;padding-left:18px}
+.sim-base details{margin-top:4px}
+.sim-base summary{cursor:pointer;font-weight:600;color:var(--pri)}
+.sim-base .dica{color:var(--mut);font-size:12px}
+.sim-base blockquote{margin:3px 0 6px;padding:4px 10px;border-left:3px solid var(--line);color:var(--tx);font-size:12.5px;font-style:italic}
+
+/* Por que cada alternativa (q.alts) */
+.alts-review{list-style:none;margin:0 0 1rem;padding:0;display:grid;gap:.5rem}
+.alts-review li{display:flex;gap:.7rem;padding:.6rem .75rem;border:1px solid var(--line,#d0d7de);border-left-width:4px;border-radius:8px}
+.alts-review li.ok{border-left-color:#1a7f37;background:rgba(26,127,55,.08)}
+.alts-review li.no{border-left-color:#cf222e}
+.alts-review li.pick.no{background:rgba(207,34,46,.08)}
+.alts-review .alt-l{font-weight:700;min-width:1.2rem}
+.alts-review .alt-o{font-size:.9em;opacity:.8;margin-bottom:.15rem}
+.alts-review .alt-o em{font-style:normal;font-weight:600}
+/* Comentário didático: mantém os parágrafos ("A regra", "Como resolver"...). */
+.expl{white-space:pre-line}

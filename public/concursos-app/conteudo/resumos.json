@@ -1,0 +1,33 @@
+{
+  "materias": [
+    {
+      "materia": "Direito Tributário",
+      "abertura": "Resumo de exemplo. Cada tópico mostra o texto da lei, depois a explicação em palavras simples e a pegadinha da prova. As questões do tópico que você errou aparecem embaixo, para refazer.",
+      "topicos": [
+        {
+          "titulo": "O que é tributo e quais são as espécies",
+          "ids": ["S2-01", "S2-02", "S2-03"],
+          "linhas": [
+            "> ctn 3",
+            "Em palavras simples: tributo é dinheiro que a lei obriga a pagar e que não é castigo. Multa é castigo por um ato ilícito; por isso multa não é tributo.",
+            "",
+            "> ctn 16",
+            "> ctn 77",
+            "Em palavras simples: o imposto não depende de nenhuma atuação do Estado voltada para você. A taxa depende: ou o Estado fiscaliza (poder de polícia) ou presta um serviço específico e divisível.",
+            "Na prova: a banca troca “específico e divisível” por “geral e indivisível”. Serviço geral (como a segurança pública) não pode ser cobrado por taxa."
+          ]
+        },
+        {
+          "titulo": "Suspensão e extinção do crédito",
+          "ids": ["S2-04", "S2-05"],
+          "linhas": [
+            "> ctn 151 I,VI",
+            "> ctn 156 I,IV",
+            "Em palavras simples: suspender é dar uma pausa na cobrança (a dívida continua existindo). Extinguir é acabar com a dívida.",
+            "Na prova: moratória e parcelamento só suspendem. Pagamento, compensação, remissão e prescrição extinguem."
+          ]
+        }
+      ]
+    }
+  ]
+}

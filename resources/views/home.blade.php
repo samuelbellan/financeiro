@@ -67,6 +67,16 @@
                     </a>
                     @endif
 
+                    @if (auth()->user()->podeAcessar('concursos'))
+                    <a href="{{ route('concursos.index') }}" class="nav-item">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+                        </svg>
+                        <span>Estudo Concursos</span>
+                    </a>
+                    @endif
+
                     @if (auth()->user()->podeAcessar('salario'))
                     <a href="{{ route('salary.index') }}" class="nav-item">
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -219,6 +229,20 @@
                         <h3>Horas de Estudo</h3>
                         <p>Cronômetro por matéria estilo YPT, funciona offline e sincroniza entre aparelhos.</p>
                         <a href="{{ route('estudos.index') }}" class="card-link">Acessar →</a>
+                    </div>
+                    @endif
+
+                    @if (auth()->user()->podeAcessar('concursos'))
+                    <div class="info-card">
+                        <div class="card-icon card-icon-blue" style="background: linear-gradient(135deg, #5b3fd0 0%, #7c3aed 100%);">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                                <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+                            </svg>
+                        </div>
+                        <h3>Estudo para Concursos</h3>
+                        <p>Caderno de questões, simulados, flashcards com revisão espaçada, lei seca com STF, resumos e edital verticalizado.</p>
+                        <a href="{{ route('concursos.index') }}" class="card-link">Acessar →</a>
                     </div>
                     @endif
 

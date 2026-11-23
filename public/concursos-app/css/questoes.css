@@ -1,0 +1,244 @@
+/* Tela de questões — Caderno (caderno.html) e Simulados (simulados.html).
+   Carregada depois de questoes-base.css (e de simulados.css, nos Simulados): só ajusta o visual, sem mudar ids nem o JS. */
+:root{
+ --q-surface:#fff;--q-soft:#fafafc;--q-hover:#f6f5fc;--q-line:#e6e6ec;--q-line-2:#d6d6de;
+ --q-tx:#2b2b33;--q-mut:#6b6b78;--q-faint:#9a9aa5;
+ --q-ok:#0f7a55;--q-ok-l:#e6f5ee;--q-no:#b5352a;--q-no-l:#fcebe9;--q-max:1120px;
+}
+body{background:var(--bg)}
+
+/* ---------- barra de ferramentas: alinhada com o cartão ---------- */
+.top{width:100%;max-width:var(--q-max);margin:0 auto;padding:.75rem 1rem .625rem;gap:.5rem 1.5rem;font-size:.875rem}
+.pager{gap:.375rem;color:var(--q-mut)}
+.pager input,.top select,.sim-filter input{height:2.125rem;border:1px solid var(--q-line);border-radius:8px;background:var(--q-surface);font:inherit;font-size:.875rem;color:var(--q-tx)}
+.pager input{width:3.75rem}
+.top select{padding:0 .625rem}
+.nav-arrow{width:2rem;height:2rem;border-radius:8px;padding:0;color:var(--q-mut);font-size:1.25rem;line-height:1}
+.nav-arrow:hover{background:var(--q-surface);color:var(--pri)}
+.top label{color:var(--q-mut);font-size:.875rem}
+
+/* Placar: números em destaque, rótulos discretos. */
+.stats{gap:1rem;font-size:.8125rem;color:var(--q-mut)}
+.stats b{font-size:.9375rem;font-variant-numeric:tabular-nums;margin-left:.125rem}
+.stats .ok,.stats .ok b{color:var(--q-ok)}
+.stats .no,.stats .no b{color:var(--q-no)}
+.stats .pct{margin-left:.5rem;padding:.125rem .5rem;border-radius:99px;background:var(--pri-l);color:var(--pri);font-weight:700}
+.stats button{height:1.875rem;padding:0 .625rem;border:1px solid var(--q-line);border-radius:8px;background:var(--q-surface);
+ color:var(--q-tx);font-size:.8125rem;font-weight:500;text-decoration:none}
+.stats button:hover{border-color:var(--pri);color:var(--pri)}
+.stats #reset{color:var(--q-mut)}
+.stats #reset:hover{border-color:var(--q-no);color:var(--q-no)}
+.sim-filter{gap:.5rem .75rem}
+.sim-filter input{min-width:12rem;padding:0 .625rem}
+
+/* ---------- o cartão ---------- */
+.wrap{max-width:var(--q-max);padding:0 1rem .875rem}
+/* As setas laterais repetiam a navegação do rodapé e cobriam o texto. */
+.side{display:none}
+.card{background:var(--q-surface);border:1px solid var(--q-line);border-radius:12px;box-shadow:none;overflow:hidden}
+
+/* Cabeçalho numa linha só: número, etiquetas e situação. */
+.head{align-items:center;gap:1rem;padding:.625rem 1.5rem;border-bottom:1px solid var(--q-line)}
+.hl{align-items:center;gap:1rem;min-width:0}
+.hl>div:last-child{display:flex;align-items:center;flex-wrap:wrap;gap:.375rem .75rem;min-width:0}
+.qn{font-size:1.0625rem;color:var(--q-tx);padding:0}
+.pills{gap:.375rem}
+.pill{background:#f1f1f5;color:#55555f;text-transform:none;letter-spacing:0;font-size:.75rem;border-radius:6px;padding:.125rem .5rem}
+.pill:first-child{background:var(--pri-l);color:var(--pri);font-weight:600}
+.hist{margin:0;font-size:.75rem;font-weight:500;letter-spacing:0;text-transform:none;color:var(--q-faint)}
+.icons{display:none}
+
+/* A questão inteira cabe na tela, sem rolar: questoes-fit.js reduz o tamanho do texto
+   (font-size do .body) quando ela não cabe. Por isso o resto usa em. */
+.body{padding:.75rem 1.5rem;font-size:16px}
+.body>*{margin-left:auto!important;margin-right:auto!important;max-width:68rem}
+.body>.question-figure{max-width:min(100%,520px);max-height:14em}
+.meta{font-size:.75em;color:var(--q-faint);gap:.5rem;margin-bottom:.25em}
+.tag{font-size:1em;padding:.0625rem .5rem;border-radius:6px}
+.sim-source{font-size:.75em;margin:0 0 .375em}
+.stem{font-size:1em;line-height:1.5;text-align:left;margin:0 0 .875em}
+.stem.cols{column-count:2;column-gap:2.5em;column-rule:1px solid var(--q-line)}
+
+/* Lei aplicável: recolhida, discreta. */
+.study-law{margin:-.25em 0 .75em;border:1px solid var(--q-line);border-radius:8px;background:var(--q-soft)}
+.study-law summary{padding:.4em .875em;font-size:.8125em}
+
+/* Alternativas: a linha inteira é o alvo; o estado aparece no fundo e na letra. */
+.opt{gap:.625em;align-items:flex-start;margin:0 0 .25em;padding:.375em .625em .375em .125em;border:1px solid transparent;border-radius:10px;transition:background .12s,border-color .12s}
+.opt:not(.locked):hover{background:var(--q-hover)}
+.letter{width:2em;height:2em;border:1.5px solid var(--q-line-2);border-radius:7px;color:var(--q-mut);font-size:.875em;background:var(--q-surface)}
+.otext{padding-top:.25em;font-size:.97em;line-height:1.45}
+.opt.sel{background:var(--q-hover);border-color:var(--pri)}
+.opt.sel .letter{background:var(--pri);border-color:var(--pri);color:#fff}
+.opt.right{background:var(--q-ok-l);border-color:#9fd6bf}
+.opt.right .letter{background:var(--q-ok);border-color:var(--q-ok);color:#fff}
+.opt.wrong{background:var(--q-no-l);border-color:#efb5ae}
+.opt.wrong .letter{background:var(--q-no);border-color:var(--q-no);color:#fff}
+/* Tesoura: só aparece forte ao passar o mouse ou quando a alternativa está riscada. */
+.cut{width:1.75em;height:1.75em;margin:0;color:var(--q-faint);font-size:1rem;opacity:.45}
+.opt:hover .cut,.cut:focus-visible,.cut[aria-pressed="true"]{opacity:1}
+.cut:disabled{opacity:0}
+.opt.struck{opacity:.55}
+
+/* ---------- rodapé de ações ---------- */
+.foot{padding:.625rem 1.5rem;gap:.75rem;border-top:1px solid var(--q-line);background:var(--q-soft)}
+.btn{height:2.5rem;padding:0 1.25rem;border-radius:8px;border:1px solid var(--pri);font-size:.875rem;font-weight:600}
+.btn.main{min-width:8.5rem}
+.btn.main:disabled{background:#e9e6f8;border-color:#e9e6f8;color:#8d82c9}
+.btn.alt{background:var(--q-surface);border-color:var(--q-line-2);color:var(--q-tx)}
+.btn.alt:hover{border-color:var(--pri);color:var(--pri)}
+.btn.alt.open{background:var(--pri-l);border-color:var(--pri);color:var(--pri)}
+
+/* Navegação: um grupo só, com ícones do mesmo traço. */
+.ctrl{gap:0;border:1px solid var(--q-line-2);border-radius:8px;background:var(--q-surface);overflow:hidden}
+.ctrl button{width:2.5rem;height:2.375rem;border:0;border-radius:0;background:none;font-size:0;color:var(--q-tx);position:relative}
+.ctrl button+button{border-left:1px solid var(--q-line)}
+.ctrl button::before{content:"";position:absolute;inset:0;margin:auto;width:1.125rem;height:1.125rem;background:currentColor;
+ -webkit-mask:var(--ic) center/contain no-repeat;mask:var(--ic) center/contain no-repeat}
+.ctrl button:hover:not(:disabled){background:var(--q-hover);color:var(--pri)}
+.ctrl button:disabled{opacity:.3}
+.ctrl button#b6{color:var(--pri);font-size:0}
+#b1{--ic:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 5v14M18 6l-7 6 7 6'/%3E%3C/svg%3E")}
+#b2{--ic:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M15 6l-6 6 6 6'/%3E%3C/svg%3E")}
+#b3{--ic:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M16 4h4v4M4 20l16-16M20 16v4h-4M15 15l5 5M4 4l5 5'/%3E%3C/svg%3E")}
+#b6{--ic:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='8' cy='12' r='4'/%3E%3Cpath d='M14 12h7M18 9l3 3-3 3'/%3E%3C/svg%3E")}
+#b4{--ic:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9 6l6 6-6 6'/%3E%3C/svg%3E")}
+#b5{--ic:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M18 5v14M6 6l7 6-7 6'/%3E%3C/svg%3E")}
+
+/* ---------- solução e comentários ---------- */
+.sol{background:var(--q-soft);padding:1.25rem 1.5rem 1.5rem}
+.verdict{gap:.5rem 1rem;margin-bottom:.5rem}
+.verdict .ans{border-radius:8px;padding:.375rem .75rem;font-size:.875rem}
+.verdict .res{font-size:.9375rem}
+.sol h3{margin:1.5rem 0 .5rem;font-size:.8125rem;font-weight:700;text-transform:none;letter-spacing:0;color:var(--q-tx)}
+.sol .small{line-height:1.5}
+.fund{padding:.3125rem .625rem;border-radius:6px;font-size:.8125rem}
+.law-buttons{gap:.375rem}
+.art{border-color:var(--q-line);border-radius:8px;padding:.25rem 1rem}
+.art p{font-size:.875rem;line-height:1.65;text-align:left;margin:.625rem 0}
+.art p.hi{background:#fff5c9}
+.ok-text{border-radius:0 8px 8px 0;font-size:.9375rem}
+.ai,.item-card{border-color:var(--q-line);border-radius:8px}
+.expl{font-size:.9375rem}
+
+/* ---------- celular ---------- */
+@media (max-width:900px){
+ .head{padding:.5rem 1rem}
+ .body,.sol,.foot{padding-left:1rem;padding-right:1rem}
+ .foot{justify-content:space-between}
+}
+@media (max-width:700px){
+ .top{padding:.5rem .75rem;gap:.5rem .75rem}
+ .stats{gap:.625rem;flex-wrap:wrap}
+ .wrap{padding:0 .5rem .5rem}
+ .hl{flex-direction:row;flex-wrap:wrap;gap:.5rem .75rem}
+ .body{padding:.75rem 1rem}
+ /* No celular a questão não cabe numa tela: a página rola, com a letra normal,
+    e as ações ficam presas no rodapé. */
+ html,body{height:auto}
+ body{overflow:visible;display:block}
+ .wrap,.card,.mid{display:block;flex:none;min-height:0}
+ .body{overflow:visible}
+ .card{overflow:visible}
+ .foot{position:sticky;bottom:0;z-index:5;flex-direction:row;flex-wrap:wrap;justify-content:space-between;border-radius:0 0 12px 12px}
+ .foot .btn{width:auto;flex:1}
+ .foot .ctrl{order:3;width:100%;justify-content:space-between}
+ .foot .ctrl button{flex:1}
+ .ctrl button{width:2.25rem}
+ .btn{padding:0 .875rem}
+}
+@media (prefers-reduced-motion:reduce){.opt{transition:none}}
+
+/* ---------- placar do dia + histórico (questoes-dia.js) ---------- */
+.qd-oculto{display:none!important}
+.qd-hoje{display:flex;align-items:baseline;gap:.5rem;white-space:nowrap;height:1.875rem;padding:0 .5rem 0 .625rem;align-items:center;
+ border:1px solid var(--q-line);border-radius:8px;background:var(--q-surface);font:inherit;font-size:.8125rem;color:var(--q-mut);cursor:pointer}
+.qd-hoje b{color:var(--q-tx);font-size:.875rem}
+.qd-hoje .ok,.qd-hoje .ok b{color:var(--q-ok)}.qd-hoje .no,.qd-hoje .no b{color:var(--q-no)}
+.qd-hoje:hover{border-color:var(--pri)}
+.qd-hoje:focus-visible{outline:3px solid var(--pri);outline-offset:2px}
+/* Seta: indica que abre o histórico. */
+.qd-seta{width:.4rem;height:.4rem;border-right:1.5px solid currentColor;border-bottom:1.5px solid currentColor;transform:translateY(-2px) rotate(45deg);margin-left:.125rem}
+.qd-rot{font-weight:600;color:var(--q-tx)}
+.stats .pct::after{content:" no total";font-weight:500}
+.qd-x:focus-visible{outline:3px solid var(--pri);outline-offset:2px}
+
+dialog.qd-dlg{border:0;border-radius:12px;padding:0;width:min(640px,calc(100vw - 32px));max-height:min(82vh,760px);
+ box-shadow:0 14px 44px #0005;color:var(--q-tx);font:15px/1.4 Inter,"Segoe UI",system-ui,sans-serif;overflow:hidden}
+dialog.qd-dlg[open]{display:flex;flex-direction:column}
+dialog.qd-dlg::backdrop{background:#17132a99}
+.qd-cab{display:flex;justify-content:space-between;align-items:flex-start;gap:1rem;padding:.875rem 1.25rem .75rem;border-bottom:1px solid var(--q-line)}
+.qd-cab h2{margin:0;font-size:1.0625rem}
+.qd-cab p{margin:.125rem 0 0;font-size:.8125rem;color:var(--q-mut)}
+.qd-x{flex:none;width:2rem;height:2rem;border:0;border-radius:7px;background:var(--bg);font-size:1.25rem;line-height:1;cursor:pointer}
+.qd-corpo{overflow:auto;padding:0 1.25rem}
+.qd-dlg table{width:100%;border-collapse:collapse;font-size:.8125rem;font-variant-numeric:tabular-nums}
+.qd-dlg thead th{position:sticky;top:0;background:var(--q-surface);font-weight:600;color:var(--q-mut);text-align:right;padding:.625rem .5rem .375rem;border-bottom:1px solid var(--q-line)}
+.qd-dlg th:first-child{text-align:left;padding-left:0}
+.qd-dlg tbody th{font-weight:600;text-align:left;padding:.375rem 0;white-space:nowrap}
+.qd-dlg td{text-align:right;padding:.375rem .5rem}
+.qd-dlg tbody tr+tr th,.qd-dlg tbody tr+tr td{border-top:1px solid #f0f0f4}
+.qd-dlg td.ok{color:var(--q-ok);font-weight:600}.qd-dlg td.no{color:var(--q-no);font-weight:600}
+.qd-hoje-l th,.qd-hoje-l td{background:#f6f5fc}
+.qd-barra{width:38%;padding-right:0!important}
+.qd-barra span{display:flex;gap:2px;height:.5rem;min-width:4px}
+.qd-barra i,.qd-leg i{display:block;border-radius:2px}
+.qd-barra i.a,.qd-leg i.a{background:#2f9e72}.qd-barra i.e,.qd-leg i.e{background:#c0392b}
+.qd-leg{display:inline-flex;align-items:center;gap:.25rem;font-weight:500}
+.qd-leg i{width:.5rem;height:.5rem;margin-left:.375rem}
+.qd-vazio{margin:0;padding:1.25rem;color:var(--q-mut);font-size:.875rem}
+.qd-nota{margin:0;padding:.625rem 1.25rem .875rem;font-size:.75rem;color:var(--q-faint);border-top:1px solid var(--q-line)}
+@media (max-width:700px){.qd-hoje{gap:.375rem}.stats .pct::after{content:""}.qd-barra{display:none}}
+/* Placar com os números do dia: mais compacto, para a barra caber numa linha só. */
+.stats{gap:.5rem .75rem}
+.top>label:has(#flt){font-size:0;gap:0}
+.top>label:has(#flt) select{font-size:.875rem}
+/* Campo da página sem as setinhas (as setas ‹ › ao lado já fazem isso). */
+.pager input{-moz-appearance:textfield;appearance:textfield;width:3.25rem}
+.pager input::-webkit-outer-spin-button,.pager input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+.top{gap:.5rem 1rem}
+@media (max-width:1180px){.stats .pct::after{content:""}}
+
+/* ---------- alternativas na solução ---------- */
+/* Questões de assertivas: uma linha por alternativa, explicada pelo resultado item a item. */
+.cb-list{list-style:none;margin:0;padding:0;border:1px solid var(--q-line);border-radius:8px;background:var(--q-surface);overflow:hidden}
+.cb{display:grid;grid-template-columns:1.5rem minmax(0,1fr);column-gap:.625rem;row-gap:.0625rem;padding:.5rem .75rem;font-size:.875rem}
+.cb+.cb{border-top:1px solid var(--q-line)}
+.cb-l{grid-row:span 2;width:1.5rem;height:1.5rem;border-radius:6px;display:grid;place-items:center;font-size:.75rem;font-weight:700;color:var(--q-mut);background:#f1f1f5}
+.cb-t{color:var(--q-tx)}
+.cb-w{font-size:.8125rem;color:var(--q-mut)}
+.cb.ok{background:var(--q-ok-l)}
+.cb.ok .cb-l{background:var(--q-ok);color:#fff}
+.cb.ok .cb-w{color:var(--q-ok);font-weight:600}
+.cb.mine:not(.ok) .cb-l{background:var(--q-no);color:#fff}
+.cb.mine:not(.ok) .cb-w{color:var(--q-no)}
+/* Questões comuns: os mesmos comentários, em cartões mais enxutos. */
+.an{gap:.5rem}
+.ai{padding:.625rem .875rem}
+.ah{margin-bottom:.25rem}
+.ao{font-size:.8125rem;line-height:1.45}
+.ax{font-size:.875rem;line-height:1.5;margin-top:.25rem}
+
+/* ---------- escolha de áreas (janela "Desempenho por área") ---------- */
+.area-box{display:flex;flex-direction:column}
+.area-list{flex:1;min-height:0;overflow:auto}
+.area-row-top{display:flex;align-items:center;gap:.75rem}
+.area-pick{display:flex;align-items:center;gap:.625rem;flex:1;min-width:0;cursor:pointer}
+.area-pick input{width:1.0625rem;height:1.0625rem;flex:none;accent-color:var(--pri);cursor:pointer}
+.area-pick .area-name{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.area-row.picked{border-color:var(--pri);background:#faf9ff}
+.area-row .area-metrics,.area-row .area-strip,.area-row .area-empty{margin-left:1.6875rem}
+/* Um quadradinho por questão da área, como no edital: acerto, erro ou ainda não respondida. */
+.area-strip{display:flex;gap:2px;height:.5rem;margin-top:.5rem}
+.area-strip i{flex:1;min-width:2px;border-radius:2px;background:#dcdce4}
+.area-strip i.hit{background:#0f8a5f}
+.area-strip i.miss{background:#d64545}
+.area-foot{position:sticky;bottom:0;display:flex;align-items:center;gap:.5rem;padding:.75rem 1rem;border-top:1px solid var(--q-line);background:var(--q-surface)}
+.area-foot span{flex:1;font-size:.8125rem;color:var(--q-mut)}
+.area-foot button{height:2.25rem;padding:0 .875rem;border-radius:8px;font:inherit;font-size:.875rem;font-weight:600;cursor:pointer}
+#areaClear{border:1px solid var(--q-line);background:var(--q-surface);color:var(--q-tx)}
+#areaClear:disabled{opacity:.45;cursor:default}
+#areaGo{border:1px solid var(--pri);background:var(--pri);color:#fff}
+.area-pick input:focus-visible,.area-foot button:focus-visible{outline:3px solid var(--pri);outline-offset:2px}
+/* Botão da barra quando há áreas escolhidas. */
+.stats #areaBtn.area-on{max-width:16rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;border-color:var(--pri);background:var(--pri-l);color:var(--pri);font-weight:600}

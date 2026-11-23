@@ -57,8 +57,14 @@
                 'concursos.questoes.index' => ['Questões', 'concursos.questoes.'],
                 'concursos.painel' => ['Desempenho', 'concursos.painel'],
                 'concursos.simulados' => ['Simulados', 'concursos.simulado'],
+                'concursos.material.index' => ['Resumos', 'concursos.material.'],
+                'concursos.leis.index' => ['Leis', 'concursos.leis.'],
                 'concursos.perfil' => ['Perfil', 'concursos.perfil'],
             ];
+            if (!auth()->user()?->temPlanoConcursos()) {
+                // Sem o planejamento dirigido, o módulo é só material de resumo e lei seca.
+                $itensMenu = array_intersect_key($itensMenu, array_flip(['concursos.material.index', 'concursos.leis.index']));
+            }
             if (auth()->user()?->is_admin || auth()->user()?->is_owner) {
                 $itensMenu['concursos.curadoria'] = ['Curadoria', 'concursos.curadoria'];
             }

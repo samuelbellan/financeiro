@@ -1,0 +1,37 @@
+/* Cards do baralho "Erros" (js/meus-cards.js): a afirmação em que o aluno errou (frente) e o mapa mental do erro
+   (verso): tema no alto, e de cada afirmação um ramo com setas até a lei. Vermelho = o que decide o certo e o errado.
+   Usado em flashcards.html e refazer.html (as duas páginas definem --no, --no-l, --pri e --line). */
+.mp-frente{display:grid;gap:.5rem;margin-top:.5rem}
+.mp-no{border:1px solid var(--line);border-radius:10px;padding:.5rem .75rem;background:var(--card,var(--paper,#fff));font-family:system-ui,sans-serif;font-size:.9375rem;line-height:1.5}
+.mp-no p{margin:0}
+.mp-no p+p{margin-top:.25rem}
+.mp-tag{display:block;font-size:.6875rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--mut,#6b6b78);margin-bottom:.125rem}
+.mp-red{color:var(--no);font-weight:700;background:var(--no-l);border-radius:3px;padding:0 .125rem}
+
+.mapa{margin-top:.75rem;font-family:system-ui,sans-serif}
+.mp-centro{margin:0 auto;width:max-content;max-width:100%;padding:.375rem .875rem;border-radius:999px;background:var(--pri);color:#fff;font-weight:700;font-size:.875rem;text-align:center}
+.mp-ramos{display:grid;grid-template-columns:repeat(auto-fit,minmax(16rem,1fr));gap:.75rem;margin-top:.25rem}
+/* Cada ramo nasce do tema: um traço sai do centro até o primeiro nó. */
+.mp-ramo{display:flex;flex-direction:column;align-items:stretch}
+.mp-ramo::before{content:"";align-self:center;width:2px;height:.875rem;background:var(--pri)}
+.mp-voce{border-left:4px solid var(--mut,#6b6b78)}
+.mp-erro{border:2px solid var(--no);background:var(--no-l)}
+.mp-erro .mp-tag{color:var(--no)}
+.mp-lei{border-left:4px solid var(--pri);font-family:Georgia,'Times New Roman',serif;font-size:.875rem}
+.mp-lei .mp-tag{font-family:system-ui,sans-serif;color:var(--pri)}
+.mp-sua{border-left:4px solid var(--ok,#0f7a55)}
+/* Seta para baixo entre os nós, com o que liga um ao outro ("mas está ERRADO", "o que a lei diz"). */
+.mp-seta{position:relative;display:flex;justify-content:center;padding:.25rem 0 .5rem}
+.mp-seta::before{content:"";position:absolute;top:0;bottom:.375rem;left:50%;width:2px;margin-left:-1px;background:var(--no)}
+.mp-seta::after{content:"";position:absolute;bottom:0;left:50%;margin-left:-.375rem;border:.375rem solid transparent;border-top-color:var(--no);border-bottom:0}
+.mp-seta span{position:relative;z-index:1;background:var(--card,var(--paper,#fff));color:var(--no);font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.03em;padding:.0625rem .5rem;border-radius:999px;border:1px solid var(--no)}
+.mp-seta-fim::before{background:var(--ok,#0f7a55)}
+.mp-seta-fim::after{border-top-color:var(--ok,#0f7a55)}
+.mp-seta-fim span{color:var(--ok,#0f7a55);border-color:var(--ok,#0f7a55)}
+
+/* Enunciado resumido (frente e verso), a troca exata em palavras e as palavras trocadas (afirmação × lei). */
+.mp-enun{margin:.5rem 0 0;padding:.375rem .625rem;border-radius:8px;background:var(--bg,#f4f4f7);font-family:system-ui,sans-serif;font-size:.8125rem;line-height:1.5;color:var(--tx,var(--ink,#2b2b33))}
+.mp-enun b{color:var(--mut,#6b6b78)}
+.mp-troca-txt{font-weight:700;color:var(--no)}
+.mp-erro p+p{margin-top:.25rem}
+.mp-troca{text-decoration:underline wavy;text-underline-offset:3px}
