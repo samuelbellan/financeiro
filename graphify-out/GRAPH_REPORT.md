@@ -1,41 +1,41 @@
-# Graph Report - financeiro  (2026-11-19)
+# Graph Report - financeiro  (2026-11-21)
 
 ## Corpus Check
-- 301 files · ~623,680 words
+- 383 files · ~1,942,222 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 2129 nodes · 5121 edges · 184 communities (143 shown, 41 thin omitted)
-- Extraction: 98% EXTRACTED · 2% INFERRED · 0% AMBIGUOUS · INFERRED: 104 edges (avg confidence: 0.75)
+- 4143 nodes · 7471 edges · 305 communities (261 shown, 44 thin omitted)
+- Extraction: 98% EXTRACTED · 2% INFERRED · 0% AMBIGUOUS · INFERRED: 130 edges (avg confidence: 0.73)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `261532c8`
+- Built from commit: `de701bbb`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
 ## Community Hubs (Navigation)
-- CartoesController
+- CreditCardReconciliationTest
 - Illuminate\Http\JsonResponse
 - EventoAuxilioDTO
-- CreditCardReconciliationService
+- GoogleAuthAndWhitelistTest
 - composer.json
 - User
 - scripts
-- OfxParserService
+- OfxImportService
 - devDependencies
-- nowMs
-- addDays
+- NBC TSP Estrutura Conceitual (R1)
+- projection.js
 - StudyRoomService
-- DatabaseSyncService
-- CategoriasController
-- StudyRoomsController
+- Transacao
+- NBC TG Estrutura Conceitual para Relatório Financeiro
+- caderno.js
 - esc
-- Illuminate\Database\Eloquent\Relations\BelongsTo
+- Illuminate\Database\Eloquent\Model
 - TelegramWebhookController
 - README.md
 - Illuminate\Database\Seeder
-- WorkoutSession
+- TelegramWebhookController.php
 - Illuminate\Database\Migrations\Migration
 - 🚀 Guia de Deploy em Nuvem - Sistema Financeiro & Concursos
 - metrics.js
@@ -44,17 +44,18 @@
 - logging.php
 - .count
 - StudySyncTest
-- AllowedGoogleEmail
-- tick
-- Illuminate\Database\Eloquent\Model
-- MidiaEstudosCommand
-- GurujaPostMetaService
-- NetworkService
+- Controller
+- nowMs
+- Illuminate\Database\Eloquent\Factories\HasFactory
+- flashcards.js
+- EstudosApiController
+- simulados.js
 - StudySummaryService
 - main.js
 - GurujaMcpService
 - DailyLog
 - Exercise
+- Constituição da República Federativa do Brasil de 1988
 - setup
 - console.php
 - rules/graphify.md
@@ -62,7 +63,7 @@
 - entrypoint.sh
 - config
 - require-dev
-- renderGuruja
+- Lei nº 5.172/1966 — Código Tributário Nacional
 - MidiaEstudosCommandTest
 - .http
 - EstudosApiTest
@@ -70,37 +71,39 @@
 - financas/index.blade.php
 - home.blade.php
 - post-meta.js
-- GearItem
+- User.php
 - SalaryCalculatorService
-- Cartao
+- NBC TG 26 (R5) — Apresentação das Demonstrações Contábeis
 - transaction-autocomplete.js
 - SalaryProjectionTest
-- Illuminate\Foundation\Testing\RefreshDatabase
-- NotaFiscal
-- Transacao
+- TestCase
+- Estrutura e conteúdo
+- TÍTULO III
 - Instrução: post da meta da semana (carrossel) sem IA
 - Illuminate\Http\Request
+- NotaFiscal
 - StatementImportService
 - SalaryProjectionTest.php
-- Controller
+- CategoriasController
 - StudySyncService
 - bootstrap/app.php
 - psr-4
-- bosses.js
-- db.js
+- dayStats
+- 24. INSTRUMENTOS FINANCEIROS
+- Lei Complementar nº 101/2000 — Lei de Responsabilidade Fiscal
 - require
-- qrcode.min.js
+- lei-seca.js
 - extra
 - BodyTrackerTest
-- audio.js
+- StudyRoomsController
 - Sabatina 2026-11-01 — "App desktop para o módulo de estudos?"
-- CreditCardReconciliationTest
-- GurujaConnectCommand
-- WorkoutSessionExercise
-- BackupEstudosCommandTest
-- TransacaoUpdateDateTest
-- TestCase
-- rooms.js
+- Definições
+- Aplicação e outros materiais explicativos
+- gerar_dados.py
+- today
+- Lei nº 4.320/1964 — Normas gerais de direito financeiro
+- render
+- NBC TG 03 (R3) — Demonstração dos Fluxos de Caixa
 - avatars-vetor.js
 - Sabatina 2026-11-01: widget flutuante do cronômetro de estudos
 - Illuminate\Support\Facades\Schema
@@ -113,47 +116,160 @@
 - estudos-sw.js
 - Sabatina 2026-11-08 — Calculadora de projeção e gerador de mídias (Instagram)
 - Illuminate\Database\Schema\Blueprint
-- CartaoCompra
+- Cartao
 - QualificacaoPermanenteDTO
 - /post-estudos semanal | semanal --parcial | diario [YYYY-MM-DD]
 - QualificacaoTemporariaDTO
 - Convite para teste — Horas de Estudo
-- TreinosController
+- GurujaPostMetaService
+- ExercisePersonalRecord
+- CreditCardReconciliationService
+- 11. ATIVO IMOBILIZADO
+- 12. ATIVO INTANGÍVEL
+- inicio.js
+- NBC TSP 07 — Ativo Imobilizado
+- NBC TG 27 (R4) — Ativo Imobilizado
+- Lei nº 9.784/1999 — Processo administrativo federal
+- Parte Geral — Contabilidade Aplicada ao Setor Público
+- NBC TG 23 (R2) — Políticas Contábeis, Mudança de Estimativa e Retificação de Erro
+- 3. RECEITA ORÇAMENTÁRIA
+- 4. BENEFÍCIOS PÓS EMPREGO (BENEFÍCIOS A EMPREGADOS)
+- texto-lei.js
+- 17. PROVISÕES, PASSIVOS CONTINGENTES E ATIVOS CONTINGENTES
+- Requisitos
+- NBC TG 16 (R2) — Estoques
+- 20. EFEITOS DAS MUDANÇAS NAS TAXAS DE CÂMBIO
 - Sincronização da Guruja no App de Estudos
+- NBC TG 07 (R2) — Subvenção e Assistência Governamentais
+- OfxAccountDTO
 - guruja.md
+- stf_jurisprudencia.py
+- Lei nº 12.527/2011 — Lei de Acesso à Informação
+- 14. RECEITA DE TRANSAÇÃO SEM CONTRAPRESTAÇÃO
+- 1.5. CONSIDERAÇÕES GERAIS
+- 2. BALANÇO ORÇAMENTÁRIO
+- 3. ESTRUTURA DO PCASP
+- OfxParserService
+- 9.2. FUSÃO
+- historico.js
+- Lei nº 6.404/1976 — Sociedades por Ações
+- Parte II — Procedimentos Contábeis Patrimoniais
+- 23. BENEFÍCIOS SOCIAIS
+- 2. ELEMENTOS DAS DEMONSTRAÇÕES CONTÁBEIS
+- meus-cards.js
+- 10.2. DEFINIÇÕES
+- 2.4. CONTABILIZAÇÃO DAS CONCESSÕES
+- 4. BALANÇO PATRIMONIAL
+- 4.6.1. Natureza de Despesa
+- 4.7.4. Estágios da Execução dos Restos a Pagar
+- OfxParserServiceTest
+- 5.2.4. Baixa
+- DatabaseSyncService
+- 6. DEMONSTRAÇÃO DOS FLUXOS DE CAIXA
+- 8. INVESTIMENTO EM COLIGADA E EM EMPREENDIMENTO CONTROLADO EM
+- Lei nº 13.709/2018 — Lei Geral de Proteção de Dados Pessoais
+- CAPÍTULO III — AÇÕES
+- CAPÍTULO V — DEBÊNTURES
+- 2. ASPECTOS GERAIS DO PCASP
+- Parte V — Demonstrações Contábeis Aplicadas ao Setor Público
+- Parte III — Procedimentos Contábeis Específicos
+- 4.2. CLASSIFICAÇÕES DA DESPESA ORÇAMENTÁRIA
+- 4.4.1. Planejamento
+- 7.3. PROCEDIMENTOS CONTÁBEIS ORÇAMENTÁRIOS
+- Manual de Instruções — Módulo Estudo para Concursos
+- edital.js
+- 22. POLÍTICAS CONTÁBEIS, MUDANÇA DE ESTIMATIVA E RETIFICAÇÃO DE ERRO
+- 2. PRINCÍPIOS ORÇAMENTÁRIOS
+- 6.3.4. Aspectos relevantes
+- 8.2. ESTRUTURA
+- 8.3.3. Definições
+- CAPÍTULO XX — SOCIEDADES COLIGADAS, CONTROLADORAS E CONTROLADAS
+- 15. RECEITA DE TRANSAÇÃO COM CONTRAPRESTAÇÃO
+- 1.4. CONTABILIZAÇÃO DO FUNDEB
+- 3.2. AVALIAÇÃO E MENSURAÇÃO
+- 4. DESPESA ORÇAMENTÁRIA
+- 4. CAIXA E EQUIVALENTE DE CAIXA
+- 6.2. CONTABILIZAÇÃO DOS PRECATÓRIOS EM REGIME ESPECIAL
+- CAPÍTULO X — ACIONISTAS
+- Lei nº 8.137/1990 — Crimes contra a ordem tributária
+- 13. REDUÇÃO AO VALOR RECUPERÁVEL
+- Parte I — Procedimentos Contábeis Orçamentários
+- 21.2. EVENTO SUBSEQUENTE
+- 3.6. PROCEDIMENTOS CONTÁBEIS REFERENTES À RECEITA ORÇAMENTÁRIA
+- 4.2. ELABORAÇÃO
+- 5. FONTE OU DESTINAÇÃO DE RECURSOS
+- 5.2. MENSURAÇÃO
+- 5. DEMONSTRAÇÃO DAS VARIAÇÕES PATRIMONIAIS
+- NBC TA 330 (R1) — Resposta do Auditor aos Riscos Avaliados
+- GurujaConnectCommand
+- ref-lei.js
+- resumos.js
+- Lei nº 14.063/2020 — Assinaturas eletrônicas
+- CAPÍTULO XV — EXERCÍCIO SOCIAL E DEMONSTRAÇÕES FINANCEIRAS
+- 4.2.4. Classificação da Despesa Orçamentária por Natureza
+- 6.2. CARACTERÍSTICAS QUALITATIVAS DA INFORMAÇÃO CONTÁBIL
+- 7. PROPRIEDADE PARA INVESTIMENTO
+- armazenamento.js
+- fundamento.js
+- CAPÍTULO XXI — GRUPO DE SOCIEDADES
+- 16. CUSTOS DE EMPRÉSTIMOS
+- 19.2. REGISTROS PATRIMONIAIS DECORRENTES DAS DESPESAS ORÇAMENTÁRIAS DE
+- 6. ATIVO BIOLÓGICO E PRODUTO AGRÍCOLA
+- 7. DEMONSTRAÇÃO DAS MUTAÇÕES NO PATRIMÔNIO LÍQUIDO
+- leis_planalto_para_md.py
+- web.php
+- CAPÍTULO VII — CONSTITUIÇÃO DA COMPANHIA
+- CAPÍTULO XII — CONSELHO DE ADMINISTRAÇÃO E DIRETORIA
+- 4.4. SISTEMA DE PROTEÇÃO SOCIAL DOS MILITARES DAS FORÇAS ARMADAS (SPSMFA)
+- questoes-fit.js
+- CAPÍTULO XI — ASSEMBLÉIA-GERAL
+- CAPÍTULO XVI — LUCRO, RESERVAS E DIVIDENDOS
+- CAPÍTULO XVII — DISSOLUÇÃO, LIQUIDAÇÃO E EXTINÇÃO
+- CAPÍTULO XVIII — TRANSFORMAÇÃO, INCORPORAÇÃO, FUSÃO E CISÃO
+- CAPÍTULO II — CAPITAL SOCIAL
+- CAPÍTULO XIV — MODIFICAÇÃO DO CAPITAL SOCIAL
+- carregar.js
+- decreto-1171-1994-etica.md
+- lei-complementar-116-2003-iss.md
+- NetworkService
+- GearItem
+- TransacaoUpdateDateTest
+- MidiaEstudosCommand
+- OfxTransactionDTO
+- importar_ofx.php
 
 ## God Nodes (most connected - your core abstractions)
-1. `User` - 183 edges
-2. `TestCase` - 70 edges
-3. `Cartao` - 66 edges
-4. `Transacao` - 64 edges
-5. `GurujaMcpService` - 48 edges
-6. `CartaoCompra` - 46 edges
-7. `CartaoParcela` - 42 edges
-8. `esc()` - 38 edges
-9. `StudySyncTest` - 37 edges
-10. `formatDuration()` - 34 edges
+1. `NBC TSP Estrutura Conceitual (R1)` - 190 edges
+2. `User` - 188 edges
+3. `NBC TG Estrutura Conceitual para Relatório Financeiro` - 95 edges
+4. `TestCase` - 72 edges
+5. `Cartao` - 66 edges
+6. `Transacao` - 64 edges
+7. `GurujaMcpService` - 48 edges
+8. `CartaoCompra` - 46 edges
+9. `NBC TG 26 (R5) — Apresentação das Demonstrações Contábeis` - 43 edges
+10. `CartaoParcela` - 42 edges
 
 ## Surprising Connections (you probably didn't know these)
+- `createWidget()` --indirect_call--> `refresh()`  [INFERRED]
+  resources/js/estudos/widget.js → public/concursos-app/js/edital.js
+- `createSync()` --indirect_call--> `schedule()`  [INFERRED]
+  resources/js/estudos/sync.js → public/concursos-app/js/flashcards.js
+- `createSync()` --indirect_call--> `start()`  [INFERRED]
+  resources/js/estudos/sync.js → public/concursos-app/js/flashcards.js
 - `gurujaPlan()` --indirect_call--> `a()`  [INFERRED]
   resources/js/estudos/main.js → public/js/qrcode.min.js
 - `trendBuckets()` --indirect_call--> `d()`  [INFERRED]
   resources/js/estudos/metrics.js → public/js/qrcode.min.js
-- `CreditCardDeleteTest` --references--> `Cartao`  [EXTRACTED]
-  tests/Feature/CreditCardDeleteTest.php → app/Models/Cartao.php
-- `CreditCardReconciliationTest` --references--> `Cartao`  [EXTRACTED]
-  tests/Feature/CreditCardReconciliationTest.php → app/Models/Cartao.php
-- `BodyTrackerTest` --references--> `User`  [EXTRACTED]
-  tests/Feature/BodyTrackerTest.php → app/Models/User.php
 
 ## Import Cycles
 - None detected.
 
-## Communities (184 total, 41 thin omitted)
+## Communities (305 total, 44 thin omitted)
 
 ### Community 1 - "Illuminate\Http\JsonResponse"
 Cohesion: 0.11
-Nodes (4): BodyTrackerController, EstudosController, Illuminate\Http\JsonResponse, Symfony\Component\HttpFoundation\BinaryFileResponse
+Nodes (3): BodyTrackerController, EstudosController, Illuminate\Http\JsonResponse
 
 ### Community 2 - "EventoAuxilioDTO"
 Cohesion: 0.18
@@ -164,56 +280,72 @@ Cohesion: 0.14
 Nodes (13): autoload-dev, psr-4, description, keywords, license, minimum-stability, name, prefer-stable (+5 more)
 
 ### Community 5 - "User"
-Cohesion: 0.06
-Nodes (10): User, Illuminate\Database\Eloquent\Relations\HasMany, Illuminate\Foundation\Auth\User, Mockery, CreditCardDeleteTest, EstudosGurujaMcpTest, GoogleAuthAndWhitelistTest, ManagersTest (+2 more)
+Cohesion: 0.05
+Nodes (11): User, Illuminate\Database\Eloquent\Relations\HasMany, Illuminate\Foundation\Auth\User, Illuminate\Http\Client\Request, ConcursosTest, CreditCardDeleteTest, EstudosGurujaMcpTest, EstudosGurujaPostMetaTest (+3 more)
 
 ### Community 6 - "scripts"
 Cohesion: 0.14
 Nodes (14): scripts, dev, post-autoload-dump, post-update-cmd, pre-package-uninstall, test, Composer\\Config::disableProcessTimeout, Illuminate\\Foundation\\ComposerScripts::postAutoloadDump (+6 more)
 
-### Community 7 - "OfxParserService"
-Cohesion: 0.05
-Nodes (18): OfxAccountDTO, OfxImportResultDTO, OfxStatementDTO, OfxTransactionDTO, OfxImportService, PDO, OfxParserService, getPdoConnection() (+10 more)
+### Community 7 - "OfxImportService"
+Cohesion: 0.16
+Nodes (7): OfxImportResultDTO, OfxImportService, PDO, PDO, PDOException, OfxImportServiceTest, PDO
 
 ### Community 8 - "devDependencies"
 Cohesion: 0.08
 Nodes (25): chart.js, concurrently, idb, laravel-vite-plugin, dependencies, chart.js, idb, devDependencies (+17 more)
 
-### Community 9 - "nowMs"
-Cohesion: 0.17
-Nodes (26): uuid(), allTypes(), checkSuspicious(), colorPicker(), exportBackup(), gurujaStudy(), gurujaStudyType(), importBackup() (+18 more)
+### Community 9 - "NBC TSP Estrutura Conceitual (R1)"
+Cohesion: 0.01
+Nodes (190): Acordos vinculantes que são igualmente não executados, Acordos vinculantes que são igualmente não executados, Agrupamento da informação, Alcance da estrutura conceitual e das NBCs TSP, Alcance da estrutura conceitual e das NBCs TSP, Aplicação das características qualitativas, Aplicação das características qualitativas, Aplicação das características qualitativas (+182 more)
 
-### Community 10 - "addDays"
-Cohesion: 0.11
-Nodes (34): BOSS_HP, bossMaxHp(), cycleMark(), JORNADA_PADRAO, jornadaState(), normalizeJornada(), objectiveProgressMs(), folgaPicker() (+26 more)
+### Community 10 - "projection.js"
+Cohesion: 0.19
+Nodes (19): folgaPicker(), formatBigHours(), longDay(), projInputs(), projPaces(), renderProjection(), renderProjHowMuch(), renderProjWhen() (+11 more)
+
+### Community 12 - "Transacao"
+Cohesion: 0.07
+Nodes (8): Conta, Transacao, Mockery\MockInterface, StatementImportTest, TelegramOfxDocumentTest, TelegramWebhookTest, TransactionDeduplicationTest, TransactionSuggestionTest
+
+### Community 13 - "NBC TG Estrutura Conceitual para Relatório Financeiro"
+Cohesion: 0.02
+Nodes (95): Agregação, Ajustes para manutenção de capital, Alterações em recursos econômicos e reivindicações, Alterações em recursos econômicos e reivindicações não resultantes do desempenho financeiro, Aplicação das características qualitativas de melhoria, Aplicação das características qualitativas fundamentais, Apresentação e divulgação como ferramentas de comunicação, Ativo e passivo (+87 more)
+
+### Community 14 - "caderno.js"
+Cohesion: 0.09
+Nodes (43): answer(), applyFilter(), areaDraft, areaOf(), AREAS, areaStats(), areaStrip(), buildSol() (+35 more)
 
 ### Community 15 - "esc"
-Cohesion: 0.11
-Nodes (51): activeSubjects(), blockKey(), bossCard(), bossLabel(), cards(), chargeBar(), chargeText(), colorVars() (+43 more)
+Cohesion: 0.10
+Nodes (45): activeSubjects(), allTypes(), blockKey(), bossCard(), bossLabel(), chargeBar(), chargeText(), colorVars() (+37 more)
 
-### Community 16 - "Illuminate\Database\Eloquent\Relations\BelongsTo"
+### Community 16 - "Illuminate\Database\Eloquent\Model"
 Cohesion: 0.13
-Nodes (5): ImportarHoleritesCommand, CartaoFaturaFechamento, SalaryPayslip, SalaryProfile, Illuminate\Database\Eloquent\Relations\BelongsTo
+Nodes (6): CartaoFaturaFechamento, ConcursoState, SalaryPayslip, SalaryProfile, Illuminate\Database\Eloquent\Model, Illuminate\Database\Eloquent\Relations\BelongsTo
 
 ### Community 17 - "TelegramWebhookController"
-Cohesion: 0.08
-Nodes (5): TelegramWebhookController, WhatsappLog, GeminiService, WhatsappMessageParser, WhatsappMessageParserTest
+Cohesion: 0.16
+Nodes (4): JsonResponse, TelegramWebhookController, WhatsappLog, WhatsappMessageParser
 
 ### Community 18 - "README.md"
 Cohesion: 0.25
 Nodes (7): About Laravel, Agentic Development, Code of Conduct, Contributing, Learning Laravel, License, Security Vulnerabilities
 
 ### Community 19 - "Illuminate\Database\Seeder"
-Cohesion: 0.11
-Nodes (11): UserFactory, DatabaseSeeder, ProductionDataSeeder, UserSeeder, Illuminate\Database\Console\Seeds\WithoutModelEvents, Illuminate\Database\Eloquent\Attributes\Fillable, Illuminate\Database\Eloquent\Attributes\Hidden, Illuminate\Database\Eloquent\Factories\Factory (+3 more)
+Cohesion: 0.18
+Nodes (7): DatabaseSeeder, ExerciseCatalogSeeder, ProductionDataSeeder, UserSeeder, Illuminate\Database\Console\Seeds\WithoutModelEvents, Illuminate\Database\Seeder, Illuminate\Support\Facades\Hash
+
+### Community 20 - "TelegramWebhookController.php"
+Cohesion: 0.14
+Nodes (8): GeminiService, GurujaComandoResumoService, Illuminate\Support\Carbon, Illuminate\Support\Facades\Cache, Illuminate\Support\Facades\Http, Illuminate\Support\Facades\Log, Throwable, ZipArchive
 
 ### Community 22 - "🚀 Guia de Deploy em Nuvem - Sistema Financeiro & Concursos"
 Cohesion: 0.15
 Nodes (12): 🔄 Como atualizar os dados antes da viagem se fizer novos lançamentos locais, 🤖 Como funciona o Bot do Telegram com Roteamento Inteligente (Local-First + Nuvem Fallback), 📱 Dica de Acesso pelo Celular, 🚀 Guia de Deploy em Nuvem - Sistema Financeiro & Concursos, 📦 O que foi preparado no projeto, 🌟 Opção 1: Deploy no Render.com com Banco Vitalício no Neon.tech (Recomendado), 🚂 Opção 2: Deploy no Railway.app, ⚡ Opção 3: Usando Banco Gratuito no Neon.tech ou Supabase (+4 more)
 
 ### Community 23 - "metrics.js"
-Cohesion: 0.07
-Nodes (53): recentSessions(), renderSyncBadge(), amountBetween(), buildDaily(), compareWithPrevious(), comparisonRanges(), comparisonSeries(), CUSTOM_TYPE_MAX (+45 more)
+Cohesion: 0.06
+Nodes (60): gurujaStudyType(), openDialog(), openSessionDialog(), openSessionNoteDialog(), openSuspiciousDialog(), recentSessions(), typeFromForm(), buildDaily() (+52 more)
 
 ### Community 24 - "sidebar.js"
 Cohesion: 0.27
@@ -228,36 +360,52 @@ Cohesion: 0.40
 Nodes (4): Monolog\Handler\NullHandler, Monolog\Handler\StreamHandler, Monolog\Handler\SyslogUdpHandler, Monolog\Processor\PsrLogMessageProcessor
 
 ### Community 27 - ".count"
-Cohesion: 0.12
-Nodes (8): BackupEstudosCommand, ExportProductionDataCommand, GurujaSyncCommand, ImportOfxCommand, ResumoEstudosCommand, SyncDatabaseCommand, TelegramRegisterLocalCommand, Illuminate\Console\Command
-
-### Community 29 - "AllowedGoogleEmail"
-Cohesion: 0.18
-Nodes (5): AllowedEmailController, AuthController, AllowedGoogleEmail, Illuminate\Http\RedirectResponse, Laravel\Socialite\Facades\Socialite
-
-### Community 31 - "tick"
 Cohesion: 0.10
-Nodes (39): avatarStage(), avatarSvg(), avatarBlock(), checkReforcoAlert(), checkRestAlert(), currentRoom(), DESK_SVG(), dismissRestAlert() (+31 more)
+Nodes (9): BackupEstudosCommand, ExportProductionDataCommand, GurujaSyncCommand, ImportarHoleritesCommand, ImportOfxCommand, ResumoEstudosCommand, TelegramRegisterLocalCommand, TelegramSetWebhook (+1 more)
 
-### Community 36 - "GurujaPostMetaService"
+### Community 29 - "Controller"
+Cohesion: 0.10
+Nodes (9): AllowedEmailController, AuthController, ConcursosController, Controller, AllowedGoogleEmail, Illuminate\Http\RedirectResponse, Illuminate\Http\Response, Laravel\Socialite\Facades\Socialite (+1 more)
+
+### Community 31 - "nowMs"
 Cohesion: 0.11
-Nodes (5): EstudosApiController, CarbonImmutable, GurujaPostMetaService, CarbonImmutable, Carbon\CarbonImmutable
+Nodes (45): getAudioContext(), playBossHitSound(), playFocusEndSound(), playLevelUpSound(), playNote(), playRestDueSound(), playRestSoonSound(), avatarStage() (+37 more)
+
+### Community 32 - "Illuminate\Database\Eloquent\Factories\HasFactory"
+Cohesion: 0.06
+Nodes (7): RunningLog, RunningSplit, StretchingLog, WorkoutSession, WorkoutSessionExercise, WorkoutSet, Illuminate\Database\Eloquent\Factories\HasFactory
+
+### Community 33 - "flashcards.js"
+Cohesion: 0.10
+Nodes (42): abreDaLista(), alternaFav(), answer(), anterior(), buildQueue(), cardHTML(), desfazAviso(), doneHTML() (+34 more)
+
+### Community 36 - "EstudosApiController"
+Cohesion: 0.27
+Nodes (3): EstudosApiController, CarbonImmutable, Carbon\CarbonImmutable
+
+### Community 38 - "simulados.js"
+Cohesion: 0.10
+Nodes (43): allAreas, allSources, altsReview(), answer(), applyFilter(), baseBox(), buildSol(), cardHtml() (+35 more)
 
 ### Community 40 - "StudySummaryService"
 Cohesion: 0.17
 Nodes (4): CarbonImmutable, StudySummaryService, Illuminate\Database\ConnectionInterface, ResumoEstudosCommandTest
 
 ### Community 41 - "main.js"
-Cohesion: 0.06
-Nodes (67): setMeta(), apiTokensCall(), applyTheme(), boot(), canvasToPngBlob(), charts, chartTooltip, checkGurujaAuthRedirect() (+59 more)
+Cohesion: 0.05
+Nodes (56): apiTokensCall(), applyTheme(), canvasToPngBlob(), charts, chartTooltip, closeFocus(), colorOf(), createApiToken() (+48 more)
 
 ### Community 43 - "DailyLog"
-Cohesion: 0.07
-Nodes (6): DailyLog, Measurement, ProgressPhoto, BodyTrackerService, FitnessAiService, FitnessAiModuleTest
+Cohesion: 0.08
+Nodes (6): TreinosController, DailyLog, Measurement, ProgressPhoto, BodyTrackerService, FitnessAiService
 
 ### Community 45 - "Exercise"
-Cohesion: 0.09
-Nodes (5): Exercise, WorkoutPlanItem, WorkoutSet, ExerciseCatalogSeeder, WorkoutModuleTest
+Cohesion: 0.07
+Nodes (4): Exercise, WorkoutPlan, WorkoutPlanItem, WorkoutModuleTest
+
+### Community 46 - "Constituição da República Federativa do Brasil de 1988"
+Cohesion: 0.05
+Nodes (43): CAPÍTULO I, CAPÍTULO I, CAPÍTULO I, CAPÍTULO I, CAPÍTULO I, CAPÍTULO I, CAPÍTULO I, CAPÍTULO II (+35 more)
 
 ### Community 47 - "setup"
 Cohesion: 0.25
@@ -271,57 +419,57 @@ Nodes (7): pestphp/pest-plugin, php-http/discovery, config, allow-plugins, optim
 Cohesion: 0.29
 Nodes (7): require-dev, fakerphp/faker, laravel/pail, laravel/pint, mockery/mockery, nunomaduro/collision, phpunit/phpunit
 
-### Community 59 - "renderGuruja"
-Cohesion: 0.32
-Nodes (12): gjDone(), gjDoneGuruja(), gjKey(), gjMarcada(), gurujaAgo(), gurujaDayDate(), gurujaDayLabel(), gurujaItem() (+4 more)
+### Community 59 - "Lei nº 5.172/1966 — Código Tributário Nacional"
+Cohesion: 0.05
+Nodes (43): CAPÍTULO I, CAPÍTULO I, CAPÍTULO I, CAPÍTULO I, CAPÍTULO I, CAPÍTULO I, CAPÍTULO I, CAPÍTULO II (+35 more)
 
 ### Community 66 - ".http"
-Cohesion: 0.06
-Nodes (7): TelegramSetWebhook, JsonResponse, TelegramService, PendingRequest, EstudosGurujaPostMetaTest, EstudosGurujaTest, TelegramWebhookRoutingTest
+Cohesion: 0.10
+Nodes (4): TelegramService, PendingRequest, FitnessAiModuleTest, TelegramWebhookRoutingTest
 
 ### Community 74 - "post-meta.js"
 Cohesion: 0.12
 Nodes (44): buildPostCaption(), buildSlidePlan(), CAPTION_HASHTAGS, createSlideCanvas(), drawFittedNumber(), drawFooter(), drawSlideClosing(), drawSlideCover() (+36 more)
 
-### Community 75 - "GearItem"
-Cohesion: 0.08
-Nodes (4): GearItem, RunningLog, RunningSplit, static
+### Community 75 - "User.php"
+Cohesion: 0.16
+Nodes (6): UserFactory, Illuminate\Database\Eloquent\Attributes\Fillable, Illuminate\Database\Eloquent\Attributes\Hidden, Illuminate\Database\Eloquent\Factories\Factory, Illuminate\Notifications\Notifiable, static
 
-### Community 77 - "Cartao"
-Cohesion: 0.10
-Nodes (6): Cartao, CreditCardService, Carbon, CartaoCompraTest, CreditCardClosingTest, FinancialSummaryAndCardLimitsTest
+### Community 77 - "NBC TG 26 (R5) — Apresentação das Demonstrações Contábeis"
+Cohesion: 0.05
+Nodes (43): Alcance, Ativo circulante, Balanço patrimonial, Capital, Ciclo operacional normal (item 69(a)) (Incluído pela Revisão NBC TG 19), Compensação de valores, Conjunto completo de demonstrações contábeis, Consistência de apresentação (+35 more)
 
 ### Community 78 - "transaction-autocomplete.js"
 Cohesion: 0.80
 Nodes (4): escapeHtml(), highlightMatch(), initTransactionAutocomplete(), normalizeStr()
 
-### Community 83 - "Illuminate\Foundation\Testing\RefreshDatabase"
-Cohesion: 0.10
-Nodes (17): GurujaComandoResumoService, Carbon\Carbon, Illuminate\Foundation\Testing\RefreshDatabase, Illuminate\Http\Client\Request, Illuminate\Http\UploadedFile, Illuminate\Support\Carbon, Illuminate\Support\Facades\Cache, Illuminate\Support\Facades\DB (+9 more)
+### Community 83 - "TestCase"
+Cohesion: 0.05
+Nodes (16): Carbon\Carbon, Illuminate\Foundation\Testing\RefreshDatabase, Illuminate\Foundation\Testing\TestCase, Illuminate\Http\UploadedFile, Illuminate\Support\Facades\DB, Illuminate\Support\Facades\Validator, Illuminate\Support\Str, Illuminate\Validation\ValidationException (+8 more)
 
-### Community 84 - "NotaFiscal"
-Cohesion: 0.12
-Nodes (4): MercadoController, NotaFiscal, NotaFiscalItem, MercadoModuleTest
+### Community 84 - "Estrutura e conteúdo"
+Cohesion: 0.05
+Nodes (41): Alcance, Apresentação adequada e conformidade com as NBCs TSP, Ativo circulante, Balanço patrimonial, Benefícios econômicos futuros ou potencial de serviços, Capital, Compensação de valores, Componentes das demonstrações contábeis (+33 more)
 
-### Community 88 - "Transacao"
-Cohesion: 0.09
-Nodes (7): Conta, Transacao, Mockery\MockInterface, StatementImportTest, TelegramOfxDocumentTest, TransactionDeduplicationTest, TransactionSuggestionTest
+### Community 88 - "TÍTULO III"
+Cohesion: 0.05
+Nodes (38): CAPÍTULO I, CAPÍTULO I, CAPÍTULO I, CAPÍTULO I, CAPÍTULO I, CAPÍTULO II, CAPÍTULO II, CAPÍTULO II (+30 more)
 
 ### Community 89 - "Instrução: post da meta da semana (carrossel) sem IA"
 Cohesion: 0.18
 Nodes (10): 1. Onde fica e como o usuário usa, 2.1 Guruja (via `GurujaMcpService`, que já faz OAuth e `callMcp`), 2.2 Horas do app (banco local, mesma lógica de `/api/estudos/periodo`), 2.3 Cálculos (em PHP, no endpoint), 2. Dados (servidor), 3. Slides (cliente, `resources/js/estudos/post-meta.js`), 4. Legenda (template fixo, sem IA), 5. Testes (+2 more)
 
 ### Community 91 - "Illuminate\Http\Request"
-Cohesion: 0.11
+Cohesion: 0.12
 Nodes (3): FinancasController, TransactionDeduplicationService, Illuminate\Http\Request
+
+### Community 92 - "NotaFiscal"
+Cohesion: 0.11
+Nodes (5): MercadoController, NotaFiscal, NotaFiscalItem, Illuminate\Support\Facades\Storage, MercadoModuleTest
 
 ### Community 95 - "SalaryProjectionTest.php"
 Cohesion: 0.13
 Nodes (6): CassemsEventoDTO, self, ConsignadoDTO, self, DespesaForaFolhaDTO, self
-
-### Community 96 - "Controller"
-Cohesion: 0.14
-Nodes (5): TvWidgetController, Controller, DatabaseSyncController, HomeController, Illuminate\Support\Facades\Route
 
 ### Community 98 - "bootstrap/app.php"
 Cohesion: 0.40
@@ -331,41 +479,61 @@ Nodes (3): Illuminate\Foundation\Application, Illuminate\Foundation\Configuratio
 Cohesion: 0.40
 Nodes (5): autoload, psr-4, App\\, Database\\Factories\\, Database\\Seeders\\
 
-### Community 102 - "bosses.js"
-Cohesion: 0.23
-Nodes (15): BOSSES, bossSvg(), DEFAULT_COLORS, ensureModelViewer(), escSvg(), ground(), koStars(), linear() (+7 more)
+### Community 102 - "dayStats"
+Cohesion: 0.13
+Nodes (25): BOSSES, bossSvg(), DEFAULT_COLORS, ensureModelViewer(), escSvg(), ground(), koStars(), linear() (+17 more)
 
-### Community 104 - "db.js"
-Cohesion: 0.30
-Nodes (13): applyServerChanges(), db(), dropFromQueue(), ensureUser(), getMeta(), loadAll(), pendingQueue(), saveLocal() (+5 more)
+### Community 103 - "24. INSTRUMENTOS FINANCEIROS"
+Cohesion: 0.05
+Nodes (38): 24.10.1. Reconhecimento e Desreconhecimento de Instrumentos Financeiros Passivos, 24.10.2. Classificação e Reclassificação de Instrumentos Financeiros Passivos, 24.10.3. Mensuração de Instrumentos Financeiros Passivos, 24.10. PASSIVO FINANCEIRO E INSTRUMENTOS PATRIMONIAIS, 24.11.1. Categorias de Ativos Financeiros e Passivos Financeiros, 24.11.2. Ativos Financeiros Mensurados Pelo VJR, Mas Que Deveriam Ser Mensurados por, 24.11.3. Passivo Financeiros Mensurados Pelo VJR, Com Obrigação de Apresentação dos, 24.11.4. Garantias em Instrumentos Financeiros (+30 more)
+
+### Community 104 - "Lei Complementar nº 101/2000 — Lei de Responsabilidade Fiscal"
+Cohesion: 0.06
+Nodes (35): CAPÍTULO I — DISPOSIÇÕES PRELIMINARES, CAPÍTULO II — DO PLANEJAMENTO, CAPÍTULO III — DA RECEITA PÚBLICA, CAPÍTULO IV — DA DESPESA PÚBLICA, CAPÍTULO IX — DA TRANSPARÊNCIA, CONTROLE E FISCALIZAÇÃO, CAPÍTULO V — DAS TRANSFERÊNCIAS VOLUNTÁRIAS, CAPÍTULO VI — DA DESTINAÇÃO DE RECURSOS PÚBLICOS PARA O SETOR PRIVADO, CAPÍTULO VII — DA DÍVIDA E DO ENDIVIDAMENTO (+27 more)
 
 ### Community 105 - "require"
 Cohesion: 0.33
 Nodes (6): require, barryvdh/laravel-dompdf, laravel/framework, laravel/socialite, laravel/tinker, php
 
-### Community 106 - "qrcode.min.js"
-Cohesion: 0.23
-Nodes (6): a(), b(), d(), g(), r(), s()
+### Community 106 - "lei-seca.js"
+Cohesion: 0.06
+Nodes (58): abrirLei(), abrirNota(), abrirPop(), ancorar(), aplicarVer(), botaoSTF(), carregar(), carregarJuris() (+50 more)
 
 ### Community 107 - "extra"
 Cohesion: 0.67
 Nodes (3): extra, laravel, dont-discover
 
-### Community 114 - "audio.js"
-Cohesion: 0.61
-Nodes (7): getAudioContext(), playBossHitSound(), playFocusEndSound(), playLevelUpSound(), playNote(), playRestDueSound(), playRestSoonSound()
-
 ### Community 116 - "Sabatina 2026-11-01 — "App desktop para o módulo de estudos?""
 Cohesion: 0.22
 Nodes (8): Conclusão, Decisões tomadas, Pergunta original, Próximos passos, Resultados medidos, Riscos e pontos em aberto, Sabatina 2026-11-01 — "App desktop para o módulo de estudos?", Suposições
 
-### Community 122 - "TestCase"
-Cohesion: 0.08
-Nodes (7): Illuminate\Foundation\Testing\TestCase, CelularAccessTest, DatabaseSyncTest, ExampleTest, ImportOfxCommandTest, TvWidgetEndpointTest, TestCase
+### Community 117 - "Definições"
+Cohesion: 0.06
+Nodes (31): Alcance, Aplicação e outros materiais explicativos, Apêndice 1 — Estratificação e seleção com base em valor (ver item A8), Apêndice 2 — Exemplos de fatores que influenciam o tamanho da amostra para os testes de controles (ver item A11), Apêndice 3 — Exemplos de fatores que influenciam o tamanho da amostra para os testes de detalhes (ver item A11), Apêndice 4 — Métodos de seleção da amostra (ver item A13), Avaliação do resultado da amostragem de auditoria (ver item 15), Avaliação do resultado da amostragem em auditoria (+23 more)
 
-### Community 123 - "rooms.js"
-Cohesion: 0.60
-Nodes (3): createRoomsApi(), memberSessionMs(), memberTodayMs()
+### Community 118 - "Aplicação e outros materiais explicativos"
+Cohesion: 0.06
+Nodes (31): Adequação da apresentação das demonstrações contábeis (ver item 24), Aplicação e outros materiais explicativos, Avaliação da efetividade operacional dos controles (ver itens 16 e 17), Avaliação da suficiência e adequação da evidência de auditoria (ver itens 25 a 27), Avaliação de risco alto (ver item 7(b)), Considerar se os procedimentos de confirmação externa devem ser executados (ver item 19), Considerações específicas para entidade de pequeno porte, Considerações específicas para entidade do setor público (+23 more)
+
+### Community 119 - "gerar_dados.py"
+Cohesion: 0.12
+Nodes (28): bloco_lei(), caderno(), erro(), flashcards(), grava(), ler(), main(), normas_da_questao() (+20 more)
+
+### Community 120 - "today"
+Cohesion: 0.13
+Nodes (37): cards(), formatDay(), formatHM(), mountStatsCharts(), renderAllTime(), renderComparison(), renderHeatmap(), renderMonthCalendar() (+29 more)
+
+### Community 121 - "Lei nº 4.320/1964 — Normas gerais de direito financeiro"
+Cohesion: 0.07
+Nodes (27): CAPÍTULO I, CAPÍTULO I, CAPÍTULO I, CAPÍTULO I, CAPÍTULO I, CAPÍTULO II, CAPÍTULO II, CAPÍTULO II (+19 more)
+
+### Community 122 - "render"
+Cohesion: 0.12
+Nodes (35): applyServerChanges(), db(), dropFromQueue(), ensureUser(), getMeta(), loadAll(), pendingQueue(), saveLocal() (+27 more)
+
+### Community 123 - "NBC TG 03 (R3) — Demonstração dos Fluxos de Caixa"
+Cohesion: 0.08
+Nodes (25): A. Demonstração dos fluxos de caixa de entidade que não é instituição financeira, Acordos de Financiamento de Fornecedores, Alcance, Alteração da participação em controlada e em outros negócios, Alteração do passivo decorrente de atividade de financiamento, Apresentação da demonstração dos fluxos de caixa, Apresentação dos fluxos de caixa das atividades de investimento e de financiamento, Apresentação dos fluxos de caixa das atividades operacionais (+17 more)
 
 ### Community 124 - "avatars-vetor.js"
 Cohesion: 0.08
@@ -395,9 +563,9 @@ Nodes (3): shellResponse(), STATIC, withTimeout()
 Cohesion: 0.29
 Nodes (6): Calculadora de projeção, Decisões, Gerador de mídias, Riscos, Sabatina 2026-11-08 — Calculadora de projeção e gerador de mídias (Instagram), Suposições
 
-### Community 152 - "CartaoCompra"
-Cohesion: 0.10
-Nodes (12): ExportController, CartaoCompra, CartaoParcela, CartaoPrevisao, Categoria, TransacaoPrevisao, CategorySanitizer, FinancialSummaryService (+4 more)
+### Community 152 - "Cartao"
+Cohesion: 0.05
+Nodes (19): CartoesController, ExportController, Cartao, CartaoCompra, CartaoParcela, CartaoPrevisao, Categoria, TransacaoPrevisao (+11 more)
 
 ### Community 159 - "/post-estudos semanal | semanal --parcial | diario [YYYY-MM-DD]"
 Cohesion: 0.33
@@ -407,28 +575,428 @@ Nodes (5): Diário (Story 1080×1920), /post-estudos semanal | semanal --parcial
 Cohesion: 0.50
 Nodes (3): Convite para teste — Horas de Estudo, 🇺🇸 English, 🇧🇷 Português
 
-### Community 173 - "TreinosController"
+### Community 173 - "ExercisePersonalRecord"
+Cohesion: 0.10
+Nodes (3): ExercisePersonalRecord, UserBodyMetric, WorkoutGoal
+
+### Community 175 - "11. ATIVO IMOBILIZADO"
 Cohesion: 0.08
-Nodes (5): TreinosController, ExercisePersonalRecord, UserBodyMetric, WorkoutGoal, WorkoutPlan
+Nodes (25): 11.10.1. Passo a Passo, 11.10.2. Notas Explicativas, 11.10. ESQUEMA DE IMPLEMENTAÇÃO DA AVALIAÇÃO E DEPRECIAÇÃO DE BENS PÚBLICOS, 11.1. DEFINIÇÕES, 11.2.1. Princípio Geral do Reconhecimento, 11.2.2. Critério do Valor do Conjunto, 11.2.3. Ativos Imobilizados Obtidos a Título Gratuito, 11.2.4. Bens de Uso Comum do Povo (+17 more)
+
+### Community 178 - "12. ATIVO INTANGÍVEL"
+Cohesion: 0.08
+Nodes (25): 12.10. DESRECONHECIMENTO DO VALOR CONTÁBIL DE UM ITEM DO ATIVO INTANGÍVEL, 12.11. EVIDENCIAÇÃO, 12.12. EXEMPLO DE CONTABILIZAÇÃO DE ATIVO INTANGÍVEL:, 12.1. DEFINIÇÕES, 12.2. PROCEDIMENTOS PARA IDENTIFICAR UM ATIVO INTANGÍVEL, 12.3.1. Aquisição Separada, 12.3.2. Geração Interna, 12.3.3. Aquisição por meio de Transações sem Contraprestação (+17 more)
+
+### Community 180 - "inicio.js"
+Cohesion: 0.13
+Nodes (18): areas, esc(), fontes, grade(), hint(), HOJE, label(), later (+10 more)
+
+### Community 182 - "NBC TSP 07 — Ativo Imobilizado"
+Cohesion: 0.09
+Nodes (22): Alcance, Ativo de infraestrutura, Custo inicial, Custo subsequente, Definições, Depreciação, Desreconhecimento, Divulgação (+14 more)
+
+### Community 183 - "NBC TG 27 (R4) — Ativo Imobilizado"
+Cohesion: 0.09
+Nodes (21): Alcance, Baixa, Custos iniciais, Custos subsequentes, Definições, Depreciação, Disposição transitória, Divulgação (+13 more)
+
+### Community 186 - "Lei nº 9.784/1999 — Processo administrativo federal"
+Cohesion: 0.10
+Nodes (19): CAPÍTULO II DOS DIREITOS DOS ADMINISTRADOS, CAPÍTULO III DOS DEVERES DO ADMINISTRADO, CAPÍTULO IV DO INÍCIO DO PROCESSO, CAPÍTULO IX DA COMUNICAÇÃO DOS ATOS, CAPÍTULO V DOS INTERESSADOS, CAPÍTULO VI DA COMPETÊNCIA, CAPÍTULO VII DOS IMPEDIMENTOS E DA SUSPEIÇÃO, CAPÍTULO VIII DA FORMA, TEMPO E LUGAR DOS ATOS DO PROCESSO (+11 more)
+
+### Community 187 - "Parte Geral — Contabilidade Aplicada ao Setor Público"
+Cohesion: 0.10
+Nodes (20): 1. CONTEXTUALIZAÇÃO, 2. PLANO DE CONTAS APLICADO AO SETOR PÚBLICO (PCASP), 3.1. ASPECTO ORÇAMENTÁRIO, 3.2. ASPECTO PATRIMONIAL, 3.3. ASPECTO FISCAL, 3. ASPECTOS ORÇAMENTÁRIO, PATRIMONIAL E FISCAL DA CONTABILIDADE APLICADA AO SETOR PÚBLICO, 4. IMPLANTAÇÃO DAS INOVAÇÕES NA CONTABILIDADE APLICADA AO SETOR PÚBLICO, 5. ALCANCE E AUTORIDADE (+12 more)
+
+### Community 188 - "NBC TG 23 (R2) — Políticas Contábeis, Mudança de Estimativa e Retificação de Erro"
+Cohesion: 0.10
+Nodes (19): Alcance, Aplicação de mudanças de políticas contábeis, Aplicação retrospectiva, Definições, Divulgação, Divulgação, Divulgação de erro de período anterior, Estrutura Conceitual para Relatório Financeiro. (Alterada pela Revisão NBC 04) (+11 more)
+
+### Community 190 - "3. RECEITA ORÇAMENTÁRIA"
+Cohesion: 0.11
+Nodes (18): 3.1.1. Ingressos Extraorçamentários, 3.1.2. Receitas Orçamentárias, 3.1. CONCEITO, 3.2.1. Classificação da Receita Orçamentária por Natureza, 3.2.2. Categoria Econômica, 3.2.3. Origens e Espécies de Receita Orçamentária, 3.2.4. Recursos Arrecadados em Exercícios Anteriores (RAEA) referente aos RPPS, 3.2.5. Classificação da Receita para Apuração do Resultado Primário (+10 more)
+
+### Community 191 - "4. BENEFÍCIOS PÓS EMPREGO (BENEFÍCIOS A EMPREGADOS)"
+Cohesion: 0.11
+Nodes (18): 4.1.1. Conceitos relativos aos Benefícios a Empregados, 4.1.2. Definições, 4.1.3. Definições relativas ao custo de benefício definido, 4.1. INTRODUÇÃO, 4.2.1. Aspectos Gerais, 4.2.2. Aspectos Legais, 4.2.3. Aspectos Orçamentários e Patrimoniais, 4.2.4. Procedimentos Contábeis (+10 more)
+
+### Community 192 - "texto-lei.js"
+Cohesion: 0.22
+Nodes (16): artigosCitados(), blocos(), criar(), estrutura(), extras(), htmlTrechos(), indice(), iniciarBusca() (+8 more)
+
+### Community 194 - "17. PROVISÕES, PASSIVOS CONTINGENTES E ATIVOS CONTINGENTES"
+Cohesion: 0.12
+Nodes (17): 17.1. DEFINIÇÕES, 17.2.1. Reconhecimento, 17.2.2. Mensuração, 17.2.3. Reversão de Provisões, 17.2. PROVISÕES, 17.3. PASSIVOS CONTINGENTES, 17.4. ATIVOS CONTINGENTES, 17.5.1. Reestruturação (+9 more)
+
+### Community 195 - "Requisitos"
+Cohesion: 0.12
+Nodes (17): Adequação da apresentação das demonstrações contábeis, Avaliação da efetividade operacional dos controles, Avaliação da suficiência e adequação da evidência de auditoria, Controle sobre risco significativo, Documentação, Natureza e extensão dos testes de controle, Procedimento substantivo, Procedimento substantivo em resposta aos riscos significativos (+9 more)
+
+### Community 196 - "NBC TG 16 (R2) — Estoques"
+Cohesion: 0.12
+Nodes (16): Alcance, Critérios de valoração de estoque, Custo do produto agrícola colhido proveniente de ativo biológico, Custos de aquisição, Custos de estoque de prestador de serviços, Custos de transformação, Custos do estoque, Definições (+8 more)
+
+### Community 197 - "20. EFEITOS DAS MUDANÇAS NAS TAXAS DE CÂMBIO"
+Cohesion: 0.12
+Nodes (16): 20.1. CONSIDERAÇÕES GERAIS, OBJETIVOS E ALCANCE, 20.2. DEFINIÇÕES, 20.3. MOEDA FUNCIONAL, 20.4. ITENS MONETÁRIOS, 20.5. INVESTIMENTO LÍQUIDO EM ENTIDADE NO EXTERIOR, 20.6.1. FUNCIONAL, 20.6.2. Apresentação em períodos subsequentes, 20.6.3. Reconhecimento das variações cambiais (+8 more)
+
+### Community 199 - "NBC TG 07 (R2) — Subvenção e Assistência Governamentais"
+Cohesion: 0.12
+Nodes (15): Alcance, Aplicação de parcela do imposto de renda devido em fundos de investimento regionais, Apresentação da subvenção na demonstração do resultado, Apresentação da subvenção no balanço patrimonial, Assistência governamental, Ativo não monetário obtido como subvenção governamental, Bases para conclusões, Consenso (+7 more)
+
+### Community 200 - "OfxAccountDTO"
+Cohesion: 0.20
+Nodes (4): OfxAccountDTO, OfxStatementDTO, InvalidArgumentException, RuntimeException
+
+### Community 202 - "stf_jurisprudencia.py"
+Cohesion: 0.22
+Nodes (14): artigos(), chave(), consulta_artigo(), consultar(), dispositivos(), main(), Partes do artigo citadas pelo acórdão: 'ART-00150 INC-00006 LET-A' → 'VI, a'., {artigo: [súmulas]} pela legislação citada: 'Código Tributário Nacional de… (+6 more)
+
+### Community 203 - "Lei nº 12.527/2011 — Lei de Acesso à Informação"
+Cohesion: 0.13
+Nodes (14): CAPÍTULO I — DISPOSIÇÕES GERAIS, CAPÍTULO II — DO ACESSO A INFORMAÇÕES E DA SUA DIVULGAÇÃO, CAPÍTULO III — DO PROCEDIMENTO DE ACESSO À INFORMAÇÃO, CAPÍTULO IV — DAS RESTRIÇÕES DE ACESSO À INFORMAÇÃO, CAPÍTULO V — DAS RESPONSABILIDADES, CAPÍTULO VI — DISPOSIÇÕES FINAIS E TRANSITÓRIAS, Lei nº 12.527/2011 — Lei de Acesso à Informação, Seção I — Disposições Gerais (+6 more)
+
+### Community 204 - "14. RECEITA DE TRANSAÇÃO SEM CONTRAPRESTAÇÃO"
+Cohesion: 0.13
+Nodes (15): 14.1. DEFINIÇÕES, 14.2. TRANSAÇÕES SEM CONTRAPRESTAÇÃO, 14.3.1. VPA e Custos Envolvidos em Transações sem Contraprestação, 14.3.2. Ativos Oriundos de Transações sem Contraprestação, 14.3.3. Passivos Oriundos de Transações sem Contraprestação, 14.3. RECONHECIMENTO, 14.4. TRIBUTOS, 14.5. RECEBIMENTOS ANTECIPADOS (+7 more)
+
+### Community 205 - "1.5. CONSIDERAÇÕES GERAIS"
+Cohesion: 0.13
+Nodes (15): 1.1. ALCANCE, 1.2. DEFINIÇÕES, 1.3. PROPÓSITO DAS DEMONSTRAÇÕES CONTÁBEIS, 1.4. RESPONSABILIDADE PELAS DEMONSTRAÇÕES CONTÁBEIS, 1.5.1. Apresentação apropriada e conformidade com as normas contábeis, 1.5.2. Continuidade, 1.5.3. Consistência de apresentação, 1.5.4. Materialidade e agregação (+7 more)
+
+### Community 206 - "2. BALANÇO ORÇAMENTÁRIO"
+Cohesion: 0.13
+Nodes (15): 2.1. INTRODUÇÃO, 2.2.1. Quadro Principal, 2.2.2. Quadro da Execução de Restos a Pagar Não Processados, 2.2.3. Quadro da Execução de Restos a Pagar Processados, 2.2. ELABORAÇÃO, 2.3. NOTAS EXPLICATIVAS, 2.4.1. Quadro Principal, 2.4.2. Quadro da Execução de Restos a Pagar Não Processados (+7 more)
+
+### Community 207 - "3. ESTRUTURA DO PCASP"
+Cohesion: 0.13
+Nodes (15): 3.1. NATUREZA DA INFORMAÇÃO CONTÁBIL, 3.2.1. Estrutura do Código da Conta Contábil, 3.2.2. Detalhamento da Conta Contábil, 3.2.3. 5º Nível – Consolidação, 3.2. CÓDIGO DA CONTA CONTÁBIL, 3.3.1. Atributos Conceituais da Conta Contábil, 3.3. ATRIBUTOS DA CONTA CONTÁBIL, 3.4.1. Introdução (+7 more)
+
+### Community 209 - "9.2. FUSÃO"
+Cohesion: 0.13
+Nodes (15): 9.1. DEFINIÇÕES, 9.2.1. Indicadores Relacionados à Contraprestação, 9.2.2. Indicadores Relacionados ao Processo de Tomada de Decisão, 9.2.3. Contabilização da Fusão, 9.2.4. Reconhecimento, 9.2.5. Mensuração, 9.2.6. Apresentação das Demonstrações Contábeis, 9.2.7. Evidenciação (+7 more)
+
+### Community 210 - "historico.js"
+Cohesion: 0.23
+Nodes (9): desfazerFlash(), dias(), gravar(), hojeDe(), importarSemData(), porOrigem(), registrar(), registrarFlash() (+1 more)
+
+### Community 211 - "Lei nº 6.404/1976 — Sociedades por Ações"
+Cohesion: 0.14
+Nodes (13): CAPÍTULO I — CARACTERÍSTICAS E NATUREZA DA COMPANHIA OU SOCIEDADE ANÔNIMA, CAPÍTULO IV — PARTES BENEFICIÁRIAS, CAPÍTULO IX — LIVROS SOCIAIS, CAPÍTULO VI — BÔNUS DE SUBSCRIÇÃO, CAPÍTULO VIII — FORMALIDADES COMPLEMENTARES DA CONSTITUIÇÃO,, CAPÍTULO XIII — CONSELHO FISCAL, CAPÍTULO XIX — SOCIEDADES DE ECONOMIA MISTA, CAPÍTULO XXII — CONSÓRCIO (+5 more)
+
+### Community 212 - "Parte II — Procedimentos Contábeis Patrimoniais"
+Cohesion: 0.14
+Nodes (14): 10.1. OBJETIVO E CONTEXTUALIZAÇÃO, 10.2. DEFINIÇÕES, 10.3. CONCEITO, 10.4. TIPOS DE ACORDO EM CONJUNTO, 10.5. DEMONSTRAÇÕES CONTÁBEIS DAS PARTES DE ACORDO EM CONJUNTO, 10.6. DEMONSTRAÇÕES CONTÁBEIS SEPARADAS, 10. ACORDOS EM CONJUNTO, 18.1. APROPRIAÇÃO DO 13º SALÁRIO (+6 more)
+
+### Community 213 - "23. BENEFÍCIOS SOCIAIS"
+Cohesion: 0.14
+Nodes (14): 23.1. ASPECTOS GERAIS, 23.2. ALCANCE E ESCOPO, 23.3.1. Guia de Definições Sobre Benefícios Sociais, 23.3.2. Guia de Definições de Riscos Sociais, 23.3.3. Diferenciação por Meio de Exemplos, 23.3. DEFINIÇÕES, 23.4.1. Abordagem Geral, 23.4.2. Abordagem Securitária (+6 more)
+
+### Community 214 - "2. ELEMENTOS DAS DEMONSTRAÇÕES CONTÁBEIS"
+Cohesion: 0.14
+Nodes (14): 2.1.1. Definição de Ativo, 2.1.2. Reconhecimento e Desreconhecimento do Ativo, 2.1.3. Ativo Circulante e Não Circulante, 2.1.4. Ativo Financeiro e Permanente, 2.1. ATIVO, 2.2.1. Definição de Passivo, 2.2.2. Reconhecimento e Desreconhecimento do Passivo, 2.2.3. Passivo Circulante e Não Circulante (+6 more)
+
+### Community 215 - "meus-cards.js"
+Cohesion: 0.27
+Nodes (10): comparar(), completarLei(), enunciadoResumido(), focar(), frasesDoComentario(), irrelevante(), leiDoErro(), mapaHTML() (+2 more)
+
+### Community 216 - "10.2. DEFINIÇÕES"
+Cohesion: 0.15
+Nodes (13): 10.1. INTRODUÇÃO, 10.2.1. Parte relacionada, 10.2.2. Transação com partes relacionadas, 10.2.3. Influência significativa, 10.2.4. Pessoal-Chave da Administração, 10.2.5. Membros próximos da família do Pessoal-Chave da Administração, 10.2. DEFINIÇÕES, 10.3. ABRANGÊNCIA DE PARTES RELACIONADAS (+5 more)
+
+### Community 217 - "2.4. CONTABILIZAÇÃO DAS CONCESSÕES"
+Cohesion: 0.15
+Nodes (13): 2.1. DEFINIÇÕES, 2.2. CONCESSÕES COMUNS, 2.3. PARCERIAS PÚBLICO-PRIVADAS (PPP), 2.4.1. Reconhecimento e Mensuração de Ativos da Concessão, 2.4.2. Reconhecimento e Mensuração de Passivos da Concessão, 2.4.3. Receitas Adicionais, 2.4.4. Aspectos Orçamentários, 2.4.5. Provisão para Riscos Decorrentes de Contratos de PPP (+5 more)
+
+### Community 218 - "4. BALANÇO PATRIMONIAL"
+Cohesion: 0.15
+Nodes (13): 4.1. INTRODUÇÃO, 4.3. NOTAS EXPLICATIVAS, 4.4.1. Quadro Principal, 4.4.2. Quadro dos Ativos e Passivos Financeiros e Permanentes, 4.4.3. Quadro das Contas de Compensação, 4.4.4. Quadro do Superávit / Déficit Financeiro, 4.4. ESTRUTURA, 4.5.1. Quadro Principal (+5 more)
+
+### Community 219 - "4.6.1. Natureza de Despesa"
+Cohesion: 0.15
+Nodes (13): 4.6.1.1. Material Permanente X Material de Consumo, 4.6.1.2. Serviços de Terceiros X Equipamentos/Bens Permanentes/Material de Consumo, 4.6.1.3. Obras e Instalações X Serviços de Terceiros, 4.6.1.4. Despesa de Exercícios Anteriores (DEA) X Indenizações e Restituições X Elemento Próprio, 4.6.1.5. Auxílio-Alimentação e Auxílio-Transporte x Outros Serviços de Terceiros – Pessoa Jurídica, 4.6.1.6. Serviços de Tecnologia da Informação e Comunicação - Pessoa Jurídica x Outros Serviços de, 4.6.1. Natureza de Despesa, 4.6.2.1. Transferência (+5 more)
+
+### Community 220 - "4.7.4. Estágios da Execução dos Restos a Pagar"
+Cohesion: 0.15
+Nodes (13): 4.7.1. Inscrição dos Restos a Pagar, 4.7.2. Restos a Pagar Não Processados (RPNP), 4.7.3. Restos a Pagar Processados (RPP), 4.7.4.1. Inscrição de Restos a Pagar Não Processados a Liquidar, 4.7.4.2. Inscrição De Restos a Pagar Não Processados em Liquidação, 4.7.4.3. Inscrição De Restos a Pagar Processados, 4.7.4.4. Evidenciação da Ocorrência do Fato Gerador, 4.7.4.5. Liquidação de Restos a Pagar Não Processados em Liquidação (+5 more)
+
+### Community 221 - "OfxParserServiceTest"
+Cohesion: 0.20
+Nodes (3): PHPUnit\Framework\TestCase, ExampleTest, OfxParserServiceTest
+
+### Community 222 - "5.2.4. Baixa"
+Cohesion: 0.15
+Nodes (13): 5.2.1.1. Procedimento de Registro 1, 5.2.1.2. Procedimento de Registro 2, 5.2.1. Inscrição, 5.2.2. Atualização Monetária, Juros, Multas e Outros Encargos, 5.2.3. Reclassificação da Dívida Ativa do Ativo Não Circulante para o Ativo Circulante, 5.2.4.1. Recebimento em Espécie, 5.2.4.2. Recebimento em Bens ou Direitos, 5.2.4.3. Abatimentos, Anistias e Remissões (+5 more)
+
+### Community 223 - "DatabaseSyncService"
+Cohesion: 0.29
+Nodes (3): SyncDatabaseCommand, DatabaseSyncService, Command
+
+### Community 224 - "6. DEMONSTRAÇÃO DOS FLUXOS DE CAIXA"
+Cohesion: 0.17
+Nodes (12): 6.1. INTRODUÇÃO, 6.2. DEFINIÇÕES, 6.4. NOTAS EXPLICATIVAS, 6.5.1. Quadro Principal, 6.5.2. Quadro de Transferências Recebidas e Concedidas, 6.5.3. Quadro de Desembolsos de Pessoal e Demais Despesas por Função, 6.5.4. Quadro de Juros e Encargos da Dívida, 6.5. ESTRUTURA (+4 more)
+
+### Community 225 - "8. INVESTIMENTO EM COLIGADA E EM EMPREENDIMENTO CONTROLADO EM"
+Cohesion: 0.17
+Nodes (12): 8.1. CONSIDERAÇÕES GERAIS, OBJETIVO E ALCANCE, 8.2. DEFINIÇÕES, 8.3. INFLUÊNCIA SIGNIFICATIVA, 8.4. MÉTODO DA EQUIVALÊNCIA PATRIMONIAL, 8.5. APLICAÇÃO DO MÉTODO DA EQUIVALÊNCIA PATRIMONIAL, 8.6.1. No Reconhecimento Inicial, 8.6.2. Distribuição de Lucros, 8.6. ASPECTOS ESPECÍFICOS DA APLICAÇÃO DO MÉTODO DA EQUIVALÊNCIA (+4 more)
+
+### Community 226 - "Lei nº 13.709/2018 — Lei Geral de Proteção de Dados Pessoais"
+Cohesion: 0.18
+Nodes (10): CAPÍTULO II DO TRATAMENTO DE DADOS PESSOAIS, CAPÍTULO III DOS DIREITOS DO TITULAR, CAPÍTULO IV DO TRATAMENTO DE DADOS PESSOAIS PELO PODER PÚBLICO, CAPÍTULO IX, CAPÍTULO V DA TRANSFERÊNCIA INTERNACIONAL DE DADOS, CAPÍTULO VI DOS AGENTES DE TRATAMENTO DE DADOS PESSOAIS, CAPÍTULO VII DA SEGURANÇA E DAS BOAS PRÁTICAS, CAPÍTULO VIII DA FISCALIZAÇÃO (+2 more)
+
+### Community 227 - "CAPÍTULO III — AÇÕES"
+Cohesion: 0.18
+Nodes (11): CAPÍTULO III — AÇÕES, Seção I — Número e Valor Nominal, Seção II — Preço de Emissão, Seção III — Espécies e Classes, Seção IV — Forma, Seção IX — Certificado de Depósito de Ações, Seção V — Certificados, Seção VI — Propriedade e Circulação (+3 more)
+
+### Community 228 - "CAPÍTULO V — DEBÊNTURES"
+Cohesion: 0.18
+Nodes (11): CAPÍTULO V — DEBÊNTURES, Seção I — Direito dos Debenturistas, Seção II — Espécies, Seção III — Criação e Emissão, Seção IV — Forma, Propriedade, Circulação e Ônus, Seção IX — Emissão de Debêntures no Estrangeiro, Seção V — Certificados, Seção VI — Agente Fiduciário dos Debenturistas (+3 more)
+
+### Community 229 - "2. ASPECTOS GERAIS DO PCASP"
+Cohesion: 0.18
+Nodes (10): 1. INTRODUÇÃO, 2.1. CONCEITO DE PLANO DE CONTAS, 2.2. OBJETIVOS DO PCASP, 2.3. CONTA CONTÁBIL, 2.4. COMPETÊNCIA PARA INSTITUIÇÃO E MANUTENÇÃO DO PCASP, 2.5. ALCANCE DO PCASP, 2.6. PRAZO PARA IMPLANTAÇÃO DO PCASP, 2. ASPECTOS GERAIS DO PCASP (+2 more)
+
+### Community 230 - "Parte V — Demonstrações Contábeis Aplicadas ao Setor Público"
+Cohesion: 0.18
+Nodes (11): 11. CONSOLIDAÇÃO DAS DEMONSTRAÇÕES CONTÁBEIS, 3.1. INTRODUÇÃO, 3.2. ELABORAÇÃO, 3.3. NOTAS EXPLICATIVAS, 3.4. ESTRUTURA <ENTE DA FEDERAÇÃO> BALANÇO FINANCEIRO EXERCÍCIO: 20XX INGRESSOS, 3.5. DEFINIÇÕES, 3. BALANÇO FINANCEIRO, 9.1. OBJETIVO E CONTEXTUALIZAÇÃO (+3 more)
+
+### Community 231 - "Parte III — Procedimentos Contábeis Específicos"
+Cohesion: 0.18
+Nodes (11): 3.1.1. Conceito de Operação de Crédito, 3.1.2. ▪, 3.1.3. Tipos de Operações de Crédito, 3.1.4. Relação com as Informações Fiscais, 3.1.5. Relação com a Apuração do Superávit Financeiro, 3.1. CONCEITO, 3.2. EXEMPLOS DE CONTABILIZAÇÃO DE OPERAÇÕES DE CRÉDITO, 3. OPERAÇÃO DE CRÉDITO (+3 more)
+
+### Community 232 - "4.2. CLASSIFICAÇÕES DA DESPESA ORÇAMENTÁRIA"
+Cohesion: 0.18
+Nodes (11): 4.2.1. Classificação Institucional, 4.2.2.1. Subfunção, 4.2.2.2. Subfunção, 4.2.2. Classificação Funcional, 4.2.3.1. Programa, 4.2.3.2. Ação, 4.2.3.3. Subtítulo / Localizador de Gasto, 4.2.3.4. Componentes da Programação Física (+3 more)
+
+### Community 233 - "4.4.1. Planejamento"
+Cohesion: 0.18
+Nodes (11): 4.4.1.1. Fixação da Despesa, 4.4.1.2. Descentralizações de Créditos Orçamentários, 4.4.1.3. Programação Orçamentária e Financeira, 4.4.1.4. Processo de Licitação e Contratação, 4.4.1. Planejamento, 4.4.2.1. Empenho, 4.4.2.2. Em Liquidação, 4.4.2.3. Liquidação (+3 more)
+
+### Community 234 - "7.3. PROCEDIMENTOS CONTÁBEIS ORÇAMENTÁRIOS"
+Cohesion: 0.18
+Nodes (11): 7.1. INTRODUÇÃO, 7.2. RECURSOS DOS CONSÓRCIOS PÚBLICOS, 7.3.1. Orçamento do Ente Consorciado, 7.3.2. Classificação Orçamentária das Transferências a Consórcios Públicos, 7.3.3. Classificação Orçamentária dos Pagamentos a Consórcios Públicos Referentes, 7.3.4. Orçamento do Consórcio Público, 7.3.5. Classificação Orçamentária das Transferências Recebidas pelo Consórcio, 7.3.6. Classificação Orçamentária das Despesas Executadas pelo Consórcio Público (+3 more)
+
+### Community 235 - "Manual de Instruções — Módulo Estudo para Concursos"
+Cohesion: 0.20
+Nodes (9): 1. Como acessar, 2. O que cada tela faz, 3. Onde fica salvo o seu progresso, 4. Como personalizar para o SEU concurso, 5. Como adicionar uma lei nova na Lei Seca, 6. Prompts prontos para gerar conteúdo com IA, Atualizar jurisprudência do STF (opcional), Manual de Instruções — Módulo Estudo para Concursos (+1 more)
+
+### Community 236 - "edital.js"
+Cohesion: 0.42
+Nodes (8): build(), close(), counts(), jump(), open(), overall(), refresh(), setTopic()
+
+### Community 237 - "22. POLÍTICAS CONTÁBEIS, MUDANÇA DE ESTIMATIVA E RETIFICAÇÃO DE ERRO"
+Cohesion: 0.20
+Nodes (10): 22.1. DEFINIÇÕES, 22.2.1. Mudanças nas Políticas Contábeis, 22.2.2. Aplicação de Mudanças nas Políticas Contábeis, 22.2.3. Evidenciação, 22.2. POLÍTICAS CONTÁBEIS, 22.3.1. Evidenciação, 22.3. MUDANÇAS DE ESTIMATIVA, 22.4.1. Evidenciação (+2 more)
+
+### Community 238 - "2. PRINCÍPIOS ORÇAMENTÁRIOS"
+Cohesion: 0.20
+Nodes (10): 2.1. UNIDADE OU TOTALIDADE, 2.2. UNIVERSALIDADE, 2.3. ANUALIDADE OU PERIODICIDADE, 2.4. EXCLUSIVIDADE, 2.5. ORÇAMENTO BRUTO, 2.6. LEGALIDADE, 2.7. PUBLICIDADE, 2.8. TRANSPARÊNCIA (+2 more)
+
+### Community 239 - "6.3.4. Aspectos relevantes"
+Cohesion: 0.20
+Nodes (10): 6.3.1. Atividades Operacionais, 6.3.2. Atividades de Investimento, 6.3.3. Atividades de financiamento, 6.3.4.1. Fluxos de caixa em moeda estrangeira, 6.3.4.2. Juros e dividendos ou distribuições similares, 6.3.4.3. Transações que não envolvem caixa ou equivalentes de caixa, 6.3.4.4. Aquisição e venda de controlada e outras unidades operacionais, 6.3.4.5. Componente de caixa e equivalentes de caixa (+2 more)
+
+### Community 240 - "8.2. ESTRUTURA"
+Cohesion: 0.20
+Nodes (10): 8.1. DEFINIÇÃO, 8.2.1.1. Bases de Mensuração, 8.2.1.2. Alteração de Políticas Contábeis, 8.2.1.3. Julgamentos pela aplicação das políticas contábeis, 8.2.1. Divulgação de Políticas Contábeis, 8.2.2. Divulgação de Estimativas, 8.2.3. Gestão de Capital, 8.2.4. Outras divulgações (+2 more)
+
+### Community 241 - "8.3.3. Definições"
+Cohesion: 0.20
+Nodes (10): 8.3.1. Objetivo, Conceito e Contextualização, 8.3.2. Apresentação de Informações por Segmento, 8.3.3.1. Políticas Contábeis do Segmento, 8.3.3.2. Ativos do Segmento, 8.3.3.3. Passivos do Segmento, 8.3.3.4. Receitas do Segmento, 8.3.3.5. Despesas do Segmento, 8.3.3. Definições (+2 more)
+
+### Community 242 - "CAPÍTULO XX — SOCIEDADES COLIGADAS, CONTROLADORAS E CONTROLADAS"
+Cohesion: 0.22
+Nodes (9): CAPÍTULO XX — SOCIEDADES COLIGADAS, CONTROLADORAS E CONTROLADAS, Seção I — Informações no Relatório da Administração, Seção II — Participação Recíproca, Seção III — Responsabilidade dos Administradores e das Sociedades Controladoras, Seção IV — Demonstrações Financeiras, Seção V — Subsidiária Integral, Seção VI — Alienação de Controle, Seção VII — Aquisição de Controle Mediante Oferta Pública (+1 more)
+
+### Community 243 - "15. RECEITA DE TRANSAÇÃO COM CONTRAPRESTAÇÃO"
+Cohesion: 0.22
+Nodes (9): 15.1. DEFINIÇÕES, 15.2. TRANSAÇÕES COM CONTRAPRESTAÇÃO, 15.3.1. Prestação de serviços, 15.3.2. Venda de bens, 15.3.3. Juros, royalties e dividendos ou distribuições similares, 15.3. RECONHECIMENTO, 15.4. MENSURAÇÃO, 15.5. EVIDENCIAÇÃO (+1 more)
+
+### Community 244 - "1.4. CONTABILIZAÇÃO DO FUNDEB"
+Cohesion: 0.22
+Nodes (9): 1.1. INTRODUÇÃO, 1.2. RECURSOS DO FUNDEB, 1.3. ITCD, 1.4.1. Contabilização dos Impostos e Transferências que compõem a base de Cálculo, 1.4.2. Contabilização das Transferências ao Fundeb, 1.4.3. Contabilização dos Recursos Recebidos do Fundeb, 1.4.4. Contabilização de Remuneração de Depósitos Bancários e Aplicações, 1.4. CONTABILIZAÇÃO DO FUNDEB (+1 more)
+
+### Community 245 - "3.2. AVALIAÇÃO E MENSURAÇÃO"
+Cohesion: 0.22
+Nodes (9): 3.1. DEFINIÇÕES, 3.2.1. Disponibilidades, 3.2.2. Créditos e Obrigações, 3.2.3. Estoques, 3.2.4. Investimentos Permanentes, 3.2.5. Imobilizado, 3.2.6. Intangível, 3.2. AVALIAÇÃO E MENSURAÇÃO (+1 more)
+
+### Community 246 - "4. DESPESA ORÇAMENTÁRIA"
+Cohesion: 0.22
+Nodes (9): 4.1. CONCEITO, 4.3. CRÉDITOS ORÇAMENTÁRIOS INICIAIS E ADICIONAIS, 4.5.1. Apropriação da VPD antes da liquidação, 4.5.2. Apropriação da VPD simultaneamente à liquidação, 4.5.3. Apropriação da VPD após a liquidação, 4.5. PROCEDIMENTOS CONTÁBEIS REFERENTES À DESPESA ORÇAMENTÁRIA, 4.8. DESPESAS DE EXERCÍCIOS ANTERIORES, 4.9. SUPRIMENTOS DE FUNDOS (REGIME DE ADIANTAMENTO) (+1 more)
+
+### Community 247 - "4. CAIXA E EQUIVALENTE DE CAIXA"
+Cohesion: 0.22
+Nodes (9): 4.1. CONSIDERAÇÕES GERAIS E CONCEITO, 4.2. RECONHECIMENTO E MENSURAÇÃO, 4.3.1. Saldos Negativos, 4.3.2. Depósitos Restituíveis e Valores Vinculados, 4.3.3. Aplicações Financeiras, 4.3. SITUAÇÕES ESPECÍFICAS, 4.4. ASPECTOS ORÇAMENTÁRIOS, 4.5. CONTABILIZAÇÃO (+1 more)
+
+### Community 248 - "6.2. CONTABILIZAÇÃO DOS PRECATÓRIOS EM REGIME ESPECIAL"
+Cohesion: 0.22
+Nodes (9): 6.1. INTRODUÇÃO, 6.2.1. Reconhecimento do Passivo, 6.2.2. Atualização monetária e juros incidentes sobre os Precatórios, 6.2.3. Transferência de Recursos Para a Conta Especial, 6.2.4. Rendimentos das Aplicações Financeiras dos Recursos Disponibilizados na, 6.2.5. Pagamento dos Precatórios, 6.2.6. Tributos Retidos na Fonte, 6.2. CONTABILIZAÇÃO DOS PRECATÓRIOS EM REGIME ESPECIAL (+1 more)
+
+### Community 249 - "CAPÍTULO X — ACIONISTAS"
+Cohesion: 0.25
+Nodes (8): CAPÍTULO X — ACIONISTAS, Seção I — Obrigação de Realizar o Capital, Seção II — Direitos Essenciais, Seção III — Direito de Voto, Seção IV — Acionista Controlador, Seção V — Acordo de Acionistas, Seção VI — Representação de Acionista Residente ou Domiciliado no Exterior, Seção VII — Suspensão do Exercício de Direitos
+
+### Community 250 - "Lei nº 8.137/1990 — Crimes contra a ordem tributária"
+Cohesion: 0.25
+Nodes (7): CAPÍTULO I — Dos Crimes Contra a Ordem Tributária, CAPÍTULO II — Dos crimes Contra a Economia e as Relações de Consumo, CAPÍTULO III — Das Multas, CAPÍTULO IV — Das Disposições Gerais, Lei nº 8.137/1990 — Crimes contra a ordem tributária, Seção I — Dos crimes praticados por particulares, Seção II — Dos crimes praticados por funcionários públicos
+
+### Community 251 - "13. REDUÇÃO AO VALOR RECUPERÁVEL"
+Cohesion: 0.25
+Nodes (8): 13.1. DEFINIÇÕES, 13.2.1. Mensuração de Ativo Não Gerador de Caixa, 13.2.2. Mensuração de Ativo Gerador de Caixa, 13.2.3. Reversão da perda por redução ao valor recuperável de ativo gerador de caixa, 13.2. MENSURAÇÃO, 13.3. RECLASSIFICAÇÃO DE ATIVOS, 13.4. EVIDENCIAÇÃO, 13. REDUÇÃO AO VALOR RECUPERÁVEL
+
+### Community 252 - "Parte I — Procedimentos Contábeis Orçamentários"
+Cohesion: 0.25
+Nodes (8): 1. INTRODUÇÃO, 6.1. CONCEITO, 6.2.1. Caso geral, 6.2.2. Reconhecimento do crédito no mesmo exercício financeiro do pagamento a maior, e, 6.2.3. Multas contratuais retidas em pagamento a fornecedor, 6.2. REGISTROS CONTÁBEIS DAS OPERAÇÕES, 6. REGISTROS CONTÁBEIS REFERENTES A TRANSAÇÕES SEM EFETIVO FLUXO DE CAIXA, Parte I — Procedimentos Contábeis Orçamentários
+
+### Community 253 - "21.2. EVENTO SUBSEQUENTE"
+Cohesion: 0.25
+Nodes (8): 21.1.1. Entidade, 21.1.2. Evento subsequente, 21.1. DEFINIÇÕES, 21.2.1. Eventos Subsequentes que dão Origem a Ajustes, 21.2.2. Eventos Subsequentes que não dão Origem a Ajustes, 21.2.3. Evidenciação, 21.2. EVENTO SUBSEQUENTE, 21. EVENTO SUBSEQUENTE
+
+### Community 254 - "3.6. PROCEDIMENTOS CONTÁBEIS REFERENTES À RECEITA ORÇAMENTÁRIA"
+Cohesion: 0.25
+Nodes (8): 3.6.1. Deduções da Receita Orçamentária, 3.6.2. Imposto de Renda Retido na Fonte, 3.6.3. Redutor Financeiro – FPM, 3.6.4. Transferências de Recursos Intergovernamentais, 3.6.5. Remuneração de Depósitos Bancários, 3.6.6. Receita Orçamentária Por Baixa De Dívida Ativa Inscrita, 3.6.7. Transações Intraorçamentárias e Descentralizações, 3.6. PROCEDIMENTOS CONTÁBEIS REFERENTES À RECEITA ORÇAMENTÁRIA
+
+### Community 255 - "4.2. ELABORAÇÃO"
+Cohesion: 0.25
+Nodes (8): 4.2.1.1. Ativo Circulante e Não Circulante, 4.2.1.2. Passivo Circulante e Não circulante, 4.2.1.3. Informação a ser apresentada no balanço patrimonial, 4.2.1. Quadro Principal, 4.2.2. Quadro dos Ativos e Passivos Financeiros e Permanentes, 4.2.3. Quadro das Contas de Compensação, 4.2.4. Quadro do Superávit / Déficit Financeiro, 4.2. ELABORAÇÃO
+
+### Community 256 - "5. FONTE OU DESTINAÇÃO DE RECURSOS"
+Cohesion: 0.25
+Nodes (8): 5.1. ASPECTOS GERAIS DA CLASSIFICAÇÃO POR FONTES OU DESTINAÇÕES DE RECURSOS (FR), 5.2. UTILIZAÇÃO DA FONTE OU DESTINAÇÃO DE RECURSOS (FR), 5.3. ESTRUTURA DA CODIFICAÇÃO DEFINIDA PARA AS FONTES OU DESTINAÇÕES DE RECURSOS (FR), 5.4. MECANISMO DE REGISTRO CONTÁBIL COM DETALHAMENTO DE FR, 5.5.1. Aplicação em Ações de Saúde e Educação, 5.5.2. Aplicação nas Despesas Previdenciárias e Transferências de Emendas Parlamentares, 5.5. ASPECTOS ESPECÍFICOS DA UTILIZAÇÃO DA ESTRUTURA DE CODIFICAÇÃO POR FR POR ESTADOS, DISTRITO FEDERAL E MUNICÍPIOS, 5. FONTE OU DESTINAÇÃO DE RECURSOS
+
+### Community 257 - "5.2. MENSURAÇÃO"
+Cohesion: 0.25
+Nodes (8): 5.1. DEFINIÇÕES, 5.2.1. Bases de Mensuração, 5.2.2. Custo dos Estoques, 5.2.3. Ajuste de Perdas de Estoques, 5.2.4. Reconhecimento no Resultado, 5.2. MENSURAÇÃO, 5.3. EVIDENCIAÇÃO, 5. ESTOQUES
+
+### Community 258 - "5. DEMONSTRAÇÃO DAS VARIAÇÕES PATRIMONIAIS"
+Cohesion: 0.25
+Nodes (8): 5.1. INTRODUÇÃO, 5.2. ELABORAÇÃO, 5.3. NOTAS EXPLICATIVAS, 5.4. ESTRUTURA <ENTE DA FEDERAÇÃO> DEMONSTRAÇÃO DAS VARIAÇÕES PATRIMONIAIS, 5.5.1. Variações Patrimoniais Aumentativas, 5.5.2. Variações Patrimoniais Diminutivas, 5.5. DEFINIÇÕES, 5. DEMONSTRAÇÃO DAS VARIAÇÕES PATRIMONIAIS
+
+### Community 259 - "NBC TA 330 (R1) — Resposta do Auditor aos Riscos Avaliados"
+Cohesion: 0.25
+Nodes (7): Alcance, Data de vigência, Definições, Introdução, NBC TA 330 (R1) — Resposta do Auditor aos Riscos Avaliados, Objetivo, Redações anteriores (substituídas ou excluídas)
+
+### Community 261 - "ref-lei.js"
+Cohesion: 0.43
+Nodes (5): abrir(), fechar(), html(), leiNomeada(), recorte()
+
+### Community 262 - "resumos.js"
+Cohesion: 0.38
+Nodes (3): linhaHtml(), montar(), repartir()
+
+### Community 263 - "Lei nº 14.063/2020 — Assinaturas eletrônicas"
+Cohesion: 0.29
+Nodes (6): CAPÍTULO II, CAPÍTULO III, CAPÍTULO IV, CAPÍTULO V, CAPÍTULO VI, Lei nº 14.063/2020 — Assinaturas eletrônicas
+
+### Community 264 - "CAPÍTULO XV — EXERCÍCIO SOCIAL E DEMONSTRAÇÕES FINANCEIRAS"
+Cohesion: 0.29
+Nodes (7): CAPÍTULO XV — EXERCÍCIO SOCIAL E DEMONSTRAÇÕES FINANCEIRAS, Seção I — Exercício Social, Seção II — Demonstrações Financeiras, Seção III — Balanço Patrimonial, Seção IV — Demonstração de Lucros ou Prejuízos Acumulados, Seção V — Demonstração do Resultado do Exercício, Seção VI — Demonstrações dos Fluxos de Caixa e do Valor Adicionado
+
+### Community 265 - "4.2.4. Classificação da Despesa Orçamentária por Natureza"
+Cohesion: 0.29
+Nodes (7): 4.2.4.1. Estrutura da Natureza da Despesa Orçamentária, 4.2.4.2. Categoria Econômica, 4.2.4.3. Grupo de Natureza da Despesa (GND), 4.2.4.4. Modalidade de Aplicação, 4.2.4.5. Elemento de Despesa Orçamentária, 4.2.4.6. Desdobramento Facultativo do Elemento da Despesa, 4.2.4. Classificação da Despesa Orçamentária por Natureza
+
+### Community 266 - "6.2. CARACTERÍSTICAS QUALITATIVAS DA INFORMAÇÃO CONTÁBIL"
+Cohesion: 0.29
+Nodes (7): 6.2.1. Relevância, 6.2.2. Representação fidedigna, 6.2.3. Compreensibilidade, 6.2.4. Tempestividade, 6.2.5. Comparabilidade, 6.2.6. Verificabilidade, 6.2. CARACTERÍSTICAS QUALITATIVAS DA INFORMAÇÃO CONTÁBIL
+
+### Community 267 - "7. PROPRIEDADE PARA INVESTIMENTO"
+Cohesion: 0.29
+Nodes (7): 7.1.1. Determinando se a propriedade se qualifica como propriedade para investimento, 7.1. DEFINIÇÕES, 7.2. RECONHECIMENTO, 7.3.1. Mensuração no reconhecimento, 7.3.2. Mensuração após o reconhecimento, 7.3. MENSURAÇÃO, 7. PROPRIEDADE PARA INVESTIMENTO
+
+### Community 268 - "armazenamento.js"
+Cohesion: 0.67
+Nodes (5): atualizar(), aviso(), csrfToken(), gravar(), xhr()
+
+### Community 269 - "fundamento.js"
+Cohesion: 0.53
+Nodes (5): balao(), dispositivo(), html(), linksBalao(), montar()
+
+### Community 270 - "CAPÍTULO XXI — GRUPO DE SOCIEDADES"
+Cohesion: 0.33
+Nodes (6): CAPÍTULO XXI — GRUPO DE SOCIEDADES, Seção I — Características e Natureza, Seção II — Constituição, Registro e Publicidade, Seção III — Administração, Seção IV — Demonstrações Financeiras, Seção V — Prejuízos Resultantes de Atos Contrários à Convenção
+
+### Community 271 - "16. CUSTOS DE EMPRÉSTIMOS"
+Cohesion: 0.33
+Nodes (6): 16.1. DEFINIÇÕES, 16.2.1. Tratamento Padrão dos custos dos empréstimos, 16.2.2. Tratamento Alternativo dos custos dos empréstimos, 16.2. RECONHECIMENTO, 16.3. EVIDENCIAÇÃO, 16. CUSTOS DE EMPRÉSTIMOS
+
+### Community 272 - "19.2. REGISTROS PATRIMONIAIS DECORRENTES DAS DESPESAS ORÇAMENTÁRIAS DE"
+Cohesion: 0.33
+Nodes (6): 19.1. INTRODUÇÃO, 19.2.1. Despesas de exercícios encerrados para as quais o orçamento respectivo, 19.2.2. Restos a Pagar com prescrição interrompida, 19.2.3. Compromissos reconhecidos após o encerramento do exercício correspondente, 19.2. REGISTROS PATRIMONIAIS DECORRENTES DAS DESPESAS ORÇAMENTÁRIAS DE, 19. REFLEXO PATRIMONIAL DAS DESPESAS DE EXERCÍCIOS ANTERIORES (DEA)
+
+### Community 273 - "6. ATIVO BIOLÓGICO E PRODUTO AGRÍCOLA"
+Cohesion: 0.33
+Nodes (6): 6.1. DEFINIÇÕES, 6.2. RECONHECIMENTO, 6.3. MENSURAÇÃO, 6.4. GANHOS E PERDAS, 6.5. DIVULGAÇÃO, 6. ATIVO BIOLÓGICO E PRODUTO AGRÍCOLA
+
+### Community 274 - "7. DEMONSTRAÇÃO DAS MUTAÇÕES NO PATRIMÔNIO LÍQUIDO"
+Cohesion: 0.33
+Nodes (6): 7.1. INTRODUÇÃO, 7.2. ELABORAÇÃO, 7.3. NOTAS EXPLICATIVAS, 7.4. ESTRUTURA <ENTE DA FEDERAÇÃO> DEMONSTRAÇÃO DAS MUTAÇÕES DO PATRIMÔNIO LÍQUIDO, 7.5. DEFINIÇÕES, 7. DEMONSTRAÇÃO DAS MUTAÇÕES NO PATRIMÔNIO LÍQUIDO
+
+### Community 275 - "leis_planalto_para_md.py"
+Cohesion: 0.40
+Nodes (4): Converte as páginas compiladas do Planalto (.htm) em Markdown na pasta leis/,…, Apaga os <span> com text-decoration:line-through (e tudo o que há dentro,…, tira_riscado_css(), to_text()
+
+### Community 276 - "web.php"
+Cohesion: 0.14
+Nodes (4): TvWidgetController, DatabaseSyncController, HomeController, Illuminate\Support\Facades\Route
+
+### Community 277 - "CAPÍTULO VII — CONSTITUIÇÃO DA COMPANHIA"
+Cohesion: 0.40
+Nodes (5): CAPÍTULO VII — CONSTITUIÇÃO DA COMPANHIA, Seção I — Requisitos Preliminares, Seção II — Constituição por Subscrição Pública, Seção III — Constituição por Subscrição Particular, Seção IV — Disposições Gerais
+
+### Community 278 - "CAPÍTULO XII — CONSELHO DE ADMINISTRAÇÃO E DIRETORIA"
+Cohesion: 0.40
+Nodes (5): CAPÍTULO XII — CONSELHO DE ADMINISTRAÇÃO E DIRETORIA, Seção I — Conselho de Administração, Seção II — Diretoria, Seção III — Administradores, Seção IV — Deveres e Responsabilidades
+
+### Community 279 - "4.4. SISTEMA DE PROTEÇÃO SOCIAL DOS MILITARES DAS FORÇAS ARMADAS (SPSMFA)"
+Cohesion: 0.40
+Nodes (5): 4.4.1. Aspectos Gerais, 4.4.2. Aspectos Legais e Ontológicos, 4.4.3. Aspectos Normativos – Aplicação da NBC TSP 15 – Benefícios a Empregados, 4.4.4. Aspectos Contábeis, 4.4. SISTEMA DE PROTEÇÃO SOCIAL DOS MILITARES DAS FORÇAS ARMADAS (SPSMFA)
+
+### Community 280 - "questoes-fit.js"
+Cohesion: 0.83
+Nodes (3): fit(), later(), shrink()
+
+### Community 281 - "CAPÍTULO XI — ASSEMBLÉIA-GERAL"
+Cohesion: 0.50
+Nodes (4): CAPÍTULO XI — ASSEMBLÉIA-GERAL, Seção I — Disposições Gerais, Seção II — Assembléia-Geral Ordinária, Seção III — Assembléia-Geral Extraordinária
+
+### Community 282 - "CAPÍTULO XVI — LUCRO, RESERVAS E DIVIDENDOS"
+Cohesion: 0.50
+Nodes (4): CAPÍTULO XVI — LUCRO, RESERVAS E DIVIDENDOS, Seção I — Lucro, Seção II — Reservas e Retenção de Lucros, Seção III — Dividendos
+
+### Community 283 - "CAPÍTULO XVII — DISSOLUÇÃO, LIQUIDAÇÃO E EXTINÇÃO"
+Cohesion: 0.50
+Nodes (4): CAPÍTULO XVII — DISSOLUÇÃO, LIQUIDAÇÃO E EXTINÇÃO, Seção I — Dissolução, Seção II — Liquidação, Seção III — Extinção
+
+### Community 284 - "CAPÍTULO XVIII — TRANSFORMAÇÃO, INCORPORAÇÃO, FUSÃO E CISÃO"
+Cohesion: 0.50
+Nodes (4): CAPÍTULO XVIII — TRANSFORMAÇÃO, INCORPORAÇÃO, FUSÃO E CISÃO, Seção I — Transformação, Seção II — Incorporação, Fusão e Cisão, Seção II — Transformação, Incorporação, Fusão e Cisão
+
+### Community 286 - "CAPÍTULO II — CAPITAL SOCIAL"
+Cohesion: 0.67
+Nodes (3): CAPÍTULO II — CAPITAL SOCIAL, Seção I — Valor, Seção II — Formação
+
+### Community 287 - "CAPÍTULO XIV — MODIFICAÇÃO DO CAPITAL SOCIAL"
+Cohesion: 0.67
+Nodes (3): CAPÍTULO XIV — MODIFICAÇÃO DO CAPITAL SOCIAL, Seção I — Aumento, Seção II — Redução
 
 ## Knowledge Gaps
-- **189 isolated node(s):** `$schema`, `name`, `type`, `description`, `laravel` (+184 more)
+- **1572 isolated node(s):** `$schema`, `name`, `type`, `description`, `laravel` (+1567 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **41 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **44 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `User` connect `User` to `Illuminate\Database\Eloquent\Relations\BelongsTo`, `TelegramWebhookController`, `Illuminate\Database\Seeder`, `CartaoCompra`, `.count`, `StudySyncTest`, `AllowedGoogleEmail`, `Illuminate\Database\Eloquent\Model`, `StudySummaryService`, `DailyLog`, `Exercise`, `.http`, `EstudosApiTest`, `Cartao`, `SalaryProjectionTest`, `Illuminate\Foundation\Testing\RefreshDatabase`, `NotaFiscal`, `Transacao`, `SalaryProjectionTest.php`, `Controller`, `BodyTrackerTest`, `CreditCardReconciliationTest`, `GurujaConnectCommand`, `BackupEstudosCommandTest`, `TransacaoUpdateDateTest`, `TestCase`?**
-  _High betweenness centrality (0.117) - this node is a cross-community bridge._
-- **Why does `TestCase` connect `TestCase` to `User`, `TelegramWebhookController`, `CartaoCompra`, `StudySyncTest`, `StudySummaryService`, `DailyLog`, `Exercise`, `MidiaEstudosCommandTest`, `.http`, `EstudosApiTest`, `Cartao`, `SalaryProjectionTest`, `Illuminate\Foundation\Testing\RefreshDatabase`, `NotaFiscal`, `Transacao`, `SalaryProjectionTest.php`, `BodyTrackerTest`, `CreditCardReconciliationTest`, `BackupEstudosCommandTest`, `TransacaoUpdateDateTest`?**
-  _High betweenness centrality (0.035) - this node is a cross-community bridge._
-- **Why does `GurujaMcpService` connect `GurujaMcpService` to `Illuminate\Http\JsonResponse`, `GurujaPostMetaService`, `Illuminate\Foundation\Testing\RefreshDatabase`, `GurujaConnectCommand`, `.count`?**
-  _High betweenness centrality (0.027) - this node is a cross-community bridge._
+- **Why does `User` connect `User` to `CreditCardReconciliationTest`, `GoogleAuthAndWhitelistTest`, `GurujaConnectCommand`, `Transacao`, `Illuminate\Database\Eloquent\Model`, `TelegramWebhookController`, `Illuminate\Database\Seeder`, `TelegramWebhookController.php`, `web.php`, `Cartao`, `.count`, `StudySyncTest`, `Controller`, `Illuminate\Database\Eloquent\Factories\HasFactory`, `StudySummaryService`, `NetworkService`, `TransacaoUpdateDateTest`, `Exercise`, `.http`, `EstudosApiTest`, `User.php`, `SalaryProjectionTest`, `TestCase`, `NotaFiscal`, `SalaryProjectionTest.php`, `BodyTrackerTest`?**
+  _High betweenness centrality (0.039) - this node is a cross-community bridge._
+- **Why does `Parte II — Procedimentos Contábeis Patrimoniais` connect `Parte II — Procedimentos Contábeis Patrimoniais` to `5.2. MENSURAÇÃO`, `7. PROPRIEDADE PARA INVESTIMENTO`, `16. CUSTOS DE EMPRÉSTIMOS`, `19.2. REGISTROS PATRIMONIAIS DECORRENTES DAS DESPESAS ORÇAMENTÁRIAS DE`, `6. ATIVO BIOLÓGICO E PRODUTO AGRÍCOLA`, `11. ATIVO IMOBILIZADO`, `12. ATIVO INTANGÍVEL`, `17. PROVISÕES, PASSIVOS CONTINGENTES E ATIVOS CONTINGENTES`, `20. EFEITOS DAS MUDANÇAS NAS TAXAS DE CÂMBIO`, `14. RECEITA DE TRANSAÇÃO SEM CONTRAPRESTAÇÃO`, `9.2. FUSÃO`, `23. BENEFÍCIOS SOCIAIS`, `2. ELEMENTOS DAS DEMONSTRAÇÕES CONTÁBEIS`, `8. INVESTIMENTO EM COLIGADA E EM EMPREENDIMENTO CONTROLADO EM`, `2. ASPECTOS GERAIS DO PCASP`, `24. INSTRUMENTOS FINANCEIROS`, `22. POLÍTICAS CONTÁBEIS, MUDANÇA DE ESTIMATIVA E RETIFICAÇÃO DE ERRO`, `15. RECEITA DE TRANSAÇÃO COM CONTRAPRESTAÇÃO`, `3.2. AVALIAÇÃO E MENSURAÇÃO`, `4. CAIXA E EQUIVALENTE DE CAIXA`, `13. REDUÇÃO AO VALOR RECUPERÁVEL`, `21.2. EVENTO SUBSEQUENTE`?**
+  _High betweenness centrality (0.022) - this node is a cross-community bridge._
+- **Why does `MCASP — Manual de Contabilidade Aplicada ao Setor Público, 11ª edição` connect `2. ASPECTOS GERAIS DO PCASP` to `Parte V — Demonstrações Contábeis Aplicadas ao Setor Público`, `Parte III — Procedimentos Contábeis Específicos`, `Parte II — Procedimentos Contábeis Patrimoniais`, `Parte Geral — Contabilidade Aplicada ao Setor Público`, `Parte I — Procedimentos Contábeis Orçamentários`?**
+  _High betweenness centrality (0.022) - this node is a cross-community bridge._
 - **What connects `$schema`, `name`, `type` to the rest of the system?**
-  _189 weakly-connected nodes found - possible documentation gaps or missing edges._
-- **Should `CartoesController` be split into smaller, more focused modules?**
-  _Cohesion score 0.14666666666666667 - nodes in this community are weakly interconnected._
+  _1572 weakly-connected nodes found - possible documentation gaps or missing edges._
+- **Should `CreditCardReconciliationTest` be split into smaller, more focused modules?**
+  _Cohesion score 0.13333333333333333 - nodes in this community are weakly interconnected._
 - **Should `Illuminate\Http\JsonResponse` be split into smaller, more focused modules?**
   _Cohesion score 0.11397849462365592 - nodes in this community are weakly interconnected._
 - **Should `composer.json` be split into smaller, more focused modules?**
