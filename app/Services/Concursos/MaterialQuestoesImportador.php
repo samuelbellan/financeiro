@@ -13,8 +13,9 @@ use InvalidArgumentException;
  * uma ou várias seções) para um material de resumo já importado. Reimportar atualiza o texto e
  * mantém as tentativas. Questões marcadas "incompleta" ficam de fora.
  *
- * Formato: {"material": "dtrib", "secoes": [{"secao": "c04", "questoes": [{chave, id, origem, tipo,
+ * Formato: {"material": "dtrib", "secoes": [{"secao": "c04", "questoes": [{chave, id, origem, assunto, tipo,
  *           enunciado, alternativas, gabarito, comentario, incompleta}]}]}
+ * As questões novas entram sem capítulo; o livro as encaixa no capítulo do assunto ao ser aberto.
  */
 class MaterialQuestoesImportador
 {
@@ -50,6 +51,7 @@ class MaterialQuestoesImportador
                         'ponto_id' => $ponto?->id,
                         'id_externo' => ($q['id'] ?? '') !== '' ? (string) $q['id'] : null,
                         'origem' => ($q['origem'] ?? '') !== '' ? mb_substr($q['origem'], 0, 250) : null,
+                        'assunto' => ($q['assunto'] ?? '') !== '' ? mb_substr($q['assunto'], 0, 500) : null,
                         'tipo' => $tipo,
                         'enunciado' => $q['enunciado'],
                         'alternativas' => $tipo === 'ME' ? array_values($q['alternativas']) : null,

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Concursos;
 
 use App\Http\Controllers\Controller;
 use App\Models\Concursos\Material;
+use App\Models\Concursos\MaterialCapitulo;
 use App\Models\Concursos\MaterialQuestao;
 use App\Models\Concursos\MaterialTentativa;
 use App\Services\Concursos\Leis\Citacoes;
@@ -31,12 +32,13 @@ class RefazerController extends Controller
         $f = $request->validate([
             'secao' => ['nullable', 'integer'],
             'ponto' => ['nullable', 'integer'],
+            'capitulo' => ['nullable', 'integer'],
             'situacao' => ['nullable', Rule::in(array_keys(self::SITUACOES))],
             'ordem' => ['nullable', Rule::in(['caderno', 'aleatoria'])],
             'qtd' => ['nullable', 'integer', 'min:1', 'max:200'],
         ]) + ['situacao' => 'errando', 'ordem' => 'caderno', 'qtd' => 20];
 
-        $todas = MaterialQuestao::with(['secao', 'ponto', 'ultimaTentativa'])
+        $todas = MaterialQuestao::with(['secao', 'ponto', 'capitulo', 'ultimaTentativa'])
             ->where('material_id', $material->id)
             ->get()
             ->sortBy(fn ($q) => sprintf('%05d-%05d', $q->secao->ordem, $q->ordem))
@@ -45,6 +47,7 @@ class RefazerController extends Controller
         $filtradas = $todas
             ->when($f['secao'] ?? null, fn ($c, $s) => $c->where('secao_id', $s))
             ->when($f['ponto'] ?? null, fn ($c, $p) => $c->where('ponto_id', $p))
+            ->when($f['capitulo'] ?? null, fn ($c, $cap) => $c->whereIn('capitulo_id', $this->comSubcapitulos($material, (int) $cap)))
             ->filter(fn ($q) => match ($f['situacao']) {
                 'nunca' => $q->ultimaTentativa === null,
                 'errando' => $q->ultimaTentativa === null || !$q->ultimaTentativa->acertou,
@@ -62,6 +65,9 @@ class RefazerController extends Controller
             'resumo' => $this->resumo($todas),
             'assuntos' => $todas->whereNotNull('ponto_id')->groupBy('ponto_id')
                 ->map(fn ($qs) => ['id' => $qs->first()->ponto_id, 'titulo' => $qs->first()->ponto->titulo, 'secao' => $qs->first()->secao->titulo, 'n' => $qs->count()])
+                ->sortBy('titulo')->values(),
+            'capitulos' => $todas->whereNotNull('capitulo_id')->groupBy('capitulo_id')
+                ->map(fn ($qs) => ['id' => $qs->first()->capitulo_id, 'titulo' => $qs->first()->capitulo->titulo, 'n' => $qs->count()])
                 ->sortBy('titulo')->values(),
             'disponiveis' => $filtradas->count(),
             'fila' => $fila->map(fn ($q) => $this->paraTela($q))->all(),
@@ -97,9 +103,22 @@ class RefazerController extends Controller
                 'armadilha' => $citacoes->html($ponto->armadilha),
                 'regra' => $citacoes->html($ponto->regra),
                 'base_legal' => $citacoes->html($ponto->base_legal),
-                'url' => route('concursos.material.show', $questao->material_id) . '#ponto-' . $ponto->id,
+                'url' => MaterialController::urlDoPonto($ponto),
             ] : null,
+            'livro' => $questao->capitulo_id ? route('concursos.material.capitulo', [$questao->material_id, $questao->capitulo_id]) : null,
         ]);
+    }
+
+    /** @return list<int> o capítulo e todos os subcapítulos dele, do mesmo livro */
+    private function comSubcapitulos(Material $material, int $capituloId): array
+    {
+        $ids = MaterialCapitulo::where('material_id', $material->id)->whereKey($capituloId)->pluck('id')->all();
+        for ($nivel = $ids; $nivel; ) {
+            $nivel = MaterialCapitulo::where('material_id', $material->id)->whereIn('parent_id', $nivel)->pluck('id')->all();
+            array_push($ids, ...$nivel);
+        }
+
+        return $ids ?: [0];
     }
 
     /** Por caderno: total, ainda erro, acertadas na última vez. */
@@ -123,7 +142,7 @@ class RefazerController extends Controller
             'id' => $q->id,
             'url' => route('concursos.material.questoes.responder', $q),
             'caderno' => $q->secao->titulo,
-            'assunto' => $q->ponto?->titulo,
+            'assunto' => $q->ponto?->titulo ?? $q->capitulo?->titulo,
             'origem' => $q->origem,
             'tipo' => $q->tipo,
             'enunciado' => $quebra($q->enunciado),

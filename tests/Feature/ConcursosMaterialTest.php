@@ -113,7 +113,7 @@ MD;
     {
         $material = $this->importar();
 
-        $this->actingAs($this->user)->get(route('concursos.material.show', $material))
+        $this->actingAs($this->user)->get($this->capitulo($material))
             ->assertOk()
             ->assertSee('Prazo de cinco dias')
             ->assertSee('href="' . route('concursos.leis.show', 'li') . '#art-2"', false)
@@ -121,7 +121,15 @@ MD;
             ->assertSee('href="' . route('concursos.leis.show', 'adct') . '#adct-art-1"', false)
             ->assertSee('#art-2-a"', false)
             ->assertSee('xx 9') // sigla fora do catálogo fica como texto
-            ->assertSee('tecconcursos.com.br/questoes/111111', false);
+            ->assertSee('Questões do TEC: 111111');
+    }
+
+    /** Abre o livro (que converte as seções em capítulos) e devolve a URL do primeiro capítulo. */
+    private function capitulo(Material $material): string
+    {
+        $this->actingAs($this->user)->get(route('concursos.material.show', $material))->assertOk();
+
+        return route('concursos.material.capitulo', [$material, $material->capitulos()->firstOrFail()]);
     }
 
     public function test_material_e_so_do_proprio_aluno(): void
@@ -148,21 +156,6 @@ MD;
             ->assertOk()->assertJson(['status' => 'revisando']);
         $this->actingAs($this->user)->postJson(route('concursos.material.pontos.status', $ponto), ['status' => 'xyz'])
             ->assertUnprocessable();
-    }
-
-    public function test_cria_secao_e_ponto_pela_tela(): void
-    {
-        $material = $this->importar();
-        $this->actingAs($this->user)->post(route('concursos.material.secoes.store', $material), ['titulo' => 'C02 · Novo'])->assertRedirect();
-        $secao = $material->secoes()->where('titulo', 'C02 · Novo')->firstOrFail();
-
-        $this->actingAs($this->user)->post(route('concursos.material.pontos.store', $secao), [
-            'titulo' => 'Ponto novo', 'regra' => 'Regra nova [[li 1]].', 'questoes' => 'Q 222222, 333333',
-        ])->assertRedirect();
-
-        $p = MaterialPonto::where('titulo', 'Ponto novo')->firstOrFail();
-        $this->assertSame(['222222', '333333'], $p->questoes);
-        $this->assertSame(['manual', 'errando'], [$p->origem, $p->status]);
     }
 
     public function test_lei_tem_ancoras_escapa_html_e_aponta_o_resumo(): void
@@ -263,7 +256,7 @@ MD;
         $material = $this->importar();
         MaterialPonto::where('chave', 'q2')->first()->update(['base_legal' => '[[sv 7]] · [[sumstj 1234]] · [[lei9999 1]]']);
 
-        $this->actingAs($this->user)->get(route('concursos.material.show', $material))
+        $this->actingAs($this->user)->get($this->capitulo($material))
             ->assertOk()
             ->assertSee('>SV 7</a>', false)
             ->assertSee('>Súmula 1.234/STJ</a>', false)
@@ -316,7 +309,9 @@ MD;
         $this->assertSame($ponto->id, $q1->ponto_id); // ligada pelo nº do TEC na lista do ponto
 
         $this->actingAs($this->user)->get(route('concursos.material.show', $material))
-            ->assertSee('Refazer erradas (2)')->assertSee('Refazer a questão');
+            ->assertSee('Refazer erradas (2)');
+        $this->actingAs($this->user)->get(route('concursos.material.capitulo', [$material, $q1->fresh()->capitulo_id]))
+            ->assertSee('Refazer as deste capítulo');
 
         $tela = $this->actingAs($this->user)->get(route('concursos.material.refazer', [$material, 'iniciar' => 1]))->assertOk();
         $tela->assertSee('Qual o prazo inventado?')->assertSee('Item inventado.')

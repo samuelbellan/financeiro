@@ -187,15 +187,26 @@ Route::middleware(['auth', 'modulos'])->group(function () {
         // Material de resumo (cadernos de erros) e lei seca do acervo ctresb/leis
         Route::get('/material', [\App\Http\Controllers\Concursos\MaterialController::class, 'index'])->name('material.index');
         Route::post('/material', [\App\Http\Controllers\Concursos\MaterialController::class, 'store'])->name('material.store');
-        Route::get('/material/{material}', [\App\Http\Controllers\Concursos\MaterialController::class, 'show'])->whereNumber('material')->name('material.show');
+        // Material de resumo como livro: capítulos, editor visual, notas na margem e imagens.
+        Route::get('/material/{material}', [\App\Http\Controllers\Concursos\LivroController::class, 'show'])->whereNumber('material')->name('material.show');
+        Route::get('/material/{material}/capitulos/{capitulo}', [\App\Http\Controllers\Concursos\LivroController::class, 'capitulo'])->whereNumber(['material', 'capitulo'])->name('material.capitulo');
+        Route::post('/material/{material}/capitulos', [\App\Http\Controllers\Concursos\LivroController::class, 'criar'])->whereNumber('material')->name('material.capitulos.store');
+        Route::post('/material/{material}/capitulos/ordem', [\App\Http\Controllers\Concursos\LivroController::class, 'ordenar'])->whereNumber('material')->name('material.capitulos.ordem');
+        Route::patch('/material/capitulos/{capitulo}', [\App\Http\Controllers\Concursos\LivroController::class, 'renomear'])->whereNumber('capitulo')->name('material.capitulos.update');
+        Route::delete('/material/capitulos/{capitulo}', [\App\Http\Controllers\Concursos\LivroController::class, 'apagar'])->whereNumber('capitulo')->name('material.capitulos.destroy');
+        Route::put('/material/capitulos/{capitulo}/conteudo', [\App\Http\Controllers\Concursos\LivroController::class, 'salvar'])->whereNumber('capitulo')->name('material.capitulos.conteudo');
+        Route::post('/material/capitulos/{capitulo}/pontos', [\App\Http\Controllers\Concursos\LivroController::class, 'novoPontoNoTexto'])->whereNumber('capitulo')->name('material.capitulos.pontos');
+        Route::post('/material/capitulos/{capitulo}/anotacoes', [\App\Http\Controllers\Concursos\LivroController::class, 'anotar'])->whereNumber('capitulo')->name('material.capitulos.anotacoes');
+        Route::post('/material/{material}/anexos', [\App\Http\Controllers\Concursos\LivroController::class, 'enviarAnexo'])->whereNumber('material')->name('material.anexos.store');
+        Route::get('/material/anexos/{anexo}', [\App\Http\Controllers\Concursos\LivroController::class, 'verAnexo'])->whereNumber('anexo')->name('material.anexos.show');
+        Route::get('/material/{material}/questoes', [\App\Http\Controllers\Concursos\LivroController::class, 'questoes'])->whereNumber('material')->name('material.questoes');
+        Route::get('/material/{material}/buscar', [\App\Http\Controllers\Concursos\LivroController::class, 'buscar'])->whereNumber('material')->name('material.buscar');
+        Route::get('/material/{material}/imprimir', [\App\Http\Controllers\Concursos\LivroController::class, 'imprimir'])->whereNumber('material')->name('material.imprimir');
+        Route::get('/material/citacao', [\App\Http\Controllers\Concursos\LivroController::class, 'citacao'])->name('material.citacao');
         Route::get('/material/{material}/refazer', [\App\Http\Controllers\Concursos\RefazerController::class, 'index'])->whereNumber('material')->name('material.refazer');
         Route::post('/material/questoes/{questao}/responder', [\App\Http\Controllers\Concursos\RefazerController::class, 'responder'])->whereNumber('questao')->name('material.questoes.responder');
-        Route::post('/material/{material}/secoes', [\App\Http\Controllers\Concursos\MaterialController::class, 'storeSecao'])->whereNumber('material')->name('material.secoes.store');
-        Route::post('/material/secoes/{secao}/pontos', [\App\Http\Controllers\Concursos\MaterialController::class, 'storePonto'])->whereNumber('secao')->name('material.pontos.store');
-        Route::put('/material/pontos/{ponto}', [\App\Http\Controllers\Concursos\MaterialController::class, 'updatePonto'])->whereNumber('ponto')->name('material.pontos.update');
         Route::post('/material/pontos/{ponto}/errei', [\App\Http\Controllers\Concursos\MaterialController::class, 'errei'])->whereNumber('ponto')->name('material.pontos.errei');
         Route::post('/material/pontos/{ponto}/status', [\App\Http\Controllers\Concursos\MaterialController::class, 'status'])->whereNumber('ponto')->name('material.pontos.status');
-        Route::delete('/material/pontos/{ponto}', [\App\Http\Controllers\Concursos\MaterialController::class, 'destroyPonto'])->whereNumber('ponto')->name('material.pontos.destroy');
         Route::get('/legislacao', [\App\Http\Controllers\Concursos\LeisController::class, 'index'])->name('leis.index');
         Route::get('/legislacao/buscar', [\App\Http\Controllers\Concursos\LeisController::class, 'buscar'])->name('leis.buscar');
         Route::get('/legislacao/acervo', [\App\Http\Controllers\Concursos\LeisController::class, 'acervo'])->name('leis.acervo');

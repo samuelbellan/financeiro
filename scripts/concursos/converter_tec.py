@@ -4,7 +4,7 @@ alternativa marcada e o gabarito) para os dois arquivos que o Material de Resumo
 
   - material (seções, uma por número de caderno: C01, C02...), sem pontos: o resumo é escrito depois;
   - questões erradas (formato de MaterialQuestoesImportador), uma vez cada, na primeira seção em que
-    apareceu.
+    apareceu, com o assunto do TEC (o livro do resumo usa o assunto para montar os capítulos).
 
 Uso:
     python -I converter_tec.py storage/concursos/tec/ctbga --slug ctbga \
@@ -153,6 +153,7 @@ def main():
                 'chave': f"q{q['id']}",
                 'id': str(q['id']),
                 'origem': origem,
+                'assunto': q.get('assunto') or '',
                 'tipo': 'CE' if ce else 'ME',
                 'enunciado': enun,
                 'alternativas': [] if ce else [{'letra': chr(65 + i), 'texto': t} for i, t in enumerate(alts)],

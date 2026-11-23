@@ -24,6 +24,11 @@ return Application::configure(basePath: dirname(__DIR__))
             'api/tv/*',
             'api/estudos/guruja/*',
         ]);
+        // O texto do livro de resumo (JSON do editor) chega em pedaços: aparar cada um come os
+        // espaços entre palavras com e sem negrito/link.
+        $semAparar = fn (\Illuminate\Http\Request $r) => $r->is('concursos/material/capitulos/*/conteudo');
+        \Illuminate\Foundation\Http\Middleware\TrimStrings::skipWhen($semAparar);
+        \Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull::skipWhen($semAparar);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

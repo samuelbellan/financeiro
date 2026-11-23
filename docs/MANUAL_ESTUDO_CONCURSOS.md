@@ -99,3 +99,25 @@ Você pode usar qualquer IA (ou o próprio assistente aqui no projeto) para gera
 - **Resumos dos erros:** cole os IDs ou enunciados que você errou, anexe `public/concursos-app/conteudo/resumos.json` e peça resumos usando `> sigla artigo [incisos]`, *"Em palavras simples:"* e *"Na prova:"*.
 
 Depois de salvar os JSONs gerados em `public/concursos-app/conteudo/`, basta rodar `python public/concursos-app/tools/gerar_dados.py` e recarregar a página!
+
+---
+
+## 7. Livro de resumo (Concursos → Resumos, `/concursos/material`)
+
+Cada matéria é um **livro** com capítulos e subcapítulos. Só funciona onde o módulo novo está ligado (`CONCURSOS_ENABLED=true`, o PC com o Postgres; de fora, pelo link do ngrok).
+
+- **Capítulos:** montados sozinhos pela árvore de assuntos do TEC a partir das questões que você errou (quem não tem assunto conhecido vira capítulo com o nome do caderno). Você cria, renomeia, move e apaga capítulos pelo **⋯** ao lado de cada um no sumário, ou em **+ Novo capítulo**.
+- **Ler:** o capítulo abre em modo leitura. Selecione um trecho para **grifar** (4 cores) ou deixar uma **✎ Nota** na margem. ← e → passam de capítulo; **/** abre a busca no livro.
+- **Editar:** botão **Editar** (ou tecla **e**). Barra com negrito, títulos, listas, tabela, link, imagem e desfazer. Digite **/** numa linha vazia para inserir: caixa (Pegadinha, Regra certa, Macete, Atenção, Exemplo, Base legal), **Ponto de erro** (com Ainda erro / Revisando / Dominado e "Errei de novo"), **Questão errada** (respondível no próprio texto), artigo de lei ou súmula e imagem. `[[ctn 98]]`, `[[sv 24]]` etc. viram link que abre o artigo sem sair da página. Cole ou arraste imagens direto no texto. Tudo salva sozinho ("Salvo às …").
+- **Imprimir / PDF do livro:** no rodapé do sumário, o livro inteiro com capa, sumário, caixas e suas notas.
+- **Refazer erradas:** agora filtra também por capítulo; cada capítulo tem "Refazer as deste capítulo".
+
+Depois de atualizar o código no PC:
+
+```
+composer install
+npm install && npm run build
+php artisan migrate --database=concursos_pgsql --path=database/migrations/concursos
+```
+
+Os materiais que já existiam são convertidos para livro ao abrir pela primeira vez (ou de uma vez com `php artisan concursos:material-livro`). Para os cadernos do TEC, o fluxo continua o mesmo (`scripts/concursos/converter_tec.py` e `concursos:importar-material ... --questoes=...`): as questões novas caem no capítulo do assunto delas.
