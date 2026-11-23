@@ -54,7 +54,7 @@
                     @if ($notas)
                         <div class="notas">
                             @foreach ($notas as $n)
-                                <a class="nota" href="{{ route('concursos.material.show', $n['material']) }}#ponto-{{ $n['id'] }}"><b>No resumo:</b> {{ $n['titulo'] }} <span class="st">· {{ $rotulos[$n['status']] ?? $n['status'] }}</span></a>
+                                <a class="nota" href="{{ $n['url'] }}"><b>No resumo:</b> {{ $n['titulo'] }}@if ($n['status']) <span class="st">· {{ $rotulos[$n['status']] ?? $n['status'] }}</span>@endif</a>
                             @endforeach
                         </div>
                     @endif

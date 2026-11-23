@@ -26,28 +26,58 @@ class Citacoes
 
         $html = Str::markdown($md, ['html_input' => 'escape', 'allow_unsafe_links' => false]);
 
+        // O resto da citação já vem escapado pelo Markdown: volta ao texto puro e é escapado uma vez só no link.
         return preg_replace_callback(self::PADRAO, function ($m) {
-            [$tudo, $sigla, $num, $resto] = $m;
-            $resto = trim($resto);
-            $cauda = $resto !== '' ? (str_starts_with($resto, ',') ? '' : ', ') . $resto : '';
-
-            // $resto já vem escapado pelo Markdown; o resto é montado de partes validadas pela regex.
-            if ($this->juris->existe($sigla) && ctype_digit($num)) {
-                $href = route('concursos.juris.show', [$sigla, $num]);
-
-                return '<a class="lei juris" href="' . e($href) . '" data-json="' . e($href) . '">' . e($this->juris->rotulo($sigla, $num)) . $cauda . '</a>';
+            $link = $this->resolver($m[1], $m[2], html_entity_decode($m[3], ENT_QUOTES | ENT_HTML5, 'UTF-8'));
+            if ($link === null) {
+                return e(trim($m[0], '[]'));
             }
+            $classe = $link['juris'] ? 'lei juris' : 'lei';
 
-            $info = $this->acervo->info($sigla);
-            if ($info === null) {
-                return e(trim($tudo, '[]'));
-            }
-            $num = Str::upper($num);
-            $href = route('concursos.leis.show', $sigla) . '#' . $this->acervo->ancora($sigla, $num);
-            $json = route('concursos.leis.artigo', [$sigla, $num]);
-
-            return '<a class="lei" href="' . e($href) . '" data-json="' . e($json) . '">' . e($info['sigla']) . ', art. ' . $num . $cauda . '</a>';
+            return '<a class="' . $classe . '" href="' . e($link['href']) . '" data-json="' . e($link['json']) . '">' . e($link['rotulo']) . '</a>';
         }, $html);
+    }
+
+    /**
+     * Uma citação avulsa ("ctn 98", "[[cf 155 §6, III]]") resolvida para o link: rótulo, página e JSON.
+     * Usado pelo livro, que guarda a citação como um nó e pede o link ao servidor.
+     *
+     * @return array{rotulo: string, href: string, json: string, juris: bool}|null
+     */
+    public function link(string $ref): ?array
+    {
+        $ref = '[[' . trim(trim($ref), '[]') . ']]';
+        if (!preg_match(self::PADRAO, $ref, $m) || $m[0] !== $ref) {
+            return null;
+        }
+
+        return $this->resolver($m[1], $m[2], $m[3]);
+    }
+
+    /** @return array{rotulo: string, href: string, json: string, juris: bool}|null */
+    private function resolver(string $sigla, string $num, string $resto): ?array
+    {
+        $resto = trim($resto);
+        $cauda = $resto !== '' ? (str_starts_with($resto, ',') ? '' : ', ') . $resto : '';
+
+        if ($this->juris->existe($sigla) && ctype_digit($num)) {
+            $href = route('concursos.juris.show', [$sigla, $num]);
+
+            return ['rotulo' => $this->juris->rotulo($sigla, $num) . $cauda, 'href' => $href, 'json' => $href, 'juris' => true];
+        }
+
+        $info = $this->acervo->info($sigla);
+        if ($info === null) {
+            return null;
+        }
+        $num = Str::upper($num);
+
+        return [
+            'rotulo' => $info['sigla'] . ', art. ' . $num . $cauda,
+            'href' => route('concursos.leis.show', $sigla) . '#' . $this->acervo->ancora($sigla, $num),
+            'json' => route('concursos.leis.artigo', [$sigla, $num]),
+            'juris' => false,
+        ];
     }
 
     /**

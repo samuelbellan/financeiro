@@ -15,8 +15,8 @@
 @endsection
 
 @section('content')
-<div class="top"><h1>Material de resumo</h1></div>
-<p class="muted small" style="margin-top:-8px">O que você ainda erra, por disciplina. Cada ponto traz a pegadinha, a regra certa e o link para o artigo da lei.</p>
+<div class="top"><h1>Resumos</h1></div>
+<p class="muted small" style="margin-top:-8px">Um livro por matéria, com capítulos por assunto. Escreva, grife, anote na margem e acompanhe os pontos que você ainda erra.</p>
 
 <div class="lista">
     @forelse ($materiais as $m)
@@ -25,21 +25,22 @@
             <h2>{{ $m->titulo }}</h2>
             @if ($m->descricao)<div class="muted small">{{ $m->descricao }}</div>@endif
             <div class="nums">
+                <span><b>{{ $capitulos[$m->id] ?? 0 }}</b> capítulos</span>
                 <span class="err"><b>{{ $c['errando'] ?? 0 }}</b> ainda erro</span>
                 <span><b>{{ $c['revisando'] ?? 0 }}</b> revisando</span>
                 <span class="dom"><b>{{ $c['dominado'] ?? 0 }}</b> dominados</span>
             </div>
         </a>
     @empty
-        <div class="card muted">Nenhum material ainda. Crie um abaixo ou importe um JSON com <code>php artisan concursos:importar-material</code>.</div>
+        <div class="card muted">Nenhum livro ainda. Crie um abaixo ou importe os cadernos com <code>php artisan concursos:importar-material</code>.</div>
     @endforelse
 </div>
 
 <div class="card" style="margin-top:16px">
     <form method="POST" action="{{ route('concursos.material.store') }}" class="form">
         @csrf
-        <input name="titulo" required maxlength="160" placeholder="Novo material (ex.: Direito Administrativo)" aria-label="Título do novo material">
-        <button class="btn main" type="submit">Criar</button>
+        <input name="titulo" required maxlength="160" placeholder="Novo livro (ex.: Direito Administrativo)" aria-label="Título do novo livro">
+        <button class="btn main" type="submit">Criar livro</button>
     </form>
 </div>
 @endsection

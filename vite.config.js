@@ -11,6 +11,7 @@ export default defineConfig({
                 'resources/js/app.js',
                 'resources/css/estudos.css',
                 'resources/js/estudos/main.js',
+                'resources/js/concursos/livro.js',
             ],
             refresh: true,
         }),

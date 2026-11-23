@@ -84,7 +84,15 @@
                         @foreach ($resumo as $r)<option value="{{ $r['id'] }}" @selected(($f['secao'] ?? null) == $r['id'])>{{ $r['titulo'] }}</option>@endforeach
                     </select>
                 </label>
-                <label>Assunto
+                @if ($capitulos->isNotEmpty())
+                <label>Capítulo do livro
+                    <select name="capitulo">
+                        <option value="">Todos</option>
+                        @foreach ($capitulos as $c)<option value="{{ $c['id'] }}" @selected(($f['capitulo'] ?? null) == $c['id'])>{{ $c['titulo'] }} ({{ $c['n'] }})</option>@endforeach
+                    </select>
+                </label>
+                @endif
+                <label>Ponto de erro
                     <select name="ponto">
                         <option value="">Todos</option>
                         @foreach ($assuntos as $a)<option value="{{ $a['id'] }}" @selected(($f['ponto'] ?? null) == $a['id'])>{{ $a['titulo'] }} ({{ $a['n'] }})</option>@endforeach
@@ -131,9 +139,9 @@
         <h2 data-fim-titulo></h2>
         <ul data-fim-lista></ul>
         <div class="acoes">
-            <a class="btn main" href="{{ route('concursos.material.refazer', [$material, 'situacao' => 'errando', 'ordem' => 'aleatoria', 'iniciar' => 1] + array_filter(['secao' => $f['secao'] ?? null, 'ponto' => $f['ponto'] ?? null])) }}">Refazer as que ainda erro</a>
+            <a class="btn main" href="{{ route('concursos.material.refazer', [$material, 'situacao' => 'errando', 'ordem' => 'aleatoria', 'iniciar' => 1] + array_filter(['secao' => $f['secao'] ?? null, 'ponto' => $f['ponto'] ?? null, 'capitulo' => $f['capitulo'] ?? null])) }}">Refazer as que ainda erro</a>
             <a class="btn" href="{{ route('concursos.material.refazer', $material) }}">Escolher outras</a>
-            <a class="btn" href="{{ route('concursos.material.show', $material) }}">Voltar ao resumo</a>
+            <a class="btn" href="{{ route('concursos.material.show', $material) }}">Voltar ao livro</a>
         </div>
     </div>
     <p class="muted small">Teclas: letra da alternativa (ou C/E) para responder, Enter para a próxima.</p>
@@ -232,8 +240,10 @@
             // HTML gerado no servidor a partir do resumo (Markdown escapado).
             ponto.innerHTML = `<div class="bloco"><span>No resumo</span><div><a href="${r.ponto.url}">${escapar(r.ponto.titulo)}</a></div></div>`
                 + (r.ponto.armadilha ? `<div class="bloco armadilha"><span>Onde caio</span><div>${r.ponto.armadilha}</div></div>` : '')
-                + `<div class="bloco regra"><span>Regra certa</span><div>${r.ponto.regra}</div></div>`
+                + (r.ponto.regra ? `<div class="bloco regra"><span>Regra certa</span><div>${r.ponto.regra}</div></div>` : '')
                 + (r.ponto.base_legal ? `<div class="bloco"><span>Base legal</span><div>${r.ponto.base_legal}</div></div>` : '');
+        } else if (r.livro) {
+            ponto.innerHTML = `<div class="bloco"><span>No livro</span><div><a href="${r.livro}">Ver o capítulo deste assunto</a></div></div>`;
         }
         $('[data-com-box]').hidden = !r.comentario;
         $('[data-com-box]').open = !r.ponto;

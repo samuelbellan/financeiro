@@ -22,6 +22,21 @@ class MaterialQuestao extends ConcursosModel
         return $this->belongsTo(MaterialSecao::class, 'secao_id');
     }
 
+    public function capitulo(): BelongsTo
+    {
+        return $this->belongsTo(MaterialCapitulo::class, 'capitulo_id');
+    }
+
+    /** Assunto do TEC: coluna própria ou, nas importadas antes dela, a linha "Assunto:" do comentário. */
+    public function assuntoTec(): ?string
+    {
+        if ($this->assunto) {
+            return $this->assunto;
+        }
+
+        return preg_match('/^Assunto:\s*(.+)$/mu', (string) $this->comentario, $m) ? trim($m[1]) : null;
+    }
+
     public function ponto(): BelongsTo
     {
         return $this->belongsTo(MaterialPonto::class, 'ponto_id');
