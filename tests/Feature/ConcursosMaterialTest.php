@@ -216,6 +216,136 @@ MD;
             ->assertOk()->assertSee('Meta do dia')->assertSee('>Simulados<', false)->assertSee('>Resumos<', false);
     }
 
+    /** Monta uma "cópia local" mínima do repositório numa pasta temporária. */
+    private function copiaLocal(): string
+    {
+        $raiz = storage_path('framework/testing/acervo-' . uniqid());
+        File::put(tap($raiz . '/li.md', fn ($f) => File::ensureDirectoryExists(dirname($f))), self::LEI);
+        $lei = $raiz . '/federal/leis-ordinarias/1999/lei-9999-1999-01-02.md';
+        File::ensureDirectoryExists(dirname($lei));
+        File::put($lei, "---\ntitulo: \"Lei nº 9.999\"\n---\n# Lei 9.999\n\n**Art. 1º** Regra inventada da lei 9.999.\n");
+        $sv = $raiz . '/jurisprudencia/stf/sumulas-vinculantes/sumula-vinculante-7.md';
+        File::ensureDirectoryExists(dirname($sv));
+        File::put($sv, "---\ntitulo: \"Súmula vinculante nº 7 do STF\"\n---\n\n# Súmula vinculante nº 7 do STF\n\n## Questão\n\nEnunciado inventado da súmula sete.\n\n## Tese\n\nnão informado\n\n## Registro original do CNJ\n\n```json\n{\"bruto\": true}\n```\n");
+        File::put($raiz . '/jurisprudencia/nota.md', "# Nota\n\nTexto solto do acervo.\n");
+        config(['concursos.leis.local' => $raiz]);
+        $this->beforeApplicationDestroyed(fn () => File::deleteDirectory($raiz));
+
+        return $raiz;
+    }
+
+    public function test_com_copia_local_le_do_disco_e_aceita_qualquer_lei_federal(): void
+    {
+        $this->copiaLocal();
+
+        $this->actingAs($this->user)->get(route('concursos.leis.show', 'li'))->assertOk()->assertSee('id="art-2"', false);
+        $this->actingAs($this->user)->get(route('concursos.leis.show', 'lei9999'))->assertOk()->assertSee('Regra inventada da lei 9.999');
+        $this->actingAs($this->user)->getJson(route('concursos.leis.artigo', ['lei9999', '1']))->assertOk()->assertJson(['titulo' => 'Lei 9.999/1999, Art. 1']);
+        $this->actingAs($this->user)->get(route('concursos.leis.show', 'lei1234'))->assertNotFound();
+        Http::assertNothingSent();
+    }
+
+    public function test_sumula_vinculante_em_pagina_e_json_sem_o_registro_bruto(): void
+    {
+        $this->copiaLocal();
+
+        $this->actingAs($this->user)->get(route('concursos.juris.show', ['sv', 7]))
+            ->assertOk()->assertSee('Enunciado inventado da súmula sete')->assertDontSee('bruto')->assertDontSee('não informado');
+        $this->actingAs($this->user)->getJson(route('concursos.juris.show', ['sv', 7]))
+            ->assertOk()->assertJson(['titulo' => 'SV 7']);
+        $this->actingAs($this->user)->getJson(route('concursos.juris.show', ['sv', 99]))->assertNotFound();
+        $this->actingAs($this->user)->get('/concursos/jurisprudencia/xyz/1')->assertNotFound();
+    }
+
+    public function test_citacoes_de_jurisprudencia_e_lei_dinamica_no_material(): void
+    {
+        $this->copiaLocal();
+        $material = $this->importar();
+        MaterialPonto::where('chave', 'q2')->first()->update(['base_legal' => '[[sv 7]] · [[sumstj 1234]] · [[lei9999 1]]']);
+
+        $this->actingAs($this->user)->get(route('concursos.material.show', $material))
+            ->assertOk()
+            ->assertSee('>SV 7</a>', false)
+            ->assertSee('>Súmula 1.234/STJ</a>', false)
+            ->assertSee('>Lei 9.999/1999, art. 1</a>', false)
+            ->assertSee('data-json="' . route('concursos.juris.show', ['sv', 7]) . '"', false);
+    }
+
+    public function test_navega_no_acervo_e_bloqueia_saida_da_pasta(): void
+    {
+        $this->copiaLocal();
+
+        $this->actingAs($this->user)->get(route('concursos.leis.acervo'))->assertOk()->assertSee('jurisprudencia')->assertSee('federal');
+        $this->actingAs($this->user)->get(route('concursos.leis.acervo', ['p' => 'jurisprudencia/nota.md']))->assertOk()->assertSee('Texto solto do acervo');
+        $this->actingAs($this->user)->get(route('concursos.leis.acervo', ['p' => 'federal/leis-ordinarias/1999/lei-9999-1999-01-02.md']))
+            ->assertRedirect(route('concursos.leis.show', 'lei9999'));
+        $this->actingAs($this->user)->get(route('concursos.leis.acervo', ['p' => '../']))->assertNotFound();
+        $this->actingAs($this->user)->get(route('concursos.leis.acervo', ['p' => 'C:/Windows']))->assertNotFound();
+
+        $this->actingAs($this->user)->get(route('concursos.leis.buscar', ['tipo' => 'sv', 'numero' => '7']))->assertRedirect(route('concursos.juris.show', ['sv', 7]));
+        $this->actingAs($this->user)->get(route('concursos.leis.buscar', ['tipo' => 'lei', 'numero' => '9999']))->assertRedirect(route('concursos.leis.show', 'lei9999'));
+    }
+
+    public function test_sem_copia_local_o_acervo_nao_existe(): void
+    {
+        $this->actingAs($this->user)->get(route('concursos.leis.acervo'))->assertNotFound();
+        $this->actingAs($this->user)->get(route('concursos.leis.show', 'lei9999'))->assertNotFound();
+    }
+
+    private function importarQuestoes(): void
+    {
+        $this->importar();
+        $r = app(\App\Services\Concursos\MaterialQuestoesImportador::class)->importar([
+            'material' => 'inventado',
+            'secoes' => [['secao' => 'c01', 'questoes' => [
+                ['chave' => 'q111111', 'id' => '111111', 'origem' => 'BANCA X', 'tipo' => 'ME', 'enunciado' => 'Qual o prazo inventado? I. um II. dois',
+                    'alternativas' => [['letra' => 'A', 'texto' => 'dez dias'], ['letra' => 'B', 'texto' => 'cinco dias']], 'gabarito' => 'B', 'comentario' => 'Comentário inventado.'],
+                ['chave' => 'q222222', 'id' => '222222', 'tipo' => 'CE', 'enunciado' => 'Item inventado.', 'alternativas' => [], 'gabarito' => 'E'],
+                ['chave' => 'q333333', 'id' => '333333', 'tipo' => 'ME', 'enunciado' => 'Sem alternativas.', 'alternativas' => [], 'gabarito' => 'D', 'incompleta' => true],
+            ]]],
+        ], $this->user->id);
+        $this->assertSame([2, 1, ['q222222']], [$r['novas'], $r['puladas'], $r['sem_ponto']]);
+    }
+
+    public function test_refazer_filtra_responde_e_atualiza_o_ponto(): void
+    {
+        $this->importarQuestoes();
+        $material = Material::first();
+        $q1 = \App\Models\Concursos\MaterialQuestao::where('chave', 'q111111')->first();
+        $ponto = MaterialPonto::where('chave', 'q1')->first();
+        $this->assertSame($ponto->id, $q1->ponto_id); // ligada pelo nº do TEC na lista do ponto
+
+        $this->actingAs($this->user)->get(route('concursos.material.show', $material))
+            ->assertSee('Refazer erradas (2)')->assertSee('Refazer a questão');
+
+        $tela = $this->actingAs($this->user)->get(route('concursos.material.refazer', [$material, 'iniciar' => 1]))->assertOk();
+        $tela->assertSee('Qual o prazo inventado?')->assertSee('Item inventado.')
+            ->assertDontSee('Comentário inventado.'); // gabarito e comentário só depois de responder
+        $this->assertStringContainsString('inventado?\\nI. um\\nII. dois', $tela->getContent()); // itens em linhas
+
+        $this->actingAs($this->user)->postJson(route('concursos.material.questoes.responder', $q1), ['resposta' => 'A'])
+            ->assertOk()->assertJson(['acertou' => false, 'gabarito' => 'B', 'comentario' => 'Comentário inventado.', 'ponto' => ['titulo' => 'Prazo de cinco dias']]);
+        $this->assertSame(2, $ponto->fresh()->vezes_errado);
+        $this->actingAs($this->user)->postJson(route('concursos.material.questoes.responder', $q1), ['resposta' => 'Z'])->assertUnprocessable();
+        $this->actingAs($this->user)->postJson(route('concursos.material.questoes.responder', $q1), ['resposta' => 'B'])->assertOk()->assertJson(['acertou' => true]);
+
+        // Acertou na última: sai de "ainda erro", continua em "todas".
+        $this->actingAs($this->user)->get(route('concursos.material.refazer', [$material, 'iniciar' => 1, 'situacao' => 'errando']))
+            ->assertDontSee('Qual o prazo inventado?')->assertSee('Item inventado.');
+        $this->actingAs($this->user)->get(route('concursos.material.refazer', [$material, 'iniciar' => 1, 'situacao' => 'todas', 'ponto' => $ponto->id]))
+            ->assertSee('Qual o prazo inventado?')->assertDontSee('Item inventado.');
+    }
+
+    public function test_refazer_e_so_do_proprio_aluno(): void
+    {
+        $this->importarQuestoes();
+        $outro = User::factory()->create();
+        $q = \App\Models\Concursos\MaterialQuestao::first();
+
+        $this->actingAs($outro)->get(route('concursos.material.refazer', Material::first()))->assertNotFound();
+        $this->actingAs($outro)->postJson(route('concursos.material.questoes.responder', $q), ['resposta' => 'A'])->assertNotFound();
+    }
+
     public function test_falha_ao_baixar_mostra_aviso(): void
     {
         config(['concursos.leis.raw' => 'https://fora-do-ar.test/']);
