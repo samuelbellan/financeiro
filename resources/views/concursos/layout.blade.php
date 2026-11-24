@@ -67,6 +67,7 @@
             }
             if (auth()->user()?->is_admin || auth()->user()?->is_owner) {
                 $itensMenu['concursos.curadoria'] = ['Curadoria', 'concursos.curadoria'];
+                $itensMenu['concursos.uso'] = ['Uso', 'concursos.uso'];
             }
             $rotaAtual = request()->route()?->getName() ?? '';
         @endphp
@@ -84,5 +85,25 @@
     @yield('content')
 </div>
 @yield('js')
+@if ($usoEvento = request()->attributes->get('uso_evento'))
+<script>
+// Telemetria: quanto tempo esta tela ficou à vista (acumulado), enviado ao esconder ou sair.
+(function () {
+    var url = @json(route('concursos.uso.tempo')), token = @json(csrf_token()), id = @json($usoEvento);
+    var total = 0, desde = document.visibilityState === 'visible' ? Date.now() : null, enviado = -1;
+    function parar() { if (desde) { total += Date.now() - desde; desde = null; } }
+    function enviar() {
+        var s = Math.round(total / 1000);
+        if (s === enviado || !navigator.sendBeacon) return;
+        var f = new FormData(); f.append('_token', token); f.append('id', id); f.append('s', s);
+        if (navigator.sendBeacon(url, f)) enviado = s;
+    }
+    document.addEventListener('visibilitychange', function () {
+        if (document.visibilityState === 'hidden') { parar(); enviar(); } else { desde = Date.now(); }
+    });
+    addEventListener('pagehide', function () { parar(); enviar(); });
+})();
+</script>
+@endif
 </body>
 </html>

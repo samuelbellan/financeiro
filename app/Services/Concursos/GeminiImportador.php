@@ -143,7 +143,7 @@ class GeminiImportador
                     $this->gravarLedger($q, $item, $lote, $imp, $subtopicos, $resumo);
                 } else {
                     QuestaoResolucao::updateOrCreate(['questao_id' => $q->id], [
-                        'lote_id' => $lote->id, 'importacao_id' => $imp->id,
+                        'fonte' => 'ia', 'autor' => null, 'lote_id' => $lote->id, 'importacao_id' => $imp->id,
                         'resumo' => $item['resumo'], 'fundamentacao' => $item['fundamentacao'] ?? null,
                         'dispositivos' => $item['dispositivos'] ?? null, 'alternativas' => $item['alternativas'],
                     ]);

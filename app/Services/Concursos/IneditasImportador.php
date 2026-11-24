@@ -123,7 +123,7 @@ class IneditasImportador
                     'dispositivos' => $q['dispositivos'] ?? null, 'importacao_id' => $imp->id,
                 ]);
                 QuestaoResolucao::updateOrCreate(['questao_id' => $questao->id], [
-                    'resumo' => $q['resolucao']['resumo'], 'fundamentacao' => $q['resolucao']['fundamentacao'] ?? null,
+                    'fonte' => 'ia', 'autor' => null, 'resumo' => $q['resolucao']['resumo'], 'fundamentacao' => $q['resolucao']['fundamentacao'] ?? null,
                     'dispositivos' => $q['dispositivos'] ?? null, 'alternativas' => $q['resolucao']['alternativas'], 'importacao_id' => $imp->id,
                 ]);
             }

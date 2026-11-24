@@ -46,14 +46,15 @@ class TecImportador
 
     /**
      * Grava um caderno já lido pelo parser (separado para os testes não dependerem do Python).
+     * Também usado pelo TecApiImportador (tipo 'api_tec'), que passa $depois para gravar a resolução.
      *
      * @param  array{caminho: string, sha256: string}  $salvo
      */
-    public function gravar(array $lido, string $arquivoOriginal, array $salvo, ?int $userId = null): array
+    public function gravar(array $lido, string $arquivoOriginal, array $salvo, ?int $userId = null, string $tipo = 'pdf_tec', ?callable $depois = null): array
     {
-        return DB::connection(config('concursos.connection'))->transaction(function () use ($lido, $arquivoOriginal, $salvo, $userId) {
+        return DB::connection(config('concursos.connection'))->transaction(function () use ($lido, $arquivoOriginal, $salvo, $userId, $tipo, $depois) {
             $imp = Importacao::create([
-                'tipo' => 'pdf_tec', 'arquivo_original' => $arquivoOriginal, 'arquivo_salvo' => $salvo['caminho'],
+                'tipo' => $tipo, 'arquivo_original' => $arquivoOriginal, 'arquivo_salvo' => $salvo['caminho'],
                 'sha256' => $salvo['sha256'], 'referencia' => $lido['caderno']['titulo'], 'status' => 'ok', 'user_id' => $userId,
             ]);
 
@@ -77,7 +78,11 @@ class TecImportador
                     'orgao' => $q['orgao'], 'cargo' => $q['cargo'], 'ano' => $q['ano'], 'cabecalho' => $q['cabecalho'],
                     'tipo' => $q['tipo'], 'enunciado' => $q['enunciado'], 'gabarito' => $q['gabarito'],
                     'anulada' => $q['anulada'], 'importacao_id' => $imp->id,
-                ])->save();
+                ]);
+                if (array_key_exists('desatualizada', $q)) {
+                    $questao->desatualizada = (bool) $q['desatualizada'];
+                }
+                $questao->save();
 
                 $questao->alternativas()->delete();
                 foreach ($q['alternativas'] as $i => $alt) {
@@ -96,6 +101,9 @@ class TecImportador
                 $questao->assuntos()->sync($vinculos);
 
                 $nova ? $resumo['novas']++ : $resumo['atualizadas']++;
+                if ($depois) {
+                    $depois($questao, $q, $imp, $resumo);
+                }
             }
 
             $resumo['assuntos_criados'] = $resolver->criados;

@@ -160,14 +160,17 @@ Route::middleware(['auth', 'modulos'])->group(function () {
     Route::delete('/estudos/api-tokens', [EstudosApiController::class, 'revokeTokens'])->name('estudos.api-tokens.destroy');
 
     // Módulo novo de concursos (banco concursos_pgsql; só onde CONCURSOS_ENABLED=true)
-    Route::middleware([\App\Http\Middleware\EnsureConcursosHabilitado::class, \App\Http\Middleware\EnsurePlanoConcursos::class])->prefix('concursos/questoes')->name('concursos.questoes.')->group(function () {
+    Route::middleware([\App\Http\Middleware\EnsureConcursosHabilitado::class, \App\Http\Middleware\EnsurePlanoConcursos::class, \App\Http\Middleware\RegistraUsoConcursos::class])->prefix('concursos/questoes')->name('concursos.questoes.')->group(function () {
         Route::get('/', [\App\Http\Controllers\Concursos\QuestoesController::class, 'index'])->name('index');
         Route::get('/resolver', [\App\Http\Controllers\Concursos\QuestoesController::class, 'resolver'])->name('resolver');
         Route::get('/{questao}', [\App\Http\Controllers\Concursos\QuestoesController::class, 'show'])->whereNumber('questao')->name('show');
         Route::post('/{questao}/responder', [\App\Http\Controllers\Concursos\QuestoesController::class, 'responder'])->whereNumber('questao')->name('responder');
         Route::post('/tentativas/{tentativa}/motivo', [\App\Http\Controllers\Concursos\QuestoesController::class, 'motivo'])->whereNumber('tentativa')->name('motivo');
     });
-    Route::middleware(\App\Http\Middleware\EnsureConcursosHabilitado::class)->prefix('concursos')->name('concursos.')->group(function () {
+    Route::middleware([\App\Http\Middleware\EnsureConcursosHabilitado::class, \App\Http\Middleware\RegistraUsoConcursos::class])->prefix('concursos')->name('concursos.')->group(function () {
+        // Telemetria de uso: painel do curador e beacon do tempo visível de cada tela.
+        Route::get('/uso', [\App\Http\Controllers\Concursos\UsoController::class, 'index'])->name('uso');
+        Route::post('/uso/tempo', [\App\Http\Controllers\Concursos\UsoController::class, 'tempo'])->name('uso.tempo');
         Route::get('/meta', [\App\Http\Controllers\Concursos\MetaController::class, 'meta'])->name('meta')->middleware(\App\Http\Middleware\EnsurePlanoConcursos::class);
         Route::post('/meta/atividades/{atividade}/feita', [\App\Http\Controllers\Concursos\MetaController::class, 'feita'])->whereNumber('atividade')->name('meta.feita')->middleware(\App\Http\Middleware\EnsurePlanoConcursos::class);
         Route::post('/meta/atividades/{atividade}/adiar', [\App\Http\Controllers\Concursos\MetaController::class, 'adiar'])->whereNumber('atividade')->name('meta.adiar')->middleware(\App\Http\Middleware\EnsurePlanoConcursos::class);
