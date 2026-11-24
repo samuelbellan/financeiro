@@ -197,6 +197,11 @@ class TecCadernoParser
         }
 
         $cabecalho = array_shift($linhas);
+        // Cabeçalho longo quebra de linha ("...Entidades Prestadoras de" / "Serviços/2024"): junta até 2 linhas.
+        for ($i = 0; $i < 2 && !preg_match(self::RE_CABECALHO_PROVA, $cabecalho) && $linhas
+            && preg_match('~/\d{4}$~u', $linhas[0]) && !preg_match(self::RE_NUMERO, $linhas[0]); $i++) {
+            $cabecalho .= ' ' . array_shift($linhas);
+        }
         if (!preg_match(self::RE_CABECALHO_PROVA, $cabecalho, $m)) {
             throw new TecParserException("cabeçalho da prova em formato desconhecido: \"{$cabecalho}\".");
         }
