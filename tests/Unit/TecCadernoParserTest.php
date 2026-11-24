@@ -129,6 +129,17 @@ class TecCadernoParserTest extends TestCase
         $this->parse($p);
     }
 
+    public function test_cabecalho_da_prova_quebrado_em_duas_linhas(): void
+    {
+        $p = $this->fixture()['paginas'];
+        $p[0] = str_replace('BANCA X - Ana Jud (TRT 99)/TRT 99/Judiciária/Direito/2025', "BANCA X - Ana Jud (TRT 99)/TRT 99/Judiciária e Fiscalização de Entidades\nPrestadoras/Direito/2025", $p[0]);
+
+        $q = $this->parse($p)['questoes'][0];
+
+        $this->assertSame(2025, $q['ano']);
+        $this->assertSame('Judiciária e Fiscalização de Entidades Prestadoras/Direito', $q['cargo']);
+    }
+
     public function test_nome_de_assunto_quebrado_em_duas_linhas(): void
     {
         $p = $this->fixture()['paginas'];
