@@ -23,18 +23,14 @@ class ResumoEstudosCommand extends Command
                             {--comparar-inicio= : Início do período de comparação (padrão: mesmo tamanho, logo antes)}
                             {--comparar-fim= : Fim do período de comparação}
                             {--usuario= : E-mail ou id do usuário (padrão: o dono do sistema)}
-                            {--connection=pgsql_cloud : Conexão de origem dos dados}
+                            {--connection= : Conexão de origem (padrão: a nuvem, se CLOUD_DATABASE_URL existir; senão o banco local)}
                             {--saida= : Arquivo onde gravar o JSON (padrão: imprime na tela)}';
 
     protected $description = 'Gera o resumo (JSON) de um dia ou período de estudo para as mídias do Instagram.';
 
     public function handle(): int
     {
-        $connection = $this->option('connection');
-        if ($connection === 'pgsql_cloud' && empty(config('database.connections.pgsql_cloud.url'))) {
-            $this->error('CLOUD_DATABASE_URL não configurada no .env: os estudos ficam na nuvem.');
-            return self::FAILURE;
-        }
+        $connection = $this->option('connection') ?: (empty(config('database.connections.pgsql_cloud.url')) ? config('database.default') : 'pgsql_cloud');
 
         try {
             $db = DB::connection($connection);

@@ -329,7 +329,10 @@ class DatabaseSyncService
     protected function syncMissingReceiptPhotos(): void
     {
         try {
-            $cloudUrl = env('CLOUD_APP_URL', 'https://financeiro-app-mrik.onrender.com');
+            $cloudUrl = (string) config('services.estudos.cloud_url');
+            if ($cloudUrl === '') {
+                return; // sem nuvem: as fotos já estão na pasta de arquivos deste servidor
+            }
             $notas = \App\Models\NotaFiscal::whereNotNull('foto_path')->get();
 
             foreach ($notas as $nf) {
