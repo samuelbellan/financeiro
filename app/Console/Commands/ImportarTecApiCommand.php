@@ -92,7 +92,7 @@ class ImportarTecApiCommand extends Command
             return [$arquivo];
         }
 
-        $pasta = storage_path('concursos/tec/' . preg_replace('/[^A-Za-z0-9_-]/', '', (string) ($dados['pacote'] ?? 'pacote')));
+        $pasta = \App\Support\Dados::path('concursos/tec/' . preg_replace('/[^A-Za-z0-9_-]/', '', (string) ($dados['pacote'] ?? 'pacote')));
         \Illuminate\Support\Facades\File::ensureDirectoryExists($pasta);
         $saida = [];
         foreach ($dados['blocos'] as $nome => $bloco) {

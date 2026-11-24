@@ -42,7 +42,7 @@ class BackupEstudosCommand extends Command
             return self::FAILURE;
         }
 
-        $dir = $this->option('dir') ?: storage_path('app/backups/estudos');
+        $dir = $this->option('dir') ?: \App\Support\Dados::path('app/backups/estudos');
         if (!is_dir($dir)) {
             mkdir($dir, 0755, true);
         }

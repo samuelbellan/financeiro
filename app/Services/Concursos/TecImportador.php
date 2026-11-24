@@ -123,7 +123,7 @@ class TecImportador
 
         $sha = hash_file('sha256', $arquivo);
         $ext = strtolower(pathinfo($arquivo, PATHINFO_EXTENSION)) ?: 'bin';
-        $dir = storage_path('concursos/imports/' . now()->format('Y-m-d'));
+        $dir = \App\Support\Dados::path('concursos/imports/' . now()->format('Y-m-d'));
         File::ensureDirectoryExists($dir);
         $destino = "{$dir}/{$sha}.{$ext}";
         if (!is_file($destino)) {

@@ -74,7 +74,7 @@ class BackupConcursosCommand extends Command
     /** Copia para o Drive os arquivos de origem que ainda não estão lá (nunca apaga nada no destino). */
     private function espelharImports(string $destino): int
     {
-        $origem = storage_path('concursos/imports');
+        $origem = \App\Support\Dados::path('concursos/imports');
         if (!is_dir($origem)) {
             return 0;
         }
