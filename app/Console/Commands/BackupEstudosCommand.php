@@ -12,18 +12,17 @@ use Illuminate\Support\Facades\DB;
 class BackupEstudosCommand extends Command
 {
     protected $signature = 'estudos:backup
-                            {--connection= : Conexão de origem (padrão: a nuvem, se CLOUD_DATABASE_URL existir; senão o banco local)}
+                            {--connection= : Conexão de origem dos dados (padrão: o banco do app)}
                             {--keep=30 : Quantos backups manter}
                             {--dir= : Pasta de destino (padrão: storage/app/backups/estudos)}';
 
-    protected $description = 'Faz backup (JSON) dos dados do módulo de estudos: da nuvem, se configurada, ou do banco local.';
+    protected $description = 'Faz backup (JSON) dos dados do módulo de estudos (banco do app) na pasta de arquivos.';
 
     public const TABLES = ['study_subjects', 'study_sessions', 'study_settings', 'study_ddays'];
 
     public function handle(): int
     {
-        // Sem nuvem configurada (CLOUD_DATABASE_URL vazio), os estudos vivem no banco local.
-        $connection = $this->option('connection') ?: (empty(config('database.connections.pgsql_cloud.url')) ? config('database.default') : 'pgsql_cloud');
+        $connection = $this->option('connection') ?: config('database.default');
 
         try {
             $db = DB::connection($connection);

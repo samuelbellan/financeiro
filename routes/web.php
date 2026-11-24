@@ -15,7 +15,6 @@ use App\Http\Controllers\StudyRoomsController;
 use App\Http\Controllers\SalaryController;
 use App\Http\Controllers\MercadoController;
 use App\Http\Controllers\TreinosController;
-use App\Http\Controllers\DatabaseSyncController;
 use App\Http\Controllers\Api\TvWidgetController;
 
 Route::get('/', function () {
@@ -79,8 +78,6 @@ Route::middleware(['auth', 'modulos'])->group(function () {
     // Sincronização Nuvem Neon
     // Só o dono: a sincronização lê e grava o banco inteiro, de todos os usuários.
     Route::middleware('owner')->group(function () {
-        Route::get('/sync/status', [DatabaseSyncController::class, 'status'])->name('sync.status');
-        Route::post('/sync/run', [DatabaseSyncController::class, 'sync'])->name('sync.run');
     });
     
     // Finanças de Casa & Supermercado

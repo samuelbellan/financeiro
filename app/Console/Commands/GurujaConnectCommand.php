@@ -5,7 +5,6 @@ namespace App\Console\Commands;
 use App\Models\User;
 use App\Services\GurujaMcpService;
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 class GurujaConnectCommand extends Command
@@ -14,11 +13,9 @@ class GurujaConnectCommand extends Command
                             {--user= : ID do usuário local (padrão: primeiro usuário)}
                             {--port=8765 : Porta local temporária em 127.0.0.1 para o callback OAuth}
                             {--timeout=180 : Tempo máximo de espera pelo login no navegador (em segundos)}
-                            {--local-only : Salva apenas no banco local, sem enviar para o banco da nuvem (pgsql_cloud)}
-                            {--cloud-only : Salva apenas no banco da nuvem (pgsql_cloud)}
                             {--no-sync : Não executa uma sincronização de teste após conectar}';
 
-    protected $description = 'Conecta a conta da Guruja via OAuth PKCE (callback em 127.0.0.1) e grava os tokens no app (local e nuvem).';
+    protected $description = 'Conecta a conta da Guruja via OAuth PKCE (callback em 127.0.0.1) e grava os tokens no banco do app.';
 
     public function handle(GurujaMcpService $mcpService): int
     {
@@ -103,37 +100,15 @@ class GurujaConnectCommand extends Command
         $hasRefresh = !empty($tokenData['refresh_token']);
         $this->info('✓ Tokens recebidos com sucesso! (refresh_token: ' . ($hasRefresh ? 'sim' : 'não') . ', expira em ' . $tokenData['expires_in'] . 's)');
 
-        // 5. Persistir localmente
-        if (!$this->option('cloud-only')) {
-            $mcpService->saveTokens($localUserId, $tokenData);
-            $this->info("✓ Token salvo no banco local (user_id={$localUserId}).");
-        }
+        // 5. Persistir no banco do app
+        $mcpService->saveTokens($localUserId, $tokenData);
+        $this->info("✓ Token salvo no banco (user_id={$localUserId}).");
 
-        // 6. Persistir na nuvem (pgsql_cloud / Render), se configurada
-        $cloudSaved = false;
-        $cloudUserId = null;
-        if (!$this->option('local-only') && $this->hasCloudDatabase()) {
-            try {
-                $cloudUserId = $this->resolveCloudUserId($localUser?->email, $localUserId);
-                $mcpService->saveTokens($cloudUserId, $tokenData, 'pgsql_cloud');
-                $cloudSaved = true;
-                $this->info("✓ Token salvo no banco da nuvem / Render (pgsql_cloud, user_id={$cloudUserId}).");
-            } catch (\Throwable $e) {
-                $this->warn('Não foi possível salvar o token em pgsql_cloud: ' . $e->getMessage());
-            }
-        }
-
-        // 7. Testar sincronização real imediatamente
+        // 6. Testar sincronização real imediatamente
         if (!$this->option('no-sync')) {
             $this->info('Testando leitura da meta atual direto no MCP da Guruja...');
             try {
-                $meta = $this->option('cloud-only') && $cloudSaved && $cloudUserId
-                    ? $mcpService->fetchCurrentMeta($cloudUserId, 'pgsql_cloud')
-                    : $mcpService->fetchCurrentMeta($localUserId);
-
-                if (!$this->option('cloud-only') && $cloudSaved && $cloudUserId) {
-                    $mcpService->saveMetaToDatabase($cloudUserId, $meta, now(), 'pgsql_cloud');
-                }
+                $meta = $mcpService->fetchCurrentMeta($localUserId);
 
                 $ordem = $meta['ordem'] ?? '?';
                 $total = count($meta['atividades'] ?? []);
@@ -256,24 +231,5 @@ class GurujaConnectCommand extends Command
         } catch (\Throwable) {
             // Se falhar, a URL já está impressa no terminal
         }
-    }
-
-    protected function hasCloudDatabase(): bool
-    {
-        return !empty(env('CLOUD_DATABASE_URL')) || !empty(env('DATABASE_URL'));
-    }
-
-    protected function resolveCloudUserId(?string $email, int $fallbackId): int
-    {
-        if ($email) {
-            $id = DB::connection('pgsql_cloud')->table('users')->where('email', $email)->value('id');
-            if ($id) {
-                return (int) $id;
-            }
-        }
-
-        $firstId = DB::connection('pgsql_cloud')->table('users')->orderBy('id')->value('id');
-
-        return $firstId ? (int) $firstId : $fallbackId;
     }
 }

@@ -23,14 +23,14 @@ class ResumoEstudosCommand extends Command
                             {--comparar-inicio= : Início do período de comparação (padrão: mesmo tamanho, logo antes)}
                             {--comparar-fim= : Fim do período de comparação}
                             {--usuario= : E-mail ou id do usuário (padrão: o dono do sistema)}
-                            {--connection= : Conexão de origem (padrão: a nuvem, se CLOUD_DATABASE_URL existir; senão o banco local)}
+                            {--connection= : Conexão de origem dos dados (padrão: o banco do app)}
                             {--saida= : Arquivo onde gravar o JSON (padrão: imprime na tela)}';
 
     protected $description = 'Gera o resumo (JSON) de um dia ou período de estudo para as mídias do Instagram.';
 
     public function handle(): int
     {
-        $connection = $this->option('connection') ?: (empty(config('database.connections.pgsql_cloud.url')) ? config('database.default') : 'pgsql_cloud');
+        $connection = $this->option('connection') ?: config('database.default');
 
         try {
             $db = DB::connection($connection);
