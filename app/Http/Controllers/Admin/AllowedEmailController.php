@@ -7,6 +7,8 @@ use App\Models\AllowedGoogleEmail;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rules\Password;
 
 class AllowedEmailController extends Controller
 {
@@ -95,5 +97,79 @@ class AllowedEmailController extends Controller
         return back()->with('success', $user->is_admin
             ? "{$user->name} agora é gestor: pode convidar usuários e criar e gerenciar salas."
             : "{$user->name} deixou de ser gestor.");
+    }
+
+    /**
+     * Cadastra o usuário já com uma senha definida pelo gestor. Ele troca a senha no primeiro acesso
+     * e continua podendo entrar com o Google, pois o e-mail também entra na lista de autorizados.
+     */
+    public function storeUsuario(Request $request)
+    {
+        if (!Auth::user()?->is_admin) {
+            abort(403, 'Acesso restrito ao administrador do sistema.');
+        }
+
+        $request->merge(['email' => strtolower(trim((string) $request->input('email')))]);
+
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'max:100'],
+            'email' => ['required', 'email', 'max:255', 'unique:users,email'],
+            'password' => ['required', 'confirmed', Password::min(8)],
+        ], [
+            'email.unique' => 'Já existe um usuário com este e-mail.',
+            'password.confirmed' => 'A confirmação não confere com a senha.',
+        ]);
+
+        $email = $validated['email'];
+
+        $user = User::create([
+            'name' => $validated['name'],
+            'email' => $email,
+            'password' => Hash::make($validated['password']),
+            'is_admin' => false,
+        ]);
+        // Convidado novo só enxerga os módulos de estudo; o dono amplia depois se quiser.
+        $user->forceFill([
+            'modulos' => config('modulos.padrao_convidado'),
+            'must_change_password' => true,
+        ])->save();
+
+        AllowedGoogleEmail::firstOrCreate(
+            ['email' => $email],
+            ['nome' => $validated['name'], 'created_by' => Auth::id()]
+        );
+
+        return back()->with('success', "Usuário '{$email}' criado. Ele deve trocar a senha no primeiro acesso.");
+    }
+
+    /**
+     * Define uma nova senha para um usuário (ex.: quem esqueceu). Ele é obrigado a trocá-la no próximo acesso.
+     * Gestores não redefinem senha de outros gestores nem do dono; só o dono faz isso.
+     */
+    public function definirSenha(Request $request, User $user)
+    {
+        $admin = Auth::user();
+        if (!$admin?->is_admin) {
+            abort(403, 'Acesso restrito ao administrador do sistema.');
+        }
+        if ($user->id === $admin->id) {
+            return back()->with('info', 'Para trocar a sua senha, use "Alterar minha senha".');
+        }
+        if (($user->is_owner || $user->is_admin) && !$admin->is_owner) {
+            abort(403, 'Só o dono do sistema pode redefinir a senha de um gestor.');
+        }
+
+        $validated = $request->validate([
+            'password' => ['required', 'confirmed', Password::min(8)],
+        ], [
+            'password.confirmed' => 'A confirmação não confere com a senha.',
+        ]);
+
+        $user->forceFill([
+            'password' => Hash::make($validated['password']),
+            'must_change_password' => true,
+        ])->save();
+
+        return back()->with('success', "Senha de {$user->name} definida. Ela deve trocá-la no próximo acesso.");
     }
 }
