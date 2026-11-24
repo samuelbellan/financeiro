@@ -8,6 +8,8 @@ const chaveUltimo = `livro-ultimo-${dados.livro?.id}`;
 montarSumario();
 montarBusca();
 montarGaveta();
+montarRecolher();
+montarIndice();
 
 if (dados.editor) {
     montarCapitulo();
@@ -215,8 +217,62 @@ function montarBusca() {
         if (e.key === '/' && !e.target.closest('input, textarea, [contenteditable=true]') && !document.body.classList.contains('editando')) {
             e.preventDefault();
             document.body.classList.add('gaveta-aberta');
+            document.body.classList.remove('lateral-recolhida');
             campo.focus();
         }
+    });
+}
+
+/** Sumário lateral recolhível no desktop (modo foco). O estado fica no navegador. */
+function montarRecolher() {
+    document.querySelectorAll('[data-recolher]').forEach(b => b.addEventListener('click', () => {
+        const recolhida = document.body.classList.toggle('lateral-recolhida');
+        guardar('livro-lateral-recolhida', recolhida ? '1' : null);
+    }));
+}
+
+/**
+ * Sumário da capa: ordenar (ordem do livro, mais erros, mais questões) e filtrar (todos, com
+ * erros, sem erros). Fora da ordem do livro a lista fica plana, sem recuo por nível.
+ */
+function montarIndice() {
+    const lista = document.querySelector('[data-indice]');
+    if (!lista) return;
+    const itens = [...lista.children];
+    const vazio = document.querySelector('[data-indice-vazio]');
+    const estadoIndice = { ordem: 'ordem', filtro: 'todos' };
+    const num = (li, k) => Number(li.dataset[k]);
+
+    const aplicar = () => {
+        const { ordem, filtro } = estadoIndice;
+        const ordenados = ordem === 'ordem'
+            ? [...itens].sort((a, b) => num(a, 'ordem') - num(b, 'ordem'))
+            : [...itens].sort((a, b) => num(b, ordem) - num(a, ordem) || num(a, 'ordem') - num(b, 'ordem'));
+        lista.replaceChildren(...ordenados);
+        lista.classList.toggle('plano', ordem !== 'ordem');
+        let visiveis = 0;
+        for (const li of itens) {
+            const erros = num(li, 'erros');
+            li.hidden = (filtro === 'erros' && !erros) || (filtro === 'limpos' && erros > 0);
+            if (!li.hidden) visiveis++;
+        }
+        if (vazio) vazio.hidden = visiveis > 0;
+        document.querySelectorAll('[data-ordenar]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.ordenar === ordem)));
+        document.querySelectorAll('[data-filtro]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.filtro === filtro)));
+        document.querySelectorAll('[data-filtro-atalho]').forEach(b => b.setAttribute('aria-pressed', String(filtro !== 'todos' && b.dataset.filtroAtalho === filtro)));
+    };
+
+    document.addEventListener('click', e => {
+        const b = e.target.closest('[data-ordenar], [data-filtro], [data-filtro-atalho]');
+        if (!b) return;
+        if (b.dataset.ordenar) estadoIndice.ordem = b.dataset.ordenar;
+        if (b.dataset.filtro) estadoIndice.filtro = b.dataset.filtro;
+        if (b.dataset.filtroAtalho) {
+            estadoIndice.filtro = b.dataset.filtroAtalho;
+            if (estadoIndice.filtro === 'erros') estadoIndice.ordem = 'erros';
+            lista.closest('.card')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+        aplicar();
     });
 }
 

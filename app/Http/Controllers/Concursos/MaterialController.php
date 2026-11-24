@@ -29,7 +29,19 @@ class MaterialController extends Controller
         $capitulos = MaterialCapitulo::whereIn('material_id', $materiais->pluck('id'))
             ->whereNull('parent_id')->selectRaw('material_id, count(*) as n')->groupBy('material_id')->pluck('n', 'material_id');
 
-        return view('concursos.material.index', compact('materiais', 'contagens', 'capitulos'));
+        // Fila "para revisar agora": capítulos de todos os livros com pontos ainda em erro ou em revisão.
+        $fila = MaterialCapitulo::whereIn('material_id', $materiais->pluck('id'))
+            ->withCount([
+                'pontos as errando' => fn ($q) => $q->where('status', 'errando'),
+                'pontos as revisando' => fn ($q) => $q->where('status', 'revisando'),
+            ])
+            ->get(['id', 'material_id', 'titulo'])
+            ->filter(fn ($c) => $c->errando + $c->revisando > 0)
+            ->sortBy([['errando', 'desc'], ['revisando', 'desc']])
+            ->take(6)
+            ->values();
+
+        return view('concursos.material.index', compact('materiais', 'contagens', 'capitulos', 'fila'));
     }
 
     public function store(Request $request): RedirectResponse
