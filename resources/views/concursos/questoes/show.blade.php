@@ -187,14 +187,17 @@
             @endif
             @if ($res)
                 <h2>Resolução</h2>
-                <p style="margin:0">{{ $res->resumo }}</p>
+                @if ($res->fonte === 'tec')
+                    <p class="small muted" style="margin:0 0 8px">Comentário {{ $res->autor ? 'do prof. ' . $res->autor : 'de professor' }} no TEC Concursos.</p>
+                @endif
+                <p style="margin:0;white-space:pre-line">{{ $res->resumo }}</p>
                 @if ($res->fundamentacao)
                     <details><summary>Fundamentação completa</summary><div class="fund">{{ $res->fundamentacao }}</div></details>
                 @endif
                 @if ($cls?->temFlag('ilegivel'))
                     <div class="alerta">A resolução foi escrita sem a figura: confira no TEC.</div>
                 @endif
-                @if ($q->urlTec())
+                @if ($q->urlTec() && $res->fonte !== 'tec')
                     <p class="small muted" style="margin:12px 0 0">Resolução gerada por IA a partir do gabarito oficial. Viu algum erro? <a href="{{ $q->urlTec() }}" target="_blank" rel="noopener">Compare com os comentários do TEC</a>.</p>
                 @endif
             @else

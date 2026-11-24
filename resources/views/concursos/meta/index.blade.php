@@ -268,7 +268,7 @@
                 @if ($a->status === 'pendente')
                     <div class="botoes">
                         @if ($a->questao_ids)
-                            <a class="btn main" href="{{ route('concursos.questoes.resolver', ['atividade' => $a->id]) }}">{{ $x['feitas'] ? 'Continuar' : 'Começar' }}</a>
+                            <a class="btn main" href="{{ route('concursos.questoes.resolver', ['atividade' => $a->id]) }}" data-cronometro="{{ $cronometro($a) }}" title="Abre as questões e liga o cronômetro do /estudos nesta matéria">{{ $x['feitas'] ? 'Continuar' : 'Começar' }}</a>
                         @else
                             <form method="POST" action="{{ route('concursos.meta.feita', $a) }}">@csrf<button class="btn main">Estudei a teoria</button></form>
                         @endif
@@ -330,8 +330,18 @@
         @if ($ritmo['calibrado'])
             Ritmo usado na meta: {{ number_format($ritmo['valor'], 1, ',', '') }} min por questão, medido pelo seu cronômetro em {{ $ritmo['amostras'] }} atividades.
         @else
-            Ritmo usado na meta: {{ number_format($ritmo['valor'], 1, ',', '') }} min por questão (padrão). Use ⏱ Cronometrar: depois de 3 atividades a meta se ajusta ao seu ritmo.
+            Ritmo usado na meta: {{ number_format($ritmo['valor'], 1, ',', '') }} min por questão (padrão). O cronômetro do /estudos liga sozinho ao clicar em Começar (ou use ⏱ Cronometrar): depois de 3 atividades cronometradas a meta se ajusta ao seu ritmo.
         @endif
         @unless ($tempoLigado) <br>Para o tempo voltar do /estudos, defina CONCURSOS_ESTUDOS_TOKEN no .env deste PC. @endunless
     </p>
+@endsection
+
+@section('js')
+<script>
+// Começar/Continuar questões já liga o cronômetro do /estudos (na aba "estudos") e segue para as questões aqui.
+document.querySelectorAll('a[data-cronometro]').forEach((a) => a.addEventListener('click', (e) => {
+    if (e.ctrlKey || e.metaKey || e.shiftKey || e.button !== 0) return;
+    window.open(a.dataset.cronometro, 'estudos');
+}));
+</script>
 @endsection
