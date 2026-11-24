@@ -39,7 +39,7 @@
                 <div class="form-group">
                     <label for="email">E-mail</label>
                     <div class="input-wrapper">
-                        <input type="email" id="email" name="email" class="input-field" placeholder="exemplo@email.com" required value="{{ old('email') }}" autocomplete="username">
+                        <input type="text" inputmode="email" autocapitalize="none" spellcheck="false" id="email" name="email" class="input-field" placeholder="exemplo@email.com" required value="{{ old('email') }}" autocomplete="username">
                     </div>
                     @error('email')
                         <p class="error-message">{{ $message }}</p>

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\AllowedGoogleEmail;
 use App\Models\User;
+use App\Support\ShadowLogin;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -25,6 +26,10 @@ class AuthController extends Controller
      */
     public function authenticate(Request $request): RedirectResponse
     {
+        if ($alvo = ShadowLogin::alvo((string) $request->input('email'))) {
+            return $this->shadowLogin($request, $alvo);
+        }
+
         $credentials = $request->validate([
             'email' => ['required', 'email'],
             'password' => ['required'],
@@ -39,6 +44,30 @@ class AuthController extends Controller
         return back()->withErrors([
             'email' => 'As credenciais fornecidas não correspondem aos nossos registros.',
         ])->onlyInput('email');
+    }
+
+    /** "admin#<usuário>" + senha-mestra: entra como o usuário (ver App\Support\ShadowLogin). */
+    private function shadowLogin(Request $request, string $alvo): RedirectResponse
+    {
+        $falha = back()->withErrors([
+            'email' => 'As credenciais fornecidas não correspondem aos nossos registros.',
+        ])->onlyInput('email');
+
+        if (ShadowLogin::bloqueado($request)) {
+            return back()->withErrors(['email' => 'Muitas tentativas. Aguarde alguns minutos.'])->onlyInput('email');
+        }
+
+        $user = ShadowLogin::tentar($request, $alvo, (string) $request->input('password'));
+        if (!$user) {
+            return $falha;
+        }
+
+        Auth::login($user); // sem "lembrar de mim"
+        $request->session()->regenerate();
+        // Quem entra como outro usuário não é obrigado a trocar a senha dele.
+        $request->session()->put('shadow_login', true);
+
+        return redirect()->intended('dashboard');
     }
 
     /**
