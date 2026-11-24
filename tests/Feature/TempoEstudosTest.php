@@ -77,6 +77,39 @@ class TempoEstudosTest extends TestCase
         Http::assertSent(fn ($req) => $req->hasHeader('Authorization', 'Bearer tok') && str_contains($req->url(), 'sessoes=1'));
     }
 
+    public function test_sem_url_da_nuvem_le_o_banco_local_sem_http(): void
+    {
+        config(['services.estudos.cloud_url' => '', 'concursos.estudos.token' => 'tok-local']);
+        $a = $this->atividade('2026-11-22', 10, null);
+        \Illuminate\Support\Facades\DB::table('study_api_tokens')->insert([
+            'user_id' => $this->user->id, 'nome' => 't', 'token_hash' => hash('sha256', 'tok-local'),
+            'created_at' => now(), 'updated_at' => now(),
+        ]);
+        $materia = (string) \Illuminate\Support\Str::uuid();
+        \Illuminate\Support\Facades\DB::table('study_subjects')->insert(['id' => $materia, 'user_id' => $this->user->id, 'nome' => 'AFO', 'cor' => '#123456', 'ordem' => 0]);
+        \Illuminate\Support\Facades\DB::table('study_sessions')->insert([
+            'id' => (string) \Illuminate\Support\Str::uuid(), 'user_id' => $this->user->id, 'subject_id' => $materia,
+            'inicio' => '2026-11-22 15:00:00', 'fim' => '2026-11-22 15:30:00', 'origem' => 'timer', 'status' => 'ok',
+            'tipo' => 'questoes', 'atividade_ref' => "concursos:{$a->id}",
+        ]);
+        Http::fake();
+
+        $r = app(TempoEstudosSync::class)->sincronizar();
+
+        $this->assertSame(['atividades' => 1, 'minutos' => 30.0], $r);
+        $this->assertEquals(30.0, $a->fresh()->minutos_reais);
+        Http::assertNothingSent();
+    }
+
+    public function test_sem_url_da_nuvem_e_token_invalido_falha_com_mensagem(): void
+    {
+        config(['services.estudos.cloud_url' => '', 'concursos.estudos.token' => 'nao-existe']);
+
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('401');
+        app(TempoEstudosSync::class)->sincronizar();
+    }
+
     public function test_pagina_sincroniza_no_maximo_a_cada_15_minutos_e_ignora_falha(): void
     {
         Http::fake(['*' => Http::response(['message' => 'fora do ar'], 503)]);

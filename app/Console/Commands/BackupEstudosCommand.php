@@ -12,24 +12,18 @@ use Illuminate\Support\Facades\DB;
 class BackupEstudosCommand extends Command
 {
     protected $signature = 'estudos:backup
-                            {--connection=pgsql_cloud : Conexão de origem dos dados}
+                            {--connection= : Conexão de origem (padrão: a nuvem, se CLOUD_DATABASE_URL existir; senão o banco local)}
                             {--keep=30 : Quantos backups manter}
                             {--dir= : Pasta de destino (padrão: storage/app/backups/estudos)}';
 
-    protected $description = 'Faz backup local (JSON) dos dados do módulo de estudos que ficam na nuvem.';
+    protected $description = 'Faz backup (JSON) dos dados do módulo de estudos: da nuvem, se configurada, ou do banco local.';
 
     public const TABLES = ['study_subjects', 'study_sessions', 'study_settings', 'study_ddays'];
 
     public function handle(): int
     {
-        $connection = $this->option('connection');
-
-        // Sem conexão com a nuvem configurada no .env, não há de onde copiar: sai sem erro
-        // (o iniciar.bat chama este comando a cada inicialização).
-        if ($connection === 'pgsql_cloud' && empty(config('database.connections.pgsql_cloud.url'))) {
-            $this->warn('CLOUD_DATABASE_URL não configurada no .env: backup automático ignorado. Use "Exportar backup" no app de estudos.');
-            return self::SUCCESS;
-        }
+        // Sem nuvem configurada (CLOUD_DATABASE_URL vazio), os estudos vivem no banco local.
+        $connection = $this->option('connection') ?: (empty(config('database.connections.pgsql_cloud.url')) ? config('database.default') : 'pgsql_cloud');
 
         try {
             $db = DB::connection($connection);
@@ -38,7 +32,7 @@ class BackupEstudosCommand extends Command
                 $data[$table] = $db->table($table)->get()->map(fn ($row) => (array) $row)->all();
             }
         } catch (\Throwable $e) {
-            $this->error('Não foi possível ler os estudos da nuvem: ' . $e->getMessage());
+            $this->error('Não foi possível ler os estudos: ' . $e->getMessage());
             return self::FAILURE;
         }
 

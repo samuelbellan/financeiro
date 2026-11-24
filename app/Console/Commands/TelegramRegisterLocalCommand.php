@@ -14,7 +14,7 @@ class TelegramRegisterLocalCommand extends Command
      */
     protected $signature = 'telegram:register-local
                             {url? : URL pública do seu projeto local (ex: https://unfrosted-surreal-ducky.ngrok-free.dev)}
-                            {--cloud= : URL do projeto na Nuvem (padrão: env CLOUD_APP_URL ou https://financeiro-app-mrik.onrender.com)}';
+                            {--cloud= : URL do projeto na Nuvem (padrão: CLOUD_APP_URL; vazio = sem nuvem, nada a registrar)}';
 
     /**
      * A descrição do comando.
@@ -35,7 +35,13 @@ class TelegramRegisterLocalCommand extends Command
             return 1;
         }
 
-        $cloudUrl = $this->option('cloud') ?: env('CLOUD_APP_URL', 'https://financeiro-app-mrik.onrender.com');
+        $cloudUrl = $this->option('cloud') ?: config('services.estudos.cloud_url');
+        if (empty($cloudUrl)) {
+            $this->info('Sem nuvem configurada (CLOUD_APP_URL vazio): o webhook do Telegram deve apontar direto para este servidor.');
+            $this->line('Use: php artisan telegram:set-webhook <URL pública>/webhook/telegram');
+
+            return 0;
+        }
         $endpoint = rtrim($cloudUrl, '/') . '/webhook/telegram/register-local';
         $secret = config('telegram.webhook_secret');
 

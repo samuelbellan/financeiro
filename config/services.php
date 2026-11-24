@@ -52,7 +52,8 @@ return [
     ],
 
     'estudos' => [
-        'cloud_url' => env('CLOUD_APP_URL', 'https://financeiro-app-mrik.onrender.com'),
+        // Vazio = o /estudos roda neste mesmo servidor (sem nuvem): não redireciona e lê os dados direto do banco.
+        'cloud_url' => env('CLOUD_APP_URL'),
     ],
 
     'google' => [
