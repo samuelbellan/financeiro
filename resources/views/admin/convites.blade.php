@@ -25,6 +25,29 @@
             gap: 1rem;
             align-items: flex-end;
         }
+        .form-grid-usuario {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+        .form-grid-usuario .full {
+            grid-column: 1 / -1;
+        }
+        .senha-reset summary {
+            cursor: pointer;
+            color: #60a5fa;
+            font-size: 0.8rem;
+            list-style: none;
+        }
+        .senha-reset form {
+            display: grid;
+            gap: 0.5rem;
+            margin-top: 0.6rem;
+            min-width: 220px;
+        }
+        @media (max-width: 640px) {
+            .form-grid-usuario { grid-template-columns: 1fr; }
+        }
         @media (max-width: 640px) {
             .form-inline-convite {
                 grid-template-columns: 1fr;
@@ -231,6 +254,39 @@
                         </form>
                     </div>
 
+                    <div class="form-card">
+                        <h3 style="margin-bottom: 0.5rem;">Criar Usuário com Senha</h3>
+                        <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1.25rem;">
+                            Cria a conta já com uma senha provisória. No primeiro acesso a pessoa troca a senha. O e-mail também fica autorizado para entrar com o Google.
+                        </p>
+
+                        <form action="{{ route('admin.usuarios.store') }}" method="POST" class="form-grid-usuario">
+                            @csrf
+                            <div class="form-group">
+                                <label for="novo_name">Nome *</label>
+                                <input type="text" id="novo_name" name="name" class="form-control" value="{{ old('name') }}" required maxlength="100">
+                            </div>
+                            <div class="form-group">
+                                <label for="novo_email">E-mail *</label>
+                                <input type="email" id="novo_email" name="email" class="form-control" value="{{ old('email') }}" placeholder="pessoa@exemplo.com" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="novo_password">Senha provisória (mín. 8) *</label>
+                                <input type="password" id="novo_password" name="password" class="form-control" required minlength="8" autocomplete="new-password">
+                            </div>
+                            <div class="form-group">
+                                <label for="novo_password_confirmation">Confirmar senha *</label>
+                                <input type="password" id="novo_password_confirmation" name="password_confirmation" class="form-control" required minlength="8" autocomplete="new-password">
+                            </div>
+                            <div class="full">
+                                <button type="submit" class="btn-add">+ Criar usuário</button>
+                            </div>
+                        </form>
+                        @if($errors->any())
+                            <p style="color: #f87171; font-size: 0.85rem; margin-top: 1rem;">{{ $errors->first() }}</p>
+                        @endif
+                    </div>
+
                     <div class="table-card">
                         <table class="table">
                             <thead>
@@ -290,6 +346,7 @@
                                 <tr>
                                     <th>Usuário</th>
                                     <th>Função</th>
+                                    <th>Senha</th>
                                     <th style="text-align: right;">Ações</th>
                                 </tr>
                             </thead>
@@ -298,6 +355,21 @@
                                     <tr>
                                         <td><b>{{ $user->name }}</b><br><span style="color: var(--text-muted); font-size: 0.8rem;">{{ $user->email }}</span></td>
                                         <td style="color: var(--text-muted);">{{ $user->is_owner ? 'Dono' : ($user->is_admin ? 'Gestor' : 'Usuário') }}</td>
+                                        <td>
+                                            @if($user->id !== auth()->id() && (!($user->is_owner || $user->is_admin) || auth()->user()->is_owner))
+                                                <details class="senha-reset">
+                                                    <summary>Definir nova senha</summary>
+                                                    <form action="{{ route('admin.usuarios.senha', $user->id) }}" method="POST">
+                                                        @csrf
+                                                        <input type="password" name="password" class="form-control" placeholder="Nova senha (mín. 8)" required minlength="8" autocomplete="new-password">
+                                                        <input type="password" name="password_confirmation" class="form-control" placeholder="Confirmar senha" required minlength="8" autocomplete="new-password">
+                                                        <button type="submit" class="btn-add" style="height: auto; padding: 0.4rem 0.8rem; font-size: 0.8rem;">Salvar senha</button>
+                                                    </form>
+                                                </details>
+                                            @else
+                                                <span style="color: var(--text-muted); font-size: 0.8rem;">—</span>
+                                            @endif
+                                        </td>
                                         <td style="text-align: right;">
                                             @if(auth()->user()->is_owner && !$user->is_owner)
                                                 <form action="{{ route('admin.usuarios.gestor', $user->id) }}" method="POST" style="display: inline;"

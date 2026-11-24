@@ -59,6 +59,12 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 Route::get('/auth/google', [AuthController::class, 'redirectToGoogle'])->name('auth.google');
 Route::get('/auth/google/callback', [AuthController::class, 'handleGoogleCallback'])->name('auth.google.callback');
 
+// Troca de senha da própria conta (também para quem tem senha provisória).
+Route::middleware('auth')->group(function () {
+    Route::get('/conta/senha', [\App\Http\Controllers\ContaController::class, 'senhaForm'])->name('conta.senha');
+    Route::post('/conta/senha', [\App\Http\Controllers\ContaController::class, 'senhaSalvar'])->name('conta.senha.salvar');
+});
+
 Route::middleware(['auth', 'modulos'])->group(function () {
     Route::get('/home', [HomeController::class, 'index'])->name('home');
 
@@ -66,6 +72,8 @@ Route::middleware(['auth', 'modulos'])->group(function () {
     Route::get('/admin/convites', [\App\Http\Controllers\Admin\AllowedEmailController::class, 'index'])->name('admin.convites');
     Route::post('/admin/convites', [\App\Http\Controllers\Admin\AllowedEmailController::class, 'store'])->name('admin.convites.store');
     Route::delete('/admin/convites/{id}', [\App\Http\Controllers\Admin\AllowedEmailController::class, 'destroy'])->name('admin.convites.destroy');
+    Route::post('/admin/usuarios', [\App\Http\Controllers\Admin\AllowedEmailController::class, 'storeUsuario'])->name('admin.usuarios.store');
+    Route::post('/admin/usuarios/{user}/senha', [\App\Http\Controllers\Admin\AllowedEmailController::class, 'definirSenha'])->name('admin.usuarios.senha');
     Route::post('/admin/usuarios/{user}/gestor', [\App\Http\Controllers\Admin\AllowedEmailController::class, 'toggleManager'])->name('admin.usuarios.gestor');
 
     // Sincronização Nuvem Neon

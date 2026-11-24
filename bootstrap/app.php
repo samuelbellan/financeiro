@@ -16,6 +16,8 @@ return Application::configure(basePath: dirname(__DIR__))
             'owner' => \App\Http\Middleware\EnsureUserIsOwner::class,
             'modulos' => \App\Http\Middleware\EnsureModuloPermitido::class,
         ]);
+        // Senha provisória (definida pelo gestor): só deixa trocar a senha até concluir.
+        $middleware->appendToGroup('web', \App\Http\Middleware\EnsureSenhaAtualizada::class);
         $middleware->validateCsrfTokens(except: [
             'webhook/whatsapp',
             'webhook/telegram',
