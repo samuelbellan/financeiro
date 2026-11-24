@@ -31,6 +31,14 @@ class Material extends ConcursosModel
         return $this->hasMany(MaterialCapitulo::class)->orderBy('ordem')->orderBy('id');
     }
 
+    /** Cor de destaque do livro na estante: fixa por id, sem coluna no banco. */
+    public function cor(): string
+    {
+        $cores = ['#7f77dd', '#1d9e75', '#d85a30', '#378add', '#d4537e', '#ba7517', '#5f9ea0', '#8e6cc7'];
+
+        return $cores[$this->id % count($cores)];
+    }
+
     /** Pontos de erro do material: os do livro (capítulo) e os que ainda só estão numa seção de caderno. */
     public static function pontosDe(array|int $materialIds): Builder
     {

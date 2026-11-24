@@ -3,44 +3,129 @@
 @section('title', 'Resumos')
 
 @section('css')
-    .lista { display: grid; gap: 12px; }
-    .mat { display: block; text-decoration: none; color: inherit; }
-    .mat h2 { font-size: 18px; margin: 0 0 4px; color: var(--ink); }
-    .mat .nums { display: flex; gap: 12px; flex-wrap: wrap; font-size: 14px; color: var(--muted); margin-top: 8px; }
-    .mat .nums b { font-variant-numeric: tabular-nums; }
-    .mat .err b { color: var(--no); }
-    .mat .dom b { color: var(--ok); }
-    .form { display: flex; gap: 8px; flex-wrap: wrap; }
-    .form input { flex: 1; min-width: 200px; border: 1px solid var(--line); background: var(--bg); color: var(--ink); border-radius: 10px; padding: 10px 12px; font: inherit; }
+    @include('concursos.material._estilo')
+    .intro { margin: 0 0 20px; }
+
+    /* fila de revisão */
+    .fila { padding: 8px; }
+    .fila .secao-titulo { padding: 10px 10px 0; }
+    .fila-item { display: flex; align-items: center; gap: 12px; padding: 10px; border-radius: 10px; text-decoration: none; color: var(--ink); }
+    .fila-item:hover, .fila-item:focus-visible { background: var(--accent-soft); outline: none; }
+    .fila-item .etq { min-width: 34px; justify-content: center; }
+    .fila-texto { flex: 1; min-width: 0; }
+    .fila-texto b { display: block; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .fila-texto span { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--muted); }
+    .ponto-cor { width: 8px; height: 8px; border-radius: 50%; flex: none; }
+    .fila-ir { font-size: 13px; font-weight: 600; color: var(--accent); white-space: nowrap; }
+    .fila-vazia { display: flex; align-items: center; gap: 10px; padding: 6px 10px 10px; color: var(--muted); font-size: 14px; }
+
+    /* estante */
+    .estante { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+    .livro-card { display: flex; flex-direction: column; gap: 10px; margin: 0; text-decoration: none; color: inherit; border-left: 4px solid var(--cor); padding: 18px 20px; }
+    .livro-card h3 { font-size: 16px; margin: 0; color: var(--ink); line-height: 1.35; }
+    .livro-card .desc { font-size: 13px; color: var(--muted); margin: -6px 0 0; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .livro-card .etqs { display: flex; gap: 6px; flex-wrap: wrap; }
+    .livro-card .rodape { display: flex; justify-content: space-between; font-size: 13px; color: var(--muted); margin-top: auto; }
+    .livro-vazio { grid-column: 1 / -1; }
+
+    /* novo livro */
+    dialog.novo-livro { border: 1px solid var(--line); border-radius: 14px; background: var(--card); color: var(--ink); padding: 20px; width: min(440px, calc(100% - 32px)); }
+    dialog.novo-livro::backdrop { background: rgba(0,0,0,.45); }
+    dialog.novo-livro h2 { font-size: 18px; margin: 0 0 4px; }
+    dialog.novo-livro input { width: 100%; border: 1px solid var(--line); background: var(--bg); color: var(--ink); border-radius: 10px; padding: 10px 12px; font: inherit; margin: 12px 0 16px; }
+    dialog.novo-livro input:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+    dialog.novo-livro .acoes { display: flex; justify-content: flex-end; gap: 8px; }
+
+    @media (max-width: 680px) { .estante { grid-template-columns: minmax(0, 1fr); } .fila-ir { display: none; } }
 @endsection
 
 @section('content')
-<div class="top"><h1>Resumos</h1></div>
-<p class="muted small" style="margin-top:-8px">Um livro por matéria, com capítulos por assunto. Escreva, grife, anote na margem e acompanhe os pontos que você ainda erra.</p>
+<div class="cabeca">
+    <h1>Resumos</h1>
+    <button type="button" class="btn main" data-novo-livro>+ Novo livro</button>
+</div>
+<p class="muted small intro">Um livro por matéria, com capítulos por assunto. Escreva, grife, anote na margem e acompanhe os pontos que você ainda erra.</p>
 
-<div class="lista">
+@if ($materiais->isNotEmpty())
+    <section class="card fila" aria-labelledby="fila-titulo">
+        <div class="secao-titulo">
+            <h2 id="fila-titulo">Para revisar agora</h2>
+            @if ($fila->isNotEmpty())
+                <span class="muted small">{{ $fila->count() }} {{ $fila->count() === 1 ? 'capítulo' : 'capítulos' }} · {{ $fila->sum('errando') }} em erro</span>
+            @endif
+        </div>
+        @forelse ($fila as $f)
+            @php $livro = $materiais->firstWhere('id', $f->material_id); @endphp
+            <a class="fila-item" href="{{ route('concursos.material.capitulo', [$f->material_id, $f->id]) }}">
+                @if ($f->errando)
+                    <span class="etq err" title="pontos que ainda erro">{{ $f->errando }}</span>
+                @else
+                    <span class="etq rev" title="pontos em revisão">{{ $f->revisando }}</span>
+                @endif
+                <span class="fila-texto">
+                    <b>{{ $f->titulo }}</b>
+                    <span><i class="ponto-cor" style="background: {{ $livro->cor() }}"></i>{{ $livro->titulo }}</span>
+                </span>
+                <span class="fila-ir">Revisar →</span>
+            </a>
+        @empty
+            <div class="fila-vazia">Nenhum ponto em erro ou em revisão. Quando marcar um erro no resumo, o capítulo aparece aqui.</div>
+        @endforelse
+    </section>
+@endif
+
+<div class="secao-titulo"><h2>Livros</h2>@if ($materiais->isNotEmpty())<span class="muted small">{{ $materiais->count() }}</span>@endif</div>
+<div class="estante">
     @forelse ($materiais as $m)
-        @php $c = $contagens[$m->id] ?? collect(); @endphp
-        <a class="card mat" href="{{ route('concursos.material.show', $m) }}">
-            <h2>{{ $m->titulo }}</h2>
-            @if ($m->descricao)<div class="muted small">{{ $m->descricao }}</div>@endif
-            <div class="nums">
-                <span><b>{{ $capitulos[$m->id] ?? 0 }}</b> capítulos</span>
-                <span class="err"><b>{{ $c['errando'] ?? 0 }}</b> ainda erro</span>
-                <span><b>{{ $c['revisando'] ?? 0 }}</b> revisando</span>
-                <span class="dom"><b>{{ $c['dominado'] ?? 0 }}</b> dominados</span>
+        @php
+            $c = $contagens[$m->id] ?? collect();
+            $err = $c['errando'] ?? 0; $rev = $c['revisando'] ?? 0; $dom = $c['dominado'] ?? 0;
+            $total = $err + $rev + $dom;
+        @endphp
+        <a class="card livro-card elevar" href="{{ route('concursos.material.show', $m) }}" style="--cor: {{ $m->cor() }}">
+            <h3>{{ $m->titulo }}</h3>
+            @if ($m->descricao)<p class="desc">{{ $m->descricao }}</p>@endif
+            <div class="seg" role="img" aria-label="{{ $err }} ainda erro, {{ $rev }} revisando, {{ $dom }} dominados">
+                @if ($total)
+                    <i class="err" style="width: {{ $err / $total * 100 }}%"></i><i class="rev" style="width: {{ $rev / $total * 100 }}%"></i><i class="dom" style="width: {{ $dom / $total * 100 }}%"></i>
+                @endif
+            </div>
+            <div class="etqs">
+                <span class="etq err">{{ $err }} ainda erro</span>
+                <span class="etq rev">{{ $rev }} revisando</span>
+                <span class="etq dom">{{ $dom }} dominados</span>
+            </div>
+            <div class="rodape">
+                <span>{{ $capitulos[$m->id] ?? 0 }} capítulos</span>
+                @if ($total)<span>{{ round($dom / $total * 100) }}% dominado</span>@endif
             </div>
         </a>
     @empty
-        <div class="card muted">Nenhum livro ainda. Crie um abaixo ou importe os cadernos com <code>php artisan concursos:importar-material</code>.</div>
+        <div class="card muted livro-vazio">Nenhum livro ainda. Crie um em <b>+ Novo livro</b> ou importe os cadernos com <code>php artisan concursos:importar-material</code>.</div>
     @endforelse
 </div>
 
-<div class="card" style="margin-top:16px">
-    <form method="POST" action="{{ route('concursos.material.store') }}" class="form">
+<dialog class="novo-livro" aria-labelledby="novo-livro-titulo">
+    <form method="POST" action="{{ route('concursos.material.store') }}">
         @csrf
-        <input name="titulo" required maxlength="160" placeholder="Novo livro (ex.: Direito Administrativo)" aria-label="Título do novo livro">
-        <button class="btn main" type="submit">Criar livro</button>
+        <h2 id="novo-livro-titulo">Novo livro</h2>
+        <p class="muted small" style="margin:0">Um livro por matéria. Os capítulos você cria depois, por assunto.</p>
+        <input name="titulo" required maxlength="160" placeholder="Direito Administrativo" aria-label="Título do novo livro" autocomplete="off">
+        <div class="acoes">
+            <button type="button" class="btn fantasma" data-fechar>Cancelar</button>
+            <button class="btn main" type="submit">Criar livro</button>
+        </div>
     </form>
-</div>
+</dialog>
+@endsection
+
+@section('js')
+<script>
+    (() => {
+        const dlg = document.querySelector('dialog.novo-livro');
+        document.querySelector('[data-novo-livro]').addEventListener('click', () => { dlg.showModal(); dlg.querySelector('input').focus(); });
+        dlg.querySelector('[data-fechar]').addEventListener('click', () => dlg.close());
+        dlg.addEventListener('click', e => { if (e.target === dlg) dlg.close(); });
+    })();
+</script>
 @endsection

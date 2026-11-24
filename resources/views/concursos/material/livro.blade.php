@@ -22,6 +22,7 @@
 @endphp
 
 @section('css')
+    @include('concursos.material._estilo')
     .wrap { max-width: 1480px; }
     .livro { display: grid; grid-template-columns: 270px minmax(0, 1fr) 250px; gap: 24px; align-items: start; }
     .livro.capa { grid-template-columns: 270px minmax(0, 1fr); }
@@ -31,7 +32,24 @@
     .lat-topo { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
     .lat-topo a { font-weight: 700; color: var(--ink); text-decoration: none; line-height: 1.3; flex: 1; }
     .lat-topo .fechar { display: none; }
-    .busca-livro { width: 100%; border: 1px solid var(--line); background: var(--bg); color: var(--ink); border-radius: 10px; padding: 8px 10px; font: inherit; font-size: 14px; margin-bottom: 10px; }
+    .lat-topo .recolher { padding: 4px 8px; color: var(--muted); }
+    .livro-lateral { scrollbar-width: thin; scrollbar-color: var(--line) transparent; }
+    .livro-lateral::-webkit-scrollbar { width: 8px; }
+    .livro-lateral::-webkit-scrollbar-track { background: transparent; }
+    .livro-lateral::-webkit-scrollbar-thumb { background: var(--line); border-radius: 99px; border: 2px solid var(--card); }
+    .livro-lateral::-webkit-scrollbar-thumb:hover { background: var(--muted); }
+    .busca-caixa { position: relative; margin-bottom: 10px; }
+    .busca-livro { width: 100%; border: 1px solid var(--line); background: var(--bg); color: var(--ink); border-radius: 10px; padding: 8px 34px 8px 10px; font: inherit; font-size: 14px; }
+    .busca-livro:focus { outline: 2px solid var(--accent); outline-offset: 0; border-color: transparent; }
+    .busca-caixa kbd { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); pointer-events: none; font: 600 11px/1 Inter, system-ui, sans-serif; color: var(--muted); border: 1px solid var(--line); border-bottom-width: 2px; border-radius: 5px; padding: 3px 6px; background: var(--card); }
+    .busca-livro:focus + kbd, .busca-livro:not(:placeholder-shown) + kbd { display: none; }
+    .expandir-lateral { display: none; }
+    @media (min-width: 1181px) {
+        body.lateral-recolhida .livro { grid-template-columns: minmax(0, 1fr) 250px; }
+        body.lateral-recolhida .livro.capa { grid-template-columns: minmax(0, 1fr); }
+        body.lateral-recolhida .livro-lateral { display: none; }
+        body.lateral-recolhida .expandir-lateral { display: inline-flex; }
+    }
     .resultados .res { display: block; text-decoration: none; color: var(--ink); padding: 8px; border-radius: 8px; }
     .resultados .res:hover { background: var(--accent-soft); }
     .resultados .res span { display: block; color: var(--muted); font-size: 13px; }
@@ -203,17 +221,53 @@
     .navega .prox { text-align: right; grid-column: 2; }
 
     /* capa */
-    .capa-topo h1 { font-size: 30px; margin: 0 0 6px; }
-    .capa-nums { display: flex; gap: 16px; flex-wrap: wrap; font-size: 14px; color: var(--muted); margin: 12px 0 16px; }
-    .capa-nums b { font-variant-numeric: tabular-nums; color: var(--ink); font-size: 18px; display: block; }
-    .capa-nums .err b { color: var(--no); } .capa-nums .dom b { color: var(--ok); }
+    .capa-topo { padding: 24px; }
+    .capa-topo .migalhas { display: block; margin-bottom: 8px; }
+    .capa-cabeca { display: flex; gap: 16px; align-items: flex-start; flex-wrap: wrap; }
+    .capa-cabeca > div:first-child { flex: 1; min-width: 240px; }
+    .capa-topo h1 { font-size: 28px; margin: 0 0 4px; letter-spacing: -.015em; line-height: 1.2; }
     .capa-acoes { display: flex; gap: 8px; flex-wrap: wrap; }
-    .indice { list-style: none; margin: 0; padding: 0; columns: 2 300px; column-gap: 32px; }
-    .indice li { break-inside: avoid; padding: 5px 0 5px calc(var(--nivel) * 18px); border-bottom: 1px dotted var(--line); display: flex; gap: 8px; align-items: baseline; }
-    .indice li[style*="--nivel: 0"] { font-weight: 700; padding-top: 10px; }
-    .indice a { color: var(--ink); text-decoration: none; flex: 1; }
-    .indice a:hover { color: var(--accent); }
-    .indice .meta { font-size: 12px; color: var(--muted); white-space: nowrap; font-weight: 400; }
+    .capa-acoes [data-continuar] span { max-width: 220px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .indicadores { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px; margin: 20px 0 14px; }
+    .ind { display: block; text-align: left; border: 1px solid var(--line); background: var(--bg); color: var(--ink); border-radius: 12px; padding: 10px 12px; font: inherit; text-decoration: none; }
+    .ind small { display: block; font-size: 12px; color: var(--muted); }
+    .ind b { display: block; font-size: 22px; font-variant-numeric: tabular-nums; line-height: 1.3; }
+    .ind.err b { color: var(--no); } .ind.rev b { color: var(--warn); } .ind.dom b { color: var(--ok); }
+    button.ind, a.ind { cursor: pointer; transition: border-color .15s; }
+    button.ind:hover, a.ind:hover { border-color: var(--accent); }
+    .ind[aria-pressed=true] { border-color: var(--accent); background: var(--accent-soft); }
+    .progresso { display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--muted); }
+    .progresso .seg { flex: 1; height: 8px; }
+
+    .sum-controles { display: flex; gap: 8px 16px; flex-wrap: wrap; align-items: center; margin-bottom: 10px; }
+    .sum-controles h2 { font-size: 18px; margin: 0; flex: 1; min-width: 120px; }
+    .alternar { display: inline-flex; background: var(--bg); border: 1px solid var(--line); border-radius: 10px; padding: 3px; gap: 2px; max-width: 100%; overflow-x: auto; }
+    .alternar button { border: 0; background: none; color: var(--muted); font: inherit; font-size: 13px; font-weight: 600; padding: 5px 10px; border-radius: 7px; cursor: pointer; white-space: nowrap; }
+    .alternar button:hover { color: var(--ink); }
+    .alternar button[aria-pressed=true] { background: var(--card); color: var(--ink); box-shadow: 0 1px 2px rgba(0,0,0,.12); }
+    .indice { list-style: none; margin: 0; padding: 0; }
+    .indice li { padding-left: calc(var(--nivel) * 20px); }
+    .indice li a { display: flex; align-items: center; gap: 10px; padding: 9px 10px; color: var(--ink); text-decoration: none; border-radius: 10px; }
+    .indice li a:hover, .indice li a:focus-visible { background: var(--accent-soft); outline: none; }
+    .indice li[data-nivel="0"] { margin-top: 4px; }
+    .indice li[data-nivel="0"] .ind-nome { font-weight: 600; }
+    .indice .cap-num { min-width: 30px; }
+    .ind-nome { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+    .ind-meta { display: flex; align-items: center; gap: 8px; flex: none; font-size: 12px; color: var(--muted); }
+    .critico { width: 56px; height: 4px; border-radius: 99px; background: var(--line); overflow: hidden; }
+    .critico i { display: block; height: 100%; background: var(--no); border-radius: 99px; }
+    .ind-seta { color: var(--muted); opacity: 0; transition: opacity .15s; font-size: 18px; line-height: 1; }
+    .indice li a:hover .ind-seta, .indice li a:focus-visible .ind-seta { opacity: 1; }
+    .indice.plano li { padding-left: 0; }
+    .indice-vazio { padding: 16px 10px; color: var(--muted); font-size: 14px; margin: 0; }
+    @media (max-width: 860px) {
+        .indicadores { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        .indicadores > :last-child { grid-column: 1 / -1; }
+        .capa-topo { padding: 18px; }
+        .capa-topo h1 { font-size: 23px; }
+        .critico { display: none; }
+        .ind-seta { opacity: 1; }
+    }
 
     /* diálogos */
     dialog.art, dialog.escolher-questao { border: 1px solid var(--line); border-radius: 14px; background: var(--card); color: var(--ink); max-width: 680px; width: calc(100% - 32px); max-height: 80vh; padding: 0; }
@@ -255,13 +309,18 @@
 @endsection
 
 @section('content')
+<script>try { if (localStorage.getItem('livro-lateral-recolhida') === '1') document.body.classList.add('lateral-recolhida'); } catch (e) {}</script>
 <div class="livro {{ $capitulo ? '' : 'capa' }}">
     <aside class="livro-lateral" aria-label="Sumário do livro">
         <div class="lat-topo">
             <a href="{{ route('concursos.material.show', $material) }}">{{ $material->titulo }}</a>
+            <button type="button" class="btn mini fantasma recolher" data-recolher aria-label="Recolher sumário" title="Recolher sumário">«</button>
             <button type="button" class="btn mini fechar" data-gaveta aria-label="Fechar sumário">✕</button>
         </div>
-        <input type="search" class="busca-livro" data-busca placeholder="Buscar no livro  ( / )" aria-label="Buscar no livro">
+        <div class="busca-caixa">
+            <input type="search" class="busca-livro" data-busca placeholder="Buscar no livro" aria-label="Buscar no livro (atalho: /)">
+            <kbd aria-hidden="true">/</kbd>
+        </div>
         <div class="resultados" data-resultados hidden></div>
         <nav class="sumario-livro" data-sumario aria-label="Capítulos">
             @include('concursos.material._sumario', ['pai' => 0])
@@ -278,7 +337,9 @@
         <main class="livro-pagina">
             <div class="pag-topo">
                 <button type="button" class="btn mini abrir-sumario" data-gaveta>☰ Sumário</button>
+                <button type="button" class="btn mini expandir-lateral" data-recolher>☰ Sumário</button>
                 <nav class="migalhas" aria-label="Você está em">
+                    <a href="{{ route('concursos.material.index') }}">Resumos</a> /
                     <a href="{{ route('concursos.material.show', $material) }}">{{ $material->titulo }}</a>
                     @foreach ($caminho as $c) › <a href="{{ route('concursos.material.capitulo', [$material, $c['id']]) }}">{{ $c['titulo'] }}</a>@endforeach
                 </nav>
@@ -311,44 +372,96 @@
             <div class="notas-lista" data-margem></div>
         </aside>
     @else
+        @php
+            $pontosTotal = $resumo['errando'] + $resumo['revisando'] + $resumo['dominado'];
+            $prioritario = $plano->where('errando', '>', 0)->sortByDesc('errando')->first();
+            $maxErros = max(1, (int) $plano->max('errando'));
+        @endphp
         <main class="livro-pagina">
-            <div class="pag-topo"><button type="button" class="btn mini abrir-sumario" data-gaveta>☰ Sumário</button></div>
-            <section class="card capa-topo">
-                <h1>{{ $material->titulo }}</h1>
-                @if ($material->descricao)<p class="muted" style="margin:0">{{ $material->descricao }}</p>@endif
-                <div class="capa-nums">
-                    <span><b>{{ $resumo['capitulos'] }}</b> capítulos</span>
-                    <span class="err"><b>{{ $resumo['errando'] }}</b> pontos que ainda erro</span>
-                    <span><b>{{ $resumo['revisando'] }}</b> revisando</span>
-                    <span class="dom"><b>{{ $resumo['dominado'] }}</b> dominados</span>
-                    <span><b>{{ $resumo['questoes'] }}</b> questões para refazer</span>
+            <div class="pag-topo">
+                <button type="button" class="btn mini abrir-sumario" data-gaveta>☰ Sumário</button>
+                <button type="button" class="btn mini expandir-lateral" data-recolher>☰ Sumário</button>
+            </div>
+            <section class="card capa-topo" style="border-top: 4px solid {{ $material->cor() }}">
+                <nav class="migalhas" aria-label="Você está em"><a href="{{ route('concursos.material.index') }}">Resumos</a> / {{ $material->titulo }}</nav>
+                <div class="capa-cabeca">
+                    <div>
+                        <h1>{{ $material->titulo }}</h1>
+                        @if ($material->descricao)<p class="muted" style="margin:0">{{ $material->descricao }}</p>@endif
+                    </div>
+                    <div class="capa-acoes">
+                        @if ($prioritario)
+                            <a class="btn main" href="{{ route('concursos.material.capitulo', [$material, $prioritario['id']]) }}" title="{{ $prioritario['num'] }} {{ $prioritario['titulo'] }}">Revisar erros prioritários</a>
+                            <a class="btn" data-continuar hidden href="#">Continuar: <span></span></a>
+                        @else
+                            <a class="btn main" data-continuar hidden href="#">Continuar: <span></span></a>
+                            @if ($plano->isNotEmpty())
+                                <a class="btn" href="{{ route('concursos.material.capitulo', [$material, $plano->first()['id']]) }}">Começar do início</a>
+                            @endif
+                        @endif
+                        <button type="button" class="btn fantasma" onclick="document.querySelector('.novo-cap').click()">+ Novo capítulo</button>
+                    </div>
                 </div>
-                <div class="capa-acoes">
-                    <a class="btn main" data-continuar hidden href="#">Continuar: <span></span></a>
-                    @if ($plano->isNotEmpty())
-                        <a class="btn" href="{{ route('concursos.material.capitulo', [$material, $plano->first()['id']]) }}">Começar do início</a>
+
+                <div class="indicadores">
+                    <button type="button" class="ind" data-filtro-atalho="todos" aria-pressed="false" title="Mostrar todos os capítulos"><small>Capítulos</small><b>{{ $resumo['capitulos'] }}</b></button>
+                    <button type="button" class="ind err" data-filtro-atalho="erros" aria-pressed="false" title="Mostrar só capítulos com erros"><small>Ainda erro</small><b>{{ $resumo['errando'] }}</b></button>
+                    <div class="ind rev"><small>Revisando</small><b>{{ $resumo['revisando'] }}</b></div>
+                    <div class="ind dom"><small>Dominados</small><b>{{ $resumo['dominado'] }}</b></div>
+                    @if ($resumo['questoes'])
+                        <a class="ind" href="{{ route('concursos.material.refazer', $material) }}"><small>Para refazer →</small><b>{{ $resumo['questoes'] }}</b></a>
+                    @else
+                        <div class="ind"><small>Para refazer</small><b>0</b></div>
                     @endif
-                    <button type="button" class="btn" onclick="document.querySelector('.novo-cap').click()">+ Novo capítulo</button>
+                </div>
+                <div class="progresso">
+                    <div class="seg" role="img" aria-label="{{ $resumo['errando'] }} ainda erro, {{ $resumo['revisando'] }} revisando, {{ $resumo['dominado'] }} dominados">
+                        @if ($pontosTotal)
+                            <i class="err" style="width: {{ $resumo['errando'] / $pontosTotal * 100 }}%"></i><i class="rev" style="width: {{ $resumo['revisando'] / $pontosTotal * 100 }}%"></i><i class="dom" style="width: {{ $resumo['dominado'] / $pontosTotal * 100 }}%"></i>
+                        @endif
+                    </div>
+                    <span>{{ $pontosTotal ? round($resumo['dominado'] / $pontosTotal * 100) . '% dominado' : 'sem pontos de erro ainda' }}</span>
                 </div>
             </section>
 
             <section class="card">
-                <h2 style="margin:0 0 8px;font-size:18px">Sumário</h2>
+                <div class="sum-controles">
+                    <h2>Sumário</h2>
+                    @if ($plano->isNotEmpty())
+                        <div class="alternar" role="group" aria-label="Ordenar o sumário">
+                            <button type="button" data-ordenar="ordem" aria-pressed="true">Ordem do sumário</button>
+                            <button type="button" data-ordenar="erros" aria-pressed="false">Mais erros</button>
+                            <button type="button" data-ordenar="questoes" aria-pressed="false">Mais questões</button>
+                        </div>
+                        <div class="alternar" role="group" aria-label="Filtrar o sumário">
+                            <button type="button" data-filtro="todos" aria-pressed="true">Todos</button>
+                            <button type="button" data-filtro="erros" aria-pressed="false">Com erros</button>
+                            <button type="button" data-filtro="limpos" aria-pressed="false">Sem erros</button>
+                        </div>
+                    @endif
+                </div>
                 @if ($plano->isEmpty())
                     <p class="muted">Este livro ainda não tem capítulos. Crie o primeiro (ex.: um assunto do edital) e escreva o resumo nele.</p>
                 @else
-                    <ol class="indice">
-                        @foreach ($plano as $c)
-                            <li style="--nivel: {{ $c['nivel'] }}">
-                                <span class="cap-num">{{ $c['num'] }}</span>
-                                <a href="{{ route('concursos.material.capitulo', [$material, $c['id']]) }}">{{ $c['titulo'] }}</a>
-                                <span class="meta">
-                                    @if ($c['errando'])<span style="color:var(--no)">{{ $c['errando'] }} erro{{ $c['errando'] > 1 ? 's' : '' }}</span>@endif
-                                    @if ($c['questoes']) · {{ $c['questoes'] }} q.@endif
-                                </span>
+                    <ol class="indice" data-indice>
+                        @foreach ($plano as $i => $c)
+                            <li style="--nivel: {{ $c['nivel'] }}" data-nivel="{{ $c['nivel'] }}" data-ordem="{{ $i }}" data-erros="{{ $c['errando'] }}" data-questoes="{{ $c['questoes'] }}">
+                                <a href="{{ route('concursos.material.capitulo', [$material, $c['id']]) }}">
+                                    <span class="cap-num">{{ $c['num'] }}</span>
+                                    <span class="ind-nome">{{ $c['titulo'] }}</span>
+                                    <span class="ind-meta">
+                                        @if ($c['questoes'])<span title="questões erradas deste assunto">{{ $c['questoes'] }} q.</span>@endif
+                                        @if ($c['errando'])
+                                            <span class="etq err" title="pontos que ainda erro">{{ $c['errando'] }}</span>
+                                            <span class="critico" aria-hidden="true"><i style="width: {{ $c['errando'] / $maxErros * 100 }}%"></i></span>
+                                        @endif
+                                        <span class="ind-seta" aria-hidden="true">›</span>
+                                    </span>
+                                </a>
                             </li>
                         @endforeach
                     </ol>
+                    <p class="indice-vazio" data-indice-vazio hidden>Nenhum capítulo neste filtro.</p>
                 @endif
             </section>
         </main>
