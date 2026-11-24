@@ -70,9 +70,8 @@ class BackupEstudosCommandTest extends TestCase
         $this->artisan('estudos:backup', ['--connection' => 'conexao_inexistente', '--dir' => $this->dir])->assertFailed();
     }
 
-    public function test_sem_nuvem_configurada_o_backup_le_o_banco_local(): void
+    public function test_backup_le_o_banco_do_app_por_padrao(): void
     {
-        config(['database.connections.pgsql_cloud.url' => null]);
         $user = User::factory()->create();
         $id = (string) Str::uuid();
         DB::table('study_subjects')->insert(['id' => $id, 'user_id' => $user->id, 'nome' => 'Local', 'cor' => '#123456', 'ordem' => 0]);

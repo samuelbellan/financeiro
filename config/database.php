@@ -99,21 +99,6 @@ return [
             'sslmode' => env('DB_SSLMODE', 'prefer'),
         ],
 
-        'pgsql_cloud' => [
-            'driver' => 'pgsql',
-            'url' => env('CLOUD_DATABASE_URL', env('DATABASE_URL')),
-            'host' => env('CLOUD_DB_HOST', '127.0.0.1'),
-            'port' => env('CLOUD_DB_PORT', '5432'),
-            'database' => env('CLOUD_DB_DATABASE', 'neondb'),
-            'username' => env('CLOUD_DB_USERNAME', 'neondb_owner'),
-            'password' => env('CLOUD_DB_PASSWORD', ''),
-            'charset' => env('CLOUD_DB_CHARSET', 'utf8'),
-            'prefix' => '',
-            'prefix_indexes' => true,
-            'search_path' => 'public',
-            'sslmode' => env('CLOUD_DB_SSLMODE', 'require'),
-        ],
-
         // Banco do módulo de concursos (questões, curadoria, progresso dos alunos).
         // Postgres local no PC servidor; nos testes vira SQLite em memória (CONCURSOS_DB_DRIVER=sqlite).
         'concursos_pgsql' => env('CONCURSOS_DB_DRIVER', 'pgsql') === 'sqlite'

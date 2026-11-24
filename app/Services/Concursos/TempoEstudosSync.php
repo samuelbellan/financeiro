@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Http;
  * minutos que contam no total do app e gravamos em meta_atividades.minutos_reais.
  * Usa a API de leitura do /estudos com token pessoal (CONCURSOS_ESTUDOS_TOKEN): por HTTP quando o /estudos
  * roda em outra URL (services.estudos.cloud_url) e, sem ela (tudo no mesmo PC), chamando a API em
- * processo, sem rede (o servidor local atende uma requisição por vez e não pode chamar a si mesmo).
+ * processo, sem rede (evita o servidor chamar a si mesmo e a dependência do endereço público).
  * O tempo só calibra o tamanho da meta: nunca entra no domínio.
  */
 class TempoEstudosSync
