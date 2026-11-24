@@ -71,7 +71,7 @@ class GerarPacotesCommand extends Command
             return self::SUCCESS;
         }
 
-        $pasta = storage_path('concursos' . DIRECTORY_SEPARATOR . 'pacotes' . DIRECTORY_SEPARATOR . now()->format('Y-m-d_His'));
+        $pasta = \App\Support\Dados::path('concursos' . DIRECTORY_SEPARATOR . 'pacotes' . DIRECTORY_SEPARATOR . now()->format('Y-m-d_His'));
         $gerados = $gerador->gerar($plano, $pasta);
 
         $erros = 0;

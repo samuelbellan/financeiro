@@ -34,7 +34,7 @@ class MidiaEstudosCommand extends Command
             $this->error('Nome de pasta inválido.');
             return self::FAILURE;
         }
-        $dir = storage_path('app/midias/' . $pasta);
+        $dir = \App\Support\Dados::path('app/midias/' . $pasta);
         $file = $dir . '/dados.json';
         if (!is_file($file)) {
             $this->error("Não encontrei {$file}");

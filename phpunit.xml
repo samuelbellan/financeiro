@@ -30,6 +30,9 @@
         <env name="CONCURSOS_DB_DATABASE" value=":memory:"/>
         <env name="CONCURSOS_ENABLED" value="true"/>
         <env name="CONCURSOS_LEIS_LOCAL" value=""/>
+        <env name="DADOS_DIR" value=""/>
+        <env name="BACKUP_DRIVE_DIR" value=""/>
+        <env name="BACKUP_LOCAL_DIR" value=""/>
         <env name="MAIL_MAILER" value="array"/>
         <env name="QUEUE_CONNECTION" value="sync"/>
         <env name="SESSION_DRIVER" value="array"/>

@@ -41,7 +41,7 @@ return [
     'leis' => [
         'raw' => env('CONCURSOS_LEIS_RAW', 'https://raw.githubusercontent.com/ctresb/leis/main/'),
         'web' => 'https://github.com/ctresb/leis/blob/main/',
-        'dir' => storage_path('concursos/leis'),
+        'dir' => \App\Support\Dados::raiz() . DIRECTORY_SEPARATOR . 'concursos' . DIRECTORY_SEPARATOR . 'leis',
         // Cópia completa do repositório (git clone --depth 1). Com ela, o app lê tudo do disco,
         // abre qualquer norma federal pelo número e navega pelo acervo inteiro.
         'local' => env('CONCURSOS_LEIS_LOCAL'),
