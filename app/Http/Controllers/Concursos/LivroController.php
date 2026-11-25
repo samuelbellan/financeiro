@@ -370,6 +370,8 @@ class LivroController extends Controller
         $porCap = $pontos->groupBy('capitulo_id');
         $plano = $this->plano($capitulos)->map(fn ($c) => $c + [
             'errando' => $porCap->get($c['id'], collect())->where('status', 'errando')->count(),
+            'revisando' => $porCap->get($c['id'], collect())->where('status', 'revisando')->count(),
+            'dominado' => $porCap->get($c['id'], collect())->where('status', 'dominado')->count(),
             'pontos' => $porCap->get($c['id'], collect())->count(),
             'questoes' => (int) ($questoes[$c['id']] ?? 0),
         ]);

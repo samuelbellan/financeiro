@@ -108,6 +108,17 @@ class ConcursosBaseTeoricaTest extends TestCase
         $this->assertSame('bulletList', $lista['content'][0]['content'][1]['type'] ?? null, 'sublista fica aninhada no item');
     }
 
+    public function test_formulas_de_matematica_financeira_viram_texto_legivel(): void
+    {
+        $m = app(MarkdownLivro::class);
+
+        $this->assertSame('VP = VF/(1 + i)ᵗ', $m->semLatex('$VP = \frac{VF}{(1 + i)^{t}}$'));
+        $this->assertSame('VP = 3.900/(1 + 0,40)', $m->semLatex('$VP = \frac{3.900}{1 + 0,40}$'));
+        $this->assertSame('VF = 2.000 × [((1 + 0,02)⁶ - 1)/0,02]', $m->semLatex('$VF = 2.000 \times \left[\frac{(1 + 0,02)^{6} - 1}{0,02}\right]$'));
+        $this->assertSame('M = C × e^(i × t) ≈ √1,21', $m->semLatex('$M = C \times e^{i \times t} \approx \sqrt{1,21}$'));
+        $this->assertSame('P_final = J₁ + VF_TOTAL_ENTRADAS', $m->semLatex('$P_{final} = J_{1} + VF_{TOTAL\_ENTRADAS}$'));
+    }
+
     public function test_coloca_o_resumo_no_topo_e_grifa_as_alternativas_com_nota(): void
     {
         $me = $this->questao(['tipo' => 'ME', 'id_externo' => '900001', 'origem' => 'BANCA X · 2024 · Órgão Y · Cargo', 'enunciado' => 'Questão inventada.',

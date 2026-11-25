@@ -22,6 +22,10 @@ class Documento
         'atencao' => 'Atenção',
         'exemplo' => 'Exemplo',
         'base' => 'Base legal',
+        'definicao' => 'Definição',
+        'doutrina' => 'Doutrina',
+        'jurisprudencia' => 'Jurisprudência',
+        'leiseca' => 'Lei seca',
     ];
 
     private const BLOCOS = ['paragraph', 'heading', 'bulletList', 'orderedList', 'listItem', 'blockquote', 'horizontalRule',

@@ -7,6 +7,7 @@ import Placeholder from '@tiptap/extension-placeholder';
 import Typography from '@tiptap/extension-typography';
 import { TableKit } from '@tiptap/extension-table';
 import { Caixa, PontoErro, Questao, Lei, Grifo, CORES } from './extensoes.js';
+import { Leitura } from './leitura.js';
 import { estado, api, el, avisar, debounce, novoId } from './util.js';
 
 const NOMES_COR = { amarelo: 'Amarelo', verde: 'Verde', azul: 'Azul', rosa: 'Rosa' };
@@ -25,7 +26,7 @@ export function criarEditor({ alvo, doc, editavel, aoMudarModo }) {
             Placeholder.configure({ placeholder: ({ node }) => (node.type.name === 'paragraph' ? 'Escreva aqui… (digite / para inserir caixa, questão, lei, imagem)' : '') }),
             Typography.configure({ oneHalf: false, oneQuarter: false, threeQuarters: false, plusMinus: false, notEqual: false, laquo: false, raquo: false }),
             TableKit.configure({ table: { resizable: false } }),
-            Caixa, PontoErro, Questao, Lei, Grifo,
+            Caixa, PontoErro, Questao, Lei, Grifo, Leitura,
         ],
         editorProps: {
             attributes: { class: 'pagina-texto', 'aria-label': 'Texto do capítulo' },
