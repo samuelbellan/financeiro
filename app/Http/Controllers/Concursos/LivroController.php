@@ -64,7 +64,10 @@ class LivroController extends Controller
             'caminho' => $this->caminho($capitulo),
             'anterior' => $i > 0 ? $plano[$i - 1] : null,
             'proximo' => $i !== false && $i < $plano->count() - 1 ? $plano[$i + 1] : null,
-            'html' => $this->documento->html($doc, $citacoes, ['pontos' => $pontos, 'questoes' => $questoes]),
+            // Capítulo de teoria: lê-se só a teoria (os pontos ficam na área de Questões e no editor).
+            // Capítulo só do diário de erros (assunto do TEC): mostra os pontos, que é tudo o que ele tem.
+            'html' => $this->documento->html($doc, $citacoes, ['pontos' => $pontos, 'questoes' => $questoes,
+                'soTeoria' => !request()->boolean('todos') && $this->documento->temTeoria($doc)]),
             'dadosEditor' => [
                 'doc' => $doc,
                 'capituloId' => $capitulo->id,
@@ -360,33 +363,69 @@ class LivroController extends Controller
     }
 
     /** Sumário, plano de leitura (capítulos em ordem) e contagens por capítulo. */
+    /**
+     * Sumário, plano de leitura (capítulos em ordem) e contagens por capítulo. O Resumo mostra só os
+     * capítulos com teoria (e os pais deles); os do diário de erros (só pontos/questões) aparecem com
+     * ?todos=1. As contagens vêm da situação calculada das questões (MaterialQuestao::estado).
+     */
     private function base(Material $material): array
     {
-        $capitulos = $material->capitulos()->get(['id', 'parent_id', 'titulo', 'ordem', 'assunto_id']);
-        $pontos = MaterialPonto::whereIn('capitulo_id', $capitulos->pluck('id'))->get(['id', 'capitulo_id', 'status']);
-        $questoes = MaterialQuestao::where('material_id', $material->id)->whereNotNull('capitulo_id')
-            ->selectRaw('capitulo_id, count(*) as n')->groupBy('capitulo_id')->pluck('n', 'capitulo_id');
+        $todosCaps = $material->capitulos()->get(['id', 'parent_id', 'titulo', 'ordem', 'assunto_id', 'conteudo']);
+        $todos = request()->boolean('todos');
+        $mostrar = $todos ? collect() : $this->comTeoria($todosCaps);
+        if ($mostrar->isEmpty()) {
+            $mostrar = $todosCaps->pluck('id')->flip(); // livro sem teoria nenhuma (ex.: Auditoria): mostra tudo
+        }
+        $capitulos = $todosCaps->filter(fn ($c) => isset($mostrar[$c->id]))->values();
 
-        $porCap = $pontos->groupBy('capitulo_id');
-        $plano = $this->plano($capitulos)->map(fn ($c) => $c + [
-            'errando' => $porCap->get($c['id'], collect())->where('status', 'errando')->count(),
-            'revisando' => $porCap->get($c['id'], collect())->where('status', 'revisando')->count(),
-            'dominado' => $porCap->get($c['id'], collect())->where('status', 'dominado')->count(),
-            'pontos' => $porCap->get($c['id'], collect())->count(),
-            'questoes' => (int) ($questoes[$c['id']] ?? 0),
-        ]);
+        $questoes = MaterialQuestao::with('ultimaTentativa')->where('material_id', $material->id)
+            ->get(['id', 'capitulo_id', 'resultado_tec', 'caixa', 'revisar_em']);
+        $porCap = $questoes->whereNotNull('capitulo_id')->groupBy('capitulo_id')->map(fn ($qs) => $qs->countBy(fn ($q) => $q->estado()));
+        $estados = $questoes->countBy(fn ($q) => $q->estado());
+
+        $plano = $this->plano($capitulos)->map(function ($c) use ($porCap) {
+            $e = $porCap->get($c['id'], collect());
+
+            return $c + [
+                'errando' => (int) $e->get('errando', 0),
+                'revisando' => (int) $e->get('revisando', 0),
+                'dominado' => (int) $e->get('dominado', 0),
+                'pontos' => (int) $e->sum(),
+                'questoes' => (int) $e->sum(),
+            ];
+        });
 
         return [
             'material' => $material,
             'plano' => $plano,
+            'todos' => $todos,
+            'ocultos' => $todosCaps->count() - $capitulos->count(),
             'resumo' => [
                 'capitulos' => $capitulos->count(),
-                'errando' => $pontos->where('status', 'errando')->count(),
-                'revisando' => $pontos->where('status', 'revisando')->count(),
-                'dominado' => $pontos->where('status', 'dominado')->count(),
-                'questoes' => MaterialQuestao::where('material_id', $material->id)->count(),
+                'errando' => (int) $estados->get('errando', 0),
+                'revisando' => (int) $estados->get('revisando', 0),
+                'dominado' => (int) $estados->get('dominado', 0),
+                'questoes' => $questoes->count(),
+                'hoje' => $questoes->filter(fn ($q) => $q->naFilaHoje())->count(),
             ],
         ];
+    }
+
+    /** @return Collection<int, int> ids (como chaves) dos capítulos com teoria e de todos os pais deles */
+    private function comTeoria(Collection $capitulos): Collection
+    {
+        $pais = $capitulos->pluck('parent_id', 'id');
+        $saida = collect();
+        foreach ($capitulos as $c) {
+            if (!$this->documento->temTeoria($c->conteudo)) {
+                continue;
+            }
+            for ($id = $c->id, $guarda = 0; $id && !$saida->has($id) && $guarda < 20; $id = $pais[$id] ?? null, $guarda++) {
+                $saida[$id] = 1;
+            }
+        }
+
+        return $saida;
     }
 
     /** Capítulos em ordem de leitura (pré-ordem da árvore), com nível e numeração "2.1.3". */

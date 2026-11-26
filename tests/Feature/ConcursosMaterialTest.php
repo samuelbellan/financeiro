@@ -300,7 +300,7 @@ MD;
         $this->assertSame([2, 1, ['q222222']], [$r['novas'], $r['puladas'], $r['sem_ponto']]);
     }
 
-    public function test_refazer_filtra_responde_e_atualiza_o_ponto(): void
+    public function test_questoes_filtra_responde_move_de_caixa_e_conta_o_erro_no_ponto(): void
     {
         $this->importarQuestoes();
         $material = Material::first();
@@ -309,9 +309,9 @@ MD;
         $this->assertSame($ponto->id, $q1->ponto_id); // ligada pelo nº do TEC na lista do ponto
 
         $this->actingAs($this->user)->get(route('concursos.material.show', $material))
-            ->assertSee('Refazer erradas (2)');
+            ->assertSee('Questões (2 para hoje)');
         $this->actingAs($this->user)->get(route('concursos.material.capitulo', [$material, $q1->fresh()->capitulo_id]))
-            ->assertSee('Refazer as deste capítulo');
+            ->assertSee('Refazer as que ainda erro');
 
         $tela = $this->actingAs($this->user)->get(route('concursos.material.refazer', [$material, 'iniciar' => 1]))->assertOk();
         $tela->assertSee('Qual o prazo inventado?')->assertSee('Item inventado.')
@@ -319,7 +319,7 @@ MD;
         $this->assertStringContainsString('inventado?\\nI. um\\nII. dois', $tela->getContent()); // itens em linhas
 
         $this->actingAs($this->user)->postJson(route('concursos.material.questoes.responder', $q1), ['resposta' => 'A'])
-            ->assertOk()->assertJson(['acertou' => false, 'gabarito' => 'B', 'comentario' => 'Comentário inventado.', 'ponto' => ['titulo' => 'Prazo de cinco dias']]);
+            ->assertOk()->assertJson(['acertou' => false, 'gabarito' => 'B', 'comentario' => 'Comentário inventado.', 'caixa' => 'Caixa 1: volta amanhã.', 'pontos' => [['titulo' => 'Prazo de cinco dias']]]);
         $this->assertSame(2, $ponto->fresh()->vezes_errado);
         $this->actingAs($this->user)->postJson(route('concursos.material.questoes.responder', $q1), ['resposta' => 'Z'])->assertUnprocessable();
         $this->actingAs($this->user)->postJson(route('concursos.material.questoes.responder', $q1), ['resposta' => 'B'])->assertOk()->assertJson(['acertou' => true]);

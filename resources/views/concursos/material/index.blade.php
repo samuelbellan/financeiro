@@ -27,6 +27,8 @@
     .livro-card .etqs { display: flex; gap: 6px; flex-wrap: wrap; }
     .livro-card .rodape { display: flex; justify-content: space-between; font-size: 13px; color: var(--muted); margin-top: auto; }
     .livro-vazio { grid-column: 1 / -1; }
+    .livro-card .acoes-card { display: flex; gap: 8px; }
+    .livro-card .acoes-card .btn { flex: 1; text-align: center; }
 
     /* novo livro */
     dialog.novo-livro { border: 1px solid var(--line); border-radius: 14px; background: var(--card); color: var(--ink); padding: 20px; width: min(440px, calc(100% - 32px)); }
@@ -41,49 +43,44 @@
 
 @section('content')
 <div class="cabeca">
-    <h1>Resumos</h1>
+    <h1>Matérias</h1>
     <button type="button" class="btn main" data-novo-livro>+ Novo livro</button>
 </div>
-<p class="muted small intro">Um livro por matéria, com capítulos por assunto. Escreva, grife, anote na margem e acompanhe os pontos que você ainda erra.</p>
+<p class="muted small intro">Uma matéria por card: o <b>Resumo</b> (teoria, para ler e grifar) e as <b>Questões</b> (todas as dos cadernos, com a fila de revisão do dia).</p>
 
 @if ($materiais->isNotEmpty())
     <section class="card fila" aria-labelledby="fila-titulo">
         <div class="secao-titulo">
-            <h2 id="fila-titulo">Para revisar agora</h2>
+            <h2 id="fila-titulo">Para revisar hoje</h2>
             @if ($fila->isNotEmpty())
-                <span class="muted small">{{ $fila->count() }} {{ $fila->count() === 1 ? 'capítulo' : 'capítulos' }} · {{ $fila->sum('errando') }} em erro</span>
+                <span class="muted small">{{ $fila->sum(fn ($m) => $contagens[$m->id]['hoje']) }} questões na fila</span>
             @endif
         </div>
-        @forelse ($fila as $f)
-            @php $livro = $materiais->firstWhere('id', $f->material_id); @endphp
-            <a class="fila-item" href="{{ route('concursos.material.capitulo', [$f->material_id, $f->id]) }}">
-                @if ($f->errando)
-                    <span class="etq err" title="pontos que ainda erro">{{ $f->errando }}</span>
-                @else
-                    <span class="etq rev" title="pontos em revisão">{{ $f->revisando }}</span>
-                @endif
+        @forelse ($fila as $m)
+            <a class="fila-item" href="{{ route('concursos.material.refazer', [$m, 'situacao' => 'fila', 'iniciar' => 1]) }}">
+                <span class="etq err" title="questões vencidas na fila de revisão">{{ $contagens[$m->id]['hoje'] }}</span>
                 <span class="fila-texto">
-                    <b>{{ $f->titulo }}</b>
-                    <span><i class="ponto-cor" style="background: {{ $livro->cor() }}"></i>{{ $livro->titulo }}</span>
+                    <b>{{ $m->titulo }}</b>
+                    <span><i class="ponto-cor" style="background: {{ $m->cor() }}"></i>{{ $contagens[$m->id]['errando'] ?? 0 }} ainda erro · {{ $contagens[$m->id]['revisando'] ?? 0 }} revisando</span>
                 </span>
                 <span class="fila-ir">Revisar →</span>
             </a>
         @empty
-            <div class="fila-vazia">Nenhum ponto em erro ou em revisão. Quando marcar um erro no resumo, o capítulo aparece aqui.</div>
+            <div class="fila-vazia">Nada vencido hoje. Quando errar uma questão, ela volta aqui amanhã.</div>
         @endforelse
     </section>
 @endif
 
-<div class="secao-titulo"><h2>Livros</h2>@if ($materiais->isNotEmpty())<span class="muted small">{{ $materiais->count() }}</span>@endif</div>
+<div class="secao-titulo"><h2>Matérias</h2>@if ($materiais->isNotEmpty())<span class="muted small">{{ $materiais->count() }}</span>@endif</div>
 <div class="estante">
     @forelse ($materiais as $m)
         @php
-            $c = $contagens[$m->id] ?? collect();
+            $c = $contagens[$m->id] ?? [];
             $err = $c['errando'] ?? 0; $rev = $c['revisando'] ?? 0; $dom = $c['dominado'] ?? 0;
             $total = $err + $rev + $dom;
         @endphp
-        <a class="card livro-card elevar" href="{{ route('concursos.material.show', $m) }}" style="--cor: {{ $m->cor() }}">
-            <h3>{{ $m->titulo }}</h3>
+        <div class="card livro-card" style="--cor: {{ $m->cor() }}">
+            <h3><a href="{{ route('concursos.material.show', $m) }}" style="color:inherit;text-decoration:none">{{ $m->titulo }}</a></h3>
             @if ($m->descricao)<p class="desc">{{ $m->descricao }}</p>@endif
             <div class="seg" role="img" aria-label="{{ $err }} ainda erro, {{ $rev }} revisando, {{ $dom }} dominados">
                 @if ($total)
@@ -93,13 +90,17 @@
             <div class="etqs">
                 <span class="etq err">{{ $err }} ainda erro</span>
                 <span class="etq rev">{{ $rev }} revisando</span>
-                <span class="etq dom">{{ $dom }} dominados</span>
+                <span class="etq dom">{{ $dom }} dominadas</span>
             </div>
             <div class="rodape">
-                <span>{{ $capitulos[$m->id] ?? 0 }} capítulos</span>
-                @if ($total)<span>{{ round($dom / $total * 100) }}% dominado</span>@endif
+                <span>{{ $total }} questões · {{ $total ? round($dom / $total * 100) : 0 }}% dominadas</span>
+                @if ($c['hoje'] ?? 0)<span>{{ $c['hoje'] }} para hoje</span>@endif
             </div>
-        </a>
+            <div class="acoes-card">
+                <a class="btn" href="{{ route('concursos.material.show', $m) }}">Resumo</a>
+                <a class="btn" href="{{ route('concursos.material.refazer', $m) }}">Questões</a>
+            </div>
+        </div>
     @empty
         <div class="card muted livro-vazio">Nenhum livro ainda. Crie um em <b>+ Novo livro</b> ou importe os cadernos com <code>php artisan concursos:importar-material</code>.</div>
     @endforelse

@@ -1,6 +1,6 @@
 @extends('concursos.layout')
 
-@section('title', 'Refazer erradas')
+@section('title', 'Questões · ' . $material->titulo)
 
 @section('css')
     .cab { display: flex; gap: 12px; align-items: baseline; flex-wrap: wrap; margin-bottom: 12px; }
@@ -46,35 +46,65 @@
     dialog.art .topo b { flex: 1; }
     dialog.art .corpo { padding: 4px 16px 16px; font-size: 15px; }
     @media (max-width: 560px) { .bloco { grid-template-columns: 1fr; } }
+    .abas { display: flex; gap: 6px; margin-bottom: 14px; border-bottom: 1px solid var(--line); }
+    .abas a { padding: 8px 14px; font-weight: 600; color: var(--muted); border-bottom: 2px solid transparent; margin-bottom: -1px; text-decoration: none; }
+    .abas a.on { color: var(--ink); border-color: var(--accent); }
+    .hoje { display: flex; gap: 16px 24px; align-items: center; flex-wrap: wrap; }
+    .hoje .big { font-size: 40px; font-weight: 800; line-height: 1; font-variant-numeric: tabular-nums; }
+    .hoje .info { flex: 1; min-width: 200px; display: grid; gap: 4px; font-size: 14px; color: var(--muted); }
+    .hoje .info b { color: var(--ink); }
+    .chips { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 12px; }
+    .chip { font-size: 13px; font-weight: 700; padding: 3px 10px; border-radius: 999px; text-decoration: none; }
+    .chip.errando { background: var(--no-soft); color: var(--no); }
+    .chip.revisando { background: color-mix(in srgb, #ca8a04 18%, transparent); color: #b7791f; }
+    .chip.dominado { background: var(--ok-soft); color: var(--ok); }
+    .chip.neutro { background: var(--bg); color: var(--muted); }
+    table.cad .rev { color: #b7791f; } table.cad .dom { color: var(--ok); }
+    .certeza { display: flex; gap: 6px; align-items: center; margin: 0 0 10px; font-size: 13px; color: var(--muted); flex-wrap: wrap; }
+    .certeza button { border: 1px solid var(--line); background: var(--card); color: var(--ink); border-radius: 999px; padding: 4px 12px; font: inherit; font-size: 13px; cursor: pointer; }
+    .certeza button.on { border-color: var(--accent); background: var(--accent); color: #fff; }
+    .caixa-info { font-size: 14px; color: var(--muted); margin: -4px 0 10px; }
+    .etq { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); border: 1px solid var(--line); border-radius: 6px; padding: 0 6px; margin-left: 6px; }
+    .ponto-card + .ponto-card { border-top: 1px dashed var(--line); margin-top: 10px; padding-top: 10px; }
 @endsection
 
 @section('content')
 <div class="cab">
-    <h1>Refazer erradas</h1>
-    <a href="{{ route('concursos.material.show', $material) }}">← {{ $material->titulo }}</a>
+    <h1>{{ $material->titulo }}</h1>
+    <a href="{{ route('concursos.material.index') }}">← Matérias</a>
 </div>
+<nav class="abas">
+    <a href="{{ route('concursos.material.show', $material) }}">Resumo</a>
+    <a class="on" href="{{ route('concursos.material.refazer', $material) }}">Questões</a>
+</nav>
 
 @if (!$fila)
     @if ($resumo->isEmpty())
-        <div class="card muted">Este material ainda não tem questões. Importe com <code>php artisan concursos:importar-material … --questoes=…</code>.</div>
+        <div class="card muted">Este material ainda não tem questões. Importe com <code>php artisan concursos:importar-todas …</code>.</div>
     @else
-        <div class="card rolar">
-            <table class="cad">
-                <thead><tr><th>Caderno</th><th class="n">Total</th><th class="n">Ainda erro</th><th class="n opc">Acertei</th><th></th></tr></thead>
-                <tbody>
-                    @foreach ($resumo as $r)
-                        <tr>
-                            <td>{{ $r['titulo'] }}</td>
-                            <td class="n">{{ $r['total'] }}</td>
-                            <td class="n {{ $r['errando'] ? 'err' : '' }}">{{ $r['errando'] }}</td>
-                            <td class="n opc">{{ $r['acertadas'] }}</td>
-                            <td class="n"><a href="{{ route('concursos.material.refazer', [$material, 'secao' => $r['id'], 'situacao' => 'todas', 'iniciar' => 1]) }}">Refazer</a></td>
-                        </tr>
-                    @endforeach
-                </tbody>
-            </table>
+        @php($p = $painel)
+        <div class="card">
+            <div class="hoje">
+                <div><div class="big">{{ $p['hoje'] }}</div><div class="muted small">para revisar hoje</div></div>
+                <div class="info">
+                    <span>Caixa 1 (erros recentes): <b>{{ $p['porCaixa'][1] }}</b> · caixa 2 (7 dias): <b>{{ $p['porCaixa'][2] }}</b> · caixa 3 (30 dias): <b>{{ $p['porCaixa'][3] }}</b></span>
+                    <span>Amanhã: <b>{{ $p['amanha'] }}</b> · próximos 7 dias: <b>{{ $p['semana'] }}</b></span>
+                </div>
+                @if ($p['hoje'])
+                    <a class="btn main" href="{{ route('concursos.material.refazer', [$material, 'situacao' => 'fila', 'iniciar' => 1]) }}">Revisar agora ({{ min(20, $p['hoje']) }})</a>
+                @else
+                    <span class="muted">Nada vencido hoje.</span>
+                @endif
+            </div>
+            <div class="chips">
+                <a class="chip errando" href="{{ route('concursos.material.refazer', [$material, 'situacao' => 'errando', 'iniciar' => 1]) }}">{{ $p['estados']['errando'] }} ainda erro</a>
+                <a class="chip revisando" href="{{ route('concursos.material.refazer', [$material, 'situacao' => 'revisando', 'iniciar' => 1]) }}">{{ $p['estados']['revisando'] }} revisando</a>
+                <a class="chip dominado" href="{{ route('concursos.material.refazer', [$material, 'situacao' => 'dominado', 'iniciar' => 1]) }}">{{ $p['estados']['dominado'] }} dominadas</a>
+                <span class="chip neutro">{{ $p['total'] }} questões</span>
+            </div>
         </div>
 
+        <h2 style="font-size:17px;margin:18px 0 8px">Explorar</h2>
         <form class="card" method="GET" action="{{ route('concursos.material.refazer', $material) }}">
             <input type="hidden" name="iniciar" value="1">
             <div class="filtros">
@@ -98,6 +128,14 @@
                         @foreach ($assuntos as $a)<option value="{{ $a['id'] }}" @selected(($f['ponto'] ?? null) == $a['id'])>{{ $a['titulo'] }} ({{ $a['n'] }})</option>@endforeach
                     </select>
                 </label>
+                @if ($bancas->count() > 1)
+                <label>Banca
+                    <select name="banca">
+                        <option value="">Todas</option>
+                        @foreach ($bancas as $b => $n)<option value="{{ $b }}" @selected(($f['banca'] ?? null) === $b)>{{ $b }} ({{ $n }})</option>@endforeach
+                    </select>
+                </label>
+                @endif
                 <label>Situação
                     <select name="situacao">
                         @foreach (\App\Http\Controllers\Concursos\RefazerController::SITUACOES as $k => $nome)<option value="{{ $k }}" @selected($f['situacao'] === $k)>{{ $nome }}</option>@endforeach
@@ -118,15 +156,39 @@
         @if (request()->boolean('iniciar'))
             <div class="card muted">Nenhuma questão com esses filtros. Tente “Todas” em Situação.</div>
         @endif
+
+        <div class="card rolar">
+            <table class="cad">
+                <thead><tr><th>Caderno</th><th class="n">Total</th><th class="n">Ainda erro</th><th class="n opc">Revisando</th><th class="n opc">Dominadas</th><th></th></tr></thead>
+                <tbody>
+                    @foreach ($resumo as $r)
+                        <tr>
+                            <td>{{ $r['titulo'] }}</td>
+                            <td class="n">{{ $r['total'] }}</td>
+                            <td class="n {{ $r['errando'] ? 'err' : '' }}">{{ $r['errando'] }}</td>
+                            <td class="n opc rev">{{ $r['revisando'] }}</td>
+                            <td class="n opc dom">{{ $r['dominado'] }}</td>
+                            <td class="n"><a href="{{ route('concursos.material.refazer', [$material, 'secao' => $r['id'], 'situacao' => 'errando', 'iniciar' => 1]) }}">Refazer erradas</a></td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
     @endif
 @else
     <div class="card" id="quiz">
         <div class="barra"><span data-pos></span><span data-placar></span></div>
         <div class="meta" data-meta></div>
         <p class="enun" data-enun></p>
+        <div class="certeza" data-certeza>Certeza:
+            <button type="button" data-c="sei">1 · Sei</button>
+            <button type="button" data-c="acho">2 · Acho</button>
+            <button type="button" data-c="chute">3 · Chute</button>
+        </div>
         <div class="opts" data-opts></div>
         <div data-retorno hidden>
             <div class="res" data-res></div>
+            <div class="caixa-info" data-caixa></div>
             <div data-ponto></div>
             <details class="com" data-com-box><summary>Comentário do caderno</summary><pre data-com></pre></details>
             <div class="acoes">
@@ -139,12 +201,12 @@
         <h2 data-fim-titulo></h2>
         <ul data-fim-lista></ul>
         <div class="acoes">
-            <a class="btn main" href="{{ route('concursos.material.refazer', [$material, 'situacao' => 'errando', 'ordem' => 'aleatoria', 'iniciar' => 1] + array_filter(['secao' => $f['secao'] ?? null, 'ponto' => $f['ponto'] ?? null, 'capitulo' => $f['capitulo'] ?? null])) }}">Refazer as que ainda erro</a>
-            <a class="btn" href="{{ route('concursos.material.refazer', $material) }}">Escolher outras</a>
-            <a class="btn" href="{{ route('concursos.material.show', $material) }}">Voltar ao livro</a>
+            <a class="btn main" href="{{ route('concursos.material.refazer', [$material, 'situacao' => 'fila', 'iniciar' => 1]) }}">Continuar a fila de hoje</a>
+            <a class="btn" href="{{ route('concursos.material.refazer', $material) }}">Voltar às Questões</a>
+            <a class="btn" href="{{ route('concursos.material.show', $material) }}">Ir ao resumo</a>
         </div>
     </div>
-    <p class="muted small">Teclas: letra da alternativa (ou C/E) para responder, Enter para a próxima.</p>
+    <p class="muted small">Teclas: 1/2/3 para a certeza, letra da alternativa (ou C/E) para responder, Enter para a próxima. Acerto no “chute” não sobe de caixa.</p>
     @csrf
 @endif
 
@@ -184,8 +246,14 @@
     });
 
     if (!fila.length) return;
-    let i = 0, acertos = 0, respondida = false;
+    let i = 0, acertos = 0, respondida = false, certeza = 'sei';
     const erros = [];
+    const certezaBox = $('[data-certeza]');
+    function marcarCerteza(c) {
+        certeza = c;
+        certezaBox.querySelectorAll('button').forEach(b => b.classList.toggle('on', b.dataset.c === c));
+    }
+    certezaBox.addEventListener('click', e => { const b = e.target.closest('button[data-c]'); if (b && !respondida) marcarCerteza(b.dataset.c); });
 
     function mostrar() {
         const q = fila[i];
@@ -194,7 +262,8 @@
         $('[data-placar]').textContent = i ? `${acertos} de ${i} certas` : '';
         const meta = $('[data-meta]');
         meta.replaceChildren();
-        [['', q.caderno], ['Assunto: ', q.assunto], ['', q.origem], ['Antes: ', q.antes]].forEach(([r, v]) => {
+        marcarCerteza('sei');
+        [['', q.caderno], ['Assunto: ', q.assunto], ['', q.origem], ['Antes: ', q.antes], ['Caixa ', q.caixa ? String(q.caixa) : null]].forEach(([r, v]) => {
             if (!v) return;
             const s = document.createElement('span');
             if (r) { const b = document.createElement('b'); b.textContent = r; s.append(b); }
@@ -220,7 +289,7 @@
         if (respondida) return;
         respondida = true;
         const q = fila[i];
-        const corpo = new FormData(); corpo.append('resposta', letra); corpo.append('_token', token);
+        const corpo = new FormData(); corpo.append('resposta', letra); corpo.append('certeza', certeza); corpo.append('_token', token);
         const resp = await fetch(q.url, { method: 'POST', body: corpo, headers: { 'Accept': 'application/json' } });
         if (!resp.ok) { respondida = false; alert('Não consegui registrar a resposta. Recarregue a página.'); return; }
         const r = await resp.json();
@@ -234,16 +303,21 @@
         const nome = x => q.tipo === 'CE' ? (x === 'C' ? 'Certo' : 'Errado') : x;
         res.className = 'res ' + (r.acertou ? 'ok' : 'no');
         res.textContent = r.acertou ? `Acertou! Gabarito: ${nome(r.gabarito)}` : `Errou. Você marcou ${nome(letra)}; o gabarito é ${nome(r.gabarito)}.`;
+        $('[data-caixa]').textContent = r.caixa ?? '';
+        $('[data-caixa]').hidden = !r.caixa;
         const ponto = $('[data-ponto]');
         ponto.innerHTML = '';
-        if (r.ponto) {
+        r.ponto = r.pontos?.[0] ?? null;
+        if (r.pontos?.length) {
             // HTML gerado no servidor a partir do resumo (Markdown escapado).
-            ponto.innerHTML = `<div class="bloco"><span>No resumo</span><div><a href="${r.ponto.url}">${escapar(r.ponto.titulo)}</a></div></div>`
-                + (r.ponto.armadilha ? `<div class="bloco armadilha"><span>Onde caio</span><div>${r.ponto.armadilha}</div></div>` : '')
-                + (r.ponto.regra ? `<div class="bloco regra"><span>Regra certa</span><div>${r.ponto.regra}</div></div>` : '')
-                + (r.ponto.base_legal ? `<div class="bloco"><span>Base legal</span><div>${r.ponto.base_legal}</div></div>` : '');
-        } else if (r.livro) {
-            ponto.innerHTML = `<div class="bloco"><span>No livro</span><div><a href="${r.livro}">Ver o capítulo deste assunto</a></div></div>`;
+            ponto.innerHTML = r.pontos.map(p => `<div class="ponto-card"><div class="bloco"><span>Ponto</span><div><a href="${p.url}">${escapar(p.titulo)}</a>${p.etiqueta ? `<span class="etq">${escapar(p.etiqueta)}</span>` : ''}</div></div>`
+                + (p.armadilha ? `<div class="bloco armadilha"><span>Onde caio</span><div>${p.armadilha}</div></div>` : '')
+                + (p.regra ? `<div class="bloco regra"><span>Regra certa</span><div>${p.regra}</div></div>` : '')
+                + (p.macete ? `<div class="bloco"><span>Macete</span><div>${p.macete}</div></div>` : '')
+                + (p.base_legal ? `<div class="bloco"><span>Base legal</span><div>${p.base_legal}</div></div>` : '') + '</div>').join('');
+        }
+        if (r.livro) {
+            ponto.insertAdjacentHTML('beforeend', `<div class="bloco"><span>No resumo</span><div><a href="${r.livro}">Ver o capítulo deste assunto</a></div></div>`);
         }
         $('[data-com-box]').hidden = !r.comentario;
         $('[data-com-box]').open = !r.ponto;
@@ -278,6 +352,7 @@
         if (dlg.open || e.target.closest('input, select, textarea')) return;
         if (e.key === 'Enter' && respondida) { e.preventDefault(); return proxima(); }
         const k = e.key.toUpperCase();
+        if (!respondida && ['1', '2', '3'].includes(k)) return marcarCerteza(['sei', 'acho', 'chute'][+k - 1]);
         if (!respondida && fila[i].alternativas.some(a => a.letra === k)) responder(k);
     });
     mostrar();
