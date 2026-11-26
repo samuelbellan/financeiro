@@ -35,8 +35,8 @@
     "semantic_hash": ""
   },
   "app/Http/Controllers/AuthController.php": {
-    "mtime": 1794649299.9805708,
-    "ast_hash": "fc6169c1d796de2f2f81f28c50bee18c",
+    "mtime": 1795268712.2886977,
+    "ast_hash": "61694b361f5be7a5994efeb8ae1b2ed7",
     "semantic_hash": ""
   },
   "app/Http/Controllers/CartoesController.php": {
@@ -55,8 +55,8 @@
     "semantic_hash": ""
   },
   "app/Http/Controllers/EstudosController.php": {
-    "mtime": 1795080718.767061,
-    "ast_hash": "6f25f7b72541b5f6dc33e65b3cd6ec88",
+    "mtime": 1795511797.2287378,
+    "ast_hash": "2442e76d57eab326325616ffac572d92",
     "semantic_hash": ""
   },
   "app/Http/Controllers/ExportController.php": {
@@ -80,8 +80,8 @@
     "semantic_hash": ""
   },
   "app/Http/Controllers/TelegramWebhookController.php": {
-    "mtime": 1795189960.1109536,
-    "ast_hash": "0b7a3854d22160bc87f1b873f5648af9",
+    "mtime": 1795423978.3396678,
+    "ast_hash": "bcb127eb7fa55800a38038a9b44d76e2",
     "semantic_hash": ""
   },
   "app/Models/Cartao.php": {
@@ -135,8 +135,8 @@
     "semantic_hash": ""
   },
   "app/Models/User.php": {
-    "mtime": 1794386319.6280584,
-    "ast_hash": "c69ae48132397204f21a01b5ed6f78b7",
+    "mtime": 1795423978.3426678,
+    "ast_hash": "9bdc69ce6ba49547a79e7168bed45aa7",
     "semantic_hash": ""
   },
   "app/Models/WhatsappLog.php": {
@@ -145,8 +145,8 @@
     "semantic_hash": ""
   },
   "app/Providers/AppServiceProvider.php": {
-    "mtime": 1788706090.3780994,
-    "ast_hash": "f428776ac9e726ca7411e6bf3a38e49b",
+    "mtime": 1795271500.183148,
+    "ast_hash": "205367827fb421e4de9db54539b91180",
     "semantic_hash": ""
   },
   "app/Services/CategorySanitizer.php": {
@@ -185,8 +185,8 @@
     "semantic_hash": ""
   },
   "bootstrap/app.php": {
-    "mtime": 1794680572.3694458,
-    "ast_hash": "06c2a442ce6506ba5a6eb0c89422d5da",
+    "mtime": 1795459195.198701,
+    "ast_hash": "65cbe674088025cad06732ef4e01bab9",
     "semantic_hash": ""
   },
   "bootstrap/providers.php": {
@@ -215,8 +215,8 @@
     "semantic_hash": ""
   },
   "config/database.php": {
-    "mtime": 1791556831.5115921,
-    "ast_hash": "f8fc3c34166024c6fa9963eecca6977c",
+    "mtime": 1795268114.415519,
+    "ast_hash": "64ede0d23aef7120f646ae940e5001ec",
     "semantic_hash": ""
   },
   "config/filesystems.php": {
@@ -405,8 +405,8 @@
     "semantic_hash": ""
   },
   "package.json": {
-    "mtime": 1793472684.6958554,
-    "ast_hash": "47900191e1a4d9eadd936bab1492b831",
+    "mtime": 1795510531.2804618,
+    "ast_hash": "bbf4319c1ed355bcce039601e915dc9a",
     "semantic_hash": ""
   },
   "public/index.php": {
@@ -440,27 +440,27 @@
     "semantic_hash": ""
   },
   "resources/views/financas/cartoes.blade.php": {
-    "mtime": 1795253574.2311819,
-    "ast_hash": "b83fadfa54cf6880ba5ea25eb976bf54",
+    "mtime": 1795423978.639547,
+    "ast_hash": "c35d5607d8983e1b16290a5091253061",
     "semantic_hash": ""
   },
   "resources/views/financas/categorias.blade.php": {
-    "mtime": 1795253575.8074691,
+    "mtime": 1795423978.6405478,
     "ast_hash": "2ebd0b21a1ddfe09527c7673ad90cc03",
     "semantic_hash": ""
   },
   "resources/views/financas/index.blade.php": {
-    "mtime": 1795253577.275077,
-    "ast_hash": "cfbdbdd9b91789962914da9335825485",
+    "mtime": 1795423978.642547,
+    "ast_hash": "b29fa023a302b97df29653d94c67a6b4",
     "semantic_hash": ""
   },
   "resources/views/home.blade.php": {
-    "mtime": 1795253537.2193806,
-    "ast_hash": "d3c6e0aeb40357f2b880fb43e79e2c42",
+    "mtime": 1795423978.645547,
+    "ast_hash": "103f0e6ece284dcc06c4c79074103faa",
     "semantic_hash": ""
   },
   "resources/views/salary/index.blade.php": {
-    "mtime": 1795253580.172083,
+    "mtime": 1795423978.6475475,
     "ast_hash": "8bb18e6362f3000093d22adc121db348",
     "semantic_hash": ""
   },
@@ -475,8 +475,8 @@
     "semantic_hash": ""
   },
   "routes/web.php": {
-    "mtime": 1795253813.4969795,
-    "ast_hash": "98b110e23476175606c9df021d816044",
+    "mtime": 1795511799.235485,
+    "ast_hash": "e0c51d36108a09bcaa58c556c453d6c0",
     "semantic_hash": ""
   },
   "tests/Feature/ExampleTest.php": {
@@ -500,8 +500,8 @@
     "semantic_hash": ""
   },
   "vite.config.js": {
-    "mtime": 1793639275.4696088,
-    "ast_hash": "21870672fe128bbe2d51613eff20b18e",
+    "mtime": 1795511795.707095,
+    "ast_hash": "500436d5b855e1933627e215159d6c51",
     "semantic_hash": ""
   },
   ".agents/rules/graphify.md": {
@@ -580,7 +580,7 @@
     "semantic_hash": ""
   },
   "resources/views/financas/mercado.blade.php": {
-    "mtime": 1795253578.6137576,
+    "mtime": 1795423978.6445484,
     "ast_hash": "e7584bb9a236a2638b135cc80e46f924",
     "semantic_hash": ""
   },
@@ -710,7 +710,7 @@
     "semantic_hash": ""
   },
   "resources/views/treinos/index.blade.php": {
-    "mtime": 1795253581.6564705,
+    "mtime": 1795423978.650548,
     "ast_hash": "85a222eb118a0829da95ecfc0e6e2252",
     "semantic_hash": ""
   },
@@ -740,8 +740,8 @@
     "semantic_hash": ""
   },
   "tests/Feature/DatabaseSyncTest.php": {
-    "mtime": 1789564056.023126,
-    "ast_hash": "4b761b6d14f1a41c7f4e0001fd1a7e85",
+    "mtime": 1795267939.3087025,
+    "ast_hash": "3ab5ec80c2c39973164ac6fd3e8ef21f",
     "semantic_hash": ""
   },
   "tests/Feature/CartaoCompraTest.php": {
@@ -815,8 +815,8 @@
     "semantic_hash": ""
   },
   "tests/Feature/TelegramWebhookRoutingTest.php": {
-    "mtime": 1795189969.854811,
-    "ast_hash": "ae7af88fb694c33bd0ae7973167462d2",
+    "mtime": 1795423978.6545482,
+    "ast_hash": "35aeaa890c4b3943656257d36c0c4d77",
     "semantic_hash": ""
   },
   "app/Services/FinancialSummaryService.php": {
@@ -1045,8 +1045,8 @@
     "semantic_hash": ""
   },
   "app/Services/StudySyncService.php": {
-    "mtime": 1794817975.8598094,
-    "ast_hash": "daffa0f34dccddf0f41905cb22faa773",
+    "mtime": 1795294302.1624057,
+    "ast_hash": "13f366a323ec36e0fccf38aeadfbe3d7",
     "semantic_hash": ""
   },
   "database/migrations/2026_10_31_140000_drop_legacy_study_tables.php": {
@@ -1075,8 +1075,8 @@
     "semantic_hash": ""
   },
   "resources/js/estudos/avatars.js": {
-    "mtime": 1793639244.3398044,
-    "ast_hash": "cbbd5afdac17e473b5827f91c8419380",
+    "mtime": 1795511794.0977917,
+    "ast_hash": "6e184f2b1515540cddbee8e794b2c1fc",
     "semantic_hash": ""
   },
   "resources/js/estudos/db.js": {
@@ -1090,8 +1090,8 @@
     "semantic_hash": ""
   },
   "resources/js/estudos/main.js": {
-    "mtime": 1795256401.9635887,
-    "ast_hash": "cdae42bbd46b569caeb0939df1a5686b",
+    "mtime": 1795511945.910228,
+    "ast_hash": "8ed4e7679d3d0ff18a352a60c620c06a",
     "semantic_hash": ""
   },
   "resources/js/estudos/metrics.js": {
@@ -1115,13 +1115,13 @@
     "semantic_hash": ""
   },
   "tests/Feature/StudySyncTest.php": {
-    "mtime": 1794817975.8959863,
-    "ast_hash": "3b71ec6d26e3d5da3f85b6af344f1e90",
+    "mtime": 1795294439.0860906,
+    "ast_hash": "5f816c1796a69a42b835efe8ff1fda2b",
     "semantic_hash": ""
   },
   "tests/js/estudos/avatars.test.js": {
-    "mtime": 1793637967.8815384,
-    "ast_hash": "47448ba87852c7b7a25db7f1d8bae7e5",
+    "mtime": 1795511947.3039868,
+    "ast_hash": "1dbd40974160f5d65c8e96e80e68f1ba",
     "semantic_hash": ""
   },
   "tests/js/estudos/importer.test.js": {
@@ -1180,13 +1180,13 @@
     "semantic_hash": ""
   },
   "resources/views/admin/convites.blade.php": {
-    "mtime": 1795253572.677188,
-    "ast_hash": "714e014b317f40e77c1c2d5503cb9cce",
+    "mtime": 1795423978.627505,
+    "ast_hash": "800e56b7f3f5502d95bdc5b532766193",
     "semantic_hash": ""
   },
   "tests/Feature/GoogleAuthAndWhitelistTest.php": {
-    "mtime": 1793524654.0801623,
-    "ast_hash": "c2a9d89642b771e0afb0d4bf0b16a726",
+    "mtime": 1795268099.2869961,
+    "ast_hash": "786527c2299c13bf4e1027767bb7c9bb",
     "semantic_hash": ""
   },
   "app/Console/Commands/ImportarHoleritesCommand.php": {
@@ -1285,8 +1285,8 @@
     "semantic_hash": ""
   },
   "resources/js/estudos/avatars-imagem.js": {
-    "mtime": 1793639353.0715635,
-    "ast_hash": "9398aa7885bb3967f12b8d1d60011fa8",
+    "mtime": 1795511791.2056088,
+    "ast_hash": "43dda17176ecd5784eaee0a31c3a4545",
     "semantic_hash": ""
   },
   "resources/js/estudos/avatars-vetor.js": {
@@ -1490,13 +1490,13 @@
     "semantic_hash": ""
   },
   "app/Http/Controllers/EstudosApiController.php": {
-    "mtime": 1794680572.3673391,
-    "ast_hash": "cf89525091beb58bcb852b6514a97cd0",
+    "mtime": 1795294303.512496,
+    "ast_hash": "3e321673e409c74924bfff3be5da9e09",
     "semantic_hash": ""
   },
   "app/Services/GurujaComandoResumoService.php": {
-    "mtime": 1794680572.3689158,
-    "ast_hash": "e6ceed72acb519107b8e3be12a9c3e28",
+    "mtime": 1795341129.9543452,
+    "ast_hash": "46c9ce991e3ca7cf3299fadc53fb6e87",
     "semantic_hash": ""
   },
   "database/migrations/2026_11_08_120000_create_study_api_tokens_table.php": {
@@ -1535,8 +1535,8 @@
     "semantic_hash": ""
   },
   "tests/Feature/EstudosGurujaTest.php": {
-    "mtime": 1794817975.8949873,
-    "ast_hash": "b3f25404419410ad20d072539d8946ce",
+    "mtime": 1795342790.9741573,
+    "ast_hash": "402d4954230b581a15a6e4f9804ebc1d",
     "semantic_hash": ""
   },
   "public/bosses/imagens-fonte/boss-06.png": {
@@ -1650,28 +1650,28 @@
     "semantic_hash": ""
   },
   "app/Http/Controllers/ConcursosController.php": {
-    "mtime": 1795253811.897434,
-    "ast_hash": "c46567da3f3f905964cefceebd76d76e",
+    "mtime": 1795423978.3376684,
+    "ast_hash": "252fd1baee990cd4fb688ec6907cc4b9",
     "semantic_hash": ""
   },
   "app/Models/ConcursoState.php": {
-    "mtime": 1795253512.3323843,
-    "ast_hash": "5e18546bb0be30045d133643548553ef",
+    "mtime": 1795423978.340669,
+    "ast_hash": "60aeb987a1a96cdd2a95318825062588",
     "semantic_hash": ""
   },
   "database/migrations/2026_11_21_000001_create_concursos_states_table.php": {
-    "mtime": 1795253510.8104203,
-    "ast_hash": "b33eed7ce90879227ff9ede742ebfe61",
+    "mtime": 1795423978.3476682,
+    "ast_hash": "2a4236988d25c6d533db954e863cb9ef",
     "semantic_hash": ""
   },
   "tests/Feature/ConcursosTest.php": {
-    "mtime": 1795253815.4591465,
-    "ast_hash": "5b70df00a9af0b36623dba84b487cd97",
+    "mtime": 1795423978.6535454,
+    "ast_hash": "f6308ed1e8cc0ef18d9105e15810cf12",
     "semantic_hash": ""
   },
   "docs/MANUAL_ESTUDO_CONCURSOS.md": {
-    "mtime": 1795253816.726057,
-    "ast_hash": "ee2cd0c6261ddabc5aa4cc037d6d27ef",
+    "mtime": 1795465472.9815361,
+    "ast_hash": "a027ef5200abc012cbb3bfe973fc41f6",
     "semantic_hash": ""
   },
   "docs/relatorio-saude-financeira-2027.html": {
@@ -1680,298 +1680,1303 @@
     "semantic_hash": ""
   },
   "resources/concursos/caderno.html": {
-    "mtime": 1795253347.1954308,
+    "mtime": 1795423978.6205046,
     "ast_hash": "a855cc4900ec4451ef97ef1047d7c301",
     "semantic_hash": ""
   },
   "resources/concursos/flashcards.html": {
-    "mtime": 1795253347.2820115,
+    "mtime": 1795423978.6215036,
     "ast_hash": "cb1ea2e5a106cd2087c9a7f4fe94477f",
     "semantic_hash": ""
   },
   "resources/concursos/inicio.html": {
-    "mtime": 1795253347.2840075,
+    "mtime": 1795423978.622507,
     "ast_hash": "a5923302d9191a6a32c747270e55ce0b",
     "semantic_hash": ""
   },
   "resources/concursos/leis.html": {
-    "mtime": 1795253347.2971363,
+    "mtime": 1795423978.6235042,
     "ast_hash": "5b36023af67e9e74126499b6d3c4abc9",
     "semantic_hash": ""
   },
   "resources/concursos/refazer.html": {
-    "mtime": 1795253347.3321373,
+    "mtime": 1795423978.624505,
     "ast_hash": "fb2a9d62ec4af69cbae0db3e74ab5155",
     "semantic_hash": ""
   },
   "resources/concursos/resumos.html": {
-    "mtime": 1795253347.3321373,
+    "mtime": 1795423978.6255043,
     "ast_hash": "50aa1a642977725f445ab2fd2e8e5219",
     "semantic_hash": ""
   },
   "resources/concursos/simulados.html": {
-    "mtime": 1795253347.3331368,
+    "mtime": 1795423978.626504,
     "ast_hash": "074bd1fd48fe4578047cc886e89741da",
     "semantic_hash": ""
   },
   "public/concursos-app/js/armazenamento.js": {
-    "mtime": 1795253506.4409578,
+    "mtime": 1795423978.544195,
     "ast_hash": "ed1690b3aaa7b3c66b9d679f36226f17",
     "semantic_hash": ""
   },
   "public/concursos-app/js/caderno.js": {
-    "mtime": 1795253347.2849844,
+    "mtime": 1795423978.546194,
     "ast_hash": "719df5a58a3383b535b4816d4b719813",
     "semantic_hash": ""
   },
   "public/concursos-app/js/carregar.js": {
-    "mtime": 1795253347.2859862,
+    "mtime": 1795423978.5471933,
     "ast_hash": "49e0893739a0f40166a207f17ad36316",
     "semantic_hash": ""
   },
   "public/concursos-app/js/config.js": {
-    "mtime": 1795253347.2859862,
+    "mtime": 1795423978.5481944,
     "ast_hash": "4c51c1cae10156fef4d7c41262f7795d",
     "semantic_hash": ""
   },
   "public/concursos-app/js/edital.js": {
-    "mtime": 1795253347.2869833,
+    "mtime": 1795423978.5481944,
     "ast_hash": "9591f37c5dc607b3ffa0091278ba3cc9",
     "semantic_hash": ""
   },
   "public/concursos-app/js/erros-questoes.js": {
-    "mtime": 1795253347.2875195,
+    "mtime": 1795423978.5491939,
     "ast_hash": "4e031d9760b5848288e25f2f12c29609",
     "semantic_hash": ""
   },
   "public/concursos-app/js/flashcards.js": {
-    "mtime": 1795253347.288525,
+    "mtime": 1795423978.5511932,
     "ast_hash": "d0b5fca4da12c0c507535a2d3b09d33f",
     "semantic_hash": ""
   },
   "public/concursos-app/js/fundamento.js": {
-    "mtime": 1795253347.288525,
+    "mtime": 1795423978.552193,
     "ast_hash": "307681c954a4d886ae39718cf93f2b5d",
     "semantic_hash": ""
   },
   "public/concursos-app/js/historico.js": {
-    "mtime": 1795253347.289525,
+    "mtime": 1795423978.5531948,
     "ast_hash": "4acdf0e46c90dc13a6dab0d74102ce1a",
     "semantic_hash": ""
   },
   "public/concursos-app/js/inicio.js": {
-    "mtime": 1795253347.289525,
+    "mtime": 1795423978.5551982,
     "ast_hash": "6ac8575858823b9142935c604e873f0a",
     "semantic_hash": ""
   },
   "public/concursos-app/js/lei-seca.js": {
-    "mtime": 1795253347.290525,
+    "mtime": 1795423978.5561967,
     "ast_hash": "e93bbc5cab31ceee1bcfd0e92244051f",
     "semantic_hash": ""
   },
   "public/concursos-app/js/meus-cards.js": {
-    "mtime": 1795253347.2915246,
+    "mtime": 1795423978.5571933,
     "ast_hash": "32099c3f4c7eded1f53b38984df842f9",
     "semantic_hash": ""
   },
   "public/concursos-app/js/nav.js": {
-    "mtime": 1795253507.5739882,
+    "mtime": 1795423978.5581927,
     "ast_hash": "51f8563b4efad88c904cbd792c82f58c",
     "semantic_hash": ""
   },
   "public/concursos-app/js/questoes-dia.js": {
-    "mtime": 1795253347.2925272,
+    "mtime": 1795423978.5591938,
     "ast_hash": "8e81dcdc5dd742a09d5bb85271d5545e",
     "semantic_hash": ""
   },
   "public/concursos-app/js/questoes-fit.js": {
-    "mtime": 1795253347.2925272,
+    "mtime": 1795423978.560194,
     "ast_hash": "f19a6a1ab4b51d843a4af92d63c384f5",
     "semantic_hash": ""
   },
   "public/concursos-app/js/ref-lei.js": {
-    "mtime": 1795253347.293526,
+    "mtime": 1795423978.5612018,
     "ast_hash": "9f3b9bb300f77a06cf72a4ca276a4135",
     "semantic_hash": ""
   },
   "public/concursos-app/js/refazer.js": {
-    "mtime": 1795253347.294131,
+    "mtime": 1795423978.5622008,
     "ast_hash": "2d821cfb8bc76b9e0daac57adf1d7688",
     "semantic_hash": ""
   },
   "public/concursos-app/js/resumos.js": {
-    "mtime": 1795253347.2951367,
+    "mtime": 1795423978.5632012,
     "ast_hash": "06578a93ff6974213948f39bc3b46aa0",
     "semantic_hash": ""
   },
   "public/concursos-app/js/revisar.js": {
-    "mtime": 1795253347.2951367,
+    "mtime": 1795423978.5642045,
     "ast_hash": "44770fb7a4b906ff6e961b199b1259ec",
     "semantic_hash": ""
   },
   "public/concursos-app/js/simulados.js": {
-    "mtime": 1795253347.2961369,
+    "mtime": 1795423978.5652027,
     "ast_hash": "284baf91503efdf726b5528aea8ccc8a",
     "semantic_hash": ""
   },
   "public/concursos-app/js/texto-lei.js": {
-    "mtime": 1795253347.2961369,
+    "mtime": 1795423978.5662007,
     "ast_hash": "58bfec81d57537bca438bbca43030ad5",
     "semantic_hash": ""
   },
   "public/concursos-app/tools/gerar_dados.py": {
-    "mtime": 1795253347.3351376,
+    "mtime": 1795423978.616498,
     "ast_hash": "7f6f4dec2077893a1edc9b85db697773",
     "semantic_hash": ""
   },
   "public/concursos-app/tools/leis_dispositivos.py": {
-    "mtime": 1795253347.3361373,
+    "mtime": 1795423978.6175048,
     "ast_hash": "e0ba4fbb6ae4ab516102d0edb62a57c4",
     "semantic_hash": ""
   },
   "public/concursos-app/tools/leis_planalto_para_md.py": {
-    "mtime": 1795253347.3361373,
+    "mtime": 1795423978.6185048,
     "ast_hash": "331db62b37169b781299c62905605357",
     "semantic_hash": ""
   },
   "public/concursos-app/tools/stf_jurisprudencia.py": {
-    "mtime": 1795253347.3371387,
+    "mtime": 1795423978.6195047,
     "ast_hash": "03cf5e2ed764579991e7eb2a132f15f5",
     "semantic_hash": ""
   },
   "public/concursos-app/leis/constituicao-federal-1988.md": {
-    "mtime": 1795253347.3001387,
+    "mtime": 1795423978.5702002,
     "ast_hash": "8e016665ecbd5cb277a1d02722d373a1",
     "semantic_hash": ""
   },
   "public/concursos-app/leis/decreto-1171-1994-etica.md": {
-    "mtime": 1795253347.3001387,
+    "mtime": 1795423978.5712001,
     "ast_hash": "73377048718d2f35fe77348890eaf74a",
     "semantic_hash": ""
   },
   "public/concursos-app/leis/lei-12527-2011-lai.md": {
-    "mtime": 1795253347.3011374,
+    "mtime": 1795423978.5721998,
     "ast_hash": "58dc4877d6f5b8263614b9a6a4ac4353",
     "semantic_hash": ""
   },
   "public/concursos-app/leis/lei-13709-2018-lgpd.md": {
-    "mtime": 1795253347.302137,
+    "mtime": 1795423978.5732007,
     "ast_hash": "bd6b34aeab6243e0531442068ab4167b",
     "semantic_hash": ""
   },
   "public/concursos-app/leis/lei-14063-2020-assinaturas-eletronicas.md": {
-    "mtime": 1795253347.302137,
+    "mtime": 1795423978.5742018,
     "ast_hash": "1e6b54b30f16a04547b860ce0033f68d",
     "semantic_hash": ""
   },
   "public/concursos-app/leis/lei-14133-2021-licitacoes.md": {
-    "mtime": 1795253347.3041363,
+    "mtime": 1795423978.5770538,
     "ast_hash": "50175a75b0a660557c238d3f95bd9ae5",
     "semantic_hash": ""
   },
   "public/concursos-app/leis/lei-4320-1964.md": {
-    "mtime": 1795253347.3051367,
+    "mtime": 1795423978.5780597,
     "ast_hash": "2f2de376216a6fc4bd63e86083e72c5c",
     "semantic_hash": ""
   },
   "public/concursos-app/leis/lei-5172-1966-ctn.md": {
-    "mtime": 1795253347.3071659,
+    "mtime": 1795423978.580061,
     "ast_hash": "30ce8514ceea5e07ba9c7e012ae6c85e",
     "semantic_hash": ""
   },
   "public/concursos-app/leis/lei-6404-1976.md": {
-    "mtime": 1795253347.30917,
+    "mtime": 1795423978.5830605,
     "ast_hash": "62dad474ed39526b4e2b3ceef55413df",
     "semantic_hash": ""
   },
   "public/concursos-app/leis/lei-8137-1990-crimes-ordem-tributaria.md": {
-    "mtime": 1795253347.3101676,
+    "mtime": 1795423978.5840607,
     "ast_hash": "9a575cbfacb2955c91cb06e183115fb5",
     "semantic_hash": ""
   },
   "public/concursos-app/leis/lei-9784-1999-processo-administrativo.md": {
-    "mtime": 1795253347.3101676,
+    "mtime": 1795423978.5850885,
     "ast_hash": "4d73ee4e7213e582ca69bd10b24957b0",
     "semantic_hash": ""
   },
   "public/concursos-app/leis/lei-complementar-101-2000-lrf.md": {
-    "mtime": 1795253347.3111374,
+    "mtime": 1795423978.5861557,
     "ast_hash": "35d3ff7f0ab1fe56c434388d2d7a1b27",
     "semantic_hash": ""
   },
   "public/concursos-app/leis/lei-complementar-116-2003-iss.md": {
-    "mtime": 1795253347.312169,
+    "mtime": 1795423978.587221,
     "ast_hash": "c5925293f5611c3f4f9fb9546db2efbc",
     "semantic_hash": ""
   },
   "public/concursos-app/leis/mcasp-11.md": {
-    "mtime": 1795253347.3211424,
+    "mtime": 1795423978.596491,
     "ast_hash": "436491c6872a902d8b57ded18829f507",
     "semantic_hash": ""
   },
   "public/concursos-app/leis/nbc-ta-330-r1.md": {
-    "mtime": 1795253347.3221407,
+    "mtime": 1795423978.5974972,
     "ast_hash": "43079297d167e7575e7b234968a033b8",
     "semantic_hash": ""
   },
   "public/concursos-app/leis/nbc-ta-530.md": {
-    "mtime": 1795253347.3221407,
+    "mtime": 1795423978.5984986,
     "ast_hash": "5c139a534b01f5ff4ef7d8f3d01b0bd7",
     "semantic_hash": ""
   },
   "public/concursos-app/leis/nbc-tg-03.md": {
-    "mtime": 1795253347.3231404,
+    "mtime": 1795423978.5994992,
     "ast_hash": "76329274e72c7ecc6710f153bf7c9664",
     "semantic_hash": ""
   },
   "public/concursos-app/leis/nbc-tg-07.md": {
-    "mtime": 1795253347.3241363,
+    "mtime": 1795423978.6004999,
     "ast_hash": "89f1f3be4652dd27c492ae7f241c0670",
     "semantic_hash": ""
   },
   "public/concursos-app/leis/nbc-tg-16.md": {
-    "mtime": 1795253347.3241363,
+    "mtime": 1795423978.602498,
     "ast_hash": "577aceb0ceeaf85a3f84bfbce54cefc2",
     "semantic_hash": ""
   },
   "public/concursos-app/leis/nbc-tg-23.md": {
-    "mtime": 1795253347.3251367,
+    "mtime": 1795423978.6034987,
     "ast_hash": "9c00c04dca04c0bc866e9d6d3cd3a0ce",
     "semantic_hash": ""
   },
   "public/concursos-app/leis/nbc-tg-26.md": {
-    "mtime": 1795253347.3261368,
+    "mtime": 1795423978.604497,
     "ast_hash": "11338379d4dfcd15744d33ebbbfeb239",
     "semantic_hash": ""
   },
   "public/concursos-app/leis/nbc-tg-27.md": {
-    "mtime": 1795253347.32714,
+    "mtime": 1795423978.6054986,
     "ast_hash": "c5fb552fc90e5f3c5c37f0a1398369d9",
     "semantic_hash": ""
   },
   "public/concursos-app/leis/nbc-tg-ec.md": {
-    "mtime": 1795253347.3291364,
+    "mtime": 1795423978.608498,
     "ast_hash": "5b5165844ad1a62cfe91b3a65bbbd571",
     "semantic_hash": ""
   },
   "public/concursos-app/leis/nbc-tsp-07.md": {
-    "mtime": 1795253347.3291364,
+    "mtime": 1795423978.6104994,
     "ast_hash": "78fa82b2827811efa60e6195bcba1f23",
     "semantic_hash": ""
   },
   "public/concursos-app/leis/nbc-tsp-11-r1.md": {
-    "mtime": 1795253347.3301365,
+    "mtime": 1795423978.6114993,
     "ast_hash": "faa4a8e903e637cf7f2581abb295676d",
     "semantic_hash": ""
   },
   "public/concursos-app/leis/nbc-tsp-ec-r1.md": {
-    "mtime": 1795253347.3321373,
+    "mtime": 1795423978.6134973,
     "ast_hash": "9a6c6e2faf779393e447596f6a89f752",
     "semantic_hash": ""
   },
   "public/concursos-app/icone.svg": {
-    "mtime": 1795253347.282981,
+    "mtime": 1795423978.543195,
     "ast_hash": "3ff4e3e3abf7d0fc3d0474f22ba7e07a",
+    "semantic_hash": ""
+  },
+  "app/Console/Commands/BackupConcursosCommand.php": {
+    "mtime": 1795268161.5637858,
+    "ast_hash": "0f7e2220b16f0f6be1741979f85608c0",
+    "semantic_hash": ""
+  },
+  "app/Console/Commands/BaixarLeisCommand.php": {
+    "mtime": 1795423978.3346984,
+    "ast_hash": "46e2c92997b4505fe9fcd4833f033532",
+    "semantic_hash": ""
+  },
+  "app/Console/Commands/GerarPacotesCommand.php": {
+    "mtime": 1795307074.0168395,
+    "ast_hash": "0b80ce5d2d847b52ce0637fc5c82ae45",
+    "semantic_hash": ""
+  },
+  "app/Console/Commands/ImportarArvoreAssuntosCommand.php": {
+    "mtime": 1795292973.670243,
+    "ast_hash": "a12550da106126bdb3958d6dd3f51ce7",
+    "semantic_hash": ""
+  },
+  "app/Console/Commands/ImportarCadernoTecCommand.php": {
+    "mtime": 1795272724.6001675,
+    "ast_hash": "72e89280eaa867316fcfaac887baa4da",
+    "semantic_hash": ""
+  },
+  "app/Console/Commands/ImportarEditalCommand.php": {
+    "mtime": 1795272724.5991573,
+    "ast_hash": "23eb17e664451a4e7f0c88e2f4da0ef9",
+    "semantic_hash": ""
+  },
+  "app/Console/Commands/ImportarGeminiCommand.php": {
+    "mtime": 1795291542.9273872,
+    "ast_hash": "39da7565a5f32d0cb60f594005d9c733",
+    "semantic_hash": ""
+  },
+  "app/Console/Commands/ImportarIneditasCommand.php": {
+    "mtime": 1795308544.8235443,
+    "ast_hash": "34d92613681c5654952f8459f5e9a8fe",
+    "semantic_hash": ""
+  },
+  "app/Console/Commands/ImportarMaterialCommand.php": {
+    "mtime": 1795425663.0487032,
+    "ast_hash": "87b22bfbbfeb34d9fbdf148318734644",
+    "semantic_hash": ""
+  },
+  "app/Console/Commands/ImportarTecApiCommand.php": {
+    "mtime": 1795469566.5129938,
+    "ast_hash": "2ae2137071e8f23080500815423ca9b0",
+    "semantic_hash": ""
+  },
+  "app/Console/Commands/LerCadernoTecCommand.php": {
+    "mtime": 1795271226.149684,
+    "ast_hash": "871a07539eb7c35b159dd3944ad915cf",
+    "semantic_hash": ""
+  },
+  "app/Console/Commands/MaterialBaseTeoricaCommand.php": {
+    "mtime": 1795465472.9784384,
+    "ast_hash": "371205087f50af2d72de05af28e3a935",
+    "semantic_hash": ""
+  },
+  "app/Console/Commands/MaterialParaLivroCommand.php": {
+    "mtime": 1795459195.1862924,
+    "ast_hash": "83d47033212f299afd4d27a3e9588e2f",
+    "semantic_hash": ""
+  },
+  "app/Console/Commands/SincronizarTempoCommand.php": {
+    "mtime": 1795294383.4415739,
+    "ast_hash": "96c3b908ec20bf8f0781a3285de1b253",
+    "semantic_hash": ""
+  },
+  "app/Console/Commands/UsuarioModulosCommand.php": {
+    "mtime": 1795268075.507456,
+    "ast_hash": "44eea1faad8d8f38a3b80d1310ebfc64",
+    "semantic_hash": ""
+  },
+  "app/Http/Controllers/Concursos/CuradoriaController.php": {
+    "mtime": 1795296869.3302767,
+    "ast_hash": "d867d9a2d6ed761bd07f8cde0708df30",
+    "semantic_hash": ""
+  },
+  "app/Http/Controllers/Concursos/LeisController.php": {
+    "mtime": 1795459195.1872926,
+    "ast_hash": "4668b8151ec13c8143987a2163f962ce",
+    "semantic_hash": ""
+  },
+  "app/Http/Controllers/Concursos/LivroController.php": {
+    "mtime": 1795459195.1882925,
+    "ast_hash": "7428ff3dcf9d239a4cc2c3ecaedc5ba0",
+    "semantic_hash": ""
+  },
+  "app/Http/Controllers/Concursos/MaterialController.php": {
+    "mtime": 1795459195.1892924,
+    "ast_hash": "b199900e09ed003f35c6e08899097139",
+    "semantic_hash": ""
+  },
+  "app/Http/Controllers/Concursos/MetaController.php": {
+    "mtime": 1795345274.1556194,
+    "ast_hash": "856ff16eb163bc4823bae34365068bfe",
+    "semantic_hash": ""
+  },
+  "app/Http/Controllers/Concursos/PainelController.php": {
+    "mtime": 1795308241.5840373,
+    "ast_hash": "fb99181b0de4ed04ebeb66bd9d638b8a",
+    "semantic_hash": ""
+  },
+  "app/Http/Controllers/Concursos/QuestoesController.php": {
+    "mtime": 1795292544.407885,
+    "ast_hash": "eac5be51e7c63ad019af0fe34e1f5845",
+    "semantic_hash": ""
+  },
+  "app/Http/Controllers/Concursos/RefazerController.php": {
+    "mtime": 1795459195.1897972,
+    "ast_hash": "dd1aaec9b8c7f8273d2508762fbcc129",
+    "semantic_hash": ""
+  },
+  "app/Http/Controllers/Concursos/SimuladosController.php": {
+    "mtime": 1795308347.1584756,
+    "ast_hash": "86ec1ff917f94eb0678025d021c7e1fd",
+    "semantic_hash": ""
+  },
+  "app/Http/Controllers/Concursos/UsoController.php": {
+    "mtime": 1795505272.48111,
+    "ast_hash": "a7e0601a8d0ca87b2e0135f4316128c9",
+    "semantic_hash": ""
+  },
+  "app/Http/Middleware/EnsureConcursosHabilitado.php": {
+    "mtime": 1795291981.9039593,
+    "ast_hash": "45b056f81e8297ae48de12ed2a463e64",
+    "semantic_hash": ""
+  },
+  "app/Http/Middleware/EnsureModuloPermitido.php": {
+    "mtime": 1795268047.7392197,
+    "ast_hash": "15dcebccd4570b53f525809e58c44f6e",
+    "semantic_hash": ""
+  },
+  "app/Http/Middleware/EnsurePlanoConcursos.php": {
+    "mtime": 1795423978.3396678,
+    "ast_hash": "670d955fb6cb37be9d0f0f98a2fa4977",
+    "semantic_hash": ""
+  },
+  "app/Http/Middleware/EnsureUserIsOwner.php": {
+    "mtime": 1795267921.9848988,
+    "ast_hash": "2b21771ed1189729281a80f8a63b4082",
+    "semantic_hash": ""
+  },
+  "app/Http/Middleware/RegistraUsoConcursos.php": {
+    "mtime": 1795505233.726891,
+    "ast_hash": "dbf1fa96b9f7afad78e6e539da075cd4",
+    "semantic_hash": ""
+  },
+  "app/Models/Concursos/Assunto.php": {
+    "mtime": 1795278411.1215885,
+    "ast_hash": "80422ebb7b1fcc81afea91ac7dc73045",
+    "semantic_hash": ""
+  },
+  "app/Models/Concursos/ConcursosModel.php": {
+    "mtime": 1795271524.862592,
+    "ast_hash": "c8f43cd08d9cb8315427c4135174aa53",
+    "semantic_hash": ""
+  },
+  "app/Models/Concursos/Disciplina.php": {
+    "mtime": 1795271524.8636281,
+    "ast_hash": "01a6b694170c0faac9aec89883665877",
+    "semantic_hash": ""
+  },
+  "app/Models/Concursos/Edital.php": {
+    "mtime": 1795271929.4905262,
+    "ast_hash": "b4d09d82f2192e73124991114881f8ae",
+    "semantic_hash": ""
+  },
+  "app/Models/Concursos/EditalArea.php": {
+    "mtime": 1795271929.4915257,
+    "ast_hash": "a3b9f9a5f98dffb8275178233fa5b1e4",
+    "semantic_hash": ""
+  },
+  "app/Models/Concursos/EditalCargo.php": {
+    "mtime": 1795271929.4905262,
+    "ast_hash": "c04eae55711bcfc820bfd86a73091bb9",
+    "semantic_hash": ""
+  },
+  "app/Models/Concursos/EditalDisciplina.php": {
+    "mtime": 1795271929.4915257,
+    "ast_hash": "a80230aebdf8142d35d14a7ab8cb4dc5",
+    "semantic_hash": ""
+  },
+  "app/Models/Concursos/EditalTopico.php": {
+    "mtime": 1795278411.1215885,
+    "ast_hash": "e3ec6ba87d77b3af112cf0f09b9c21ff",
+    "semantic_hash": ""
+  },
+  "app/Models/Concursos/Importacao.php": {
+    "mtime": 1795271524.866144,
+    "ast_hash": "e5470198e8417bab56aa72e5d4db874f",
+    "semantic_hash": ""
+  },
+  "app/Models/Concursos/Lote.php": {
+    "mtime": 1795279541.8631134,
+    "ast_hash": "b9a422bc1cb339e2ddd5ca5ff8a3b43f",
+    "semantic_hash": ""
+  },
+  "app/Models/Concursos/Material.php": {
+    "mtime": 1795459195.1908028,
+    "ast_hash": "caa46e16deac6937e05d1b341a450e30",
+    "semantic_hash": ""
+  },
+  "app/Models/Concursos/MaterialAnexo.php": {
+    "mtime": 1795459195.1918027,
+    "ast_hash": "6af7a91ac02a615f27ff981a660cafb2",
+    "semantic_hash": ""
+  },
+  "app/Models/Concursos/MaterialAnotacao.php": {
+    "mtime": 1795459195.1918027,
+    "ast_hash": "0a672f13f81283de6a989984b7f9edb6",
+    "semantic_hash": ""
+  },
+  "app/Models/Concursos/MaterialCapitulo.php": {
+    "mtime": 1795459195.1928031,
+    "ast_hash": "1b3749acb88335c457c42687237b7c3d",
+    "semantic_hash": ""
+  },
+  "app/Models/Concursos/MaterialPonto.php": {
+    "mtime": 1795459195.1928031,
+    "ast_hash": "f11b4c3946e69b5b424ab5be34749305",
+    "semantic_hash": ""
+  },
+  "app/Models/Concursos/MaterialQuestao.php": {
+    "mtime": 1795459195.194386,
+    "ast_hash": "8291a27c2b92318adccdd6471ce31d6c",
+    "semantic_hash": ""
+  },
+  "app/Models/Concursos/MaterialSecao.php": {
+    "mtime": 1795423978.3426678,
+    "ast_hash": "113597d0e18390fbe3676cedd6ee90ad",
+    "semantic_hash": ""
+  },
+  "app/Models/Concursos/MaterialTentativa.php": {
+    "mtime": 1795425663.0517018,
+    "ast_hash": "3e9d6d67c622f7d6ceb96ab84298eb3f",
+    "semantic_hash": ""
+  },
+  "app/Models/Concursos/Meta.php": {
+    "mtime": 1795292440.0783186,
+    "ast_hash": "c60bb18c8bf8be7d2b4f74fd2e146c02",
+    "semantic_hash": ""
+  },
+  "app/Models/Concursos/MetaAtividade.php": {
+    "mtime": 1795292440.1046002,
+    "ast_hash": "e7a22ae45a1f3142a30bea1decc41072",
+    "semantic_hash": ""
+  },
+  "app/Models/Concursos/Perfil.php": {
+    "mtime": 1795292440.052475,
+    "ast_hash": "7f58c5057472fdf9d0ae0b004a2eb1ad",
+    "semantic_hash": ""
+  },
+  "app/Models/Concursos/Questao.php": {
+    "mtime": 1795291416.2958798,
+    "ast_hash": "d8f5de1ce7f3e3a91540f65dd717dd20",
+    "semantic_hash": ""
+  },
+  "app/Models/Concursos/QuestaoAlternativa.php": {
+    "mtime": 1795271524.8680298,
+    "ast_hash": "a1bcd0bebf514c09d2f8ee24128da8f0",
+    "semantic_hash": ""
+  },
+  "app/Models/Concursos/QuestaoClassificacao.php": {
+    "mtime": 1795291286.199088,
+    "ast_hash": "665a9147450f4910c725af848eeae1ae",
+    "semantic_hash": ""
+  },
+  "app/Models/Concursos/QuestaoResolucao.php": {
+    "mtime": 1795291286.2200296,
+    "ast_hash": "9459fc66f1356830c3e57fd5a9fa7b63",
+    "semantic_hash": ""
+  },
+  "app/Models/Concursos/Simulado.php": {
+    "mtime": 1795308305.490109,
+    "ast_hash": "c701546123a7e2d24e04a86837b39a10",
+    "semantic_hash": ""
+  },
+  "app/Models/Concursos/Subtopico.php": {
+    "mtime": 1795271524.866144,
+    "ast_hash": "cd3d4cf6ec86c6fe09e9695351c4a0b4",
+    "semantic_hash": ""
+  },
+  "app/Models/Concursos/Tentativa.php": {
+    "mtime": 1795291959.2720366,
+    "ast_hash": "32284e428c81ab9c43dca73a93c90380",
+    "semantic_hash": ""
+  },
+  "app/Models/Concursos/UsoEvento.php": {
+    "mtime": 1795505226.0218005,
+    "ast_hash": "96be7641db85745c67481eaae66bfb11",
+    "semantic_hash": ""
+  },
+  "app/Services/Concursos/ArvoreAssuntosImportador.php": {
+    "mtime": 1795292969.6424282,
+    "ast_hash": "d5a208a3199c82d4aad0df950ba4db9a",
+    "semantic_hash": ""
+  },
+  "app/Services/Concursos/AssuntoResolver.php": {
+    "mtime": 1795272694.9196134,
+    "ast_hash": "f03c59db0e843db1da381246226a232a",
+    "semantic_hash": ""
+  },
+  "app/Services/Concursos/ContratoJsonValidator.php": {
+    "mtime": 1795271903.1569433,
+    "ast_hash": "325dc0e4287327648c9c2f1bf8cd3d7e",
+    "semantic_hash": ""
+  },
+  "app/Services/Concursos/CuradoriaSubtopicos.php": {
+    "mtime": 1795296853.588936,
+    "ast_hash": "a54a98c06bb52b4851fc3ec2c2af7f64",
+    "semantic_hash": ""
+  },
+  "app/Services/Concursos/EditalImportador.php": {
+    "mtime": 1795272710.7807226,
+    "ast_hash": "aa333f178fa4abfca2aa50efbe0170eb",
+    "semantic_hash": ""
+  },
+  "app/Services/Concursos/GeminiImportador.php": {
+    "mtime": 1795466725.2609625,
+    "ast_hash": "ad4b7fae754800086d3c24b49e8b7a2b",
+    "semantic_hash": ""
+  },
+  "app/Services/Concursos/IneditasImportador.php": {
+    "mtime": 1795466725.2621467,
+    "ast_hash": "fd71afaa73a055f99e43ba955e51320e",
+    "semantic_hash": ""
+  },
+  "app/Services/Concursos/JornadaMeta.php": {
+    "mtime": 1795345477.8366325,
+    "ast_hash": "422b4df8db3b07d55f727bd9916b8b5e",
+    "semantic_hash": ""
+  },
+  "app/Services/Concursos/Leis/AcervoLeis.php": {
+    "mtime": 1795425663.0537064,
+    "ast_hash": "037bf49aec077a1585a29da644e1502c",
+    "semantic_hash": ""
+  },
+  "app/Services/Concursos/Leis/Citacoes.php": {
+    "mtime": 1795459195.1953917,
+    "ast_hash": "e30a43ea2b56a689feba6babf8ad90e8",
+    "semantic_hash": ""
+  },
+  "app/Services/Concursos/Leis/Jurisprudencia.php": {
+    "mtime": 1795425663.0537064,
+    "ast_hash": "01bd8a43fe311ef59abcc927895a9fef",
+    "semantic_hash": ""
+  },
+  "app/Services/Concursos/Livro/BaseTeorica.php": {
+    "mtime": 1795465472.9794385,
+    "ast_hash": "0a62aa09ee5f303ab7b1b5a57f6b822e",
+    "semantic_hash": ""
+  },
+  "app/Services/Concursos/Livro/ConversorLivro.php": {
+    "mtime": 1795459195.1963916,
+    "ast_hash": "242a4e665442d2124e2da1f399777b3c",
+    "semantic_hash": ""
+  },
+  "app/Services/Concursos/Livro/Documento.php": {
+    "mtime": 1795459195.1963916,
+    "ast_hash": "d62c845104f891b955d4b28515a6259a",
+    "semantic_hash": ""
+  },
+  "app/Services/Concursos/Livro/Grifador.php": {
+    "mtime": 1795465472.9794385,
+    "ast_hash": "d11d533eaaf49534b3665bf812837bdb",
+    "semantic_hash": ""
+  },
+  "app/Services/Concursos/Livro/MarkdownLivro.php": {
+    "mtime": 1795465472.9804382,
+    "ast_hash": "b75693c895fbdb9f546d47c9e0fea118",
+    "semantic_hash": ""
+  },
+  "app/Services/Concursos/MaterialImportador.php": {
+    "mtime": 1795423978.3456683,
+    "ast_hash": "82431a5bf338612e54d33f9961502d3d",
+    "semantic_hash": ""
+  },
+  "app/Services/Concursos/MaterialQuestoesImportador.php": {
+    "mtime": 1795459195.1973917,
+    "ast_hash": "ed2d70bd37bd54613ee525459b805ebd",
+    "semantic_hash": ""
+  },
+  "app/Services/Concursos/MotorMeta.php": {
+    "mtime": 1795308553.6149573,
+    "ast_hash": "4b51a62925002db5edcb287615867d8f",
+    "semantic_hash": ""
+  },
+  "app/Services/Concursos/PacoteGerador.php": {
+    "mtime": 1795308553.6159587,
+    "ast_hash": "4a5d7501153dd87c02a6d7597c1337c5",
+    "semantic_hash": ""
+  },
+  "app/Services/Concursos/PainelDesempenho.php": {
+    "mtime": 1795308231.3533492,
+    "ast_hash": "b6a93367ee3f340735fb86b97758f4bd",
+    "semantic_hash": ""
+  },
+  "app/Services/Concursos/SimuladoService.php": {
+    "mtime": 1795308736.6926794,
+    "ast_hash": "164ce405188baf5eddf85627c933bbaa",
+    "semantic_hash": ""
+  },
+  "app/Services/Concursos/TecApiImportador.php": {
+    "mtime": 1795467811.7060077,
+    "ast_hash": "df6705ab4e4d5e0ff3fbdde74e00a061",
+    "semantic_hash": ""
+  },
+  "app/Services/Concursos/TecCadernoParser.php": {
+    "mtime": 1795274017.6265974,
+    "ast_hash": "01815b0adb51cfb4358d0cd3e5f9fe7b",
+    "semantic_hash": ""
+  },
+  "app/Services/Concursos/TecImportador.php": {
+    "mtime": 1795466725.2609625,
+    "ast_hash": "6b27b61725cfaf4e882b4944059ca810",
+    "semantic_hash": ""
+  },
+  "app/Services/Concursos/TecParserException.php": {
+    "mtime": 1795271067.3666158,
+    "ast_hash": "2e1409ab3660d58701dca851f74fec62",
+    "semantic_hash": ""
+  },
+  "app/Services/Concursos/TecPdfExtractor.php": {
+    "mtime": 1795271072.6156895,
+    "ast_hash": "dea9392f9a0336404629ef219bd5919c",
+    "semantic_hash": ""
+  },
+  "app/Services/Concursos/TempoEstudosSync.php": {
+    "mtime": 1795294358.5089567,
+    "ast_hash": "15a3482a612720cceef9e5686f5e165c",
+    "semantic_hash": ""
+  },
+  "app/Services/Concursos/UsoConcursos.php": {
+    "mtime": 1795505267.2458017,
+    "ast_hash": "621de0a5dc45b5b88b4f497f2e9b57d0",
+    "semantic_hash": ""
+  },
+  "config/concursos.php": {
+    "mtime": 1795425663.05622,
+    "ast_hash": "d0f4bcba3873e8d9fab3f281b99f9e1f",
+    "semantic_hash": ""
+  },
+  "config/modulos.php": {
+    "mtime": 1795268040.7983823,
+    "ast_hash": "cd40b3f494ca500d0c23d36b8663cd1c",
+    "semantic_hash": ""
+  },
+  "database/migrations/2026_11_21_100000_add_modulos_to_users_table.php": {
+    "mtime": 1795268044.187505,
+    "ast_hash": "c7cd2ae8f7d1c63e8710fac7ae88037d",
+    "semantic_hash": ""
+  },
+  "database/migrations/2026_11_22_100000_add_atividade_ref_to_study_sessions.php": {
+    "mtime": 1795294294.9789815,
+    "ast_hash": "55f286e33757b7e6c01e7a6096e39982",
+    "semantic_hash": ""
+  },
+  "database/migrations/2026_11_23_100000_add_concursos_plano_to_users_table.php": {
+    "mtime": 1795423978.348668,
+    "ast_hash": "be26e7042fb0e4f8e3c085f35c96fbe4",
+    "semantic_hash": ""
+  },
+  "database/migrations/concursos/2026_11_21_200000_create_concursos_taxonomia_e_questoes.php": {
+    "mtime": 1795271513.3585877,
+    "ast_hash": "6f0b3c028095597b236e5108515f3f35",
+    "semantic_hash": ""
+  },
+  "database/migrations/concursos/2026_11_21_210000_create_concursos_editais.php": {
+    "mtime": 1795271918.5932314,
+    "ast_hash": "6195b575544275998a9b17d4caefdec6",
+    "semantic_hash": ""
+  },
+  "database/migrations/concursos/2026_11_21_220000_create_concursos_lotes.php": {
+    "mtime": 1795279541.8390248,
+    "ast_hash": "b89865aee0cd86be949e295781ef5a9d",
+    "semantic_hash": ""
+  },
+  "database/migrations/concursos/2026_11_21_230000_create_concursos_classificacoes.php": {
+    "mtime": 1795291275.7874432,
+    "ast_hash": "d91dae082962ab0826f88e05c9b68ac6",
+    "semantic_hash": ""
+  },
+  "database/migrations/concursos/2026_11_22_000001_create_concursos_tentativas.php": {
+    "mtime": 1795291955.288185,
+    "ast_hash": "66e44b1824ac819151d310016e3509a7",
+    "semantic_hash": ""
+  },
+  "database/migrations/concursos/2026_11_22_000002_create_concursos_perfis_e_metas.php": {
+    "mtime": 1795292430.4697862,
+    "ast_hash": "1267a1b22a4f42a9d371d64a44b9bbf7",
+    "semantic_hash": ""
+  },
+  "database/migrations/concursos/2026_11_22_000003_create_concursos_assunto_incidencias.php": {
+    "mtime": 1795292946.090105,
+    "ast_hash": "ace7e8e7156ef28d01e962081122b7da",
+    "semantic_hash": ""
+  },
+  "database/migrations/concursos/2026_11_22_000004_add_minutos_reais_to_meta_atividades.php": {
+    "mtime": 1795294334.5601587,
+    "ast_hash": "902514453c83617b61df8c03afd916c8",
+    "semantic_hash": ""
+  },
+  "database/migrations/concursos/2026_11_22_000005_create_concursos_simulados.php": {
+    "mtime": 1795308301.7016766,
+    "ast_hash": "45136881db0a41eb3e82a0a86fe05963",
+    "semantic_hash": ""
+  },
+  "database/migrations/concursos/2026_11_23_000001_create_concursos_materiais.php": {
+    "mtime": 1795423978.348668,
+    "ast_hash": "9ee5e97602f75bf4067f4d0a8ea7bf1f",
+    "semantic_hash": ""
+  },
+  "database/migrations/concursos/2026_11_23_000002_create_concursos_material_questoes.php": {
+    "mtime": 1795425663.05622,
+    "ast_hash": "5c27643c733daea435bd30063d9b1210",
+    "semantic_hash": ""
+  },
+  "database/migrations/concursos/2026_11_24_000001_create_concursos_material_livro.php": {
+    "mtime": 1795459195.198701,
+    "ast_hash": "31cd73040b94c0187a82a193202407e4",
+    "semantic_hash": ""
+  },
+  "database/migrations/concursos/2026_11_24_000002_add_fonte_to_questao_resolucoes.php": {
+    "mtime": 1795466725.0868194,
+    "ast_hash": "f2803e136c4af992f2a0c62c2cc21d0c",
+    "semantic_hash": ""
+  },
+  "database/migrations/concursos/2026_11_24_000003_create_concursos_uso_eventos.php": {
+    "mtime": 1795505218.1749403,
+    "ast_hash": "7ace3f873c9e5c0a20040e915acd8253",
+    "semantic_hash": ""
+  },
+  "resources/js/concursos/livro.js": {
+    "mtime": 1795459195.2041006,
+    "ast_hash": "47ca406a0eed6cc7702a49b1a7cde8c2",
+    "semantic_hash": ""
+  },
+  "resources/js/concursos/livro/editor.js": {
+    "mtime": 1795459195.2051055,
+    "ast_hash": "593e40df499bb0392e47578b2e0c2954",
+    "semantic_hash": ""
+  },
+  "resources/js/concursos/livro/extensoes.js": {
+    "mtime": 1795459195.2061074,
+    "ast_hash": "473c8930eae63ed9465362d071f44e1e",
+    "semantic_hash": ""
+  },
+  "resources/js/concursos/livro/util.js": {
+    "mtime": 1795459195.2067752,
+    "ast_hash": "9b94c195536c420367b60bc5d0c1186f",
+    "semantic_hash": ""
+  },
+  "resources/js/estudos/familia-3d-faces.js": {
+    "mtime": 1795511719.2577362,
+    "ast_hash": "3d4addc5c2424c70f33aa827e484322f",
+    "semantic_hash": ""
+  },
+  "resources/js/estudos/familia-3d-page.js": {
+    "mtime": 1795511898.9453862,
+    "ast_hash": "23878f5c2f1ab1f91591a7c25b992c30",
+    "semantic_hash": ""
+  },
+  "resources/js/estudos/familia-3d-scene.js": {
+    "mtime": 1795511721.1621208,
+    "ast_hash": "70083dfb94f652bb61e5497e8c905ce1",
+    "semantic_hash": ""
+  },
+  "resources/schemas/concursos/comum.schema.json": {
+    "mtime": 1795294089.932621,
+    "ast_hash": "e74cf24db0275ae7e0d906b104072309",
+    "semantic_hash": ""
+  },
+  "resources/schemas/concursos/contexto.schema.json": {
+    "mtime": 1795279542.1322935,
+    "ast_hash": "79027452b6225cf5e635afe99deaabaf",
+    "semantic_hash": ""
+  },
+  "resources/schemas/concursos/edital.schema.json": {
+    "mtime": 1795272680.786557,
+    "ast_hash": "73f68d76f7ad71c7b249f06cc3a0f62d",
+    "semantic_hash": ""
+  },
+  "resources/schemas/concursos/ineditas.schema.json": {
+    "mtime": 1795308481.5939436,
+    "ast_hash": "26db7ef4098e2405b854aea21befe42e",
+    "semantic_hash": ""
+  },
+  "resources/schemas/concursos/ledger.schema.json": {
+    "mtime": 1795267458.1211512,
+    "ast_hash": "7ea265135f8de6a492392c3f259c1687",
+    "semantic_hash": ""
+  },
+  "resources/schemas/concursos/mapa-assunto.schema.json": {
+    "mtime": 1795267492.2385216,
+    "ast_hash": "5ef25db5ba8d2940766799c99b5956c8",
+    "semantic_hash": ""
+  },
+  "resources/schemas/concursos/resolucoes.schema.json": {
+    "mtime": 1795267467.5236218,
+    "ast_hash": "88ba5f934bf4e82110e6514311be451b",
+    "semantic_hash": ""
+  },
+  "resources/schemas/concursos/validar.py": {
+    "mtime": 1795308470.8387682,
+    "ast_hash": "6f240f85308d08edb3ac8c97f3d28b76",
+    "semantic_hash": ""
+  },
+  "resources/views/concursos/curadoria/assunto.blade.php": {
+    "mtime": 1795296897.0557792,
+    "ast_hash": "ae77eeaa579b93391ed8cc7c9f1bd76a",
+    "semantic_hash": ""
+  },
+  "resources/views/concursos/curadoria/index.blade.php": {
+    "mtime": 1795308210.6747706,
+    "ast_hash": "ca97786983743d6f88052ddb768e7225",
+    "semantic_hash": ""
+  },
+  "resources/views/concursos/layout.blade.php": {
+    "mtime": 1795505301.7534132,
+    "ast_hash": "8625b10784b54b34fd73c6379b0ace31",
+    "semantic_hash": ""
+  },
+  "resources/views/concursos/leis/acervo.blade.php": {
+    "mtime": 1795425663.0582197,
+    "ast_hash": "6123a50e72f678b5ea2dbc220f5cfdcb",
+    "semantic_hash": ""
+  },
+  "resources/views/concursos/leis/documento.blade.php": {
+    "mtime": 1795425663.059221,
+    "ast_hash": "edd46a5c18b4f79d326bd352e9bbd827",
+    "semantic_hash": ""
+  },
+  "resources/views/concursos/leis/erro.blade.php": {
+    "mtime": 1795425663.06022,
+    "ast_hash": "3ffd92c8016e6dd75b9bf25be7b0bbf4",
+    "semantic_hash": ""
+  },
+  "resources/views/concursos/leis/index.blade.php": {
+    "mtime": 1795425663.06022,
+    "ast_hash": "4ad5364e1f599477165e4101a647e786",
+    "semantic_hash": ""
+  },
+  "resources/views/concursos/leis/show.blade.php": {
+    "mtime": 1795459195.2077808,
+    "ast_hash": "b4784c846b98c8de465c60f4e34de195",
+    "semantic_hash": ""
+  },
+  "resources/views/concursos/material/_sumario.blade.php": {
+    "mtime": 1795459195.2077808,
+    "ast_hash": "40dd5f5e6f6b3b886879ccaa55d4688c",
+    "semantic_hash": ""
+  },
+  "resources/views/concursos/material/imprimir.blade.php": {
+    "mtime": 1795459195.208781,
+    "ast_hash": "876d81f5cf185425eff2070f7de37508",
+    "semantic_hash": ""
+  },
+  "resources/views/concursos/material/index.blade.php": {
+    "mtime": 1795459195.2097816,
+    "ast_hash": "3db0ee4192ffc7b31051e8c70ac02097",
+    "semantic_hash": ""
+  },
+  "resources/views/concursos/material/livro.blade.php": {
+    "mtime": 1795459195.2107823,
+    "ast_hash": "a30b049ea87f04614c13d2053d404e03",
+    "semantic_hash": ""
+  },
+  "resources/views/concursos/material/refazer.blade.php": {
+    "mtime": 1795459195.2117822,
+    "ast_hash": "26c1a66e8833ab66c5a890cb54f38ce5",
+    "semantic_hash": ""
+  },
+  "resources/views/concursos/meta/index.blade.php": {
+    "mtime": 1795505639.4238803,
+    "ast_hash": "a35f9710fa2f7cdf3098eea4572e106c",
+    "semantic_hash": ""
+  },
+  "resources/views/concursos/meta/perfil.blade.php": {
+    "mtime": 1795308210.757666,
+    "ast_hash": "993129ed5d99d933e27bff710ed6a7d9",
+    "semantic_hash": ""
+  },
+  "resources/views/concursos/painel/index.blade.php": {
+    "mtime": 1795308726.7619073,
+    "ast_hash": "d54bc57d6b3898a4c37d1fb27457a08a",
+    "semantic_hash": ""
+  },
+  "resources/views/concursos/questoes/_linha.blade.php": {
+    "mtime": 1795292049.051957,
+    "ast_hash": "664c93886229eac530f988dd07763ef7",
+    "semantic_hash": ""
+  },
+  "resources/views/concursos/questoes/index.blade.php": {
+    "mtime": 1795308210.6844382,
+    "ast_hash": "872404c7ee3db7e4b74397fb11db0595",
+    "semantic_hash": ""
+  },
+  "resources/views/concursos/questoes/show.blade.php": {
+    "mtime": 1795466725.2631433,
+    "ast_hash": "9af227af6fe1209789f0e7fef5fad332",
+    "semantic_hash": ""
+  },
+  "resources/views/concursos/simulados/index.blade.php": {
+    "mtime": 1795308748.5900083,
+    "ast_hash": "de8f6b63c0f654f180a7411fbd5598d5",
+    "semantic_hash": ""
+  },
+  "resources/views/concursos/simulados/prova.blade.php": {
+    "mtime": 1795308388.1652336,
+    "ast_hash": "752615a6177ea38fb0088439b09687bd",
+    "semantic_hash": ""
+  },
+  "resources/views/concursos/simulados/resultado.blade.php": {
+    "mtime": 1795308402.7792785,
+    "ast_hash": "3ed890d07a1876040f5e37de72957713",
+    "semantic_hash": ""
+  },
+  "resources/views/concursos/uso/index.blade.php": {
+    "mtime": 1795505342.7469707,
+    "ast_hash": "00184b18601230bdf88c49317bdfe83a",
+    "semantic_hash": ""
+  },
+  "resources/views/estudos/familia-3d.blade.php": {
+    "mtime": 1795511897.3221915,
+    "ast_hash": "ae90041f459bebe72f98c518cee17121",
+    "semantic_hash": ""
+  },
+  "scripts/concursos-setup.ps1": {
+    "mtime": 1795271339.3060553,
+    "ast_hash": "72fda8054967bf2060b7efcc22d05d95",
+    "semantic_hash": ""
+  },
+  "scripts/concursos/converter_tec.py": {
+    "mtime": 1795459195.2137818,
+    "ast_hash": "5637400fe36a1a89db6b61fde185cd37",
+    "semantic_hash": ""
+  },
+  "scripts/concursos/extrair_caderno_erros.py": {
+    "mtime": 1795425663.063728,
+    "ast_hash": "db4caaf10fc5f64afabbb4a276759047",
+    "semantic_hash": ""
+  },
+  "scripts/pdf_texto.py": {
+    "mtime": 1795271064.386612,
+    "ast_hash": "aef017d063004bd75b31ad2c01f714a4",
+    "semantic_hash": ""
+  },
+  "scripts/servidor-setup.ps1": {
+    "mtime": 1795270177.5231667,
+    "ast_hash": "3f24757fac3212424095cc9ec41c1bfe",
+    "semantic_hash": ""
+  },
+  "tests/Concerns/UsaBancoConcursos.php": {
+    "mtime": 1795271715.3228223,
+    "ast_hash": "7c3cf54d06a6d6fc19e8b8287273c2d3",
+    "semantic_hash": ""
+  },
+  "tests/Feature/AcessoPublicoTailscaleTest.php": {
+    "mtime": 1795268712.3227909,
+    "ast_hash": "33951fbada2e8e9feaffcd6a36f7af77",
+    "semantic_hash": ""
+  },
+  "tests/Feature/ArvoreAssuntosImportadorTest.php": {
+    "mtime": 1795293006.5263896,
+    "ast_hash": "70e1270ba7e4e6ce12b91c6b264aee84",
+    "semantic_hash": ""
+  },
+  "tests/Feature/BackupConcursosCommandTest.php": {
+    "mtime": 1795268168.1645396,
+    "ast_hash": "dd087aa57610a4c5af0c424dd2f1901d",
+    "semantic_hash": ""
+  },
+  "tests/Feature/ConcursosBaseTeoricaTest.php": {
+    "mtime": 1795465472.9825363,
+    "ast_hash": "2b4f03684e12b0e026a2c1a3d2aa0ad4",
+    "semantic_hash": ""
+  },
+  "tests/Feature/ConcursosLivroTest.php": {
+    "mtime": 1795459195.2147825,
+    "ast_hash": "329c87f4b118c308453d6e0b837927a9",
+    "semantic_hash": ""
+  },
+  "tests/Feature/ConcursosMaterialTest.php": {
+    "mtime": 1795459195.2157822,
+    "ast_hash": "09b8dbc3780d7afb8038986601a4dfb5",
+    "semantic_hash": ""
+  },
+  "tests/Feature/ConcursosQuestoesTest.php": {
+    "mtime": 1795292196.3497834,
+    "ast_hash": "7fb63a78b52c89e0466c71e55eb110dc",
+    "semantic_hash": ""
+  },
+  "tests/Feature/ConcursosTecApiTest.php": {
+    "mtime": 1795469572.6072474,
+    "ast_hash": "c78153fabc4ff1145c0e18cb5ba0d537",
+    "semantic_hash": ""
+  },
+  "tests/Feature/ConcursosUsoTest.php": {
+    "mtime": 1795505434.6939902,
+    "ast_hash": "fda4111408137cd538f047ce51dbe608",
+    "semantic_hash": ""
+  },
+  "tests/Feature/CuradoriaSubtopicosTest.php": {
+    "mtime": 1795296926.5290806,
+    "ast_hash": "72194a6f5361170554b33f3248f3e435",
+    "semantic_hash": ""
+  },
+  "tests/Feature/EditalImportadorTest.php": {
+    "mtime": 1795272734.386931,
+    "ast_hash": "d7f2086a1874b4adbb03976c7aea21a6",
+    "semantic_hash": ""
+  },
+  "tests/Feature/GeminiImportadorTest.php": {
+    "mtime": 1795291516.851624,
+    "ast_hash": "adfbc70a74a75ac0765017f4ffa811a5",
+    "semantic_hash": ""
+  },
+  "tests/Feature/IneditasImportadorTest.php": {
+    "mtime": 1795308582.9486237,
+    "ast_hash": "6c394262de50e42a20a54c9fcb567fbe",
+    "semantic_hash": ""
+  },
+  "tests/Feature/JornadaMetaTest.php": {
+    "mtime": 1795345368.496677,
+    "ast_hash": "e7ce3990645c61e14bba6c8cc4a42979",
+    "semantic_hash": ""
+  },
+  "tests/Feature/ModulosAccessTest.php": {
+    "mtime": 1795270788.8091338,
+    "ast_hash": "7ea7fe67e03463a95fb6928eb05ef486",
+    "semantic_hash": ""
+  },
+  "tests/Feature/MotorMetaTest.php": {
+    "mtime": 1795293014.8077927,
+    "ast_hash": "45f83e54d88f7d85e19ffac22cc39bbb",
+    "semantic_hash": ""
+  },
+  "tests/Feature/PacoteGeradorTest.php": {
+    "mtime": 1795279701.0402248,
+    "ast_hash": "f26bd8d8a17bedcdc3e71c15581a6d31",
+    "semantic_hash": ""
+  },
+  "tests/Feature/SimuladoPainelTest.php": {
+    "mtime": 1795308742.6507819,
+    "ast_hash": "aed164f9158d1e499e0174ab603d00ba",
+    "semantic_hash": ""
+  },
+  "tests/Feature/TecCadernoPdfRealTest.php": {
+    "mtime": 1795271217.5932288,
+    "ast_hash": "d44574342298b8e92cf8cebe7ffb3ef1",
+    "semantic_hash": ""
+  },
+  "tests/Feature/TecImportadorTest.php": {
+    "mtime": 1795271773.9647326,
+    "ast_hash": "e2673203d177d63a983acef59c29a5b9",
+    "semantic_hash": ""
+  },
+  "tests/Feature/TempoEstudosTest.php": {
+    "mtime": 1795294485.060332,
+    "ast_hash": "b752d075c8a267aae93f80b1e510ec13",
+    "semantic_hash": ""
+  },
+  "tests/Unit/TecCadernoParserTest.php": {
+    "mtime": 1795274028.7422843,
+    "ast_hash": "81d3ae0b4d0af9e4f46c5ccce4f8c47b",
+    "semantic_hash": ""
+  },
+  "tools/blender/build_familia_3d.py": {
+    "mtime": 1795511517.8255374,
+    "ast_hash": "3be4a94a4a5ac8447a1e2a85be2f9a41",
+    "semantic_hash": ""
+  },
+  "tools/blender/characters.py": {
+    "mtime": 1795511496.9306839,
+    "ast_hash": "2aef65cf513fd0fc4770ff9cf7505a6f",
+    "semantic_hash": ""
+  },
+  "tools/blender/mesh_utils.py": {
+    "mtime": 1795510870.2737172,
+    "ast_hash": "9275c9e2ea88d6b15272bb0f2fa6945f",
+    "semantic_hash": ""
+  },
+  "tools/blender/room_props.py": {
+    "mtime": 1795511495.5786197,
+    "ast_hash": "a9fc0704dccd08cbd8c65dc7c8526787",
+    "semantic_hash": ""
+  },
+  "tools/blender/textures.py": {
+    "mtime": 1795511392.814461,
+    "ast_hash": "fd910aff4eb9c2016e214aef7086930c",
+    "semantic_hash": ""
+  },
+  "docs/sabatina-2026-11-21-modulo-concursos.md": {
+    "mtime": 1795268763.1034353,
+    "ast_hash": "f8d82ade6b09da4513878461fd52ed58",
+    "semantic_hash": ""
+  },
+  "resources/schemas/concursos/README.md": {
+    "mtime": 1795308609.8492284,
+    "ast_hash": "db8c7519ea8464cb1d87ca6eb3978bd3",
+    "semantic_hash": ""
+  },
+  "resources/schemas/concursos/prompts/gemini-ineditas.md": {
+    "mtime": 1795308503.2056732,
+    "ast_hash": "6440202bf7888a5d5d4ebf686acbb209",
+    "semantic_hash": ""
+  },
+  "resources/schemas/concursos/prompts/gemini-ledger-lote.md": {
+    "mtime": 1795294089.9336216,
+    "ast_hash": "6caf7d7f84724b72dc649c871860d0be",
+    "semantic_hash": ""
+  },
+  "scripts/requirements-concursos.txt": {
+    "mtime": 1795271883.8089936,
+    "ast_hash": "c666aaea7db965d1bf85930470a7f2dd",
+    "semantic_hash": ""
+  },
+  "tools/blender/previews/preview_stage0.png": {
+    "mtime": 1795511431.3230586,
+    "ast_hash": "89c2f6e08d4bb5d71e9a0c104904ac3a",
+    "semantic_hash": ""
+  },
+  "tools/blender/previews/preview_stage3.png": {
+    "mtime": 1795511423.7646868,
+    "ast_hash": "ec1ea2fc3c4fed2f2e2bbf7079d715ad",
+    "semantic_hash": ""
+  },
+  "tools/blender/previews/preview_stage6.png": {
+    "mtime": 1795511439.4086108,
+    "ast_hash": "a60afc54f2e0a2d3640284b669bb208f",
+    "semantic_hash": ""
+  },
+  "tools/blender/textures_baked/Tex_BabyOnesie.png": {
+    "mtime": 1795511522.893104,
+    "ast_hash": "d301c17913bfa772a89610b4fbf53974",
+    "semantic_hash": ""
+  },
+  "tools/blender/textures_baked/Tex_BookPages.png": {
+    "mtime": 1795511522.6635532,
+    "ast_hash": "cd2c8c9174087286b314f7fc139dc364",
+    "semantic_hash": ""
+  },
+  "tools/blender/textures_baked/Tex_DeskWood.png": {
+    "mtime": 1795511522.7636757,
+    "ast_hash": "fa52860c6ef0bb6568bcbf1c6ec78fdd",
+    "semantic_hash": ""
+  },
+  "tools/blender/textures_baked/Tex_Face_Baby.png": {
+    "mtime": 1795511523.2628834,
+    "ast_hash": "eb9a3a9832a16128eba7dd77f0a14ed2",
+    "semantic_hash": ""
+  },
+  "tools/blender/textures_baked/Tex_Face_Dad_Smile.png": {
+    "mtime": 1795511523.0690029,
+    "ast_hash": "d9340e8476a8848349e3ec3c7d05c381",
+    "semantic_hash": ""
+  },
+  "tools/blender/textures_baked/Tex_Face_Son_Cheer.png": {
+    "mtime": 1795511523.1999934,
+    "ast_hash": "021e124326681bdf9f18c4ff01e01a04",
+    "semantic_hash": ""
+  },
+  "tools/blender/textures_baked/Tex_Face_Wife_Smile.png": {
+    "mtime": 1795511523.1379516,
+    "ast_hash": "f98903633734a52b3565a169292b1e66",
+    "semantic_hash": ""
+  },
+  "tools/blender/textures_baked/Tex_LaptopScreen.png": {
+    "mtime": 1795511522.9735942,
+    "ast_hash": "e744068cb7581752e277747a4ae67370",
+    "semantic_hash": ""
+  },
+  "tools/blender/textures_baked/Tex_PencilCase.png": {
+    "mtime": 1795511522.8709342,
+    "ast_hash": "daa76ed87872f5e5a6c81056291f1bf3",
+    "semantic_hash": ""
+  },
+  "tools/blender/textures_baked/Tex_PhotoFrame1.png": {
+    "mtime": 1795511522.982108,
+    "ast_hash": "1c5524695763c03d47f8fcd0d23f6239",
+    "semantic_hash": ""
+  },
+  "tools/blender/textures_baked/Tex_PhotoFrame2.png": {
+    "mtime": 1795511522.987804,
+    "ast_hash": "cc153b45fb665d5cb9f7c26d20f88c30",
+    "semantic_hash": ""
+  },
+  "tools/blender/textures_baked/Tex_ShelfWood.png": {
+    "mtime": 1795511522.8503792,
+    "ast_hash": "4a173c38ed7d56c6238d3bf8a1f4dd5a",
+    "semantic_hash": ""
+  },
+  "tools/blender/textures_baked/Tex_Sign_ForcaPai.png": {
+    "mtime": 1795511522.505267,
+    "ast_hash": "9ed0f9c80fcf0ff7bda2f5341c14e0f5",
+    "semantic_hash": ""
+  },
+  "tools/blender/textures_baked/Tex_SonShirt.png": {
+    "mtime": 1795511522.9525254,
+    "ast_hash": "761aed3e3f52461c3b90e405d30ca59b",
     "semantic_hash": ""
   }
 }
