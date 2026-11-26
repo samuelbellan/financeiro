@@ -220,6 +220,23 @@ class Documento
      *
      * @param  array{pontos?: \Illuminate\Support\Collection, questoes?: \Illuminate\Support\Collection, notas?: \Illuminate\Support\Collection}  $ctx
      */
+    /**
+     * O capítulo tem teoria? (algum bloco além de pontos de erro, questões, caixas e parágrafos vazios;
+     * caixa sozinha é a introdução "padrões do caderno" que o conversor põe nos capítulos de seção).
+     * Capítulos só com pontos/questões são do diário de erros: ficam fora do sumário do Resumo.
+     */
+    public function temTeoria(mixed $doc): bool
+    {
+        foreach ((is_array($doc) ? $doc['content'] ?? [] : []) as $no) {
+            $tipo = $no['type'] ?? null;
+            if (!in_array($tipo, ['pontoErro', 'questao', 'caixa'], true) && !($tipo === 'paragraph' && empty($no['content']))) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     public function html(array $doc, Citacoes $citacoes, array $ctx = []): string
     {
         return $this->htmlFilhos($doc['content'] ?? [], $citacoes, $ctx);
@@ -273,6 +290,9 @@ class Documento
 
                 return '<aside class="caixa ' . e($tipo) . '"><div class="caixa-rotulo">' . e(self::CAIXAS[$tipo] ?? 'Atenção') . '</div>' . $dentro() . '</aside>';
             case 'pontoErro':
+                if (!empty($ctx['soTeoria'])) {
+                    return ''; // no Resumo os pontos ficam na área de Questões
+                }
                 $p = ($ctx['pontos'] ?? collect())->get($a['pontoId'] ?? 0);
                 $status = $p?->status ?? 'errando';
                 $rotulo = \App\Models\Concursos\MaterialPonto::STATUS[$status] ?? '';
@@ -281,7 +301,7 @@ class Documento
                 return '<section class="ponto-erro" data-status="' . e($status) . '"><header><b>' . e($a['titulo'] ?? '') . '</b> <span class="tag ' . e($status) . '">' . e($rotulo) . '</span>' . $vezes . '</header>' . $dentro() . '</section>';
             case 'questao':
                 $q = ($ctx['questoes'] ?? collect())->get($a['questaoId'] ?? 0);
-                if (!$q) {
+                if (!$q || !empty($ctx['soTeoria'])) {
                     return '';
                 }
                 $alts = $q->tipo === 'ME'

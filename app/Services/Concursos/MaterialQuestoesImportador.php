@@ -64,9 +64,87 @@ class MaterialQuestoesImportador
                         $existente->update($campos);
                         $r['atualizadas']++;
                     } else {
-                        MaterialQuestao::create($campos + ['material_id' => $material->id, 'chave' => $q['chave']]);
+                        // Caderno de erros: entra como errada no TEC, na caixa 1 da fila, vencida hoje.
+                        MaterialQuestao::create($campos + ['material_id' => $material->id, 'chave' => $q['chave'],
+                            'resultado_tec' => 'errada', 'caixa' => 1, 'revisar_em' => today()->toDateString()]);
                         $r['novas']++;
                     }
+                }
+            }
+
+            return $r;
+        });
+    }
+
+    /**
+     * Todas as questões resolvidas nos cadernos (converter_tec.py --todas, com "resultado": certa | errada).
+     * As que já existem no material (pelo nº do TEC) mantêm texto, ponto e tentativas: só ganham o
+     * resultado do TEC (errada vence certa, porque a mesma questão pode ter caído em dois cadernos).
+     * As novas entram sem capítulo; erradas novas entram na caixa 1 da fila, vencidas hoje.
+     *
+     * @return array{novas: int, certas: int, existentes: int, puladas: int, secoes_criadas: int}
+     */
+    public function importarTodas(array $dados, int $userId, ?string $slug = null, string $prefixoSecao = ''): array
+    {
+        $slug ??= $dados['material'] ?? '';
+        $material = Material::where('user_id', $userId)->where('slug', $slug)->first();
+        if (!$material) {
+            throw new InvalidArgumentException("Material \"{$slug}\" não encontrado para esse usuário.");
+        }
+
+        return DB::connection('concursos_pgsql')->transaction(function () use ($dados, $material, $prefixoSecao) {
+            $r = ['novas' => 0, 'certas' => 0, 'existentes' => 0, 'puladas' => 0, 'secoes_criadas' => 0];
+            $secoes = $material->secoes()->get()->keyBy('chave');
+            $pontos = Material::pontosDe($material->id)->get();
+            $porId = MaterialQuestao::where('material_id', $material->id)->whereNotNull('id_externo')->get()->keyBy('id_externo');
+            $hoje = today()->toDateString();
+
+            foreach ($dados['secoes'] ?? [] as $s) {
+                $chave = $prefixoSecao . ($s['secao'] ?? '');
+                $secao = $secoes[$chave] ?? null;
+                if (!$secao) {
+                    $secao = $material->secoes()->create(['chave' => $chave, 'titulo' => strtoupper($chave), 'ordem' => 200 + $r['secoes_criadas']]);
+                    $secoes[$chave] = $secao;
+                    $r['secoes_criadas']++;
+                }
+                foreach (array_values($s['questoes'] ?? []) as $i => $q) {
+                    $resultado = ($q['resultado'] ?? '') === 'certa' ? 'certa' : 'errada';
+                    $id = (string) ($q['id'] ?? '');
+                    if ($id !== '' && ($existente = $porId[$id] ?? null)) {
+                        if ($existente->resultado_tec === null || ($resultado === 'errada' && $existente->resultado_tec === 'certa')) {
+                            $existente->update(['resultado_tec' => $resultado] + ($resultado === 'errada' && !$existente->caixa ? ['caixa' => 1, 'revisar_em' => $hoje] : []));
+                        }
+                        $r['existentes']++;
+                        continue;
+                    }
+                    if (!empty($q['incompleta']) || empty($q['chave']) || empty($q['enunciado']) || empty($q['gabarito'])) {
+                        $r['puladas']++;
+                        continue;
+                    }
+                    $tipo = $q['tipo'] === 'CE' ? 'CE' : 'ME';
+                    $nova = MaterialQuestao::create([
+                        'material_id' => $material->id,
+                        'chave' => $q['chave'],
+                        'secao_id' => $secao->id,
+                        'ponto_id' => $this->pontoDa($q, $pontos)?->id,
+                        'id_externo' => $id !== '' ? $id : null,
+                        'origem' => ($q['origem'] ?? '') !== '' ? mb_substr($q['origem'], 0, 250) : null,
+                        'assunto' => ($q['assunto'] ?? '') !== '' ? mb_substr($q['assunto'], 0, 500) : null,
+                        'tipo' => $tipo,
+                        'enunciado' => $q['enunciado'],
+                        'alternativas' => $tipo === 'ME' ? array_values($q['alternativas']) : null,
+                        'gabarito' => strtoupper($q['gabarito'])[0],
+                        'comentario' => $q['comentario'] ?? null,
+                        'ordem' => $i + 1,
+                        'resultado_tec' => $resultado,
+                        'caixa' => $resultado === 'errada' ? 1 : null,
+                        'revisar_em' => $resultado === 'errada' ? $hoje : null,
+                    ]);
+                    if ($id !== '') {
+                        $porId[$id] = $nova;
+                    }
+                    $r['novas']++;
+                    $r['certas'] += $resultado === 'certa' ? 1 : 0;
                 }
             }
 

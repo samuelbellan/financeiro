@@ -118,29 +118,26 @@ class ConcursosLivroTest extends TestCase
         $this->assertSame(1, substr_count(json_encode($estoques->fresh()->conteudo), '"pontoErro"'));
     }
 
-    public function test_estante_mostra_fila_de_revisao_e_capa_aponta_o_capitulo_prioritario(): void
+    public function test_estante_mostra_fila_de_hoje_e_situacao_calculada_pelas_questoes(): void
     {
         $material = $this->material();
         $this->abrir($material); // monta os capítulos
-        MaterialPonto::where('chave', 'p1')->update(['status' => 'errando']);
-        MaterialPonto::where('chave', 'p2')->update(['status' => 'revisando']);
-        $estoques = MaterialCapitulo::where('titulo', 'Estoques')->firstOrFail();
 
-        // Fila: primeiro o capítulo com ponto em erro, depois o que só tem ponto em revisão.
+        // Erradas do caderno entram na caixa 1, vencidas hoje: a matéria aparece em "Para revisar hoje".
         $this->actingAs($this->user)->get(route('concursos.material.index'))->assertOk()
-            ->assertSeeInOrder(['Para revisar agora', 'Estoques', 'C02 · Diversos', 'Livros', 'Contabilidade Inventada'])
-            ->assertSee(route('concursos.material.capitulo', [$material, $estoques]), false);
+            ->assertSeeInOrder(['Para revisar hoje', 'Contabilidade Inventada', 'Matérias', 'Contabilidade Inventada'])
+            ->assertSee('2 ainda erro')
+            ->assertSee(route('concursos.material.refazer', [$material, 'situacao' => 'fila', 'iniciar' => 1]));
+        $this->abrir($material)->assertSee('Revisar questões (2 hoje)');
 
-        $this->abrir($material)
-            ->assertSee('Revisar erros prioritários')
-            ->assertSee('href="' . route('concursos.material.capitulo', [$material, $estoques]) . '" title=', false)
-            ->assertSee('data-erros="1"', false)
-            ->assertSee('data-ordenar="erros"', false);
-
-        // Sem erro nem revisão, a fila fica vazia e o botão prioritário some.
-        MaterialPonto::query()->update(['status' => 'dominado']);
-        $this->actingAs($this->user)->get(route('concursos.material.index'))->assertSee('Nenhum ponto em erro ou em revisão');
-        $this->abrir($material)->assertDontSee('Revisar erros prioritários')->assertSee('Começar do início');
+        // Acertou as duas no app: saem de "ainda erro" (caixa 2, volta em 7 dias) e a fila de hoje esvazia.
+        foreach (MaterialQuestao::all() as $q) {
+            $this->actingAs($this->user)->postJson(route('concursos.material.questoes.responder', $q), ['resposta' => $q->gabarito, 'certeza' => 'sei'])
+                ->assertOk()->assertJson(['acertou' => true]);
+            $this->assertSame(2, $q->fresh()->caixa);
+            $this->assertSame('revisando', $q->fresh()->load('ultimaTentativa')->estado());
+        }
+        $this->actingAs($this->user)->get(route('concursos.material.index'))->assertSee('Nada vencido hoje')->assertSee('2 revisando');
     }
 
     public function test_capitulo_mostra_texto_links_de_lei_e_questoes(): void
@@ -153,7 +150,7 @@ class ConcursosLivroTest extends TestCase
             ->assertOk()
             ->assertSee('PEPS vs média')
             ->assertSee('>LI, art. 2</a>', false)
-            ->assertSee('Refazer as deste capítulo')
+            ->assertSee('Refazer as que ainda erro')
             ->assertSee('livro-dados', false);
 
         $outro = Material::create(['user_id' => $this->user->id, 'slug' => 'x', 'titulo' => 'Outro']);

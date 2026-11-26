@@ -78,6 +78,61 @@ def numero_caderno(nome):
     return m.group(1) if m else None
 
 
+def questao_saida(q):
+    """Uma questão do TEC no formato de MaterialQuestoesImportador."""
+    enun, fig = html_texto(q['enunciado'])
+    alts = [html_texto(x)[0] for x in q['alternativas']]
+    ce = q['tipo'] == 'CERTO_ERRADO'
+    if ce:
+        gab, marcada = ('C' if q['correta'] == 1 else 'E'), ('C' if q['marcada'] == 1 else 'E')
+    else:
+        gab, marcada = chr(64 + q['correta']), chr(64 + q['marcada'])
+    if fig:
+        enun += f"\n\n(Esta questão tem {'figura' if fig == 1 else str(fig) + ' figuras'}: veja no TEC, #{q['id']}.)"
+    origem = ' · '.join(str(x) for x in [q.get('banca'), q.get('ano'), q.get('orgao'), q.get('cargo')] if x)
+    com = [f"No TEC você marcou {marcada}; gabarito {gab}." + (' Questão marcada como desatualizada no TEC.' if q.get('desatualizada') else '')]
+    if q.get('assunto'):
+        com.append(f"Assunto: {q['assunto']}")
+    if q.get('comentario'):
+        c = q['comentario']
+        com.append(f"Comentário do prof. {c.get('professor') or ''}".strip() + ':\n' + html_texto(c.get('texto'))[0])
+    return {
+        'chave': f"q{q['id']}",
+        'id': str(q['id']),
+        'origem': origem,
+        'assunto': q.get('assunto') or '',
+        'tipo': 'CE' if ce else 'ME',
+        'enunciado': enun,
+        'alternativas': [] if ce else [{'letra': chr(65 + i), 'texto': t} for i, t in enumerate(alts)],
+        'gabarito': gab,
+        'comentario': '\n\n'.join(com),
+        'incompleta': not enun or (not ce and len(alts) < 2),
+    }
+
+
+def gerar_todas(a, cadernos):
+    """Todas as resolvidas (sem anuladas), uma vez cada, na seção do primeiro caderno em que apareceu."""
+    errou = {}
+    for _, d in cadernos:
+        for q in d['questoes']:
+            if q['resolvida'] and not q.get('anulada'):
+                errou[q['id']] = errou.get(q['id'], False) or bool(q['errou'])
+    secoes, vistas = OrderedDict(), set()
+    for num, d in cadernos:
+        for q in d['questoes']:
+            if not q['resolvida'] or q.get('anulada') or q['id'] in vistas:
+                continue
+            vistas.add(q['id'])
+            secoes.setdefault(num, []).append(questao_saida(q) | {'resultado': 'errada' if errou[q['id']] else 'certa'})
+    saida = {'material': a.slug, 'secoes': [{'secao': f'c{n}', 'questoes': qs} for n, qs in secoes.items()]}
+    os.makedirs(a.saida, exist_ok=True)
+    with open(os.path.join(a.saida, f'{a.slug}-todas.json'), 'w', encoding='utf-8') as f:
+        json.dump(saida, f, ensure_ascii=False, indent=1)
+    sys.stdout.reconfigure(encoding='utf-8')
+    certas = sum(1 for v in errou.values() if not v)
+    print(f"{len(vistas)} questões únicas: {certas} certas, {len(vistas) - certas} erradas")
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('pasta')
@@ -85,6 +140,9 @@ def main():
     ap.add_argument('--titulo', required=True)
     ap.add_argument('--disciplina', required=True)
     ap.add_argument('--saida', required=True)
+    ap.add_argument('--todas', action='store_true',
+                    help='gera só <slug>-todas.json com TODAS as questões resolvidas (certas e erradas, campo "resultado"), '
+                         'para concursos:importar-todas; uma questão errada em qualquer caderno conta como errada')
     a = ap.parse_args()
 
     cadernos = []
@@ -94,6 +152,9 @@ def main():
         if num:
             cadernos.append((num, d))
     cadernos.sort(key=lambda x: (x[0], 'Teste' in x[1]['caderno'], int(x[1]['cadernoId'])))
+
+    if a.todas:
+        return gerar_todas(a, cadernos)
 
     secoes = OrderedDict()
     vistas = set()
@@ -133,34 +194,7 @@ def main():
         })
         qs = []
         for q in s['questoes']:
-            enun, fig = html_texto(q['enunciado'])
-            alts = [html_texto(x)[0] for x in q['alternativas']]
-            ce = q['tipo'] == 'CERTO_ERRADO'
-            if ce:
-                gab, marcada = ('C' if q['correta'] == 1 else 'E'), ('C' if q['marcada'] == 1 else 'E')
-            else:
-                gab, marcada = chr(64 + q['correta']), chr(64 + q['marcada'])
-            if fig:
-                enun += f"\n\n(Esta questão tem {'figura' if fig == 1 else str(fig) + ' figuras'}: veja no TEC, #{q['id']}.)"
-            origem = ' · '.join(str(x) for x in [q.get('banca'), q.get('ano'), q.get('orgao'), q.get('cargo')] if x)
-            com = [f"No TEC você marcou {marcada}; gabarito {gab}." + (' Questão marcada como desatualizada no TEC.' if q.get('desatualizada') else '')]
-            if q.get('assunto'):
-                com.append(f"Assunto: {q['assunto']}")
-            if q.get('comentario'):
-                c = q['comentario']
-                com.append(f"Comentário do prof. {c.get('professor') or ''}".strip() + ':\n' + html_texto(c.get('texto'))[0])
-            qs.append({
-                'chave': f"q{q['id']}",
-                'id': str(q['id']),
-                'origem': origem,
-                'assunto': q.get('assunto') or '',
-                'tipo': 'CE' if ce else 'ME',
-                'enunciado': enun,
-                'alternativas': [] if ce else [{'letra': chr(65 + i), 'texto': t} for i, t in enumerate(alts)],
-                'gabarito': gab,
-                'comentario': '\n\n'.join(com),
-                'incompleta': not enun or (not ce and len(alts) < 2),
-            })
+            qs.append(questao_saida(q))
         saida_q['secoes'].append({'secao': f'c{num}', 'questoes': qs})
         resumo.append(f"C{num}: {s['total']} resolvidas, {s['erros']} erros, {len(qs)} questões novas para refazer")
 

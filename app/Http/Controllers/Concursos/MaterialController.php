@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Concursos\Material;
 use App\Models\Concursos\MaterialCapitulo;
 use App\Models\Concursos\MaterialPonto;
+use App\Models\Concursos\MaterialQuestao;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -23,23 +24,18 @@ class MaterialController extends Controller
     public function index(Request $request): View
     {
         $materiais = Material::where('user_id', $request->user()->id)->orderBy('titulo')->get();
-        $contagens = Material::pontosDe($materiais->pluck('id')->all())->with(['capitulo:id,material_id', 'secao:id,material_id'])->get(['id', 'capitulo_id', 'secao_id', 'status'])
-            ->groupBy(fn ($p) => Material::materialDoPonto($p))
-            ->map(fn ($ps) => $ps->countBy('status'));
+
+        // Situação calculada pelas questões (última resposta no app ou no TEC + caixa da fila).
+        $contagens = MaterialQuestao::with('ultimaTentativa')->whereIn('material_id', $materiais->pluck('id'))
+            ->get(['id', 'material_id', 'resultado_tec', 'caixa', 'revisar_em'])
+            ->groupBy('material_id')
+            ->map(fn ($qs) => $qs->countBy(fn ($q) => $q->estado())->all() + ['hoje' => $qs->filter(fn ($q) => $q->naFilaHoje())->count(), 'total' => $qs->count()]);
         $capitulos = MaterialCapitulo::whereIn('material_id', $materiais->pluck('id'))
             ->whereNull('parent_id')->selectRaw('material_id, count(*) as n')->groupBy('material_id')->pluck('n', 'material_id');
 
-        // Fila "para revisar agora": capítulos de todos os livros com pontos ainda em erro ou em revisão.
-        $fila = MaterialCapitulo::whereIn('material_id', $materiais->pluck('id'))
-            ->withCount([
-                'pontos as errando' => fn ($q) => $q->where('status', 'errando'),
-                'pontos as revisando' => fn ($q) => $q->where('status', 'revisando'),
-            ])
-            ->get(['id', 'material_id', 'titulo'])
-            ->filter(fn ($c) => $c->errando + $c->revisando > 0)
-            ->sortBy([['errando', 'desc'], ['revisando', 'desc']])
-            ->take(6)
-            ->values();
+        // "Para revisar hoje": matérias com questões vencidas na fila.
+        $fila = $materiais->filter(fn ($m) => ($contagens[$m->id]['hoje'] ?? 0) > 0)
+            ->sortByDesc(fn ($m) => $contagens[$m->id]['hoje'])->values();
 
         return view('concursos.material.index', compact('materiais', 'contagens', 'capitulos', 'fila'));
     }
@@ -88,14 +84,10 @@ class MaterialController extends Controller
         return redirect()->to(self::urlDoPonto($ponto));
     }
 
-    /** Onde o ponto aparece no livro (capítulo) ou, se ainda não convertido, a capa do livro. */
+    /** Os pontos vivem na área de Questões: as questões ligadas ao ponto, para refazer. */
     public static function urlDoPonto(MaterialPonto $ponto): string
     {
-        $material = $ponto->materialDono();
-
-        return $ponto->capitulo_id
-            ? route('concursos.material.capitulo', [$material, $ponto->capitulo_id]) . '#ponto-' . $ponto->id
-            : route('concursos.material.show', $material);
+        return route('concursos.material.refazer', [$ponto->materialDono(), 'ponto' => $ponto->id, 'situacao' => 'todas', 'iniciar' => 1]);
     }
 
     private function doAluno(Request $request, MaterialPonto $ponto): Material

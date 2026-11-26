@@ -435,7 +435,9 @@
             <button type="button" class="novo-cap" data-acao="novo">+ Novo capítulo</button>
         </nav>
         <div class="lat-rodape">
-            @if ($resumo['questoes'])<a href="{{ route('concursos.material.refazer', $material) }}">↻ Refazer erradas ({{ $resumo['questoes'] }})</a>@endif
+            @if ($resumo['questoes'])<a href="{{ route('concursos.material.refazer', $material) }}">↻ Questões ({{ $resumo['hoje'] }} para hoje)</a>@endif
+            @if ($todos)<a href="{{ route('concursos.material.show', $material) }}">Só os capítulos de teoria</a>
+            @elseif ($ocultos)<a href="{{ route('concursos.material.show', [$material, 'todos' => 1]) }}" title="Capítulos só com pontos e questões (diário de erros)">Ver também {{ $ocultos }} capítulos do diário de erros</a>@endif
             <a href="{{ route('concursos.material.imprimir', $material) }}" target="_blank">🖨 Imprimir / PDF do livro</a>
             <a href="{{ route('concursos.material.index') }}">← Todos os livros</a>
         </div>
@@ -464,8 +466,8 @@
 
             @if (count($dadosEditor['doCapitulo']))
                 <div class="card questoes-cap">
-                    <p><b>{{ count($dadosEditor['doCapitulo']) }}</b> {{ count($dadosEditor['doCapitulo']) === 1 ? 'questão errada' : 'questões erradas' }} deste assunto. Insira no texto pelo botão <b>Questão</b> (ou digite <code>/questão</code>) ou refaça em sequência.</p>
-                    <a class="btn" href="{{ route('concursos.material.refazer', [$material, 'capitulo' => $capitulo->id, 'situacao' => 'todas', 'iniciar' => 1]) }}">Refazer as deste capítulo</a>
+                    <p><b>{{ count($dadosEditor['doCapitulo']) }}</b> {{ count($dadosEditor['doCapitulo']) === 1 ? 'questão' : 'questões' }} deste assunto nos cadernos. Refaça na área de Questões.</p>
+                    <a class="btn" href="{{ route('concursos.material.refazer', [$material, 'capitulo' => $capitulo->id, 'situacao' => 'errando', 'iniciar' => 1]) }}">Refazer as que ainda erro</a>
                 </div>
             @endif
 
@@ -483,7 +485,7 @@
     @else
         @php
             $pontosTotal = $resumo['errando'] + $resumo['revisando'] + $resumo['dominado'];
-            $prioritario = $plano->where('errando', '>', 0)->sortByDesc('errando')->first();
+            $prioritario = $resumo['questoes'] > 0;
             $maxErros = max(1, (int) $plano->max('errando'));
         @endphp
         <main class="livro-pagina">
@@ -500,7 +502,7 @@
                     </div>
                     <div class="capa-acoes">
                         @if ($prioritario)
-                            <a class="btn main" href="{{ route('concursos.material.capitulo', [$material, $prioritario['id']]) }}" title="{{ $prioritario['num'] }} {{ $prioritario['titulo'] }}">Revisar erros prioritários</a>
+                            <a class="btn main" href="{{ route('concursos.material.refazer', [$material, 'situacao' => 'fila', 'iniciar' => 1]) }}">Revisar questões ({{ $resumo['hoje'] }} hoje)</a>
                             <a class="btn" data-continuar hidden href="#">Continuar: <span></span></a>
                         @else
                             <a class="btn main" data-continuar hidden href="#">Continuar: <span></span></a>
@@ -516,9 +518,9 @@
                     <button type="button" class="ind" data-filtro-atalho="todos" aria-pressed="false" title="Mostrar todos os capítulos"><small>Capítulos</small><b>{{ $resumo['capitulos'] }}</b></button>
                     <button type="button" class="ind err" data-filtro-atalho="erros" aria-pressed="false" title="Mostrar só capítulos com erros"><small>Ainda erro</small><b>{{ $resumo['errando'] }}</b></button>
                     <div class="ind rev"><small>Revisando</small><b>{{ $resumo['revisando'] }}</b></div>
-                    <div class="ind dom"><small>Dominados</small><b>{{ $resumo['dominado'] }}</b></div>
+                    <div class="ind dom"><small>Dominadas</small><b>{{ $resumo['dominado'] }}</b></div>
                     @if ($resumo['questoes'])
-                        <a class="ind" href="{{ route('concursos.material.refazer', $material) }}"><small>Para refazer →</small><b>{{ $resumo['questoes'] }}</b></a>
+                        <a class="ind" href="{{ route('concursos.material.refazer', $material) }}"><small>Questões →</small><b>{{ $resumo['questoes'] }}</b></a>
                     @else
                         <div class="ind"><small>Para refazer</small><b>0</b></div>
                     @endif
@@ -529,7 +531,7 @@
                             <i class="err" style="width: {{ $resumo['errando'] / $pontosTotal * 100 }}%"></i><i class="rev" style="width: {{ $resumo['revisando'] / $pontosTotal * 100 }}%"></i><i class="dom" style="width: {{ $resumo['dominado'] / $pontosTotal * 100 }}%"></i>
                         @endif
                     </div>
-                    <span>{{ $pontosTotal ? round($resumo['dominado'] / $pontosTotal * 100) . '% dominado' : 'sem pontos de erro ainda' }}</span>
+                    <span>{{ $pontosTotal ? round($resumo['dominado'] / $pontosTotal * 100) . '% das questões dominadas' : 'sem questões ainda' }}</span>
                 </div>
             </section>
 
