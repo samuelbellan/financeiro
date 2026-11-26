@@ -77,10 +77,19 @@ def main():
         def log_message(self, fmt, *args):
             pass
 
+    class Servidor(HTTPServer):
+        # No Windows o padrão (SO_REUSEADDR) deixa dois receptores na mesma porta e o antigo
+        # continua atendendo: sem reuso, um segundo receptor falha logo avisando.
+        allow_reuse_address = False
+
+    try:
+        servidor = Servidor(('127.0.0.1', a.porta), H)
+    except OSError as e:
+        raise SystemExit(f'Porta {a.porta} ocupada (outro receptor aberto?): {e}')
     print(f'Receptor do TEC em http://127.0.0.1:{a.porta} gravando em {saida}', flush=True)
     print('Deixe esta janela aberta; Ctrl+C para parar.', flush=True)
     try:
-        HTTPServer(('127.0.0.1', a.porta), H).serve_forever()
+        servidor.serve_forever()
     except KeyboardInterrupt:
         pass
 

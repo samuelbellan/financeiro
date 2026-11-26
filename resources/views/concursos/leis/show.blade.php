@@ -60,10 +60,10 @@
     mark.grifo.verde, #paleta .cor.verde { background: #c8f2d4; }
     mark.grifo.azul, #paleta .cor.azul { background: #cfe3ff; }
     mark.grifo.rosa, #paleta .cor.rosa { background: #ffd3e4; }
-    @media (prefers-color-scheme: dark) {
-        mark.grifo.amarelo, #paleta .cor.amarelo { background: #5c4d0f; } mark.grifo.verde, #paleta .cor.verde { background: #1d4a2c; }
-        mark.grifo.azul, #paleta .cor.azul { background: #1d3557; } mark.grifo.rosa, #paleta .cor.rosa { background: #5a2238; }
-    }
+    :root[data-theme=dark] mark.grifo.amarelo, :root[data-theme=dark] #paleta .cor.amarelo { background: #5c4d0f; }
+    :root[data-theme=dark] mark.grifo.verde, :root[data-theme=dark] #paleta .cor.verde { background: #1d4a2c; }
+    :root[data-theme=dark] mark.grifo.azul, :root[data-theme=dark] #paleta .cor.azul { background: #1d3557; }
+    :root[data-theme=dark] mark.grifo.rosa, :root[data-theme=dark] #paleta .cor.rosa { background: #5a2238; }
     #paleta { position: absolute; z-index: 30; display: flex; gap: 6px; align-items: center; background: var(--card); border: 1px solid var(--line); border-radius: 999px; padding: 6px 8px; box-shadow: 0 6px 20px rgba(0,0,0,.18); }
     #paleta[hidden] { display: none; }
     #paleta.fixa { position: fixed; left: 50% !important; top: auto !important; bottom: 16px; transform: translateX(-50%); padding: 10px 12px; }

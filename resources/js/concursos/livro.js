@@ -20,6 +20,10 @@ if (dados.editor) {
 // ---------------------------------------------------------------------------------------------
 async function montarCapitulo() {
     guardar(chaveUltimo, JSON.stringify({ url: location.pathname, titulo: dados.editor.titulo }));
+    const secaoPdf = document.querySelector('[data-pdf]');
+    if (secaoPdf) {
+        import('./livro/pdf-aula.js').then(m => m.montarPdfAula(secaoPdf));
+    }
     const { criarEditor } = await import('./livro/editor.js');
     const alvo = document.querySelector('[data-editor]');
     const estatico = document.querySelector('[data-estatico]');

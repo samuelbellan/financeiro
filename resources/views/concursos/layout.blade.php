@@ -7,6 +7,25 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+    // Tema antes de pintar: 'claro' | 'escuro' | 'auto' (padrão, segue o sistema).
+    (function () {
+        var mq = matchMedia('(prefers-color-scheme: dark)');
+        function pref() { try { return localStorage.getItem('concursos.tema') || 'auto'; } catch (e) { return 'auto'; } }
+        function aplicar() {
+            var t = pref(), escuro = t === 'escuro' || (t === 'auto' && mq.matches);
+            document.documentElement.dataset.theme = escuro ? 'dark' : 'light';
+            document.documentElement.dataset.tema = t;
+        }
+        aplicar();
+        mq.addEventListener && mq.addEventListener('change', aplicar);
+        window.trocarTema = function () {
+            var ordem = ['auto', 'claro', 'escuro'], t = ordem[(ordem.indexOf(pref()) + 1) % 3];
+            try { localStorage.setItem('concursos.tema', t); } catch (e) {}
+            aplicar();
+        };
+    })();
+    </script>
     @yield('head')
     <style>
         :root {
@@ -14,12 +33,12 @@
             --accent: #3b6fe0; --accent-ink: #ffffff; --accent-soft: #e8efff;
             --ok: #12805c; --ok-soft: #e3f6ee; --no: #c0362c; --no-soft: #fdecea; --warn: #9a6400; --warn-soft: #fff4dc;
         }
-        @media (prefers-color-scheme: dark) {
-            :root {
-                --bg: #12151c; --card: #1b1f29; --ink: #e6e9f0; --muted: #98a2b3; --line: #2c3241;
-                --accent: #6f9bff; --accent-ink: #0d1117; --accent-soft: #1f2a44;
-                --ok: #4cc79a; --ok-soft: #15322a; --no: #ff8076; --no-soft: #3a1d1b; --warn: #f0b44c; --warn-soft: #3a2e15;
-            }
+        /* Tema: data-theme é resolvido no <head> (auto segue o sistema; claro/escuro ficam salvos no aparelho). */
+        :root[data-theme=dark] {
+            color-scheme: dark;
+            --bg: #12151c; --card: #1b1f29; --ink: #e6e9f0; --muted: #98a2b3; --line: #2c3241;
+            --accent: #6f9bff; --accent-ink: #0d1117; --accent-soft: #1f2a44;
+            --ok: #4cc79a; --ok-soft: #15322a; --no: #ff8076; --no-soft: #3a1d1b; --warn: #f0b44c; --warn-soft: #3a2e15;
         }
         * { box-sizing: border-box; }
         body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.55 Inter, system-ui, sans-serif; }
@@ -45,6 +64,11 @@
         .menu a { flex: none; padding: 7px 12px; border-radius: 99px; text-decoration: none; color: var(--muted); font-size: 14px; font-weight: 600; }
         .menu a:hover { color: var(--ink); background: var(--card); }
         .menu a[aria-current=page] { color: var(--accent-ink); background: var(--accent); }
+        .menu .tema { flex: none; margin-left: auto; border: 1px solid var(--line); background: var(--card); color: var(--muted); border-radius: 99px; padding: 6px 12px; font: 600 13px/1 Inter, system-ui, sans-serif; cursor: pointer; white-space: nowrap; }
+        .menu .tema:hover { color: var(--ink); }
+        .menu .tema::after { content: 'Tema: auto'; }
+        :root[data-tema=claro] .menu .tema::after { content: '☀ Claro'; }
+        :root[data-tema=escuro] .menu .tema::after { content: '☾ Escuro'; }
         @yield('css')
     </style>
 </head>
@@ -78,6 +102,7 @@
                     <a href="{{ route($rota) }}" @if (str_starts_with($rotaAtual, $prefixo)) aria-current="page" @endif>{{ $nome }}</a>
                 @endif
             @endforeach
+            <button type="button" class="tema" onclick="trocarTema()" title="Trocar tema (automático, claro, escuro)" aria-label="Trocar tema"></button>
         </nav>
     @endunless
     @if (session('status'))
