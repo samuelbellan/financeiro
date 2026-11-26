@@ -136,7 +136,7 @@ export function analisar(doc) {
                 questoesDaNota(a?.nota).forEach(q => qs.add(q));
                 if (atual) { atual.marcas.add(g.attrs.id); questoesDaNota(a?.nota).forEach(q => atual.questoes.add(q)); }
             });
-            if (qs.size) decos.push(Decoration.node(pos, pos + node.nodeSize, { class: 'quente', 'data-calor': String(Math.min(qs.size, 3)), title: `${qs.size} ${qs.size === 1 ? 'questão errada cai' : 'questões erradas caem'} aqui` }));
+            if (qs.size) decos.push(Decoration.node(pos, pos + node.nodeSize, { class: 'quente', 'data-calor': String(Math.min(qs.size, 3)), title: `${qs.size} ${qs.size === 1 ? 'questão cai' : 'questões caem'} aqui` }));
         }
         if (node.isText) {
             textoInline(node.text, pos, decos, leiPadrao);
@@ -162,8 +162,8 @@ export function analisar(doc) {
             b.className = 'badge-erros';
             b.contentEditable = 'false';
             b.dataset.secao = s.id;
-            b.textContent = `✗ ${total.size} ${total.size === 1 ? 'erro' : 'erros'}`;
-            b.title = 'Ver as questões erradas desta seção';
+            b.textContent = `${total.size} ${total.size === 1 ? 'questão' : 'questões'}`;
+            b.title = 'Ver as questões desta seção';
             return b;
         }, { side: 1, key: `badge-${s.id}-${total.size}`, ignoreSelection: true }));
     }

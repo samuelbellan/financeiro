@@ -114,7 +114,7 @@ function montarGavetaErros(alvo, secoes) {
         });
         const refazer = document.querySelector('.questoes-cap a.btn');
         gaveta.replaceChildren(
-            el('header', {}, el('div', {}, el('small', {}, `${s.num} · ${s.total.size} ${s.total.size === 1 ? 'questão errada' : 'questões erradas'}`), el('h2', {}, s.titulo)), fechar1),
+            el('header', {}, el('div', {}, el('small', {}, `${s.num} · ${s.total.size} ${s.total.size === 1 ? 'questão' : 'questões'}`), el('h2', {}, s.titulo)), fechar1),
             el('div', { class: 'ge-lista' }, ...itens),
             ...(refazer ? [el('a', { class: 'btn main', href: refazer.href }, 'Refazer as questões do capítulo')] : []),
         );

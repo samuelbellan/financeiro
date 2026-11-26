@@ -206,6 +206,34 @@ class ConcursosLivroTest extends TestCase
         $this->assertNull(MaterialQuestao::where('chave', 'q900001')->value('ponto_id'));
     }
 
+    public function test_rascunho_a_mao_e_limpo_salvo_e_desenhado(): void
+    {
+        $material = $this->material();
+        $this->abrir($material);
+        $cap = MaterialCapitulo::where('titulo', 'Estoques')->firstOrFail();
+
+        $doc = ['type' => 'doc', 'content' => [
+            ['type' => 'rascunho', 'attrs' => ['altura' => 99999, 'tracos' => [
+                ['c' => 'azul', 'p' => [10.04, 20, 0.5, 30, 40.55, 0.8]],
+                ['c' => '"><script>', 'p' => [1, 2, 0.5, 'x', 3, 0.5]], // ponto inválido: traço descartado
+                ['c' => 'marca', 's' => 1, 'p' => [5000, -900, 3]],    // coordenadas presas aos limites
+                ['c' => 'preto', 'p' => [1, 2]],                      // sem ponto completo
+            ]], 'content' => [['type' => 'paragraph']]],
+        ]];
+        $this->actingAs($this->user)->putJson(route('concursos.material.capitulos.conteudo', $cap), ['conteudo' => $doc])->assertOk();
+
+        $r = $cap->fresh()->conteudo['content'][0];
+        $this->assertSame('rascunho', $r['type']);
+        $this->assertArrayNotHasKey('content', $r);
+        $this->assertSame(6000, $r['attrs']['altura']);
+        $this->assertCount(2, $r['attrs']['tracos']);
+        $this->assertEquals(['c' => 'azul', 'p' => [10.0, 20.0, 0.5, 30.0, 40.6, 0.8]], $r['attrs']['tracos'][0]);
+        $this->assertEquals(['c' => 'marca', 'p' => [1050.0, -50.0, 1.0], 's' => 1], $r['attrs']['tracos'][1]);
+
+        $this->actingAs($this->user)->get(route('concursos.material.imprimir', $material))
+            ->assertOk()->assertSee('viewBox="0 0 1000 6000"', false)->assertSee('M10 20 L30 40.6', false)->assertDontSee('"><script>', false);
+    }
+
     public function test_capitulos_criar_renomear_ordenar_e_apagar(): void
     {
         $material = Material::create(['user_id' => $this->user->id, 'slug' => 'livre', 'titulo' => 'Livro Livre']);
