@@ -41,6 +41,7 @@ class Material extends ConcursosModel
         'demp' => '#ca8a04', // Empresarial: âmbar
         'mfin' => '#0d9488', // Matemática Financeira: verde-água
         'ctbga' => '#4f46e5', // Contabilidade: índigo
+        'ti' => '#0891b2', // TI: ciano
     ];
 
     /** Cor de destaque do livro: a da disciplina; sem ela, fixa por id (sem coluna no banco). */

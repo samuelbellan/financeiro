@@ -25,6 +25,7 @@
         "@tiptap/starter-kit": "^3.35.0",
         "chart.js": "^4.5.1",
         "idb": "^8.0.3",
+        "pdfjs-dist": "^4.10.38",
         "perfect-freehand": "^1.2.2"
     }
 }

@@ -67,6 +67,7 @@ class LivroController extends Controller
         return view('concursos.material.livro', $base + [
             'capitulo' => $capitulo,
             'caminho' => $this->caminho($capitulo),
+            'pdf' => $capitulo->pdf_anexo_id ? route('concursos.material.anexos.show', $capitulo->pdf_anexo_id) : null,
             'anterior' => $i > 0 ? $plano[$i - 1] : null,
             'proximo' => $i !== false && $i < $plano->count() - 1 ? $plano[$i + 1] : null,
             // Capítulo de teoria: lê-se só a teoria (os pontos ficam na área de Questões e no editor).
@@ -377,7 +378,7 @@ class LivroController extends Controller
      */
     private function base(Material $material): array
     {
-        $todosCaps = $material->capitulos()->get(['id', 'parent_id', 'titulo', 'ordem', 'assunto_id', 'conteudo']);
+        $todosCaps = $material->capitulos()->get(['id', 'parent_id', 'titulo', 'ordem', 'assunto_id', 'conteudo', 'pdf_anexo_id']);
         $todos = request()->boolean('todos');
         $mostrar = $todos ? collect() : $this->comTeoria($todosCaps);
         if ($mostrar->isEmpty()) {
@@ -432,7 +433,7 @@ class LivroController extends Controller
         $pais = $capitulos->pluck('parent_id', 'id');
         $saida = collect();
         foreach ($capitulos as $c) {
-            if (!$this->documento->temTeoria($c->conteudo)) {
+            if (!$c->pdf_anexo_id && !$this->documento->temTeoria($c->conteudo)) {
                 continue;
             }
             for ($id = $c->id, $guarda = 0; $id && !$saida->has($id) && $guarda < 20; $id = $pais[$id] ?? null, $guarda++) {

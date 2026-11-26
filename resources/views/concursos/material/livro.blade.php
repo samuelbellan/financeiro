@@ -194,6 +194,16 @@
     /* bolha de grifo e menu "/" */
     .bolha, .slash { position: absolute; z-index: 50; background: var(--card); border: 1px solid var(--line); border-radius: 10px; box-shadow: 0 8px 24px rgba(0,0,0,.18); }
     .bolha { display: flex; gap: 2px; padding: 4px; }
+    /* aula em PDF abaixo do resumo (caderno de TI) */
+    .aula-pdf { margin-top: 20px; padding: 14px; }
+    .aula-pdf-topo { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin-bottom: 12px; }
+    .aula-pdf-topo h2 { margin: 0; font-size: 17px; }
+    .aula-pdf-topo a { margin-left: auto; }
+    .aula-pdf-paginas { display: flex; flex-direction: column; gap: 10px; }
+    .aula-pdf-pagina { position: relative; width: 100%; background: #fff; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
+    .aula-pdf-pagina canvas { display: block; width: 100%; height: auto; }
+    .aula-pdf-pagina small { position: absolute; right: 8px; bottom: 6px; padding: 1px 6px; border-radius: 6px; background: rgba(0,0,0,.55); color: #fff; font-size: 11px; }
+
     .bolha button { border: 0; background: none; color: var(--ink); font: inherit; font-size: 13px; font-weight: 600; padding: 6px 8px; border-radius: 7px; cursor: pointer; }
     .bolha button:hover { background: var(--bg); }
     /* modo caneta (grifar com a caneta) */
@@ -444,7 +454,7 @@
         .cap-menu > summary { opacity: 1; }
     }
     @media print {
-        .menu, .livro-lateral, .pag-topo, .barra, .navega, .questoes-cap, .margem, .bolha, .slash, .caneta-paleta, .rascunho-barra { display: none !important; }
+        .menu, .livro-lateral, .pag-topo, .barra, .navega, .questoes-cap, .margem, .bolha, .slash, .caneta-paleta, .rascunho-barra, .aula-pdf { display: none !important; }
         .livro { display: block; }
         .pagina { border: 0; padding: 0; }
     }
@@ -507,6 +517,17 @@
             @endif
 
             <nav class="navega" aria-label="Capítulos">
+            @if ($pdf)
+                <section class="card aula-pdf" data-pdf="{{ $pdf }}">
+                    <div class="aula-pdf-topo">
+                        <h2>Aula em PDF</h2>
+                        <span class="muted" data-pdf-info>Carregando…</span>
+                        <a class="btn mini fantasma" href="{{ $pdf }}" target="_blank" rel="noopener">Abrir em outra aba ↗</a>
+                    </div>
+                    <div class="aula-pdf-paginas" data-pdf-paginas></div>
+                </section>
+            @endif
+
                 @if ($anterior)<a href="{{ route('concursos.material.capitulo', [$material, $anterior['id']]) }}" data-anterior><small>← Anterior</small>{{ $anterior['num'] }} {{ $anterior['titulo'] }}</a>@endif
                 @if ($proximo)<a class="prox" href="{{ route('concursos.material.capitulo', [$material, $proximo['id']]) }}" data-proximo><small>Próximo →</small>{{ $proximo['num'] }} {{ $proximo['titulo'] }}</a>@endif
             </nav>
