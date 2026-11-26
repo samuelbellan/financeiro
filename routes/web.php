@@ -221,6 +221,12 @@ Route::middleware(['auth', 'modulos'])->group(function () {
         Route::get('/jurisprudencia/{tipo}/{numero}', [\App\Http\Controllers\Concursos\LeisController::class, 'juris'])->where(['tipo' => '[a-z]+', 'numero' => '\d{1,6}'])->name('juris.show');
         Route::get('/legislacao/{lei}', [\App\Http\Controllers\Concursos\LeisController::class, 'show'])->where('lei', '[a-z][a-z0-9]*')->name('leis.show');
         Route::get('/legislacao/{lei}/artigos/{artigo}', [\App\Http\Controllers\Concursos\LeisController::class, 'artigo'])->where(['lei' => '[a-z][a-z0-9]*', 'artigo' => '\d+(-[A-Za-z])?'])->name('leis.artigo');
+        // Vade Mecum anotável: marcador + nota por artigo e "Levar ao material".
+        Route::post('/legislacao/{lei}/marcas/{ancora}', [\App\Http\Controllers\Concursos\VadeMecumController::class, 'marcar'])->where(['lei' => '[a-z][a-z0-9]*', 'ancora' => '(adct-)?art-\d+(-[a-z])?'])->name('leis.marcar');
+        Route::post('/legislacao/{lei}/marcas/{ancora}/levar', [\App\Http\Controllers\Concursos\VadeMecumController::class, 'levar'])->where(['lei' => '[a-z][a-z0-9]*', 'ancora' => '(adct-)?art-\d+(-[a-z])?'])->name('leis.levar');
+        Route::post('/legislacao/{lei}/grifos/{ancora}', [\App\Http\Controllers\Concursos\VadeMecumController::class, 'grifar'])->where(['lei' => '[a-z][a-z0-9]*', 'ancora' => '(adct-)?art-\d+(-[a-z])?'])->name('leis.grifar');
+        Route::patch('/legislacao/grifos/{grifo}', [\App\Http\Controllers\Concursos\VadeMecumController::class, 'recolorir'])->whereNumber('grifo')->name('leis.grifos.update');
+        Route::delete('/legislacao/grifos/{grifo}', [\App\Http\Controllers\Concursos\VadeMecumController::class, 'desgrifar'])->whereNumber('grifo')->name('leis.grifos.destroy');
     });
 
     // Sistema - Estudo para Concursos (Questões, Simulados, Flashcards, Lei Seca e Edital)

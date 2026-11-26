@@ -7,6 +7,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    @yield('head')
     <style>
         :root {
             --bg: #f4f5f8; --card: #ffffff; --ink: #1d2433; --muted: #667085; --line: #e3e6ec;

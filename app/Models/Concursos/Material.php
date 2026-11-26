@@ -31,9 +31,24 @@ class Material extends ConcursosModel
         return $this->hasMany(MaterialCapitulo::class)->orderBy('ordem')->orderBy('id');
     }
 
-    /** Cor de destaque do livro na estante: fixa por id, sem coluna no banco. */
+    /** Cor de cada disciplina (estante, breadcrumb, chips, callouts), pelo slug do livro. */
+    public const CORES_DISCIPLINA = [
+        'dcon' => '#3b82f6', // Constitucional: azul
+        'dtrib' => '#16a34a', // Tributário: verde
+        'dadm' => '#ea580c', // Administrativo: laranja
+        'dciv' => '#8b5cf6', // Civil: roxo
+        'dpen' => '#dc2626', // Penal: vermelho
+        'demp' => '#ca8a04', // Empresarial: âmbar
+        'mfin' => '#0d9488', // Matemática Financeira: verde-água
+        'ctbga' => '#4f46e5', // Contabilidade: índigo
+    ];
+
+    /** Cor de destaque do livro: a da disciplina; sem ela, fixa por id (sem coluna no banco). */
     public function cor(): string
     {
+        if (isset(self::CORES_DISCIPLINA[$this->slug])) {
+            return self::CORES_DISCIPLINA[$this->slug];
+        }
         $cores = ['#7f77dd', '#1d9e75', '#d85a30', '#378add', '#d4537e', '#ba7517', '#5f9ea0', '#8e6cc7'];
 
         return $cores[$this->id % count($cores)];

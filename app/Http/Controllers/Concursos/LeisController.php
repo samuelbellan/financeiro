@@ -3,11 +3,15 @@
 namespace App\Http\Controllers\Concursos;
 
 use App\Http\Controllers\Controller;
+use App\Models\Concursos\LeiGrifo;
+use App\Models\Concursos\LeiMarca;
 use App\Models\Concursos\Material;
 use App\Models\Concursos\MaterialCapitulo;
 use App\Models\Concursos\MaterialPonto;
 use App\Services\Concursos\Leis\AcervoLeis;
 use App\Services\Concursos\Leis\Citacoes;
+use App\Services\Concursos\Leis\IncidenciaLeis;
+use App\Services\Concursos\Leis\Reancorador;
 use App\Services\Concursos\Leis\Jurisprudencia;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -34,7 +38,7 @@ class LeisController extends Controller
         return view('concursos.leis.index', compact('leis'));
     }
 
-    public function show(Request $request, string $lei, AcervoLeis $acervo, Citacoes $citacoes): View
+    public function show(Request $request, string $lei, AcervoLeis $acervo, Citacoes $citacoes, IncidenciaLeis $incidencia, Reancorador $reancorador): View
     {
         abort_unless($acervo->existe($lei), 404);
         try {
@@ -52,7 +56,52 @@ class LeisController extends Controller
             'acervo' => $acervo,
             'fonte' => $acervo->urlFonte($lei),
             'citados' => $this->citados($request->user()->id, $lei, $citacoes),
+            'incidencia' => $incidencia->daLei($lei, $request->user()->id),
+            'marcas' => LeiMarca::where('user_id', $request->user()->id)->where('lei', $lei)->get()->keyBy('ancora'),
+            'capitulos' => $this->capitulosDoAluno($request->user()->id),
+            'grifos' => $this->grifos($request->user()->id, $lei, $blocos, $acervo, $reancorador),
         ]);
+    }
+
+    /** Grifos do aluno já reposicionados no texto atual: âncora → [{id, cor, trecho, inicio, fim}] (inicio null = órfão). */
+    private function grifos(int $userId, string $lei, array $blocos, AcervoLeis $acervo, Reancorador $reancorador): array
+    {
+        $porAncora = LeiGrifo::where('user_id', $userId)->where('lei', $lei)->orderBy('id')->get()->groupBy('ancora');
+        if ($porAncora->isEmpty()) {
+            return [];
+        }
+        $saida = [];
+        foreach ($blocos as $b) {
+            if ($b['tipo'] === 'artigo' && $porAncora->has($b['ancora'])) {
+                $texto = Reancorador::textoDoHtml($acervo->mdParaHtml($b['md']));
+                $saida[$b['ancora']] = $reancorador->posicionar($texto, $porAncora[$b['ancora']]);
+            }
+        }
+
+        return $saida;
+    }
+
+    /** Capítulos do livro do aluno, para o "Levar ao material": [{material, capitulos: [{id, titulo}]}]. */
+    private function capitulosDoAluno(int $userId): array
+    {
+        $materiais = Material::where('user_id', $userId)->orderBy('titulo')->get(['id', 'titulo']);
+        $caps = MaterialCapitulo::whereIn('material_id', $materiais->pluck('id'))
+            ->orderBy('ordem')->orderBy('id')->get(['id', 'material_id', 'parent_id', 'titulo'])->groupBy('material_id');
+
+        return $materiais->filter(fn ($m) => $caps->has($m->id))->map(function ($m) use ($caps) {
+            // Em ordem de árvore, com recuo nos subcapítulos.
+            $filhos = $caps[$m->id]->groupBy(fn ($c) => (int) $c->parent_id);
+            $lista = [];
+            $andar = function (int $pai, int $nivel) use (&$andar, &$lista, $filhos) {
+                foreach ($filhos->get($pai, []) as $c) {
+                    $lista[] = ['id' => $c->id, 'titulo' => str_repeat('— ', $nivel) . $c->titulo];
+                    $andar($c->id, $nivel + 1);
+                }
+            };
+            $andar(0, 0);
+
+            return ['material' => $m->titulo, 'capitulos' => $lista];
+        })->values()->all();
     }
 
     public function artigo(string $lei, string $artigo, AcervoLeis $acervo): JsonResponse

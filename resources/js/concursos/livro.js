@@ -27,7 +27,8 @@ async function montarCapitulo() {
     const btn = document.querySelector('[data-modo]');
     const titulo = document.querySelector('[data-titulo-capitulo]');
 
-    const { definirModo, salvarAgora } = criarEditor({
+    const { montarPainel } = await import('./livro/painel.js');
+    const { editor, definirModo, salvarAgora } = criarEditor({
         alvo,
         doc: dados.editor.doc,
         editavel: params.has('editar'),
@@ -39,6 +40,7 @@ async function montarCapitulo() {
     });
     estatico.remove();
     alvo.hidden = false;
+    montarPainel(editor);
 
     btn.addEventListener('click', async () => {
         const editando = btn.getAttribute('aria-pressed') !== 'true';

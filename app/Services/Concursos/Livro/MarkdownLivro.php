@@ -36,7 +36,18 @@ use League\CommonMark\Parser\MarkdownParser;
 class MarkdownLivro
 {
     private const SIMBOLOS = ['\\ge' => '≥', '\\geq' => '≥', '\\le' => '≤', '\\leq' => '≤', '\\neq' => '≠', '\\Sigma' => 'Σ',
-        '\\times' => '×', '\\cdot' => '·', '\\to' => '→', '\\rightarrow' => '→', '\\Rightarrow' => '⇒', '\\%' => '%', '\\,' => ' '];
+        '\\times' => '×', '\\cdot' => '·', '\\to' => '→', '\\rightarrow' => '→', '\\Rightarrow' => '⇒', '\\%' => '%', '\\,' => ' ',
+        '\\approx' => '≈', '\\div' => '÷', '\\pm' => '±', '\\infty' => '∞', '\\Delta' => 'Δ', '\\sum' => 'Σ', '\\dots' => '…',
+        '\\ldots' => '…', '\\cdots' => '⋯', '\\leftrightarrow' => '↔', '\\Leftrightarrow' => '⇔', '\\lceil' => '⌈', '\\rceil' => '⌉',
+        '\\lfloor' => '⌊', '\\rfloor' => '⌋', '\\ln' => 'ln', '\\log' => 'log', '\\quad' => ' ', '\\qquad' => ' ', '\\ ' => ' ',
+        '\\left' => '', '\\right' => '', '\\_' => '_'];
+
+    private const SOBRESCRITO = ['0' => '⁰', '1' => '¹', '2' => '²', '3' => '³', '4' => '⁴', '5' => '⁵', '6' => '⁶', '7' => '⁷', '8' => '⁸',
+        '9' => '⁹', '+' => '⁺', '-' => '⁻', '(' => '⁽', ')' => '⁾', 'n' => 'ⁿ', 'i' => 'ⁱ', 't' => 'ᵗ', 'k' => 'ᵏ', 'm' => 'ᵐ', 'x' => 'ˣ'];
+
+    private const SUBSCRITO = ['0' => '₀', '1' => '₁', '2' => '₂', '3' => '₃', '4' => '₄', '5' => '₅', '6' => '₆', '7' => '₇', '8' => '₈',
+        '9' => '₉', '+' => '₊', '-' => '₋', 'a' => 'ₐ', 'e' => 'ₑ', 'o' => 'ₒ', 'x' => 'ₓ', 'i' => 'ᵢ', 'j' => 'ⱼ', 'k' => 'ₖ', 'n' => 'ₙ',
+        'm' => 'ₘ', 't' => 'ₜ', 'p' => 'ₚ', 's' => 'ₛ', 'r' => 'ᵣ', 'h' => 'ₕ', 'l' => 'ₗ', 'u' => 'ᵤ', 'v' => 'ᵥ'];
 
     /**
      * Partes do arquivo por título: [['nivel' => 2|3, 'titulo' => ..., 'md' => texto com o título]].
@@ -96,6 +107,8 @@ class MarkdownLivro
         $md = preg_replace_callback('/\$\$(.+?)\$\$|\$(.+?)\$/su', function ($m) {
             $f = $m[1] !== '' ? $m[1] : $m[2];
             $f = preg_replace('/\\\\(?:text|mathrm|mathbf|textbf)\{([^{}]*)\}/u', '$1', $f);
+            $f = $this->fracoes($f);
+            $f = $this->indices($f);
             $f = strtr($f, self::SIMBOLOS);
             $f = preg_replace('/\\\\[a-zA-Z]+/u', '', $f);
 
@@ -103,6 +116,57 @@ class MarkdownLivro
         }, $md);
 
         return str_replace("\u{E000}", '\\$', $md);
+    }
+
+    /** \frac{a}{b} → a/(b) e \sqrt{x} → √(x), de dentro para fora; parênteses só quando precisa. */
+    private function fracoes(string $f): string
+    {
+        $grupo = '\{((?:[^{}]|\{(?-1)\})*)\}';
+        for ($i = 0; $i < 20 && preg_match('/\\\\(?:frac|sqrt)/', $f); $i++) {
+            $antes = $f;
+            $f = preg_replace_callback("/\\\\frac\\s*{$grupo}\\s*{$grupo}/u",
+                fn ($m) => $this->atomo($this->fracoes($m[1])) . '/' . $this->atomo($this->fracoes($m[2])), $f);
+            $f = preg_replace_callback("/\\\\sqrt\\s*(?:\\[[^\\]]*\\])?\\s*{$grupo}/u",
+                fn ($m) => '√' . $this->atomo($this->fracoes($m[1])), $f);
+            if ($f === $antes) {
+                break;
+            }
+        }
+
+        return $f;
+    }
+
+    /** Envolve em parênteses o que não é um termo só ("1 + i" → "(1 + i)"; "VF" e "(1 + i)" ficam). */
+    private function atomo(string $s): string
+    {
+        $s = trim($s);
+        $t = preg_replace('/[\^_](?:\{[^{}]*\}|[\pL\pN])/u', '', $s); // índices não contam
+        if (preg_match('/^[\pL\pN.,%]+$/u', $t) || preg_match('/^\((?:[^()]|\((?:[^()]|\([^()]*\))*\))*\)$/u', $t)) {
+            return $s;
+        }
+
+        return '(' . $s . ')';
+    }
+
+    /** x^{n} → xⁿ e VP_{1} → VP₁ quando há o caractere Unicode; senão x^(n+1) / VP_liq. */
+    private function indices(string $f): string
+    {
+        $troca = function (string $txt, array $mapa, string $sinal): string {
+            $txt = trim(str_replace(['{', '}'], '', $txt));
+            $chars = mb_str_split($txt);
+            // Palavra inteira no índice (P_{final}) fica legível como P_final; só número ou letra solta vira Unicode.
+            $ok = $chars && !array_diff($chars, array_keys($mapa)) && (count($chars) === 1 || preg_match('/^[\pN+\-()]+$/u', $txt));
+
+            return $ok ? implode('', array_map(fn ($c) => $mapa[$c], $chars))
+                : $sinal . (mb_strlen($txt) > 1 && $sinal === '^' ? '(' . $txt . ')' : $txt);
+        };
+        $grupo = '\{((?:[^{}]|\{(?-1)\})*)\}';
+        $f = str_replace(['\\ ', '\\_'], [' ', "\u{E001}"], $f);
+        $f = preg_replace_callback("/\\^(?:{$grupo}|([\\pL\\pN]))/u", fn ($m) => $troca($m[1] !== '' ? $m[1] : ($m[2] ?? ''), self::SOBRESCRITO, '^'), $f);
+
+        $f = preg_replace_callback("/_(?:{$grupo}|([\\pL\\pN]))/u", fn ($m) => $troca($m[1] !== '' ? $m[1] : ($m[2] ?? ''), self::SUBSCRITO, '_'), $f);
+
+        return str_replace("\u{E001}", '_', $f); // "\_" literal (TOTAL\_ENTRADAS) não é índice
     }
 
     /** @return list<array> */
