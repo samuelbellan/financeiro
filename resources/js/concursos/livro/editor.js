@@ -8,6 +8,8 @@ import Typography from '@tiptap/extension-typography';
 import { TableKit } from '@tiptap/extension-table';
 import { Caixa, PontoErro, Questao, Lei, Grifo, CORES } from './extensoes.js';
 import { Leitura } from './leitura.js';
+import { Rascunho } from './rascunho.js';
+import { montarCaneta } from './caneta.js';
 import { estado, api, el, avisar, debounce, novoId } from './util.js';
 
 const NOMES_COR = { amarelo: 'Amarelo', verde: 'Verde', azul: 'Azul', rosa: 'Rosa' };
@@ -26,7 +28,7 @@ export function criarEditor({ alvo, doc, editavel, aoMudarModo }) {
             Placeholder.configure({ placeholder: ({ node }) => (node.type.name === 'paragraph' ? 'Escreva aqui… (digite / para inserir caixa, questão, lei, imagem)' : '') }),
             Typography.configure({ oneHalf: false, oneQuarter: false, threeQuarters: false, plusMinus: false, notEqual: false, laquo: false, raquo: false }),
             TableKit.configure({ table: { resizable: false } }),
-            Caixa, PontoErro, Questao, Lei, Grifo, Leitura,
+            Caixa, PontoErro, Questao, Lei, Grifo, Leitura, Rascunho,
         ],
         editorProps: {
             attributes: { class: 'pagina-texto', 'aria-label': 'Texto do capítulo' },
@@ -145,6 +147,7 @@ export function criarEditor({ alvo, doc, editavel, aoMudarModo }) {
         { id: 'lei', nome: 'Artigo de lei / súmula', dica: '[[ctn 98]], [[sv 24]]…', acao: inserirLei },
         { id: 'tabela', nome: 'Tabela', dica: 'Quadro comparativo', run: c => c.insertTable({ rows: 3, cols: 3, withHeaderRow: true }) },
         { id: 'imagem', nome: 'Imagem', dica: 'Print, esquema, mapa mental', acao: escolherImagem },
+        { id: 'rascunho', nome: 'Rascunho à mão', dica: 'Área para escrever ou desenhar com a caneta', run: c => c.inserirRascunho() },
         { id: 'citacao', nome: 'Citação', dica: 'Texto recuado', run: c => c.toggleBlockquote() },
         { id: 'linha', nome: 'Linha divisória', dica: '', run: c => c.setHorizontalRule() },
     ];
@@ -192,6 +195,7 @@ export function criarEditor({ alvo, doc, editavel, aoMudarModo }) {
                 botao('🔗', 'Link', inserirLink, () => editor.isActive('link')),
                 botao('▦', 'Tabela', () => editor.chain().focus().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run()),
                 botao('🖼', 'Imagem', escolherImagem),
+                botao('✍', 'Rascunho à mão (caneta)', () => editor.chain().focus().inserirRascunho().run()),
             ),
             grupo(
                 botao('↶', 'Desfazer (Ctrl+Z)', () => editor.chain().focus().undo().run()),
@@ -289,6 +293,9 @@ export function criarEditor({ alvo, doc, editavel, aoMudarModo }) {
 
     // ---- notas na margem ----------------------------------------------------------------------
     const notas = criarNotas(editor, alvo, () => (pendente ? salvar.agora() : Promise.resolve()));
+
+    // ---- caneta: grifar passando a caneta sobre o texto ---------------------------------------
+    montarCaneta(editor, alvo, document.querySelector('[data-caneta]'));
 
     // ---- menu "/" -----------------------------------------------------------------------------
     const slash = criarMenuBarra(editor, comandos, executar);
@@ -422,7 +429,10 @@ function criarNotas(editor, alvo, salvarTexto) {
         const ok = el('button', { type: 'button', class: 'btn mini main' }, 'Salvar');
         const cancelar = el('button', { type: 'button', class: 'btn mini' }, 'Cancelar');
         const form = el('div', { class: 'nota-form' }, area, el('div', { class: 'nota-acoes' }, ok, cancelar));
-        c.append(trecho, texto, el('div', { class: 'nota-acoes' }, editar, apagar), form);
+        // Grifo ligado a questões (Fase 2): atalho para refazê-las.
+        const gq = estado.grifosQ?.[a.marca];
+        const refazer = gq ? el('a', { class: 'link', href: gq.url }, `Refazer ${gq.n === 1 ? 'esta questão' : `estas ${gq.n} questões`}`) : null;
+        c.append(trecho, texto, el('div', { class: 'nota-acoes' }, ...(refazer ? [refazer] : []), editar, apagar), form);
 
         const modo = ed => { form.hidden = !ed; texto.hidden = ed; editar.parentElement.hidden = ed; if (ed) { area.value = a.nota; setTimeout(() => area.focus(), 0); } };
         modo(editando);

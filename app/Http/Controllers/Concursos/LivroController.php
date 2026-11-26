@@ -7,11 +7,13 @@ use App\Models\Concursos\Material;
 use App\Models\Concursos\MaterialAnexo;
 use App\Models\Concursos\MaterialAnotacao;
 use App\Models\Concursos\MaterialCapitulo;
+use App\Models\Concursos\MaterialGrifoQuestao;
 use App\Models\Concursos\MaterialPonto;
 use App\Models\Concursos\MaterialQuestao;
 use App\Services\Concursos\Leis\Citacoes;
 use App\Services\Concursos\Livro\ConversorLivro;
 use App\Services\Concursos\Livro\Documento;
+use App\Services\Concursos\Livro\GrifosQuestoes;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -43,7 +45,7 @@ class LivroController extends Controller
         return view('concursos.material.livro', $this->base($material) + ['capitulo' => null]);
     }
 
-    public function capitulo(Request $request, Material $material, MaterialCapitulo $capitulo, Citacoes $citacoes): View
+    public function capitulo(Request $request, Material $material, MaterialCapitulo $capitulo, Citacoes $citacoes, GrifosQuestoes $grifos): View
     {
         $this->doAluno($request, $material);
         abort_unless($capitulo->material_id === $material->id, 404);
@@ -53,7 +55,10 @@ class LivroController extends Controller
         $questoes = MaterialQuestao::with('ultimaTentativa')->where('material_id', $material->id)
             ->where(fn ($q) => $q->where('capitulo_id', $capitulo->id)->orWhereIn('id', $this->documento->ids($doc, 'questao', 'questaoId')))
             ->orderBy('ordem')->orderBy('id')->get()->keyBy('id');
-        $anotacoes = $capitulo->anotacoes()->get();
+        // Grifos ligados a questões: cor e nota saem da última tentativa (Fase 2).
+        [$doc, $anotacoes, $grifosQ] = $grifos->aplicar($capitulo, $doc, $capitulo->anotacoes()->get());
+        $refazer = route('concursos.material.refazer', $material);
+        $grifosQ = array_map(fn ($g) => $g + ['url' => $refazer . '?' . http_build_query(['ids' => implode(',', $g['ids']), 'situacao' => 'todas', 'iniciar' => 1, 'qtd' => 200])], $grifosQ);
 
         $base = $this->base($material);
         $plano = $base['plano'];
@@ -75,6 +80,7 @@ class LivroController extends Controller
                 'questoes' => $questoes->map(fn ($q) => $this->dadosQuestao($q))->all(),
                 'doCapitulo' => $questoes->where('capitulo_id', $capitulo->id)->keys()->values()->all(),
                 'anotacoes' => $anotacoes->map(fn ($a) => $this->dadosAnotacao($a))->values()->all(),
+                'grifosQ' => (object) $grifosQ,
                 'caixas' => Documento::CAIXAS,
                 'status' => MaterialPonto::STATUS,
                 'urls' => [
@@ -202,6 +208,7 @@ class LivroController extends Controller
             // Notas cujo grifo sumiu do texto saem junto.
             $marcas = $this->marcas($doc);
             $capitulo->anotacoes()->whereNotIn('marca', $marcas ?: [''])->delete();
+            MaterialGrifoQuestao::where('capitulo_id', $capitulo->id)->whereNotIn('marca', $marcas ?: [''])->delete();
 
             $capitulo->update(['conteudo' => $doc, 'texto' => $this->documento->texto($doc)]);
 
@@ -380,7 +387,15 @@ class LivroController extends Controller
 
         $questoes = MaterialQuestao::with('ultimaTentativa')->where('material_id', $material->id)
             ->get(['id', 'capitulo_id', 'resultado_tec', 'caixa', 'revisar_em']);
-        $porCap = $questoes->whereNotNull('capitulo_id')->groupBy('capitulo_id')->map(fn ($qs) => $qs->countBy(fn ($q) => $q->estado()));
+        // Questões de cada capítulo: as do assunto do TEC (capitulo_id) mais as ligadas aos grifos do texto.
+        $ids = $questoes->whereNotNull('capitulo_id')->groupBy('capitulo_id')->map(fn ($qs) => $qs->pluck('id'));
+        MaterialGrifoQuestao::whereIn('capitulo_id', $todosCaps->pluck('id'))->get(['capitulo_id', 'questao_id'])
+            ->groupBy('capitulo_id')
+            ->each(function ($ls, $capId) use ($ids) {
+                $ids[$capId] = $ids->get($capId, collect())->merge($ls->pluck('questao_id'))->unique()->values();
+            });
+        $porId = $questoes->keyBy('id');
+        $porCap = $ids->map(fn ($qids) => $qids->map(fn ($id) => $porId->get($id))->filter()->countBy(fn ($q) => $q->estado()));
         $estados = $questoes->countBy(fn ($q) => $q->estado());
 
         $plano = $this->plano($capitulos)->map(function ($c) use ($porCap) {

@@ -29,7 +29,7 @@ class Documento
     ];
 
     private const BLOCOS = ['paragraph', 'heading', 'bulletList', 'orderedList', 'listItem', 'blockquote', 'horizontalRule',
-        'image', 'table', 'tableRow', 'tableHeader', 'tableCell', 'caixa', 'pontoErro', 'questao'];
+        'image', 'table', 'tableRow', 'tableHeader', 'tableCell', 'caixa', 'pontoErro', 'questao', 'rascunho'];
 
     private const EM_LINHA = ['text', 'hardBreak', 'lei'];
 
@@ -85,6 +85,7 @@ class Documento
             'caixa' => ['tipo' => array_key_exists($a['tipo'] ?? '', self::CAIXAS) ? $a['tipo'] : 'atencao'],
             'pontoErro' => ['pontoId' => ($id = (int) ($a['pontoId'] ?? 0)) > 0 ? $id : null, 'titulo' => mb_substr(trim((string) ($a['titulo'] ?? '')), 0, 200) ?: 'Ponto que eu erro'],
             'questao' => ($id = (int) ($a['questaoId'] ?? 0)) > 0 ? ['questaoId' => $id] : null,
+            'rascunho' => $this->limparRascunho($a),
             'lei' => ($ref = trim((string) ($a['ref'] ?? ''))) !== '' && mb_strlen($ref) <= 80 ? ['ref' => $ref] : null,
             default => [],
         };
@@ -105,7 +106,7 @@ class Documento
             if ($marcas) {
                 $saida['marks'] = $marcas;
             }
-        } elseif (!in_array($tipo, ['hardBreak', 'lei', 'image', 'horizontalRule', 'questao'], true)) {
+        } elseif (!in_array($tipo, ['hardBreak', 'lei', 'image', 'horizontalRule', 'questao', 'rascunho'], true)) {
             $filhos = $this->limparFilhos($no['content'] ?? []);
             if ($filhos) {
                 $saida['content'] = $filhos;
@@ -144,6 +145,61 @@ class Documento
         }
 
         return $saida;
+    }
+
+    /** Cores de tinta do rascunho à mão (iguais às de resources/js/concursos/livro/rascunho.js). */
+    private const TINTAS = ['preto' => ['currentColor', 4, 1], 'azul' => ['#2563eb', 4, 1], 'vermelho' => ['#dc2626', 4, 1], 'verde' => ['#16a34a', 4, 1], 'marca' => ['#facc15', 22, 0.45]];
+
+    /**
+     * Rascunho à mão: altura (largura fixa 1000) e traços {c: tinta, p: [x, y, pressão, ...], s?: 1}.
+     * Limites para o documento não crescer sem controle (o PUT inteiro tem teto de 4 MB).
+     */
+    private function limparRascunho(array $a): array
+    {
+        $tracos = [];
+        $total = 0;
+        foreach (array_slice(is_array($a['tracos'] ?? null) ? $a['tracos'] : [], 0, 3000) as $t) {
+            $pts = is_array($t['p'] ?? null) ? array_values($t['p']) : [];
+            $n = intdiv(min(count($pts), 9000), 3) * 3;
+            if ($n < 3 || ($total += $n) > 450_000) {
+                continue;
+            }
+            $p = [];
+            for ($i = 0; $i < $n; $i += 3) {
+                if (!is_numeric($pts[$i]) || !is_numeric($pts[$i + 1]) || !is_numeric($pts[$i + 2])) {
+                    continue 2;
+                }
+                array_push($p, round(max(-50, min(1050, (float) $pts[$i])), 1), round(max(-50, min(6050, (float) $pts[$i + 1])), 1), round(max(0, min(1, (float) $pts[$i + 2])), 2));
+            }
+            $traco = ['c' => array_key_exists($t['c'] ?? '', self::TINTAS) ? $t['c'] : 'preto', 'p' => $p];
+            if (!empty($t['s'])) {
+                $traco['s'] = 1;
+            }
+            $tracos[] = $traco;
+        }
+
+        return ['altura' => max(160, min(6000, (int) ($a['altura'] ?? 360))), 'tracos' => $tracos];
+    }
+
+    /** SVG do rascunho para leitura sem JS e impressão (traço de espessura fixa, sem pressão). */
+    private function htmlRascunho(array $a): string
+    {
+        $altura = (int) ($a['altura'] ?? 360);
+        $paths = '';
+        foreach ($a['tracos'] ?? [] as $t) {
+            [$cor, $tam, $op] = self::TINTAS[$t['c'] ?? 'preto'] ?? self::TINTAS['preto'];
+            $p = $t['p'] ?? [];
+            $d = [];
+            for ($i = 0; $i + 1 < count($p); $i += 3) {
+                $d[] = ($i ? 'L' : 'M') . $p[$i] . ' ' . $p[$i + 1];
+            }
+            if (count($d) === 1) {
+                $d[] = 'L' . $p[0] . ' ' . $p[1];
+            }
+            $paths .= '<path d="' . implode(' ', $d) . '" stroke="' . $cor . '" stroke-width="' . ($tam * 0.8) . '"' . ($op < 1 ? ' stroke-opacity="' . $op . '"' : '') . '/>';
+        }
+
+        return '<figure class="rascunho"><svg viewBox="0 0 1000 ' . $altura . '" width="100%" fill="none" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="Rascunho à mão">' . $paths . '</svg></figure>';
     }
 
     /** Só imagens enviadas para o próprio sistema (rota de anexos). */
@@ -309,6 +365,8 @@ class Documento
                     : '<p class="alts">( ) Certo ( ) Errado</p>';
 
                 return '<section class="questao-livro"><div class="caixa-rotulo">Questão' . ($q->id_externo ? ' TEC ' . e($q->id_externo) : '') . '</div><p>' . nl2br(e($q->enunciado)) . '</p>' . $alts . '<p class="gab">Gabarito: ' . e($q->gabarito) . '</p></section>';
+            case 'rascunho':
+                return $this->htmlRascunho($a);
             case 'lei':
                 $link = $cit->link($a['ref'] ?? '');
 

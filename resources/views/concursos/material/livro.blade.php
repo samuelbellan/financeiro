@@ -196,6 +196,40 @@
     .bolha { display: flex; gap: 2px; padding: 4px; }
     .bolha button { border: 0; background: none; color: var(--ink); font: inherit; font-size: 13px; font-weight: 600; padding: 6px 8px; border-radius: 7px; cursor: pointer; }
     .bolha button:hover { background: var(--bg); }
+    /* modo caneta (grifar com a caneta) */
+    .caneta-paleta { position: fixed; left: 50%; bottom: 16px; transform: translateX(-50%); z-index: 60; display: flex; gap: 4px; padding: 6px; background: var(--card); border: 1px solid var(--line); border-radius: 14px; box-shadow: 0 8px 24px rgba(0,0,0,.2); }
+    .caneta-paleta[hidden] { display: none; }
+    .caneta-paleta button { border: 0; background: none; color: var(--ink); font: inherit; font-size: 16px; font-weight: 600; min-width: 44px; height: 44px; border-radius: 10px; cursor: pointer; }
+    .caneta-paleta button[aria-pressed=true] { background: var(--accent-soft); outline: 2px solid var(--accent); }
+    .caneta-paleta .cor { width: 22px; height: 22px; border-radius: 6px; }
+    .caneta-previa i { position: absolute; z-index: 40; pointer-events: none; border-radius: 3px; opacity: .55; }
+    .caneta-previa.amarelo i { background: #ffe066; } .caneta-previa.verde i { background: #7bd99a; }
+    .caneta-previa.azul i { background: #8bbcff; } .caneta-previa.rosa i { background: #ff9cc2; }
+    .caneta-previa.apagar i { background: transparent; outline: 2px dashed var(--no); opacity: .8; }
+    body.caneta-ligada:not(.editando) .pagina-texto { -webkit-user-select: none; user-select: none; }
+    .caneta-debug { position: fixed; top: 8px; right: 8px; z-index: 90; max-width: 70vw; margin: 0; padding: 8px; font: 11px/1.35 ui-monospace, monospace; background: rgba(0,0,0,.82); color: #9f9; border-radius: 8px; pointer-events: none; white-space: pre-wrap; }
+    body.caneta-ligada [data-caneta] { color: var(--accent); }
+
+    /* bloco de rascunho à mão */
+    .pagina-texto .rascunho { margin: 1em 0; border: 1px solid var(--line); border-radius: 12px; background: var(--card); overflow: hidden; }
+    .rascunho-barra { display: flex; flex-wrap: wrap; align-items: center; gap: 2px; padding: 4px 6px; border-bottom: 1px solid var(--line); background: var(--bg); font: 600 13px/1 Inter, system-ui, sans-serif; }
+    .rascunho-barra .rascunho-rotulo { color: var(--muted); margin-right: 6px; }
+    .rascunho-barra .esp { flex: 1; }
+    .rascunho-barra button { border: 0; background: none; color: var(--ink); font: inherit; min-width: 36px; height: 36px; padding: 0 8px; border-radius: 8px; cursor: pointer; }
+    .rascunho-barra button:disabled { opacity: .35; cursor: default; }
+    .rascunho-barra button[aria-pressed=true] { background: var(--accent-soft); outline: 2px solid var(--accent); }
+    .rascunho-barra .so-editando { display: none; }
+    body.editando .rascunho-barra .so-editando { display: inline-block; color: var(--no); }
+    .rascunho-barra .tinta { display: inline-block; width: 16px; height: 16px; border-radius: 50%; vertical-align: middle; }
+    .rascunho-barra .tinta.preto { background: var(--ink); } .rascunho-barra .tinta.azul { background: #2563eb; }
+    .rascunho-barra .tinta.vermelho { background: #dc2626; } .rascunho-barra .tinta.verde { background: #16a34a; }
+    .rascunho-barra .tinta.marca { background: #facc15; border-radius: 3px; width: 10px; height: 18px; }
+    .rascunho-folha { display: block; width: 100%; height: auto; touch-action: pan-y; cursor: crosshair;
+        background-image: radial-gradient(color-mix(in srgb, var(--muted) 35%, transparent) 1px, transparent 1px); background-size: 24px 24px; }
+    .rascunho-folha path.tinta { fill: var(--ink); }
+    .rascunho-folha path.tinta.azul { fill: #2563eb; } .rascunho-folha path.tinta.vermelho { fill: #dc2626; }
+    .rascunho-folha path.tinta.verde { fill: #16a34a; } .rascunho-folha path.tinta.marca { fill: #facc15; opacity: .45; }
+    .rascunho-folha path.apagando { opacity: .15; }
     .slash { width: 280px; max-height: 320px; overflow: auto; padding: 4px; }
     .slash button { display: block; width: 100%; text-align: left; border: 0; background: none; color: var(--ink); font: inherit; font-size: 14px; padding: 6px 10px; border-radius: 7px; cursor: pointer; }
     .slash button small { display: block; color: var(--muted); font-size: 12px; }
@@ -410,7 +444,7 @@
         .cap-menu > summary { opacity: 1; }
     }
     @media print {
-        .menu, .livro-lateral, .pag-topo, .barra, .navega, .questoes-cap, .margem, .bolha, .slash { display: none !important; }
+        .menu, .livro-lateral, .pag-topo, .barra, .navega, .questoes-cap, .margem, .bolha, .slash, .caneta-paleta, .rascunho-barra { display: none !important; }
         .livro { display: block; }
         .pagina { border: 0; padding: 0; }
     }
@@ -454,6 +488,7 @@
                     @foreach ($caminho as $c) › <a href="{{ route('concursos.material.capitulo', [$material, $c['id']]) }}">{{ $c['titulo'] }}</a>@endforeach
                 </nav>
                 <span class="salvo" data-salvo role="status" aria-live="polite"></span>
+                <button type="button" class="btn mini fantasma" data-caneta aria-pressed="false" title="Modo caneta: passe a caneta sobre o texto para grifar (o dedo continua rolando)">✒ Caneta</button>
                 <button type="button" class="btn mini fantasma" data-foco aria-pressed="false" title="Modo foco: esconde sumário e notas (atalho: F)">◎ Foco</button>
                 <button type="button" class="btn mini main" data-modo aria-pressed="false" title="Atalho: e">Editar</button>
             </div>
