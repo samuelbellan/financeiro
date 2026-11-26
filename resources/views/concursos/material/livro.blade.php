@@ -28,7 +28,7 @@
 
 @section('css')
     @include('concursos.material._estilo')
-    .wrap { max-width: 1480px; }
+    .wrap { max-width: 1680px; }
     .livro { display: grid; grid-template-columns: 270px minmax(0, 1fr) 250px; gap: 24px; align-items: start; }
     .livro.capa { grid-template-columns: 270px minmax(0, 1fr); }
 
@@ -92,7 +92,7 @@
     .pagina { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 36px 48px 48px; min-height: 60vh; }
     .pagina h1 { font-size: 28px; line-height: 1.25; margin: 0 0 20px; letter-spacing: -.01em; outline: none; }
     body.editando .pagina h1 { border-bottom: 1px dashed var(--line); }
-    .pagina-texto, [data-estatico] { font-size: 17px; line-height: 1.7; outline: none; max-width: 72ch; }
+    .pagina-texto, [data-estatico] { font-size: 17px; line-height: 1.7; outline: none; max-width: 100%; }
     .pagina-texto > * + *, [data-estatico] > * + * { margin-top: .75em; }
     .pagina-texto p, [data-estatico] p { margin: 0; }
     .pagina-texto h2, [data-estatico] h3 { font-size: 22px; margin: 1.4em 0 .4em; line-height: 1.3; }
@@ -118,11 +118,9 @@
     mark.grifo.azul { background: #cfe3ff; }
     mark.grifo.rosa { background: #ffd3e4; }
     mark.grifo[data-nota] { border-bottom: 2px solid rgba(0,0,0,.35); cursor: pointer; }
-    @media (prefers-color-scheme: dark) {
-        mark.grifo.amarelo { background: #5c4d0f; } mark.grifo.verde { background: #1d4a2c; }
-        mark.grifo.azul { background: #1d3557; } mark.grifo.rosa { background: #5a2238; }
-        mark.grifo[data-nota] { border-bottom-color: rgba(255,255,255,.5); }
-    }
+    :root[data-theme=dark] mark.grifo.amarelo { background: #5c4d0f; } :root[data-theme=dark] mark.grifo.verde { background: #1d4a2c; }
+    :root[data-theme=dark] mark.grifo.azul { background: #1d3557; } :root[data-theme=dark] mark.grifo.rosa { background: #5a2238; }
+    :root[data-theme=dark] mark.grifo[data-nota] { border-bottom-color: rgba(255,255,255,.5); }
     .cor { display: inline-block; width: 14px; height: 14px; border-radius: 4px; vertical-align: middle; border: 1px solid rgba(0,0,0,.15); }
     .cor.amarelo { background: #ffe066; } .cor.verde { background: #7bd99a; } .cor.azul { background: #8bbcff; } .cor.rosa { background: #ff9cc2; }
     .piscar { animation: piscar 1.2s; }
@@ -194,6 +192,8 @@
     /* bolha de grifo e menu "/" */
     .bolha, .slash { position: absolute; z-index: 50; background: var(--card); border: 1px solid var(--line); border-radius: 10px; box-shadow: 0 8px 24px rgba(0,0,0,.18); }
     .bolha { display: flex; gap: 2px; padding: 4px; }
+    .bolha button { border: 0; background: none; color: var(--ink); font: inherit; font-size: 13px; font-weight: 600; padding: 6px 8px; border-radius: 7px; cursor: pointer; }
+    .bolha button:hover { background: var(--bg); }
     /* aula em PDF abaixo do resumo (caderno de TI) */
     .aula-pdf { margin-top: 20px; padding: 14px; }
     .aula-pdf-topo { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin-bottom: 12px; }
@@ -204,8 +204,6 @@
     .aula-pdf-pagina canvas { display: block; width: 100%; height: auto; }
     .aula-pdf-pagina small { position: absolute; right: 8px; bottom: 6px; padding: 1px 6px; border-radius: 6px; background: rgba(0,0,0,.55); color: #fff; font-size: 11px; }
 
-    .bolha button { border: 0; background: none; color: var(--ink); font: inherit; font-size: 13px; font-weight: 600; padding: 6px 8px; border-radius: 7px; cursor: pointer; }
-    .bolha button:hover { background: var(--bg); }
     /* modo caneta (grifar com a caneta) */
     .caneta-paleta { position: fixed; left: 50%; bottom: 16px; transform: translateX(-50%); z-index: 60; display: flex; gap: 4px; padding: 6px; background: var(--card); border: 1px solid var(--line); border-radius: 14px; box-shadow: 0 8px 24px rgba(0,0,0,.2); }
     .caneta-paleta[hidden] { display: none; }
@@ -322,16 +320,25 @@
     .livro { --disc-soft: color-mix(in srgb, var(--disc) 12%, var(--card)); --serif: 'Literata', 'Source Serif 4', Georgia, serif; }
     .migalhas a { color: color-mix(in srgb, var(--disc) 80%, var(--ink)); }
     .pagina { border: 0; background: var(--card); box-shadow: 0 1px 2px rgba(16,24,40,.04), 0 6px 24px rgba(16,24,40,.05); position: relative; --pad-x: 56px; padding: 64px var(--pad-x) 56px; }
-    @media (prefers-color-scheme: dark) { .pagina { box-shadow: none; } }
+    :root[data-theme=dark] .pagina { box-shadow: none; }
     .pagina h1 { font-family: var(--serif); font-size: 32px; font-weight: 700; letter-spacing: -.015em; max-width: 34ch; }
-    .pagina-texto, [data-estatico] { font-family: var(--serif); font-size: 18px; line-height: 1.7; max-width: 70ch; font-optical-sizing: auto; }
+    .pagina-texto, [data-estatico] { font-family: var(--serif); font-size: 18px; line-height: 1.7; max-width: 100%; font-optical-sizing: auto; }
     .pagina-texto h2, .pagina-texto h3, [data-estatico] h3, [data-estatico] h4 { font-family: var(--serif); letter-spacing: -.01em; }
     .pagina-texto h2 { font-size: 25px; margin-top: 1.8em; }
     .pagina-texto h3 { font-size: 20px; margin-top: 1.5em; }
     .pagina-texto h4, [data-estatico] h5 { font-family: Inter, system-ui, sans-serif; font-size: 12.5px; font-weight: 700; letter-spacing: .09em; color: var(--disc); margin-top: 1.6em; }
     .pagina-texto .sec[data-num]::before { content: attr(data-num); font-family: Inter, system-ui, sans-serif; font-size: .62em; font-weight: 700; color: var(--disc); margin-right: .6em; vertical-align: .18em; letter-spacing: 0; }
     .pagina-texto h4.sec[data-num]::before { font-size: 1em; vertical-align: 0; opacity: .7; }
-    .pagina-texto strong, [data-estatico] strong { font-weight: 650; }
+    .pagina-texto strong, [data-estatico] strong { font-weight: 650; color: color-mix(in srgb, var(--disc) 70%, var(--ink)); }
+
+    /* inspirado em livro digital: coluna larga justificada, seções em faixa, página sem cartão no claro */
+    @media (min-width: 861px) {
+        .pagina-texto, [data-estatico] { text-align: justify; hyphens: auto; line-height: 1.65; }
+        .pagina-texto h2, .pagina-texto h3, .pagina-texto h4, .pagina-texto table, .pagina-texto td, .pagina-texto th { text-align: left; hyphens: manual; }
+    }
+    .pagina-texto h2, [data-estatico] h3 { background: var(--disc); color: #fff; text-align: center; padding: .45em .8em; border-radius: 8px; line-height: 1.3; }
+    .pagina-texto h2.sec[data-num]::before { color: inherit; opacity: .75; }
+    :root[data-theme=light] .livro-pagina .pagina { box-shadow: none; border: 1px solid var(--line); }
     .pagina-texto table, [data-estatico] table { font-family: Inter, system-ui, sans-serif; font-size: 14.5px; }
     body:not(.editando) .pagina-texto .titulo-repetido { display: none; }
     body:not(.editando) .pagina-texto > .titulo-repetido + * { margin-top: 0; }
@@ -433,6 +440,7 @@
     /* telas menores: sumário vira gaveta; notas abaixo do texto */
     @media (max-width: 1180px) {
         .livro, .livro.capa { grid-template-columns: minmax(0, 1fr) 230px; }
+        .pagina { --pad-x: 32px; padding: 52px var(--pad-x) 44px; }
         .livro.capa { grid-template-columns: minmax(0, 1fr); }
         .livro-lateral { position: fixed; inset: 0 auto 0 0; width: min(320px, 88vw); max-height: none; z-index: 40; border-radius: 0 14px 14px 0; transform: translateX(-105%); transition: transform .2s; box-shadow: 0 0 40px rgba(0,0,0,.25); }
         body.gaveta-aberta .livro-lateral { transform: none; }
@@ -509,14 +517,6 @@
                 <div data-editor hidden></div>
             </article>
 
-            @if (count($dadosEditor['doCapitulo']))
-                <div class="card questoes-cap">
-                    <p><b>{{ count($dadosEditor['doCapitulo']) }}</b> {{ count($dadosEditor['doCapitulo']) === 1 ? 'questão' : 'questões' }} deste assunto nos cadernos. Refaça na área de Questões.</p>
-                    <a class="btn" href="{{ route('concursos.material.refazer', [$material, 'capitulo' => $capitulo->id, 'situacao' => 'errando', 'iniciar' => 1]) }}">Refazer as que ainda erro</a>
-                </div>
-            @endif
-
-            <nav class="navega" aria-label="Capítulos">
             @if ($pdf)
                 <section class="card aula-pdf" data-pdf="{{ $pdf }}">
                     <div class="aula-pdf-topo">
@@ -528,6 +528,14 @@
                 </section>
             @endif
 
+            @if (count($dadosEditor['doCapitulo']))
+                <div class="card questoes-cap">
+                    <p><b>{{ count($dadosEditor['doCapitulo']) }}</b> {{ count($dadosEditor['doCapitulo']) === 1 ? 'questão' : 'questões' }} deste assunto nos cadernos. Refaça na área de Questões.</p>
+                    <a class="btn" href="{{ route('concursos.material.refazer', [$material, 'capitulo' => $capitulo->id, 'situacao' => 'errando', 'iniciar' => 1]) }}">Refazer as que ainda erro</a>
+                </div>
+            @endif
+
+            <nav class="navega" aria-label="Capítulos">
                 @if ($anterior)<a href="{{ route('concursos.material.capitulo', [$material, $anterior['id']]) }}" data-anterior><small>← Anterior</small>{{ $anterior['num'] }} {{ $anterior['titulo'] }}</a>@endif
                 @if ($proximo)<a class="prox" href="{{ route('concursos.material.capitulo', [$material, $proximo['id']]) }}" data-proximo><small>Próximo →</small>{{ $proximo['num'] }} {{ $proximo['titulo'] }}</a>@endif
             </nav>
