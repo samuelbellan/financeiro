@@ -5,7 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Finanças de Casa | Controle Financeiro</title>
     <link rel="stylesheet" href="{{ asset('css/home.css') }}">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700;800&family=JetBrains+Mono:wght@500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="{{ asset('js/sidebar.js') }}"></script>
     <style>
@@ -374,6 +376,7 @@
             to { opacity: 1; transform: translate(-50%, 0); }
         }
     </style>
+    <link rel="stylesheet" href="{{ asset('css/financas-theme.css') }}">
 </head>
 <body>
     <div class="layout">
@@ -457,9 +460,9 @@
                         <p>Planejamento de {{ \Carbon\Carbon::create(null, $mes)->translatedFormat('F') }} / {{ $ano }}</p>
                     </div>
                 </div>
-                <div style="display: flex; gap: 0.5rem; align-items: center;">
+                <div class="fin-header-actions">
                     <div class="dropdown-whatsapp">
-                        <button type="button" class="btn-add" style="background: #25d366; font-size: 0.75rem; color: white; display: inline-flex; align-items: center; gap: 0.35rem; box-shadow: 0 2px 4px rgba(37,211,102,0.3);">
+                        <button type="button" class="btn-add fin-btn-whatsapp" style="display: inline-flex; align-items: center; gap: 0.35rem;">
                             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
                                 <path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.182-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766.001-3.187-2.575-5.77-5.764-5.771zm3.392 8.244c-.144.405-.837.774-1.17.824-.299.045-.677.063-1.092-.069-.252-.08-.575-.187-.988-.365-1.739-.751-2.874-2.502-2.961-2.617-.087-.116-.708-.94-.708-1.793s.448-1.273.607-1.446c.159-.173.346-.217.462-.217l.332.006c.106.005.249-.04.39.298.144.347.491 1.2.534 1.287.043.087.072.188.014.304-.058.116-.087.188-.173.289l-.26.304c-.087.086-.177.18-.076.354.101.174.449.741.964 1.201.662.591 1.221.774 1.394.861.174.086.275.073.376-.044.101-.116.433-.506.549-.68.116-.173.231-.145.39-.087s1.011.477 1.184.564.289.13.332.202c.045.072.045.419-.099.824zm-3.423-14.416c-6.627 0-12 5.373-12 12 0 2.159.57 4.184 1.564 5.939l-1.664 6.083 6.241-1.637c1.7 1.01 3.682 1.615 5.859 1.615 6.627 0 12-5.373 12-12s-5.373-12-12-12z"/>
                             </svg>
@@ -480,26 +483,26 @@
                                     <div style="font-size:0.7rem; color:var(--text-muted); font-weight:normal;">+55 67 98445-6378</div>
                                 </div>
                             </a>
-                            <a href="{{ route('financas.relatorio.pdf', ['mes' => $mes, 'ano' => $ano, 'download' => 1]) }}" target="_blank" class="dropdown-whatsapp-item" style="border-top: 1px solid #e2e8f0; background: #f8fafc;">
+                            <a href="{{ route('financas.relatorio.pdf', ['mes' => $mes, 'ano' => $ano, 'download' => 1]) }}" target="_blank" class="dropdown-whatsapp-item" style="border-top: 1px solid var(--border); background: var(--fin-surface-subtle);">
                                 <span>📄</span>
                                 <div>
-                                    <div style="color: #4338ca;">Baixar Relatório (PDF)</div>
+                                    <div style="color: var(--primary);">Baixar Relatório (PDF)</div>
                                     <div style="font-size:0.7rem; color:var(--text-muted); font-weight:normal;">Extrato Completo & Cartões</div>
                                 </div>
                             </a>
                         </div>
                     </div>
-                    <button type="button" onclick="openImportExtratoModal()" class="btn-add" style="background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%); font-size: 0.75rem; border: none; cursor: pointer; color: white; display: inline-flex; align-items: center; gap: 0.35rem; font-weight: 600; box-shadow: 0 2px 4px rgba(99, 102, 241, 0.3);" title="Importar extrato bancário nos formatos PDF, Excel, CSV ou OFX">
+                    <button type="button" onclick="openImportExtratoModal()" class="btn-add fin-btn-primary" style="cursor: pointer; display: inline-flex; align-items: center; gap: 0.4rem;" title="Importar extrato bancário nos formatos PDF, Excel, CSV ou OFX">
                         <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
                             <polyline points="17 8 12 3 7 8"/>
                             <line x1="12" y1="3" x2="12" y2="15"/>
                         </svg>
-                        <span>📥 Importar Extrato</span>
+                        <span>Importar Extrato</span>
                     </button>
-                    <button onclick="downloadPdf()" class="btn-add" style="background: #ef4444; font-size: 0.75rem; border: none; cursor: pointer; color: white;">PDF</button>
-                    <a href="{{ route('export.orcamento', ['format' => 'csv', 'mes' => $mes, 'ano' => $ano, 'data_inicio' => $dataInicio, 'data_fim' => $dataFim]) }}" class="btn-add" style="background: #10b981; font-size: 0.75rem;">CSV</a>
-                    <a href="{{ route('export.orcamento', ['format' => 'sql', 'mes' => $mes, 'ano' => $ano, 'data_inicio' => $dataInicio, 'data_fim' => $dataFim]) }}" class="btn-add" style="background: #3b82f6; font-size: 0.75rem;">DB (SQL)</a>
+                    <button onclick="downloadPdf()" class="btn-add fin-btn-ghost" style="cursor: pointer;">PDF</button>
+                    <a href="{{ route('export.orcamento', ['format' => 'csv', 'mes' => $mes, 'ano' => $ano, 'data_inicio' => $dataInicio, 'data_fim' => $dataFim]) }}" class="btn-add fin-btn-ghost">CSV</a>
+                    <a href="{{ route('export.orcamento', ['format' => 'sql', 'mes' => $mes, 'ano' => $ano, 'data_inicio' => $dataInicio, 'data_fim' => $dataFim]) }}" class="btn-add fin-btn-ghost">SQL</a>
                 </div>
             </header>
 
@@ -1261,9 +1264,11 @@
                     datasets: [{
                         data: Object.values(expData),
                         backgroundColor: [
-                            '#6366f1', '#10b981', '#f59e0b', '#ef4444', '#3b82f6', 
-                            '#8b5cf6', '#ec4899', '#06b6d4', '#f97316', '#14b8a6'
-                        ]
+                            '#0f5132', '#0f766e', '#c28e3a', '#b91c1c', '#334155',
+                            '#15803d', '#c2410c', '#0369a1', '#a16207', '#4d7c0f'
+                        ],
+                        borderWidth: 2,
+                        borderColor: '#ffffff'
                     }]
                 },
                 options: {

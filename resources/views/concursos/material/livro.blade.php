@@ -322,6 +322,11 @@
     .pagina { border: 0; background: var(--card); box-shadow: 0 1px 2px rgba(16,24,40,.04), 0 6px 24px rgba(16,24,40,.05); position: relative; --pad-x: 56px; padding: 64px var(--pad-x) 56px; }
     :root[data-theme=dark] .pagina { box-shadow: none; }
     .pagina h1 { font-family: var(--serif); font-size: 32px; font-weight: 700; letter-spacing: -.015em; max-width: 34ch; }
+    .pagina h1:has(+ .cap-tempo:not([hidden])) { margin-bottom: 6px; }
+    .cap-tempo { display: inline-flex; align-items: center; gap: 6px; margin: 0 0 22px; font-family: Inter, system-ui, sans-serif; font-size: 13px; font-weight: 500; color: var(--muted); font-variant-numeric: tabular-nums; }
+    .cap-tempo svg, .capa-tempo svg { width: 14px; height: 14px; flex: none; opacity: .8; }
+    .capa-tempo { display: inline-flex; align-items: center; gap: 6px; margin: 6px 0 0; font-size: 13px; color: var(--muted); font-variant-numeric: tabular-nums; }
+    .ind-tempo { font-variant-numeric: tabular-nums; white-space: nowrap; }
     .pagina-texto, [data-estatico] { font-family: var(--serif); font-size: 18px; line-height: 1.7; max-width: 100%; font-optical-sizing: auto; }
     .pagina-texto h2, .pagina-texto h3, [data-estatico] h3, [data-estatico] h4 { font-family: var(--serif); letter-spacing: -.01em; }
     .pagina-texto h2 { font-size: 25px; margin-top: 1.8em; }
@@ -524,6 +529,10 @@
             <div class="barra" data-barra hidden role="toolbar" aria-label="Formatação"></div>
             <article class="pagina">
                 <h1 data-titulo-capitulo>{{ $capitulo->titulo }}</h1>
+                <p class="cap-tempo" data-tempo-leitura @if (!$tempoLeitura) hidden @endif title="Tempo médio estimado (200 palavras/min)">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                    <span data-tempo-texto>{{ $tempoLeitura ? \App\Services\Concursos\Livro\Documento::formatarDuracao($tempoLeitura) . ' de leitura' : '' }}</span>
+                </p>
                 <div data-estatico>{!! $html !!}</div>
                 <div data-editor hidden></div>
             </article>
@@ -574,6 +583,12 @@
                     <div>
                         <h1>{{ $material->titulo }}</h1>
                         @if ($material->descricao)<p class="muted" style="margin:0">{{ $material->descricao }}</p>@endif
+                        @if ($resumo['tempo_leitura'])
+                            <p class="capa-tempo" title="Tempo médio estimado de leitura do livro (200 palavras/min)">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                                <span>Tempo médio de leitura: {{ \App\Services\Concursos\Livro\Documento::formatarDuracao($resumo['tempo_leitura']) }}</span>
+                            </p>
+                        @endif
                     </div>
                     <div class="capa-acoes">
                         @if ($prioritario)
@@ -636,6 +651,7 @@
                                     <span class="cap-num">{{ $c['num'] }}</span>
                                     <span class="ind-nome">{{ $c['titulo'] }}</span>
                                     <span class="ind-meta">
+                                        @if ($c['tempo_leitura'])<span class="ind-tempo" title="Tempo médio de leitura">{{ \App\Services\Concursos\Livro\Documento::formatarDuracao($c['tempo_leitura']) }}</span>@endif
                                         @if ($c['questoes'])<span title="questões erradas deste assunto">{{ $c['questoes'] }} q.</span>@endif
                                         @if ($c['errando'])
                                             <span class="etq err" title="pontos que ainda erro">{{ $c['errando'] }}</span>

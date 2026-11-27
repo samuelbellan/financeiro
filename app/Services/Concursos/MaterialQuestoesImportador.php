@@ -103,7 +103,12 @@ class MaterialQuestoesImportador
                 $chave = $prefixoSecao . ($s['secao'] ?? '');
                 $secao = $secoes[$chave] ?? null;
                 if (!$secao) {
-                    $secao = $material->secoes()->create(['chave' => $chave, 'titulo' => strtoupper($chave), 'ordem' => 200 + $r['secoes_criadas']]);
+                    $secao = $material->secoes()->create([
+                        'chave' => $chave,
+                        'titulo' => ($s['titulo'] ?? '') !== '' ? $s['titulo'] : strtoupper($chave),
+                        'origem' => $s['origem'] ?? null,
+                        'ordem' => $this->abrirOrdem($secoes, $chave),
+                    ]);
                     $secoes[$chave] = $secao;
                     $r['secoes_criadas']++;
                 }
@@ -150,6 +155,46 @@ class MaterialQuestoesImportador
 
             return $r;
         });
+    }
+
+    /**
+     * Ordem de uma seção nova de caderno (c04, tc04…): logo depois da irmã de número menor com o mesmo
+     * prefixo, empurrando as seguintes; sem irmãs, no fim do livro. Assim o C04 que chega depois cai
+     * entre o C03 e o C05, e os grupos do Tributário (c… em 1-13, tc… em 101+) não se misturam.
+     */
+    private function abrirOrdem($secoes, string $chave): int
+    {
+        if (!preg_match('/^(.*?)c(\d+)$/', $chave, $m)) {
+            return (int) $secoes->max('ordem') + 1;
+        }
+        $num = (int) $m[2];
+        $padrao = '/^' . preg_quote($m[1], '/') . 'c(\d+)$/';
+        $numeros = [];
+        foreach ($secoes as $s) {
+            if (preg_match($padrao, $s->chave, $x)) {
+                $numeros[$s->chave] = (int) $x[1];
+            }
+        }
+        if (!$numeros) {
+            return (int) $secoes->max('ordem') + 1;
+        }
+        asort($numeros);
+        $antes = $depois = null;
+        foreach ($numeros as $ch => $n) {
+            if ($n < $num) {
+                $antes = $secoes[$ch];
+            } elseif ($depois === null) {
+                $depois = $secoes[$ch];
+            }
+        }
+        $ordem = $antes ? $antes->ordem + 1 : $depois->ordem;
+        foreach ($numeros as $ch => $n) {
+            if ($n > $num) {
+                $secoes[$ch]->increment('ordem');
+            }
+        }
+
+        return $ordem;
     }
 
     /** Ponto do resumo que explica a questão: mesma chave (c05-q02) ou o nº do TEC na lista do ponto. */

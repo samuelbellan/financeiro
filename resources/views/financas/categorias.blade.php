@@ -5,7 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Categorias | Finanças de Casa</title>
     <link rel="stylesheet" href="{{ asset('css/home.css') }}">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700;800&family=JetBrains+Mono:wght@500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="{{ asset('js/sidebar.js') }}"></script>
     <style>
         .cat-grid {
@@ -109,6 +111,7 @@
         .btn-primary { background: #6366f1; color: white; border: none; padding: 0.5rem 1rem; border-radius: 0.5rem; cursor: pointer; font-weight: 600; }
         .btn-secondary { background: #f3f4f6; color: #374151; border: none; padding: 0.5rem 1rem; border-radius: 0.5rem; cursor: pointer; font-weight: 600; }
     </style>
+    <link rel="stylesheet" href="{{ asset('css/financas-theme.css') }}">
 </head>
 <body>
     <div class="layout">

@@ -17,7 +17,7 @@ class MaterialQuestao extends ConcursosModel
 
     public const CERTEZAS = ['sei' => 'Sei', 'acho' => 'Acho', 'chute' => 'Chute'];
 
-    protected $casts = ['alternativas' => 'array', 'revisar_em' => 'date'];
+    protected $casts = ['alternativas' => 'array', 'revisar_em' => 'date', 'trechos_errados' => 'array'];
 
     /**
      * Situação calculada (substitui o status manual dos pontos):

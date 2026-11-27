@@ -27,15 +27,34 @@ use RuntimeException;
  */
 class LeisController extends Controller
 {
-    public function index(AcervoLeis $acervo): View
+    public function index(Request $request, AcervoLeis $acervo): View
     {
-        $leis = collect($acervo->catalogo())->map(fn ($l, $sigla) => $l + [
-            'chave' => $sigla,
-            'baixada' => $acervo->baixada($sigla),
-            'fonte' => $acervo->urlFonte($sigla),
-        ]);
+        $userId = $request->user()?->id;
+        $grifos = $userId
+            ? LeiGrifo::where('user_id', $userId)->selectRaw('lei, COUNT(*) as total')->groupBy('lei')->pluck('total', 'lei')
+            : collect();
+        $marcasPorLei = $userId
+            ? LeiMarca::where('user_id', $userId)->get(['lei', 'marcado', 'nota'])->groupBy('lei')
+            : collect();
 
-        return view('concursos.leis.index', compact('leis'));
+        $leis = collect($acervo->catalogo())->map(function ($l, $sigla) use ($acervo, $grifos, $marcasPorLei) {
+            $marcas = $marcasPorLei->get($sigla, collect());
+
+            return $l + [
+                'chave' => $sigla,
+                'grupo' => $l['grupo'] ?? 'Outras Normas',
+                'prefixo' => $l['prefixo'] ?? '',
+                'baixada' => $acervo->baixada($sigla),
+                'fonte' => $acervo->urlFonte($sigla),
+                'grifos' => (int) ($grifos[$sigla] ?? 0),
+                'notas' => $marcas->filter(fn ($m) => filled($m->nota))->count(),
+                'marcados' => $marcas->where('marcado', true)->count(),
+            ];
+        });
+
+        $grupos = $leis->groupBy('grupo');
+
+        return view('concursos.leis.index', compact('leis', 'grupos'));
     }
 
     public function show(Request $request, string $lei, AcervoLeis $acervo, Citacoes $citacoes, IncidenciaLeis $incidencia, Reancorador $reancorador): View

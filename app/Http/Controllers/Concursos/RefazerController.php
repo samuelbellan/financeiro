@@ -9,6 +9,7 @@ use App\Models\Concursos\MaterialPonto;
 use App\Models\Concursos\MaterialQuestao;
 use App\Models\Concursos\MaterialTentativa;
 use App\Services\Concursos\Leis\Citacoes;
+use App\Services\Concursos\TrechosErrados;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
@@ -141,6 +142,22 @@ class RefazerController extends Controller
         ]);
     }
 
+    /**
+     * Trechos que tornam cada alternativa errada, para grifar depois de um erro. Pedido à parte
+     * (o Gemini pode levar alguns segundos) e só depois de o aluno ter respondido a questão.
+     */
+    public function trechos(Request $request, MaterialQuestao $questao, TrechosErrados $trechos): JsonResponse
+    {
+        abort_unless($questao->material->user_id === $request->user()->id, 404);
+        abort_unless($questao->tentativas()->where('user_id', $request->user()->id)->exists(), 403);
+
+        $t = $trechos->para($questao);
+
+        return $t === null
+            ? response()->json(['erro' => 'Não consegui analisar as alternativas agora.'], 503)
+            : response()->json(['trechos' => (object) $t]);
+    }
+
     /** Pontos do resumo ligados à questão: o dela e os que citam o nº do TEC (baterias diferentes). */
     private function pontosDa(MaterialQuestao $q): Collection
     {
@@ -225,6 +242,7 @@ class RefazerController extends Controller
         return [
             'id' => $q->id,
             'url' => route('concursos.material.questoes.responder', $q),
+            'trechos' => route('concursos.material.questoes.trechos', $q),
             'caderno' => $q->secao?->titulo,
             'assunto' => $q->ponto?->titulo ?? $q->capitulo?->titulo,
             'origem' => $q->origem,

@@ -78,6 +78,11 @@
     .certeza button.on { border-color: var(--accent); background: var(--accent); color: #fff; }
     .caixa-info { font-size: 14px; color: var(--muted); margin: -4px 0 10px; }
     .etq { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); border: 1px solid var(--line); border-radius: 6px; padding: 0 6px; margin-left: 6px; }
+    mark.errado { background: var(--no-soft); color: var(--no); font-weight: 600; border-radius: 4px; padding: 0 2px; box-shadow: inset 0 -2px 0 var(--no); animation: surgir .3s var(--mola); cursor: help; }
+    .opt:disabled:has(mark.errado) { opacity: .9; }
+    .porque { font-size: 14px; margin: -2px 0 10px; display: grid; gap: 4px; }
+    .porque b { color: var(--no); }
+    .porque.carregando { color: var(--muted); }
     .ponto-card + .ponto-card { border-top: 1px dashed var(--line); margin-top: 10px; padding-top: 10px; }
 @endsection
 
@@ -208,6 +213,7 @@
         <div class="opts" data-opts></div>
         <div data-retorno hidden>
             <div class="res" data-res></div>
+            <div class="porque" data-porque hidden></div>
             <div class="caixa-info" data-caixa></div>
             <div data-ponto></div>
             <details class="com" data-com-box><summary>Comentário do caderno</summary><pre data-com></pre></details>
@@ -297,7 +303,7 @@
             const b = document.createElement('button');
             b.type = 'button'; b.className = 'opt'; b.dataset.letra = a.letra;
             const l = document.createElement('span'); l.className = 'l'; l.textContent = q.tipo === 'CE' ? '' : a.letra + ')';
-            const t = document.createElement('span'); t.textContent = a.texto;
+            const t = document.createElement('span'); t.className = 'tx'; t.textContent = a.texto;
             b.append(l, t);
             b.addEventListener('click', () => responder(a.letra));
             return b;
@@ -326,6 +332,8 @@
         void res.offsetWidth; // reinicia a animação de entrada
         res.className = 'res ' + (r.acertou ? 'ok' : 'no');
         res.textContent = r.acertou ? `Acertou! Gabarito: ${nome(r.gabarito)}` : `Errou. Você marcou ${nome(letra)}; o gabarito é ${nome(r.gabarito)}.`;
+        $('[data-porque]').hidden = true;
+        if (!r.acertou) grifarErros(q, letra);
         $('[data-caixa]').textContent = r.caixa ?? '';
         $('[data-caixa]').hidden = !r.caixa;
         const ponto = $('[data-ponto]');
@@ -351,6 +359,60 @@
         $('[data-retorno]').hidden = false;
         $('[data-prox]').textContent = i + 1 < fila.length ? 'Próxima →' : 'Ver resultado';
         $('[data-prox]').focus({ preventScroll: true });
+    }
+
+    // Depois de um erro: grifa em vermelho o que torna cada alternativa errada (gerado uma vez pelo
+    // Gemini e guardado na questão). Em Certo/Errado, o grifo vai no próprio item.
+    async function grifarErros(q, letra) {
+        const box = $('[data-porque]');
+        box.className = 'porque carregando'; box.textContent = 'Procurando o erro das alternativas…'; box.hidden = false;
+        let t = null;
+        try {
+            const resp = await fetch(q.trechos, { headers: { 'Accept': 'application/json' } });
+            t = resp.ok ? (await resp.json()).trechos : null;
+        } catch (err) { /* sem rede: fica sem grifo */ }
+        if (fila[i] !== q) return; // já passou para a próxima
+        if (!t) { box.hidden = true; return; }
+        if (q.tipo === 'CE') {
+            if (t.enunciado) grifar($('[data-enun]'), t.enunciado);
+        } else {
+            document.querySelectorAll('.opt').forEach(b => { if (t[b.dataset.letra]) grifar(b.querySelector('.tx'), t[b.dataset.letra]); });
+        }
+        const marcada = q.tipo === 'CE' ? t.enunciado : t[letra];
+        box.className = 'porque';
+        box.replaceChildren();
+        if (marcada?.motivo) {
+            const p = document.createElement('div');
+            const b = document.createElement('b'); b.textContent = q.tipo === 'CE' ? 'Por que está errado: ' : `Por que ${letra} está errada: `;
+            p.append(b, marcada.motivo);
+            box.append(p);
+        }
+        box.hidden = !box.childElementCount;
+    }
+
+    /** Envolve em <mark class="errado"> cada trecho (sem diferenciar maiúsculas nem espaços). */
+    function grifar(el, { trechos = [], motivo = '' }) {
+        const texto = el.textContent;
+        const faixas = [];
+        trechos.forEach(tr => {
+            const re = new RegExp(tr.trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replace(/\s+/g, '\\s+'), 'giu');
+            for (const m of texto.matchAll(re)) if (m[0]) faixas.push([m.index, m.index + m[0].length]);
+        });
+        if (!faixas.length) return;
+        faixas.sort((a, b) => a[0] - b[0]);
+        const juntas = [faixas[0]];
+        faixas.slice(1).forEach(f => { const u = juntas[juntas.length - 1]; if (f[0] <= u[1]) u[1] = Math.max(u[1], f[1]); else juntas.push(f); });
+        const nos = [];
+        let pos = 0;
+        juntas.forEach(([a, b]) => {
+            if (a > pos) nos.push(document.createTextNode(texto.slice(pos, a)));
+            const m = document.createElement('mark'); m.className = 'errado'; m.textContent = texto.slice(a, b);
+            if (motivo) m.title = motivo;
+            nos.push(m);
+            pos = b;
+        });
+        if (pos < texto.length) nos.push(document.createTextNode(texto.slice(pos)));
+        el.replaceChildren(...nos);
     }
 
     function escapar(s) { const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }

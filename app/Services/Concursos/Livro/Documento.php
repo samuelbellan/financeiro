@@ -15,6 +15,8 @@ use App\Services\Concursos\Leis\Citacoes;
  */
 class Documento
 {
+    public const PALAVRAS_POR_MINUTO = 200;
+
     public const CAIXAS = [
         'pegadinha' => 'Pegadinha',
         'regra' => 'Regra certa',
@@ -232,6 +234,60 @@ class Documento
         $andar($doc['content'] ?? []);
 
         return trim(preg_replace("/[ \t]+/u", ' ', preg_replace("/\n{2,}/u", "\n", implode('', $partes))));
+    }
+
+    /** Total de palavras do documento (ignorando pontos de erro e questões quando $soTeoria é true). */
+    public function palavras(mixed $doc, bool $soTeoria = false): int
+    {
+        if (!is_array($doc)) {
+            return 0;
+        }
+        $total = 0;
+        $contar = static function (?string $s) use (&$total): void {
+            if ($s !== null && $s !== '') {
+                $total += (int) preg_match_all('/[\p{L}\p{N}]+/u', $s);
+            }
+        };
+        $andar = function (array $nos) use (&$andar, $contar, $soTeoria): void {
+            foreach ($nos as $no) {
+                $tipo = $no['type'] ?? null;
+                if ($soTeoria && in_array($tipo, ['pontoErro', 'questao'], true)) {
+                    continue;
+                }
+                match ($tipo) {
+                    'text' => $contar($no['text'] ?? null),
+                    'lei' => $contar($no['attrs']['ref'] ?? null),
+                    'pontoErro' => $contar($no['attrs']['titulo'] ?? null),
+                    default => null,
+                };
+                if (!empty($no['content'])) {
+                    $andar($no['content']);
+                }
+            }
+        };
+        $andar($doc['content'] ?? []);
+
+        return $total;
+    }
+
+    /** Tempo médio de leitura em minutos (200 palavras/min), ou 0 se o capítulo estiver vazio. */
+    public function tempoLeitura(mixed $doc, bool $soTeoria = false): int
+    {
+        $palavras = $this->palavras($doc, $soTeoria);
+
+        return $palavras > 0 ? max(1, (int) round($palavras / self::PALAVRAS_POR_MINUTO)) : 0;
+    }
+
+    /** Formata minutos como "8 min", "1h" ou "1h 25min". */
+    public static function formatarDuracao(int $minutos): string
+    {
+        if ($minutos < 60) {
+            return "{$minutos} min";
+        }
+        $horas = intdiv($minutos, 60);
+        $resto = $minutos % 60;
+
+        return $resto > 0 ? "{$horas}h {$resto}min" : "{$horas}h";
     }
 
     /** @return list<int> valores de um atributo inteiro em todos os nós de um tipo (ex.: pontoErro.pontoId). */

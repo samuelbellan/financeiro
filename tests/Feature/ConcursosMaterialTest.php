@@ -331,6 +331,36 @@ MD;
             ->assertSee('Qual o prazo inventado?')->assertDontSee('Item inventado.');
     }
 
+    public function test_trechos_errados_vem_do_gemini_uma_vez_e_so_depois_de_responder(): void
+    {
+        config(['services.gemini.key' => 'chave-teste']);
+        $this->importarQuestoes();
+        $q1 = \App\Models\Concursos\MaterialQuestao::where('chave', 'q111111')->first();
+        $resposta = ['itens' => [
+            ['letra' => 'A', 'trechos' => ['DEZ  dias', 'inexistente'], 'motivo' => 'São cinco dias.'],
+            ['letra' => 'B', 'trechos' => ['cinco'], 'motivo' => 'É o gabarito, não entra.'],
+        ]];
+        $gemini = fn ($json) => ['candidates' => [['content' => ['parts' => [['text' => json_encode($json)]]]]]];
+        Http::fake(['generativelanguage.googleapis.com/*' => Http::sequence()->push($gemini($resposta))
+            ->push($gemini(['itens' => [['letra' => 'E', 'trechos' => ['inventado'], 'motivo' => 'x']]]))]);
+
+        $this->actingAs($this->user)->getJson(route('concursos.material.questoes.trechos', $q1))->assertForbidden();
+        $this->actingAs($this->user)->postJson(route('concursos.material.questoes.responder', $q1), ['resposta' => 'A'])->assertOk();
+        $esperado = ['trechos' => ['A' => ['trechos' => ['DEZ  dias'], 'motivo' => 'São cinco dias.']]];
+        $this->actingAs($this->user)->getJson(route('concursos.material.questoes.trechos', $q1))->assertOk()->assertExactJson($esperado);
+        $this->actingAs($this->user)->getJson(route('concursos.material.questoes.trechos', $q1))->assertOk()->assertExactJson($esperado);
+        Http::assertSentCount(1); // a segunda vem do banco
+
+        // Certo/Errado com gabarito E: o grifo vai no enunciado.
+        $q2 = \App\Models\Concursos\MaterialQuestao::where('chave', 'q222222')->first();
+        $this->actingAs($this->user)->postJson(route('concursos.material.questoes.responder', $q2), ['resposta' => 'C'])->assertOk();
+        $this->actingAs($this->user)->getJson(route('concursos.material.questoes.trechos', $q2))->assertOk()
+            ->assertJsonPath('trechos.enunciado.trechos', ['inventado']);
+
+        $outro = User::factory()->create();
+        $this->actingAs($outro)->getJson(route('concursos.material.questoes.trechos', $q1))->assertNotFound();
+    }
+
     public function test_refazer_e_so_do_proprio_aluno(): void
     {
         $this->importarQuestoes();

@@ -214,6 +214,7 @@ Route::middleware(['auth', 'modulos'])->group(function () {
         Route::get('/material/citacao', [\App\Http\Controllers\Concursos\LivroController::class, 'citacao'])->name('material.citacao');
         Route::get('/material/{material}/refazer', [\App\Http\Controllers\Concursos\RefazerController::class, 'index'])->whereNumber('material')->name('material.refazer');
         Route::post('/material/questoes/{questao}/responder', [\App\Http\Controllers\Concursos\RefazerController::class, 'responder'])->whereNumber('questao')->name('material.questoes.responder');
+        Route::get('/material/questoes/{questao}/trechos', [\App\Http\Controllers\Concursos\RefazerController::class, 'trechos'])->whereNumber('questao')->name('material.questoes.trechos');
         Route::post('/material/pontos/{ponto}/errei', [\App\Http\Controllers\Concursos\MaterialController::class, 'errei'])->whereNumber('ponto')->name('material.pontos.errei');
         Route::post('/material/pontos/{ponto}/status', [\App\Http\Controllers\Concursos\MaterialController::class, 'status'])->whereNumber('ponto')->name('material.pontos.status');
         Route::get('/legislacao', [\App\Http\Controllers\Concursos\LeisController::class, 'index'])->name('leis.index');

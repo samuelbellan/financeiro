@@ -9,6 +9,7 @@ export function montarPainel(editor) {
     montarPrevia(alvo);
     montarGavetaErros(alvo, secoes);
     montarNestaPagina(editor, secoes);
+    montarTempoLeitura(editor);
     montarProgresso();
     montarFoco();
 }
@@ -182,6 +183,41 @@ function montarNestaPagina(editor, secoes) {
 }
 
 // ---- progresso de leitura e modo foco -----------------------------------------------------------
+function montarTempoLeitura(editor) {
+    const elTempo = document.querySelector('[data-tempo-leitura]');
+    if (!elTempo) return;
+    const textoSpan = elTempo.querySelector('[data-tempo-texto]');
+    const soTeoria = Boolean(estado.soTeoria);
+    const formatar = min => {
+        if (min < 60) return `${min} min`;
+        const h = Math.floor(min / 60);
+        const r = min % 60;
+        return r ? `${h}h ${r}min` : `${h}h`;
+    };
+    const contar = doc => {
+        let palavras = 0;
+        const somar = s => { const m = s?.match(/[\p{L}\p{N}]+/gu); if (m) palavras += m.length; };
+        doc.descendants(node => {
+            if (soTeoria && (node.type.name === 'pontoErro' || node.type.name === 'questao')) return false;
+            if (node.isText) somar(node.text);
+            else if (node.type.name === 'lei') somar(node.attrs.ref);
+            else if (node.type.name === 'pontoErro') somar(node.attrs.titulo);
+            return true;
+        });
+        return palavras ? Math.max(1, Math.round(palavras / 200)) : 0;
+    };
+    let t;
+    const atualizar = () => {
+        const min = contar(editor.state.doc);
+        if (!min) { elTempo.hidden = true; return; }
+        const rotulo = `${formatar(min)} de leitura`;
+        if (textoSpan) textoSpan.textContent = rotulo;
+        else elTempo.textContent = rotulo;
+        elTempo.hidden = false;
+    };
+    editor.on('update', () => { clearTimeout(t); t = setTimeout(atualizar, 400); });
+}
+
 function montarProgresso() {
     const barra = el('div', { class: 'progresso-leitura', 'aria-hidden': 'true' }, el('i'));
     document.body.prepend(barra);

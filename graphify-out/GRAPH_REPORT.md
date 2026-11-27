@@ -1,42 +1,42 @@
-# Graph Report - financeiro  (2026-11-24)
+# Graph Report - financeiro  (2026-11-27)
 
 ## Corpus Check
-- 572 files · ~2,163,015 words
+- 604 files · ~2,063,018 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 6039 nodes · 11737 edges · 460 communities (398 shown, 62 thin omitted)
-- Extraction: 97% EXTRACTED · 3% INFERRED · 0% AMBIGUOUS · INFERRED: 383 edges (avg confidence: 0.78)
+- 6169 nodes · 12111 edges · 478 communities (413 shown, 65 thin omitted)
+- Extraction: 97% EXTRACTED · 3% INFERRED · 0% AMBIGUOUS · INFERRED: 415 edges (avg confidence: 0.78)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `f644b3c2`
+- Built from commit: `53847141`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
 ## Community Hubs (Navigation)
-- CartaoCompra
+- Cartao
 - Illuminate\Http\Request
 - EventoAuxilioDTO
-- AllowedGoogleEmail
+- Mockery
 - composer.json
 - EstudosGurujaTest
 - scripts
 - OfxImportService
 - dependencies
 - NBC TSP Estrutura Conceitual (R1)
-- formatDay
-- characters.py
-- Perfil
+- addDays
+- Conta
+- Carbon\CarbonImmutable
 - NBC TG Estrutura Conceitual para Relatório Financeiro
 - caderno.js
 - esc
-- SalaryPayslip
+- today
 - TelegramWebhookController
 - README.md
 - Illuminate\Database\Seeder
-- Illuminate\Support\Facades\DB
-- Illuminate\Support\Facades\Schema
+- TestCase
+- Illuminate\Database\Migrations\Migration
 - 🚀 Guia de Deploy em Nuvem - Sistema Financeiro & Concursos
 - metrics.js
 - sidebar.js
@@ -44,14 +44,15 @@
 - logging.php
 - Illuminate\Console\Command
 - StudySyncTest
-- Controller
+- Tentativa
 - 2026_10_31_140000_drop_legacy_study_tables.php
 - tick
 - Illuminate\Database\Eloquent\Model
 - flashcards.js
-- .db
+- EstudosApiController
 - Illuminate\Database\Schema\Blueprint
 - simulados.js
+- GrifosQuestoes
 - StudySummaryService
 - main.js
 - GurujaMcpService
@@ -59,7 +60,7 @@
 - Exercise
 - Constituição da República Federativa do Brasil de 1988
 - setup
-- console.php
+- TransacaoPrevisao
 - rules/graphify.md
 - workflows/graphify.md
 - entrypoint.sh
@@ -71,7 +72,7 @@
 - EstudosApiTest
 - components.conciliacao-fatura-modal
 - financas/index.blade.php
-- home.blade.php
+- components.celular-modal
 - post-meta.js
 - static
 - SalaryCalculatorService
@@ -80,12 +81,13 @@
 - SalaryProjectionTest
 - User
 - Estrutura e conteúdo
-- Importacao
+- Questao
 - TÍTULO III
 - Instrução: post da meta da semana (carrossel) sem IA
+- Illuminate\Support\Facades\Schema
 - Transacao
-- NotaFiscal
-- StatementImportService
+- Illuminate\Database\Eloquent\Relations\BelongsTo
+- JornadaMetaTest
 - SalaryProjectionTest.php
 - Categoria
 - StudySyncService
@@ -103,31 +105,34 @@
 - Definições
 - Aplicação e outros materiais explicativos
 - gerar_dados.py
-- Material
+- Carbon\Carbon
 - Lei nº 4.320/1964 — Normas gerais de direito financeiro
 - render
 - NBC TG 03 (R3) — Demonstração dos Fluxos de Caixa
 - avatars-vetor.js
 - Sabatina 2026-11-01: widget flutuante do cronômetro de estudos
-- Illuminate\Database\Migrations\Migration
+- GurujaPostMetaService
 - Módulo de estudos estilo YPT (offline)
+- refazer.js
 - ServidorDTO
 - post-create-project-cmd
 - SalaryController
 - planImport
-- AuthController.php
+- AuthController
 - estudos-sw.js
 - Sabatina 2026-11-08 — Calculadora de projeção e gerador de mídias (Instagram)
-- Cartao
-- Illuminate\Database\Eloquent\Relations\BelongsTo
+- CreditCardReconciliationTest
+- MaterialQuestao
+- CartaoCompra
 - QualificacaoPermanenteDTO
 - /post-estudos semanal | semanal --parcial | diario [YYYY-MM-DD]
 - Assunto
-- Questao
+- BaseTeorica
+- Reancorador
 - Illuminate\Database\Eloquent\Relations\HasMany
 - Convite para teste — Horas de Estudo
 - EditalTopico
-- CartaoPrevisao
+- NotaFiscal
 - TreinosController.php
 - CartaoParcela
 - 11. ATIVO IMOBILIZADO
@@ -170,9 +175,9 @@
 - 4. BALANÇO PATRIMONIAL
 - 4.6.1. Natureza de Despesa
 - 4.7.4. Estágios da Execução dos Restos a Pagar
-- OfxParserServiceTest
+- PHPUnit\Framework\TestCase
 - 5.2.4. Baixa
-- DatabaseSyncService
+- .count
 - 6. DEMONSTRAÇÃO DOS FLUXOS DE CAIXA
 - 8. INVESTIMENTO EM COLIGADA E EM EMPREENDIMENTO CONTROLADO EM
 - Lei nº 13.709/2018 — Lei Geral de Proteção de Dados Pessoais
@@ -220,12 +225,12 @@
 - armazenamento.js
 - fundamento.js
 - CAPÍTULO XXI — GRUPO DE SOCIEDADES
-- MaterialCapitulo
+- Material
 - 19.2. REGISTROS PATRIMONIAIS DECORRENTES DAS DESPESAS ORÇAMENTÁRIAS DE
-- MaterialAnotacao
+- StatementImportService
 - 7. DEMONSTRAÇÃO DAS MUTAÇÕES NO PATRIMÔNIO LÍQUIDO
 - leis_planalto_para_md.py
-- familia-3d-scene.js
+- livro.js
 - CAPÍTULO VII — CONSTITUIÇÃO DA COMPANHIA
 - CAPÍTULO XII — CONSELHO DE ADMINISTRAÇÃO E DIRETORIA
 - 4.4. SISTEMA DE PROTEÇÃO SOCIAL DOS MILITARES DAS FORÇAS ARMADAS (SPSMFA)
@@ -237,27 +242,27 @@
 - CAPÍTULO II — CAPITAL SOCIAL
 - CAPÍTULO XIV — MODIFICAÇÃO DO CAPITAL SOCIAL
 - carregar.js
-- familia-3d-page.js
+- leitura.js
 - properties
 - decreto-1171-1994-etica.md
 - lei-complementar-116-2003-iss.md
 - NetworkService
 - GearItem
-- TransacaoUpdateDateTest
-- BackupConcursosCommand.php
+- ConcursosModel
+- BackupDriveCommandTest
 - ConcursosMaterialTest
 - required
 - properties
 - Simulado
 - type
 - Closure
-- .count
+- TecCadernoParser
 - properties
 - $defs
 - TecCadernoParserTest
 - properties
 - properties
-- avatars.js
+- caneta.js
 - Texto
 - properties
 - contexto.schema.json
@@ -271,17 +276,17 @@
 - ledger.schema.json
 - subtopicos
 - properties
-- items
+- properties
 - resolucoes.schema.json
-- PacoteGeradorTest
-- TelegramWebhookRoutingTest
+- painel.js
+- MarkdownLivro
 - enum
 - properties
 - alternativas
 - mapa-assunto.schema.json
 - extrair_caderno_erros.py
 - BackupConcursosCommand
-- ExercisePersonalRecord
+- MotorMetaTest
 - WorkoutSession
 - required
 - enum
@@ -290,33 +295,33 @@
 - items
 - properties
 - properties
-- items
+- 12.8. AMORTIZAÇÃO
 - Contrato de dados: módulo de concursos (versão 1)
 - properties
-- EstudosGurujaPostMetaTest
-- ProgressPhoto
+- ConcursosVadeMecumTest
+- TelegramWebhookRoutingTest
 - enum
 - assunto
 - area
 - distrator_principal
-- properties
+- Material por matéria: Resumo grifado + área de Questões
 - distrator_principal
 - ENGENHARIA REVERSA DE UM LOTE DE QUESTÕES (saída em JSON para o sistema)
-- ResumoEstudosCommandTest
-- StudyRoomsTest
-- TempoEstudosSync
+- .db
+- Sabatina 2026-11-26 — Vade Mecum anotável
+- GeminiImportadorTest
 - required
 - required
-- audio.js
-- items
+- 16. CUSTOS DE EMPRÉSTIMOS
+- 6. ATIVO BIOLÓGICO E PRODUTO AGRÍCOLA
 - properties
 - properties
-- TecImportadorTest
+- GurujaConnectCommand
 - TvWidgetEndpointTest
-- TecPdfExtractor
+- FitnessAiService
 - Sabatina 2026-11-21 — Módulo de estudo para concursos dirigido por índices
-- 10. ACORDOS EM CONJUNTO
-- 24.7. RECLASSIFICAÇÃO DE ATIVOS FINANCEIROS
+- validar_grifos.py
+- items
 - topico
 - assunto_ref
 - enum
@@ -324,22 +329,21 @@
 - enum
 - lote
 - lote
-- 3.2. CLASSIFICAÇÕES DA RECEITA ORÇAMENTÁRIA
-- 4.6. DÚVIDAS COMUNS REFERENTES À CLASSIFICAÇÃO ORÇAMENTÁRIA
-- 4.7. RESTOS A PAGAR
+- WorkoutPlan
+- properties
+- Grifador
 - validar.py
-- WhatsappMessageParserTest
+- items
 - lista_ids
 - dispositivos_validos
 - dispositivos
 - ponto_cobrado
 - alternativas
 - dispositivos
-- ImportarTecApiCommand.php
-- ResumoEstudosCommand.php
-- 4.3. SISTEMA DE PROTEÇÃO SOCIAL DOS MILITARES DOS ESTADOS, DOS TERRITÓRIOS E DO DISTRITO FEDERAL (SPSM)
+- ModulosAccessTest
+- TecImportadorTest
+- SalaryPayslip
 - numero
-- orgao
 - comum.schema.json
 - dispositivo_id
 - id_externo
@@ -348,27 +352,36 @@
 - ano
 - enum
 - prerequisitos
-- enum
+- BackupEstudosCommandTest
 - Prompt: questões inéditas de uma norma (tópicos sem questões no TEC)
 - 2026_11_21_100000_add_modulos_to_users_table.php
 - 2026_11_23_100000_add_concursos_plano_to_users_table.php
-- verso
+- 2026_11_01_070000_add_google_auth_and_whitelist_tables.php
 - pdf_texto.py
 - concursos.questoes._linha
 - livro.blade.php
 - _sumario.blade.php
+- material/index.blade.php
+- 2026_11_26_000003_add_revisao_to_material_questoes.php
+- arquivo
+- receptor_tec.py
+- revisoes.blade.php
+- FitnessAiModuleTest
+- slug
+- orgao
+- frente
 
 ## God Nodes (most connected - your core abstractions)
-1. `User` - 250 edges
+1. `User` - 279 edges
 2. `NBC TSP Estrutura Conceitual (R1)` - 190 edges
-3. `TestCase` - 114 edges
+3. `TestCase` - 124 edges
 4. `NBC TG Estrutura Conceitual para Relatório Financeiro` - 95 edges
-5. `Assunto` - 81 edges
-6. `Questao` - 70 edges
-7. `Cartao` - 66 edges
-8. `Transacao` - 64 edges
-9. `Material` - 62 edges
-10. `MaterialCapitulo` - 48 edges
+5. `Material` - 87 edges
+6. `Assunto` - 81 edges
+7. `Questao` - 74 edges
+8. `Cartao` - 66 edges
+9. `Transacao` - 64 edges
+10. `MaterialCapitulo` - 63 edges
 
 ## Surprising Connections (you probably didn't know these)
 - `createWidget()` --indirect_call--> `refresh()`  [INFERRED]
@@ -385,23 +398,23 @@
 ## Import Cycles
 - None detected.
 
-## Communities (460 total, 62 thin omitted)
+## Communities (478 total, 65 thin omitted)
 
-### Community 0 - "CartaoCompra"
-Cohesion: 0.10
-Nodes (4): CartaoCompra, CartaoCompraTest, CreditCardDeleteTest, CreditCardReconciliationTest
+### Community 0 - "Cartao"
+Cohesion: 0.08
+Nodes (8): CartoesController, Cartao, CartaoFaturaFechamento, CartaoPrevisao, CreditCardService, Carbon, CreditCardClosingTest, CreditCardDeleteTest
 
 ### Community 1 - "Illuminate\Http\Request"
-Cohesion: 0.08
-Nodes (10): BodyTrackerController, ConcursosController, EstudosController, HomeController, StudyRoomsController, ConcursoState, Illuminate\Http\JsonResponse, Illuminate\Http\Request (+2 more)
+Cohesion: 0.07
+Nodes (11): TvWidgetController, BodyTrackerController, MaterialController, VadeMecumController, ConcursosController, StudyRoomsController, ConcursoState, Illuminate\Http\JsonResponse (+3 more)
 
 ### Community 2 - "EventoAuxilioDTO"
 Cohesion: 0.18
 Nodes (4): EventoAuxilioDTO, self, self, QualificacaoTemporariaDTO
 
-### Community 3 - "AllowedGoogleEmail"
-Cohesion: 0.12
-Nodes (5): AllowedEmailController, AllowedGoogleEmail, Mockery, AcessoPublicoTailscaleTest, GoogleAuthAndWhitelistTest
+### Community 3 - "Mockery"
+Cohesion: 0.16
+Nodes (5): Laravel\Socialite\Facades\Socialite, Laravel\Socialite\Two\GoogleProvider, Mockery, AcessoPublicoTailscaleTest, GoogleAuthAndWhitelistTest
 
 ### Community 4 - "composer.json"
 Cohesion: 0.14
@@ -412,28 +425,24 @@ Cohesion: 0.14
 Nodes (14): scripts, dev, post-autoload-dump, post-update-cmd, pre-package-uninstall, test, Composer\\Config::disableProcessTimeout, Illuminate\\Foundation\\ComposerScripts::postAutoloadDump (+6 more)
 
 ### Community 7 - "OfxImportService"
-Cohesion: 0.16
-Nodes (7): OfxImportResultDTO, OfxImportService, PDO, PDO, PDOException, OfxImportServiceTest, PDO
+Cohesion: 0.14
+Nodes (9): OfxImportResultDTO, OfxImportService, PDO, PDO, PDOException, OfxImportServiceTest, PDO, Throwable (+1 more)
 
 ### Community 8 - "dependencies"
 Cohesion: 0.05
-Nodes (41): chart.js, concurrently, idb, laravel-vite-plugin, dependencies, chart.js, idb, three (+33 more)
+Nodes (43): chart.js, concurrently, idb, laravel-vite-plugin, dependencies, chart.js, idb, pdfjs-dist (+35 more)
 
 ### Community 9 - "NBC TSP Estrutura Conceitual (R1)"
 Cohesion: 0.01
 Nodes (190): Acordos vinculantes que são igualmente não executados, Acordos vinculantes que são igualmente não executados, Agrupamento da informação, Alcance da estrutura conceitual e das NBCs TSP, Alcance da estrutura conceitual e das NBCs TSP, Aplicação das características qualitativas, Aplicação das características qualitativas, Aplicação das características qualitativas (+182 more)
 
-### Community 10 - "formatDay"
-Cohesion: 0.17
-Nodes (21): folgaPicker(), formatBigHours(), formatDay(), longDay(), projInputs(), projPaces(), renderProjection(), renderProjHowMuch() (+13 more)
+### Community 10 - "addDays"
+Cohesion: 0.16
+Nodes (24): folgaPicker(), formatBigHours(), longDay(), projInputs(), projPaces(), renderProjection(), renderProjHowMuch(), renderProjWhen() (+16 more)
 
-### Community 11 - "characters.py"
-Cohesion: 0.06
-Nodes (87): Image, ndarray, Object, apply_default_pose_stage3(), _clear_scene(), main(), Master Blender 5.3 scene generator for Familia 3D. Usage: "C:\\Program…, Render a quick crisp Cycles CPU / EEVEE preview image for visual QA. (+79 more)
-
-### Community 12 - "Perfil"
-Cohesion: 0.06
-Nodes (18): QuestoesController, ConcursosModel, Meta, MetaAtividade, Perfil, QuestaoAlternativa, Tentativa, UsoEvento (+10 more)
+### Community 12 - "Carbon\CarbonImmutable"
+Cohesion: 0.21
+Nodes (4): ResumoEstudosCommand, JornadaMeta, CarbonImmutable, Carbon\CarbonImmutable
 
 ### Community 13 - "NBC TG Estrutura Conceitual para Relatório Financeiro"
 Cohesion: 0.02
@@ -444,8 +453,12 @@ Cohesion: 0.09
 Nodes (43): answer(), applyFilter(), areaDraft, areaOf(), AREAS, areaStats(), areaStrip(), buildSol() (+35 more)
 
 ### Community 15 - "esc"
-Cohesion: 0.09
-Nodes (58): cycleMark(), allTypes(), blockKey(), bossCard(), bossLabel(), cards(), chargeBar(), chargeText() (+50 more)
+Cohesion: 0.12
+Nodes (39): cycleMark(), allTypes(), blockKey(), bossCard(), bossLabel(), chargeBar(), chargeText(), colorVars() (+31 more)
+
+### Community 16 - "today"
+Cohesion: 0.10
+Nodes (37): applyTheme(), cards(), colorOf(), cssVar(), formatDay(), formatHM(), formatSigned(), hoursOf() (+29 more)
 
 ### Community 17 - "TelegramWebhookController"
 Cohesion: 0.17
@@ -456,12 +469,12 @@ Cohesion: 0.25
 Nodes (7): About Laravel, Agentic Development, Code of Conduct, Contributing, Learning Laravel, License, Security Vulnerabilities
 
 ### Community 19 - "Illuminate\Database\Seeder"
-Cohesion: 0.18
-Nodes (7): DatabaseSeeder, ExerciseCatalogSeeder, ProductionDataSeeder, UserSeeder, Illuminate\Database\Console\Seeds\WithoutModelEvents, Illuminate\Database\Seeder, Illuminate\Support\Facades\Hash
+Cohesion: 0.20
+Nodes (6): DatabaseSeeder, ExerciseCatalogSeeder, ProductionDataSeeder, UserSeeder, Illuminate\Database\Console\Seeds\WithoutModelEvents, Illuminate\Database\Seeder
 
-### Community 20 - "Illuminate\Support\Facades\DB"
-Cohesion: 0.09
-Nodes (16): GurujaSyncCommand, GurujaComandoResumoService, Carbon\Carbon, Illuminate\Http\Client\Request, Illuminate\Http\UploadedFile, Illuminate\Support\Facades\Cache, Illuminate\Support\Facades\DB, Illuminate\Support\Facades\Http (+8 more)
+### Community 20 - "TestCase"
+Cohesion: 0.05
+Nodes (20): ImportarEditalCommand, EditalCargo, EditalImportador, TecParserException, Illuminate\Foundation\Inspiring, Illuminate\Foundation\Testing\RefreshDatabase, Illuminate\Foundation\Testing\TestCase, Illuminate\Support\Carbon (+12 more)
 
 ### Community 22 - "🚀 Guia de Deploy em Nuvem - Sistema Financeiro & Concursos"
 Cohesion: 0.15
@@ -469,7 +482,7 @@ Nodes (12): 🔄 Como atualizar os dados antes da viagem se fizer novos lançame
 
 ### Community 23 - "metrics.js"
 Cohesion: 0.07
-Nodes (57): mountStatsCharts(), shiftStats(), statsRange(), addDays(), allTimeStats(), amountBetween(), buildDaily(), compareWithPrevious() (+49 more)
+Nodes (45): recentSessions(), renderSyncBadge(), amountBetween(), compareWithPrevious(), comparisonRanges(), comparisonSeries(), CUSTOM_TYPE_MAX, CUSTOM_TYPE_PREFIX (+37 more)
 
 ### Community 24 - "sidebar.js"
 Cohesion: 0.27
@@ -484,52 +497,52 @@ Cohesion: 0.40
 Nodes (4): Monolog\Handler\NullHandler, Monolog\Handler\StreamHandler, Monolog\Handler\SyslogUdpHandler, Monolog\Processor\PsrLogMessageProcessor
 
 ### Community 27 - "Illuminate\Console\Command"
-Cohesion: 0.10
-Nodes (10): BackupEstudosCommand, ExportProductionDataCommand, ImportarCadernoTecCommand, ImportOfxCommand, SyncDatabaseCommand, TelegramRegisterLocalCommand, TelegramSetWebhook, UsuarioModulosCommand (+2 more)
+Cohesion: 0.07
+Nodes (13): BackupEstudosCommand, ExportProductionDataCommand, ImportarTecApiCommand, ImportOfxCommand, MaterialPdfsCommand, MidiaEstudosCommand, SincronizarTempoCommand, UsuarioModulosCommand (+5 more)
 
-### Community 29 - "Controller"
-Cohesion: 0.08
-Nodes (12): TvWidgetController, AuthController, CuradoriaController, LeisController, MetaController, PainelController, UsoController, Controller (+4 more)
+### Community 29 - "Tentativa"
+Cohesion: 0.06
+Nodes (15): CuradoriaController, MetaController, PainelController, QuestoesController, UsoController, ContaController, Controller, HomeController (+7 more)
 
 ### Community 31 - "tick"
-Cohesion: 0.10
-Nodes (42): avatarStage(), avatarSvg(), avatarBlock(), checkReforcoAlert(), checkRestAlert(), currentRoom(), DESK_SVG(), dismissRestAlert() (+34 more)
+Cohesion: 0.09
+Nodes (48): getAudioContext(), playBossHitSound(), playFocusEndSound(), playLevelUpSound(), playNote(), playRestDueSound(), playRestSoonSound(), avatarStage() (+40 more)
 
 ### Community 32 - "Illuminate\Database\Eloquent\Model"
-Cohesion: 0.09
-Nodes (6): SalaryProfile, StretchingLog, WorkoutSessionExercise, WorkoutSet, Illuminate\Database\Eloquent\Factories\HasFactory, Illuminate\Database\Eloquent\Model
+Cohesion: 0.08
+Nodes (7): SalaryProfile, StretchingLog, WorkoutPlanItem, WorkoutSessionExercise, WorkoutSet, Illuminate\Database\Eloquent\Factories\HasFactory, Illuminate\Database\Eloquent\Model
 
 ### Community 33 - "flashcards.js"
 Cohesion: 0.10
 Nodes (42): abreDaLista(), alternaFav(), answer(), anterior(), buildQueue(), cardHTML(), desfazAviso(), doneHTML() (+34 more)
 
-### Community 36 - ".db"
-Cohesion: 0.14
-Nodes (5): EstudosApiController, CarbonImmutable, Carbon, StudyRoomService, setUpBancoConcursos()
-
 ### Community 38 - "simulados.js"
 Cohesion: 0.10
 Nodes (43): allAreas, allSources, altsReview(), answer(), applyFilter(), baseBox(), buildSol(), cardHtml() (+35 more)
+
+### Community 39 - "GrifosQuestoes"
+Cohesion: 0.09
+Nodes (8): ImportarGrifosCommand, ImportarMaterialCommand, MaterialGrifoQuestao, MaterialSecao, MaterialTentativa, GrifosQuestoes, MaterialImportador, ConcursosGrifosQuestoesTest
 
 ### Community 40 - "StudySummaryService"
 Cohesion: 0.32
 Nodes (3): CarbonImmutable, StudySummaryService, Illuminate\Database\ConnectionInterface
 
 ### Community 41 - "main.js"
-Cohesion: 0.05
-Nodes (65): active3DAvatars, apiTokensCall(), applyTheme(), canvasToPngBlob(), charts, chartTooltip, createApiToken(), cssVar() (+57 more)
+Cohesion: 0.06
+Nodes (57): apiTokensCall(), canvasToPngBlob(), charts, chartTooltip, closeFocus(), createApiToken(), dayDiff(), deleteGurujaCommand() (+49 more)
 
 ### Community 42 - "GurujaMcpService"
-Cohesion: 0.06
-Nodes (5): GurujaConnectCommand, GurujaMcpService, Carbon, GurujaPostMetaService, CarbonImmutable
+Cohesion: 0.09
+Nodes (3): EstudosController, GurujaMcpService, Carbon
 
 ### Community 43 - "DailyLog"
-Cohesion: 0.09
-Nodes (5): TreinosController, DailyLog, Measurement, BodyTrackerService, FitnessAiService
+Cohesion: 0.08
+Nodes (5): TreinosController, DailyLog, Measurement, ProgressPhoto, BodyTrackerService
 
 ### Community 45 - "Exercise"
-Cohesion: 0.07
-Nodes (4): Exercise, WorkoutPlan, WorkoutPlanItem, WorkoutModuleTest
+Cohesion: 0.08
+Nodes (3): Exercise, ExercisePersonalRecord, WorkoutModuleTest
 
 ### Community 46 - "Constituição da República Federativa do Brasil de 1988"
 Cohesion: 0.05
@@ -538,6 +551,10 @@ Nodes (43): CAPÍTULO I, CAPÍTULO I, CAPÍTULO I, CAPÍTULO I, CAPÍTULO I, CAP
 ### Community 47 - "setup"
 Cohesion: 0.25
 Nodes (8): post-root-package-install, setup, composer install, npm install --ignore-scripts, npm run build, @php artisan key:generate, @php artisan migrate --force, @php -r \"file_exists('.env') || copy('.env.example', '.env');\
+
+### Community 48 - "TransacaoPrevisao"
+Cohesion: 0.11
+Nodes (7): ExportController, TransacaoPrevisao, AppServiceProvider, CategorySanitizer, FinancialSummaryService, Illuminate\Support\Facades\URL, Illuminate\Support\ServiceProvider
 
 ### Community 53 - "config"
 Cohesion: 0.29
@@ -552,16 +569,20 @@ Cohesion: 0.05
 Nodes (43): CAPÍTULO I, CAPÍTULO I, CAPÍTULO I, CAPÍTULO I, CAPÍTULO I, CAPÍTULO I, CAPÍTULO I, CAPÍTULO II (+35 more)
 
 ### Community 63 - ".app"
-Cohesion: 0.08
-Nodes (5): ArvoreAssuntosImportadorTest, JornadaMetaTest, MidiaEstudosCommandTest, MotorMetaTest, TempoEstudosTest
+Cohesion: 0.09
+Nodes (5): ArvoreAssuntosImportadorTest, ConcursosBaseTeoricaTest, IneditasImportadorTest, MidiaEstudosCommandTest, TempoEstudosTest
+
+### Community 66 - ".http"
+Cohesion: 0.13
+Nodes (5): GurujaSyncCommand, TelegramRegisterLocalCommand, TelegramSetWebhook, TelegramService, PendingRequest
 
 ### Community 74 - "post-meta.js"
 Cohesion: 0.12
 Nodes (44): buildPostCaption(), buildSlidePlan(), CAPTION_HASHTAGS, createSlideCanvas(), drawFittedNumber(), drawFooter(), drawSlideClosing(), drawSlideCover() (+36 more)
 
 ### Community 75 - "static"
-Cohesion: 0.22
-Nodes (3): UserFactory, Illuminate\Database\Eloquent\Factories\Factory, static
+Cohesion: 0.15
+Nodes (6): UserFactory, Illuminate\Database\Eloquent\Attributes\Fillable, Illuminate\Database\Eloquent\Attributes\Hidden, Illuminate\Database\Eloquent\Factories\Factory, Illuminate\Notifications\Notifiable, static
 
 ### Community 77 - "NBC TG 26 (R5) — Apresentação das Demonstrações Contábeis"
 Cohesion: 0.05
@@ -573,15 +594,15 @@ Nodes (4): escapeHtml(), highlightMatch(), initTransactionAutocomplete(), normal
 
 ### Community 83 - "User"
 Cohesion: 0.03
-Nodes (27): Disciplina, Conta, User, EditalImportador, TecParserException, Illuminate\Foundation\Auth\User, Illuminate\Foundation\Testing\RefreshDatabase, Illuminate\Foundation\Testing\TestCase (+19 more)
+Nodes (20): AllowedEmailController, AllowedGoogleEmail, User, Illuminate\Foundation\Auth\User, Illuminate\Http\Client\Request, Illuminate\Support\Facades\Hash, Illuminate\Support\Facades\RateLimiter, Illuminate\Validation\Rules\Password (+12 more)
 
 ### Community 84 - "Estrutura e conteúdo"
 Cohesion: 0.05
 Nodes (41): Alcance, Apresentação adequada e conformidade com as NBCs TSP, Ativo circulante, Balanço patrimonial, Benefícios econômicos futuros ou potencial de serviços, Capital, Compensação de valores, Componentes das demonstrações contábeis (+33 more)
 
-### Community 87 - "Importacao"
+### Community 87 - "Questao"
 Cohesion: 0.06
-Nodes (14): ImportarArvoreAssuntosCommand, ImportarGeminiCommand, ImportarIneditasCommand, Importacao, Lote, QuestaoClassificacao, QuestaoResolucao, ArvoreAssuntosImportador (+6 more)
+Nodes (14): ImportarCadernoTecCommand, ImportarGeminiCommand, ImportarIneditasCommand, Importacao, Lote, Questao, QuestaoClassificacao, QuestaoResolucao (+6 more)
 
 ### Community 88 - "TÍTULO III"
 Cohesion: 0.05
@@ -595,17 +616,21 @@ Nodes (10): 1. Onde fica e como o usuário usa, 2.1 Guruja (via `GurujaMcpServic
 Cohesion: 0.07
 Nodes (6): FinancasController, Transacao, TransactionDeduplicationService, TransactionSuggestionService, TransactionDeduplicationTest, TransactionSuggestionTest
 
-### Community 92 - "NotaFiscal"
-Cohesion: 0.14
-Nodes (3): MercadoController, NotaFiscal, NotaFiscalItem
+### Community 92 - "Illuminate\Database\Eloquent\Relations\BelongsTo"
+Cohesion: 0.07
+Nodes (4): EditalArea, EditalDisciplina, MaterialAnexo, Illuminate\Database\Eloquent\Relations\BelongsTo
 
 ### Community 95 - "SalaryProjectionTest.php"
 Cohesion: 0.10
 Nodes (8): CassemsEventoDTO, self, ConsignadoDTO, self, DespesaForaFolhaDTO, self, FilhoDTO, self
 
 ### Community 96 - "Categoria"
-Cohesion: 0.11
+Cohesion: 0.12
 Nodes (5): CategoriasController, Categoria, Subcategoria, GeminiService, WhatsappMessageParser
+
+### Community 97 - "StudySyncService"
+Cohesion: 0.31
+Nodes (3): Carbon, StudySyncService, Illuminate\Support\Facades\Validator
 
 ### Community 98 - "bootstrap/app.php"
 Cohesion: 0.40
@@ -620,8 +645,8 @@ Cohesion: 0.15
 Nodes (23): BOSSES, bossSvg(), DEFAULT_COLORS, ensureModelViewer(), escSvg(), ground(), koStars(), linear() (+15 more)
 
 ### Community 103 - "24. INSTRUMENTOS FINANCEIROS"
-Cohesion: 0.06
-Nodes (31): 24.10.1. Reconhecimento e Desreconhecimento de Instrumentos Financeiros Passivos, 24.10.2. Classificação e Reclassificação de Instrumentos Financeiros Passivos, 24.10.3. Mensuração de Instrumentos Financeiros Passivos, 24.10. PASSIVO FINANCEIRO E INSTRUMENTOS PATRIMONIAIS, 24.11.1. Categorias de Ativos Financeiros e Passivos Financeiros, 24.11.2. Ativos Financeiros Mensurados Pelo VJR, Mas Que Deveriam Ser Mensurados por, 24.11.3. Passivo Financeiros Mensurados Pelo VJR, Com Obrigação de Apresentação dos, 24.11.4. Garantias em Instrumentos Financeiros (+23 more)
+Cohesion: 0.05
+Nodes (38): 24.10.1. Reconhecimento e Desreconhecimento de Instrumentos Financeiros Passivos, 24.10.2. Classificação e Reclassificação de Instrumentos Financeiros Passivos, 24.10.3. Mensuração de Instrumentos Financeiros Passivos, 24.10. PASSIVO FINANCEIRO E INSTRUMENTOS PATRIMONIAIS, 24.11.1. Categorias de Ativos Financeiros e Passivos Financeiros, 24.11.2. Ativos Financeiros Mensurados Pelo VJR, Mas Que Deveriam Ser Mensurados por, 24.11.3. Passivo Financeiros Mensurados Pelo VJR, Com Obrigação de Apresentação dos, 24.11.4. Garantias em Instrumentos Financeiros (+30 more)
 
 ### Community 104 - "Lei Complementar nº 101/2000 — Lei de Responsabilidade Fiscal"
 Cohesion: 0.06
@@ -640,12 +665,12 @@ Cohesion: 0.67
 Nodes (3): extra, laravel, dont-discover
 
 ### Community 108 - "MarkdownLivro.php"
-Cohesion: 0.05
-Nodes (28): MaterialBaseTeoricaCommand, BaseTeorica, Grifador, MarkdownLivro, League\CommonMark\Environment\Environment, League\CommonMark\Extension\CommonMark\CommonMarkCoreExtension, League\CommonMark\Extension\CommonMark\Node\Block\BlockQuote, League\CommonMark\Extension\CommonMark\Node\Block\FencedCode (+20 more)
+Cohesion: 0.10
+Nodes (20): League\CommonMark\Environment\Environment, League\CommonMark\Extension\CommonMark\CommonMarkCoreExtension, League\CommonMark\Extension\CommonMark\Node\Block\BlockQuote, League\CommonMark\Extension\CommonMark\Node\Block\FencedCode, League\CommonMark\Extension\CommonMark\Node\Block\Heading, League\CommonMark\Extension\CommonMark\Node\Block\IndentedCode, League\CommonMark\Extension\CommonMark\Node\Block\ListItem, League\CommonMark\Extension\CommonMark\Node\Block\ThematicBreak (+12 more)
 
 ### Community 114 - "editor.js"
-Cohesion: 0.09
-Nodes (54): agenda(), base(), cardHTML(), comecar(), confirmar(), feedback(), fim(), info() (+46 more)
+Cohesion: 0.24
+Nodes (22): criarEditor(), criarMenuBarra(), criarNotas(), escolherQuestao(), NOMES_COR, Caixa, citacoes, CORES (+14 more)
 
 ### Community 116 - "Sabatina 2026-11-01 — "App desktop para o módulo de estudos?""
 Cohesion: 0.22
@@ -663,25 +688,25 @@ Nodes (31): Adequação da apresentação das demonstrações contábeis (ver it
 Cohesion: 0.12
 Nodes (28): bloco_lei(), caderno(), erro(), flashcards(), grava(), ler(), main(), normas_da_questao() (+20 more)
 
-### Community 120 - "Material"
-Cohesion: 0.09
-Nodes (13): ImportarMaterialCommand, MaterialParaLivroCommand, MaterialController, Material, MaterialPonto, MaterialSecao, ConversorLivro, MaterialImportador (+5 more)
+### Community 120 - "Carbon\Carbon"
+Cohesion: 0.19
+Nodes (7): GurujaComandoResumoService, Barryvdh\DomPDF\Facade\Pdf, Carbon\Carbon, Illuminate\Support\Facades\Auth, Illuminate\Support\Facades\Cache, Illuminate\Support\Facades\Http, Illuminate\Support\Facades\Log
 
 ### Community 121 - "Lei nº 4.320/1964 — Normas gerais de direito financeiro"
 Cohesion: 0.07
 Nodes (27): CAPÍTULO I, CAPÍTULO I, CAPÍTULO I, CAPÍTULO I, CAPÍTULO I, CAPÍTULO II, CAPÍTULO II, CAPÍTULO II (+19 more)
 
 ### Community 122 - "render"
-Cohesion: 0.09
-Nodes (58): applyServerChanges(), db(), dropFromQueue(), ensureUser(), getMeta(), loadAll(), pendingQueue(), saveLocal() (+50 more)
+Cohesion: 0.10
+Nodes (55): applyServerChanges(), db(), dropFromQueue(), ensureUser(), getMeta(), loadAll(), pendingQueue(), saveLocal() (+47 more)
 
 ### Community 123 - "NBC TG 03 (R3) — Demonstração dos Fluxos de Caixa"
 Cohesion: 0.08
 Nodes (25): A. Demonstração dos fluxos de caixa de entidade que não é instituição financeira, Acordos de Financiamento de Fornecedores, Alcance, Alteração da participação em controlada e em outros negócios, Alteração do passivo decorrente de atividade de financiamento, Apresentação da demonstração dos fluxos de caixa, Apresentação dos fluxos de caixa das atividades de investimento e de financiamento, Apresentação dos fluxos de caixa das atividades operacionais (+17 more)
 
 ### Community 124 - "avatars-vetor.js"
-Cohesion: 0.10
-Nodes (18): FAMILIA, FAMILIA_3D_FALLBACK, FAMILIA_IMAGENS, CAOTICO, cFace(), confetti(), face(), hamster() (+10 more)
+Cohesion: 0.08
+Nodes (27): AVATAR_LIMITES_MIN, AVATAR_PADRAO, AVATARS, BICHINHO, eggCrack, happyFace(), AVATARS_IMAGEM, FAMILIA (+19 more)
 
 ### Community 125 - "Sabatina 2026-11-01: widget flutuante do cronômetro de estudos"
 Cohesion: 0.25
@@ -691,6 +716,10 @@ Nodes (7): Decisões tomadas, Implementação, Pergunta original, Próximos pass
 Cohesion: 0.20
 Nodes (9): Avatares, Backup no PC, Decisões, Jornada dos Bosses, Módulo de estudos estilo YPT (offline), Onde está o código, Riscos conhecidos, Roteiro de teste manual (modo avião) (+1 more)
 
+### Community 136 - "refazer.js"
+Cohesion: 0.23
+Nodes (20): agenda(), base(), cardHTML(), comecar(), confirmar(), feedback(), fim(), info() (+12 more)
+
 ### Community 139 - "post-create-project-cmd"
 Cohesion: 0.50
 Nodes (4): post-create-project-cmd, @php artisan key:generate --ansi, @php artisan migrate --graceful --ansi, @php -r \"file_exists('database/database.sqlite') || touch('database/database.sqlite');\
@@ -698,10 +727,6 @@ Nodes (4): post-create-project-cmd, @php artisan key:generate --ansi, @php artis
 ### Community 145 - "planImport"
 Cohesion: 0.48
 Nodes (4): normalize(), planImport(), toUuid(), empty
-
-### Community 147 - "AuthController.php"
-Cohesion: 0.22
-Nodes (5): AppServiceProvider, Illuminate\Support\Facades\URL, Illuminate\Support\ServiceProvider, Laravel\Socialite\Facades\Socialite, Laravel\Socialite\Two\GoogleProvider
 
 ### Community 148 - "estudos-sw.js"
 Cohesion: 0.40
@@ -711,13 +736,13 @@ Nodes (3): shellResponse(), STATIC, withTimeout()
 Cohesion: 0.29
 Nodes (6): Calculadora de projeção, Decisões, Gerador de mídias, Riscos, Sabatina 2026-11-08 — Calculadora de projeção e gerador de mídias (Instagram), Suposições
 
-### Community 152 - "Cartao"
-Cohesion: 0.08
-Nodes (7): CartoesController, Cartao, CartaoFatura, CartaoFaturaFechamento, CreditCardService, Carbon, CreditCardClosingTest
+### Community 155 - "MaterialQuestao"
+Cohesion: 0.10
+Nodes (5): RefazerController, MaterialQuestao, MaterialQuestoesImportador, TecCadernosNovos, Illuminate\Support\Facades\Process
 
-### Community 155 - "Illuminate\Database\Eloquent\Relations\BelongsTo"
-Cohesion: 0.06
-Nodes (5): RefazerController, MaterialAnexo, MaterialQuestao, MaterialTentativa, Illuminate\Database\Eloquent\Relations\BelongsTo
+### Community 156 - "CartaoCompra"
+Cohesion: 0.12
+Nodes (3): CartaoCompra, CartaoCompraTest, FinancialSummaryAndCardLimitsTest
 
 ### Community 159 - "/post-estudos semanal | semanal --parcial | diario [YYYY-MM-DD]"
 Cohesion: 0.33
@@ -725,39 +750,35 @@ Nodes (5): Diário (Story 1080×1920), /post-estudos semanal | semanal --parcial
 
 ### Community 160 - "Assunto"
 Cohesion: 0.10
-Nodes (7): GerarPacotesCommand, Assunto, Subtopico, AssuntoResolver, CuradoriaSubtopicos, PacoteGerador, CuradoriaSubtopicosTest
-
-### Community 161 - "Questao"
-Cohesion: 0.11
-Nodes (5): Questao, Illuminate\Database\Eloquent\Relations\BelongsToMany, Illuminate\Database\Eloquent\Relations\HasOne, ConcursosTecApiTest, IneditasImportadorTest
+Nodes (8): GerarPacotesCommand, Assunto, Disciplina, Subtopico, AssuntoResolver, PacoteGerador, CuradoriaSubtopicosTest, PacoteGeradorTest
 
 ### Community 163 - "Illuminate\Database\Eloquent\Relations\HasMany"
-Cohesion: 0.06
-Nodes (6): EditalArea, EditalDisciplina, Illuminate\Database\Eloquent\Attributes\Fillable, Illuminate\Database\Eloquent\Attributes\Hidden, Illuminate\Database\Eloquent\Relations\HasMany, Illuminate\Notifications\Notifiable
+Cohesion: 0.05
+Nodes (5): Edital, Meta, Illuminate\Database\Eloquent\Relations\BelongsToMany, Illuminate\Database\Eloquent\Relations\HasMany, Illuminate\Database\Eloquent\Relations\HasOne
 
 ### Community 164 - "Convite para teste — Horas de Estudo"
 Cohesion: 0.50
 Nodes (3): Convite para teste — Horas de Estudo, 🇺🇸 English, 🇧🇷 Português
 
 ### Community 169 - "EditalTopico"
-Cohesion: 0.10
-Nodes (6): ImportarEditalCommand, Edital, EditalCargo, EditalTopico, EditalImportadorTest, SimuladoPainelTest
+Cohesion: 0.12
+Nodes (5): ImportarArvoreAssuntosCommand, EditalTopico, ArvoreAssuntosImportador, EditalImportadorTest, SimuladoPainelTest
 
-### Community 172 - "CartaoPrevisao"
-Cohesion: 0.10
-Nodes (8): ExportController, CartaoPrevisao, TransacaoPrevisao, CategorySanitizer, FinancialSummaryService, Barryvdh\DomPDF\Facade\Pdf, Illuminate\Support\Facades\Auth, FinancialSummaryAndCardLimitsTest
+### Community 172 - "NotaFiscal"
+Cohesion: 0.13
+Nodes (4): MercadoController, NotaFiscal, NotaFiscalItem, Illuminate\Support\Facades\Route
 
-### Community 173 - "TreinosController.php"
-Cohesion: 0.11
-Nodes (3): RunningLog, UserBodyMetric, WorkoutGoal
+### Community 174 - "CartaoParcela"
+Cohesion: 0.17
+Nodes (3): CartaoParcela, CreditCardReconciliationService, Illuminate\Http\UploadedFile
 
 ### Community 175 - "11. ATIVO IMOBILIZADO"
 Cohesion: 0.08
 Nodes (25): 11.10.1. Passo a Passo, 11.10.2. Notas Explicativas, 11.10. ESQUEMA DE IMPLEMENTAÇÃO DA AVALIAÇÃO E DEPRECIAÇÃO DE BENS PÚBLICOS, 11.1. DEFINIÇÕES, 11.2.1. Princípio Geral do Reconhecimento, 11.2.2. Critério do Valor do Conjunto, 11.2.3. Ativos Imobilizados Obtidos a Título Gratuito, 11.2.4. Bens de Uso Comum do Povo (+17 more)
 
 ### Community 178 - "12. ATIVO INTANGÍVEL"
-Cohesion: 0.08
-Nodes (25): 12.10. DESRECONHECIMENTO DO VALOR CONTÁBIL DE UM ITEM DO ATIVO INTANGÍVEL, 12.11. EVIDENCIAÇÃO, 12.12. EXEMPLO DE CONTABILIZAÇÃO DE ATIVO INTANGÍVEL:, 12.1. DEFINIÇÕES, 12.2. PROCEDIMENTOS PARA IDENTIFICAR UM ATIVO INTANGÍVEL, 12.3.1. Aquisição Separada, 12.3.2. Geração Interna, 12.3.3. Aquisição por meio de Transações sem Contraprestação (+17 more)
+Cohesion: 0.12
+Nodes (17): 12.10. DESRECONHECIMENTO DO VALOR CONTÁBIL DE UM ITEM DO ATIVO INTANGÍVEL, 12.11. EVIDENCIAÇÃO, 12.12. EXEMPLO DE CONTABILIZAÇÃO DE ATIVO INTANGÍVEL:, 12.1. DEFINIÇÕES, 12.2. PROCEDIMENTOS PARA IDENTIFICAR UM ATIVO INTANGÍVEL, 12.3.1. Aquisição Separada, 12.3.2. Geração Interna, 12.3.3. Aquisição por meio de Transações sem Contraprestação (+9 more)
 
 ### Community 180 - "inicio.js"
 Cohesion: 0.13
@@ -776,28 +797,28 @@ Cohesion: 0.10
 Nodes (19): CAPÍTULO II DOS DIREITOS DOS ADMINISTRADOS, CAPÍTULO III DOS DEVERES DO ADMINISTRADO, CAPÍTULO IV DO INÍCIO DO PROCESSO, CAPÍTULO IX DA COMUNICAÇÃO DOS ATOS, CAPÍTULO V DOS INTERESSADOS, CAPÍTULO VI DA COMPETÊNCIA, CAPÍTULO VII DOS IMPEDIMENTOS E DA SUSPEIÇÃO, CAPÍTULO VIII DA FORMA, TEMPO E LUGAR DOS ATOS DO PROCESSO (+11 more)
 
 ### Community 187 - "Parte Geral — Contabilidade Aplicada ao Setor Público"
-Cohesion: 0.14
-Nodes (14): 1. CONTEXTUALIZAÇÃO, 2. PLANO DE CONTAS APLICADO AO SETOR PÚBLICO (PCASP), 3.1. ASPECTO ORÇAMENTÁRIO, 3.2. ASPECTO PATRIMONIAL, 3.3. ASPECTO FISCAL, 3. ASPECTOS ORÇAMENTÁRIO, PATRIMONIAL E FISCAL DA CONTABILIDADE APLICADA AO SETOR PÚBLICO, 4. IMPLANTAÇÃO DAS INOVAÇÕES NA CONTABILIDADE APLICADA AO SETOR PÚBLICO, 5. ALCANCE E AUTORIDADE (+6 more)
+Cohesion: 0.10
+Nodes (20): 1. CONTEXTUALIZAÇÃO, 2. PLANO DE CONTAS APLICADO AO SETOR PÚBLICO (PCASP), 3.1. ASPECTO ORÇAMENTÁRIO, 3.2. ASPECTO PATRIMONIAL, 3.3. ASPECTO FISCAL, 3. ASPECTOS ORÇAMENTÁRIO, PATRIMONIAL E FISCAL DA CONTABILIDADE APLICADA AO SETOR PÚBLICO, 4. IMPLANTAÇÃO DAS INOVAÇÕES NA CONTABILIDADE APLICADA AO SETOR PÚBLICO, 5. ALCANCE E AUTORIDADE (+12 more)
 
 ### Community 188 - "NBC TG 23 (R2) — Políticas Contábeis, Mudança de Estimativa e Retificação de Erro"
 Cohesion: 0.10
 Nodes (19): Alcance, Aplicação de mudanças de políticas contábeis, Aplicação retrospectiva, Definições, Divulgação, Divulgação, Divulgação de erro de período anterior, Estrutura Conceitual para Relatório Financeiro. (Alterada pela Revisão NBC 04) (+11 more)
 
 ### Community 189 - "AcervoLeis"
-Cohesion: 0.12
-Nodes (4): BaixarLeisCommand, AcervoLeis, Jurisprudencia, RuntimeException
+Cohesion: 0.10
+Nodes (5): BaixarLeisCommand, AcervoLeis, IncidenciaLeis, Jurisprudencia, RuntimeException
 
 ### Community 190 - "3. RECEITA ORÇAMENTÁRIA"
-Cohesion: 0.17
-Nodes (12): 3.1.1. Ingressos Extraorçamentários, 3.1.2. Receitas Orçamentárias, 3.1. CONCEITO, 3.3. REGISTRO DA RECEITA ORÇAMENTÁRIA, 3.4. RELACIONAMENTO DO REGIME ORÇAMENTÁRIO COM O REGIME CONTÁBIL, 3.5.1. Previsão, 3.5.2. Lançamento, 3.5.3. Arrecadação (+4 more)
+Cohesion: 0.11
+Nodes (18): 3.1.1. Ingressos Extraorçamentários, 3.1.2. Receitas Orçamentárias, 3.1. CONCEITO, 3.2.1. Classificação da Receita Orçamentária por Natureza, 3.2.2. Categoria Econômica, 3.2.3. Origens e Espécies de Receita Orçamentária, 3.2.4. Recursos Arrecadados em Exercícios Anteriores (RAEA) referente aos RPPS, 3.2.5. Classificação da Receita para Apuração do Resultado Primário (+10 more)
 
 ### Community 191 - "4. BENEFÍCIOS PÓS EMPREGO (BENEFÍCIOS A EMPREGADOS)"
-Cohesion: 0.14
-Nodes (14): 4.1.1. Conceitos relativos aos Benefícios a Empregados, 4.1.2. Definições, 4.1.3. Definições relativas ao custo de benefício definido, 4.1. INTRODUÇÃO, 4.2.1. Aspectos Gerais, 4.2.2. Aspectos Legais, 4.2.3. Aspectos Orçamentários e Patrimoniais, 4.2.4. Procedimentos Contábeis (+6 more)
+Cohesion: 0.11
+Nodes (18): 4.1.1. Conceitos relativos aos Benefícios a Empregados, 4.1.2. Definições, 4.1.3. Definições relativas ao custo de benefício definido, 4.1. INTRODUÇÃO, 4.2.1. Aspectos Gerais, 4.2.2. Aspectos Legais, 4.2.3. Aspectos Orçamentários e Patrimoniais, 4.2.4. Procedimentos Contábeis (+10 more)
 
 ### Community 192 - "properties"
 Cohesion: 0.07
-Nodes (30): items, maxItems, minItems, type, description, type, type, type (+22 more)
+Nodes (31): items, maxItems, minItems, type, type, type, $ref, properties (+23 more)
 
 ### Community 194 - "17. PROVISÕES, PASSIVOS CONTINGENTES E ATIVOS CONTINGENTES"
 Cohesion: 0.12
@@ -848,7 +869,7 @@ Cohesion: 0.13
 Nodes (15): 3.1. NATUREZA DA INFORMAÇÃO CONTÁBIL, 3.2.1. Estrutura do Código da Conta Contábil, 3.2.2. Detalhamento da Conta Contábil, 3.2.3. 5º Nível – Consolidação, 3.2. CÓDIGO DA CONTA CONTÁBIL, 3.3.1. Atributos Conceituais da Conta Contábil, 3.3. ATRIBUTOS DA CONTA CONTÁBIL, 3.4.1. Introdução (+7 more)
 
 ### Community 208 - "OfxParserService"
-Cohesion: 0.25
+Cohesion: 0.23
 Nodes (3): OfxParserService, getPdoConnection(), PDO
 
 ### Community 209 - "9.2. FUSÃO"
@@ -864,8 +885,8 @@ Cohesion: 0.14
 Nodes (13): CAPÍTULO I — CARACTERÍSTICAS E NATUREZA DA COMPANHIA OU SOCIEDADE ANÔNIMA, CAPÍTULO IV — PARTES BENEFICIÁRIAS, CAPÍTULO IX — LIVROS SOCIAIS, CAPÍTULO VI — BÔNUS DE SUBSCRIÇÃO, CAPÍTULO VIII — FORMALIDADES COMPLEMENTARES DA CONSTITUIÇÃO,, CAPÍTULO XIII — CONSELHO FISCAL, CAPÍTULO XIX — SOCIEDADES DE ECONOMIA MISTA, CAPÍTULO XXII — CONSÓRCIO (+5 more)
 
 ### Community 212 - "Parte II — Procedimentos Contábeis Patrimoniais"
-Cohesion: 0.11
-Nodes (19): 16.1. DEFINIÇÕES, 16.2.1. Tratamento Padrão dos custos dos empréstimos, 16.2.2. Tratamento Alternativo dos custos dos empréstimos, 16.2. RECONHECIMENTO, 16.3. EVIDENCIAÇÃO, 16. CUSTOS DE EMPRÉSTIMOS, 18.1. APROPRIAÇÃO DO 13º SALÁRIO, 18.2. APROPRIAÇÃO DAS FÉRIAS (+11 more)
+Cohesion: 0.14
+Nodes (14): 10.1. OBJETIVO E CONTEXTUALIZAÇÃO, 10.2. DEFINIÇÕES, 10.3. CONCEITO, 10.4. TIPOS DE ACORDO EM CONJUNTO, 10.5. DEMONSTRAÇÕES CONTÁBEIS DAS PARTES DE ACORDO EM CONJUNTO, 10.6. DEMONSTRAÇÕES CONTÁBEIS SEPARADAS, 10. ACORDOS EM CONJUNTO, 18.1. APROPRIAÇÃO DO 13º SALÁRIO (+6 more)
 
 ### Community 213 - "23. BENEFÍCIOS SOCIAIS"
 Cohesion: 0.14
@@ -892,20 +913,24 @@ Cohesion: 0.15
 Nodes (13): 4.1. INTRODUÇÃO, 4.3. NOTAS EXPLICATIVAS, 4.4.1. Quadro Principal, 4.4.2. Quadro dos Ativos e Passivos Financeiros e Permanentes, 4.4.3. Quadro das Contas de Compensação, 4.4.4. Quadro do Superávit / Déficit Financeiro, 4.4. ESTRUTURA, 4.5.1. Quadro Principal (+5 more)
 
 ### Community 219 - "4.6.1. Natureza de Despesa"
-Cohesion: 0.29
-Nodes (7): 4.6.1.1. Material Permanente X Material de Consumo, 4.6.1.2. Serviços de Terceiros X Equipamentos/Bens Permanentes/Material de Consumo, 4.6.1.3. Obras e Instalações X Serviços de Terceiros, 4.6.1.4. Despesa de Exercícios Anteriores (DEA) X Indenizações e Restituições X Elemento Próprio, 4.6.1.5. Auxílio-Alimentação e Auxílio-Transporte x Outros Serviços de Terceiros – Pessoa Jurídica, 4.6.1.6. Serviços de Tecnologia da Informação e Comunicação - Pessoa Jurídica x Outros Serviços de, 4.6.1. Natureza de Despesa
+Cohesion: 0.15
+Nodes (13): 4.6.1.1. Material Permanente X Material de Consumo, 4.6.1.2. Serviços de Terceiros X Equipamentos/Bens Permanentes/Material de Consumo, 4.6.1.3. Obras e Instalações X Serviços de Terceiros, 4.6.1.4. Despesa de Exercícios Anteriores (DEA) X Indenizações e Restituições X Elemento Próprio, 4.6.1.5. Auxílio-Alimentação e Auxílio-Transporte x Outros Serviços de Terceiros – Pessoa Jurídica, 4.6.1.6. Serviços de Tecnologia da Informação e Comunicação - Pessoa Jurídica x Outros Serviços de, 4.6.1. Natureza de Despesa, 4.6.2.1. Transferência (+5 more)
 
 ### Community 220 - "4.7.4. Estágios da Execução dos Restos a Pagar"
-Cohesion: 0.29
-Nodes (7): 4.7.4.1. Inscrição de Restos a Pagar Não Processados a Liquidar, 4.7.4.2. Inscrição De Restos a Pagar Não Processados em Liquidação, 4.7.4.3. Inscrição De Restos a Pagar Processados, 4.7.4.4. Evidenciação da Ocorrência do Fato Gerador, 4.7.4.5. Liquidação de Restos a Pagar Não Processados em Liquidação, 4.7.4.6. Pagamento de Restos a Pagar, 4.7.4. Estágios da Execução dos Restos a Pagar
+Cohesion: 0.15
+Nodes (13): 4.7.1. Inscrição dos Restos a Pagar, 4.7.2. Restos a Pagar Não Processados (RPNP), 4.7.3. Restos a Pagar Processados (RPP), 4.7.4.1. Inscrição de Restos a Pagar Não Processados a Liquidar, 4.7.4.2. Inscrição De Restos a Pagar Não Processados em Liquidação, 4.7.4.3. Inscrição De Restos a Pagar Processados, 4.7.4.4. Evidenciação da Ocorrência do Fato Gerador, 4.7.4.5. Liquidação de Restos a Pagar Não Processados em Liquidação (+5 more)
 
-### Community 221 - "OfxParserServiceTest"
-Cohesion: 0.18
+### Community 221 - "PHPUnit\Framework\TestCase"
+Cohesion: 0.16
 Nodes (3): PHPUnit\Framework\TestCase, ExampleTest, OfxParserServiceTest
 
 ### Community 222 - "5.2.4. Baixa"
 Cohesion: 0.15
 Nodes (13): 5.2.1.1. Procedimento de Registro 1, 5.2.1.2. Procedimento de Registro 2, 5.2.1. Inscrição, 5.2.2. Atualização Monetária, Juros, Multas e Outros Encargos, 5.2.3. Reclassificação da Dívida Ativa do Ativo Não Circulante para o Ativo Circulante, 5.2.4.1. Recebimento em Espécie, 5.2.4.2. Recebimento em Bens ou Direitos, 5.2.4.3. Abatimentos, Anistias e Remissões (+5 more)
+
+### Community 223 - ".count"
+Cohesion: 0.10
+Nodes (8): Perfil, UsoEvento, MotorMeta, PainelDesempenho, UsoConcursos, Carbon\CarbonInterface, DateTimeInterface, Illuminate\Support\Collection
 
 ### Community 224 - "6. DEMONSTRAÇÃO DOS FLUXOS DE CAIXA"
 Cohesion: 0.17
@@ -1072,8 +1097,8 @@ Cohesion: 0.29
 Nodes (7): 4.2.4.1. Estrutura da Natureza da Despesa Orçamentária, 4.2.4.2. Categoria Econômica, 4.2.4.3. Grupo de Natureza da Despesa (GND), 4.2.4.4. Modalidade de Aplicação, 4.2.4.5. Elemento de Despesa Orçamentária, 4.2.4.6. Desdobramento Facultativo do Elemento da Despesa, 4.2.4. Classificação da Despesa Orçamentária por Natureza
 
 ### Community 266 - "6.2. CARACTERÍSTICAS QUALITATIVAS DA INFORMAÇÃO CONTÁBIL"
-Cohesion: 0.15
-Nodes (13): 6.1. INTRODUÇÃO, 6.2.1. Relevância, 6.2.2. Representação fidedigna, 6.2.3. Compreensibilidade, 6.2.4. Tempestividade, 6.2.5. Comparabilidade, 6.2.6. Verificabilidade, 6.2. CARACTERÍSTICAS QUALITATIVAS DA INFORMAÇÃO CONTÁBIL (+5 more)
+Cohesion: 0.29
+Nodes (7): 6.2.1. Relevância, 6.2.2. Representação fidedigna, 6.2.3. Compreensibilidade, 6.2.4. Tempestividade, 6.2.5. Comparabilidade, 6.2.6. Verificabilidade, 6.2. CARACTERÍSTICAS QUALITATIVAS DA INFORMAÇÃO CONTÁBIL
 
 ### Community 267 - "7. PROPRIEDADE PARA INVESTIMENTO"
 Cohesion: 0.29
@@ -1091,13 +1116,13 @@ Nodes (5): balao(), dispositivo(), html(), linksBalao(), montar()
 Cohesion: 0.33
 Nodes (6): CAPÍTULO XXI — GRUPO DE SOCIEDADES, Seção I — Características e Natureza, Seção II — Constituição, Registro e Publicidade, Seção III — Administração, Seção IV — Demonstrações Financeiras, Seção V — Prejuízos Resultantes de Atos Contrários à Convenção
 
+### Community 271 - "Material"
+Cohesion: 0.07
+Nodes (13): ImportarTodasCommand, MaterialParaLivroCommand, LivroController, Material, MaterialAnotacao, MaterialCapitulo, MaterialPonto, ConversorLivro (+5 more)
+
 ### Community 272 - "19.2. REGISTROS PATRIMONIAIS DECORRENTES DAS DESPESAS ORÇAMENTÁRIAS DE"
 Cohesion: 0.33
 Nodes (6): 19.1. INTRODUÇÃO, 19.2.1. Despesas de exercícios encerrados para as quais o orçamento respectivo, 19.2.2. Restos a Pagar com prescrição interrompida, 19.2.3. Compromissos reconhecidos após o encerramento do exercício correspondente, 19.2. REGISTROS PATRIMONIAIS DECORRENTES DAS DESPESAS ORÇAMENTÁRIAS DE, 19. REFLEXO PATRIMONIAL DAS DESPESAS DE EXERCÍCIOS ANTERIORES (DEA)
-
-### Community 273 - "MaterialAnotacao"
-Cohesion: 0.15
-Nodes (3): MaterialAnotacao, ConcursosBaseTeoricaTest, ConcursosLivroTest
 
 ### Community 274 - "7. DEMONSTRAÇÃO DAS MUTAÇÕES NO PATRIMÔNIO LÍQUIDO"
 Cohesion: 0.33
@@ -1107,9 +1132,9 @@ Nodes (6): 7.1. INTRODUÇÃO, 7.2. ELABORAÇÃO, 7.3. NOTAS EXPLICATIVAS, 7.4. E
 Cohesion: 0.40
 Nodes (4): Converte as páginas compiladas do Planalto (.htm) em Markdown na pasta leis/,…, Apaga os <span> com text-decoration:line-through (e tudo o que há dentro,…, tira_riscado_css(), to_text()
 
-### Community 276 - "familia-3d-scene.js"
-Cohesion: 0.19
-Nodes (21): createFaceCanvasTexture(), drawAnimeEye(), drawSweatDrop(), getBabyFaceTexture(), getDadFaceTexture(), getSonFaceTexture(), getWifeFaceTexture(), textureCache (+13 more)
+### Community 276 - "livro.js"
+Cohesion: 0.22
+Nodes (10): dados, destacar(), montarCapitulo(), montarGaveta(), montarRecolher(), montarSumario(), mover(), renumerar() (+2 more)
 
 ### Community 277 - "CAPÍTULO VII — CONSTITUIÇÃO DA COMPANHIA"
 Cohesion: 0.40
@@ -1151,13 +1176,21 @@ Nodes (3): CAPÍTULO II — CAPITAL SOCIAL, Seção I — Valor, Seção II — 
 Cohesion: 0.67
 Nodes (3): CAPÍTULO XIV — MODIFICAÇÃO DO CAPITAL SOCIAL, Seção I — Aumento, Seção II — Redução
 
-### Community 290 - "familia-3d-page.js"
-Cohesion: 0.09
-Nodes (21): btnCompare, btnCompareClose, btnNext, btnOutlines, btnPrev, btnTour, canvasHost, compareCard (+13 more)
+### Community 290 - "leitura.js"
+Cohesion: 0.19
+Nodes (14): analisar(), AUTORES, chaveLeitura, classificar(), LEI_DO_LIVRO, LEIS, Leitura, MARCADOR (+6 more)
 
 ### Community 291 - "properties"
 Cohesion: 0.09
 Nodes (22): description, type, type, type, type, type, $ref, $ref (+14 more)
+
+### Community 301 - "ConcursosModel"
+Cohesion: 0.18
+Nodes (5): LeisController, ConcursosModel, LeiGrifo, LeiMarca, QuestaoAlternativa
+
+### Community 302 - "BackupDriveCommandTest"
+Cohesion: 0.12
+Nodes (3): BackupDriveCommand, Dados, BackupDriveCommandTest
 
 ### Community 304 - "required"
 Cohesion: 0.11
@@ -1172,20 +1205,24 @@ Cohesion: 0.21
 Nodes (3): SimuladosController, Simulado, SimuladoService
 
 ### Community 307 - "type"
-Cohesion: 0.13
-Nodes (18): items, type, items, type, description, items, type, additionalProperties (+10 more)
+Cohesion: 0.14
+Nodes (17): items, type, items, type, items, type, description, items (+9 more)
 
 ### Community 308 - "Closure"
-Cohesion: 0.21
-Nodes (7): EnsureConcursosHabilitado, EnsureModuloPermitido, EnsurePlanoConcursos, EnsureUserIsOwner, RegistraUsoConcursos, Closure, Symfony\Component\HttpFoundation\Response
+Cohesion: 0.18
+Nodes (8): EnsureConcursosHabilitado, EnsureModuloPermitido, EnsurePlanoConcursos, EnsureSenhaAtualizada, EnsureUserIsOwner, RegistraUsoConcursos, Closure, Symfony\Component\HttpFoundation\Response
+
+### Community 309 - "TecCadernoParser"
+Cohesion: 0.15
+Nodes (4): LerCadernoTecCommand, TecCadernoParser, TecPdfExtractor, TecCadernoPdfRealTest
 
 ### Community 310 - "properties"
 Cohesion: 0.12
 Nodes (17): Fapec, examples, type, format, type, format, type, minimum (+9 more)
 
 ### Community 311 - "$defs"
-Cohesion: 0.12
-Nodes (17): $defs, dificuldade, gabarito, schema_versao, slug, subtopico_ref, tipologia, description (+9 more)
+Cohesion: 0.17
+Nodes (12): $defs, dificuldade, gabarito, schema_versao, subtopico_ref, tipologia, description, description (+4 more)
 
 ### Community 313 - "properties"
 Cohesion: 0.12
@@ -1195,13 +1232,13 @@ Nodes (16): armadilhas, como_cobrado, como_resolver, teoria, additionalPropertie
 Cohesion: 0.13
 Nodes (15): $ref, $ref, description, $ref, $ref, properties, maxLength, type (+7 more)
 
-### Community 315 - "avatars.js"
-Cohesion: 0.19
-Nodes (12): AVATAR_LIMITES_MIN, AVATAR_PADRAO, AVATARS, BICHINHO, eggCrack, happyFace(), AVATARS_3D, AVATARS_IMAGEM (+4 more)
+### Community 315 - "caneta.js"
+Cohesion: 0.21
+Nodes (12): diag(), linhas, montarCaneta(), NOMES, pedidos, segurarCaneta(), arred(), caminho() (+4 more)
 
 ### Community 316 - "Texto"
-Cohesion: 0.19
-Nodes (7): HTMLParser, html_texto(), main(), numero_caderno(), Converte os cadernos baixados do TEC Concursos (um JSON por caderno, com todas…, HTML do TEC para texto corrido, mantendo parágrafos, itens e linhas de tabela., Texto
+Cohesion: 0.16
+Nodes (11): HTMLParser, gerar_todas(), html_texto(), main(), numero_caderno(), questao_saida(), Converte os cadernos baixados do TEC Concursos (um JSON por caderno, com todas…, Todas as resolvidas (sem anuladas), uma vez cada, na seção do primeiro caderno… (+3 more)
 
 ### Community 317 - "properties"
 Cohesion: 0.15
@@ -1248,16 +1285,24 @@ Cohesion: 0.17
 Nodes (12): description, items, type, uniqueItems, $ref, dispositivos, subtopicos, description (+4 more)
 
 ### Community 328 - "properties"
-Cohesion: 0.17
-Nodes (12): $ref, properties, assunto, schema_versao, subtopicos, transversal, $ref, items (+4 more)
+Cohesion: 0.15
+Nodes (13): $ref, description, items, type, properties, assunto, material, schema_versao (+5 more)
 
-### Community 329 - "items"
+### Community 329 - "properties"
 Cohesion: 0.17
-Nodes (12): type, items, type, items, type, items, type, diferencas_bancas (+4 more)
+Nodes (12): type, items, type, items, type, diferencas_bancas, lacunas_provaveis, padroes_redacao (+4 more)
 
 ### Community 330 - "resolucoes.schema.json"
 Cohesion: 0.17
 Nodes (11): additionalProperties, description, $id, assunto, lote, questoes, schema_versao, required (+3 more)
+
+### Community 331 - "painel.js"
+Cohesion: 0.22
+Nodes (15): montarCapa(), artigo(), link(), links, montarFoco(), montarGavetaErros(), montarNestaPagina(), montarPainel() (+7 more)
+
+### Community 332 - "MarkdownLivro"
+Cohesion: 0.21
+Nodes (5): MarkdownLivro, League\CommonMark\Extension\CommonMark\Node\Block\ListBlock, League\CommonMark\Extension\Table\Table, League\CommonMark\Node\Node, ListBlock
 
 ### Community 333 - "enum"
 Cohesion: 0.18
@@ -1278,6 +1323,10 @@ Nodes (10): additionalProperties, description, $id, assunto, schema_versao, subt
 ### Community 337 - "extrair_caderno_erros.py"
 Cohesion: 0.29
 Nodes (10): blocos_posicionais(), gabaritos_e_comentarios(), limpar(), main(), origem_e_enunciado(), questoes_parte1(), Extrai as questões erradas de um "Caderno de Erros" (PDF gerado no Gemini a…, Para cadernos sem id na Parte 2 (C07): um bloco por "1. Diagnóstico:", na ordem… (+2 more)
+
+### Community 340 - "WorkoutSession"
+Cohesion: 0.09
+Nodes (3): RunningLog, RunningSplit, WorkoutSession
 
 ### Community 341 - "required"
 Cohesion: 0.20
@@ -1307,9 +1356,9 @@ Nodes (10): description, minItems, type, additionalProperties, type, properties,
 Cohesion: 0.20
 Nodes (10): properties, minimum, type, minimum, type, numero, parte, total_partes (+2 more)
 
-### Community 348 - "items"
-Cohesion: 0.20
-Nodes (10): additionalProperties, properties, type, items, maxItems, type, cheat_sheet, erros_fatais (+2 more)
+### Community 348 - "12.8. AMORTIZAÇÃO"
+Cohesion: 0.25
+Nodes (8): 12.8.1. Determinação da Vida Útil, 12.8.2. Amortização de Ativo Intangível (com Vida Útil Definida), 12.8.3. Métodos de Amortização, 12.8.4. Determinação do Valor Residual, 12.8.5. Revisão do Período e do Método, 12.8.6. Ativo Intangível com Vida Útil Indefinida, 12.8.7. Revisão da Vida Útil, 12.8. AMORTIZAÇÃO
 
 ### Community 349 - "Contrato de dados: módulo de concursos (versão 1)"
 Cohesion: 0.20
@@ -1335,9 +1384,9 @@ Nodes (9): maxLength, minLength, type, maxLength, minLength, type, area, ordem (
 Cohesion: 0.22
 Nodes (9): additionalProperties, properties, required, type, letra, mecanismo, distrator_principal, letra (+1 more)
 
-### Community 357 - "properties"
-Cohesion: 0.22
-Nodes (9): codigo, titulo, additionalProperties, required, type, properties, norma, schema_versao (+1 more)
+### Community 357 - "Material por matéria: Resumo grifado + área de Questões"
+Cohesion: 0.33
+Nodes (5): Decisões, Fora deste plano, Material por matéria: Resumo grifado + área de Questões, Riscos e pontos em aberto, Suposições a validar
 
 ### Community 358 - "distrator_principal"
 Cohesion: 0.22
@@ -1347,6 +1396,14 @@ Nodes (9): additionalProperties, properties, required, type, letra, mecanismo, d
 Cohesion: 0.22
 Nodes (8): 1. PAPEL, 2. DADOS DESTE LOTE, 3. REGRAS (valem para tudo), 4. FORMATO DAS RESPOSTAS, ENGENHARIA REVERSA DE UM LOTE DE QUESTÕES (saída em JSON para o sistema), Resposta 1 — LEDGER (todas as questões do lote), Resposta 2 — RESOLUÇÕES da 1ª metade das questões do pacote (na ordem do pacote), Resposta 3 — RESOLUÇÕES da 2ª metade
 
+### Community 360 - ".db"
+Cohesion: 0.15
+Nodes (4): Carbon, StudyRoomService, setUpBancoConcursos(), ResumoEstudosCommandTest
+
+### Community 361 - "Sabatina 2026-11-26 — Vade Mecum anotável"
+Cohesion: 0.33
+Nodes (5): Decisões, Entrega, Riscos, Sabatina 2026-11-26 — Vade Mecum anotável, Suposições
+
 ### Community 363 - "required"
 Cohesion: 0.25
 Nodes (8): data_prova, orgao, additionalProperties, required, type, banca, numero, edital
@@ -1355,13 +1412,13 @@ Nodes (8): data_prova, orgao, additionalProperties, required, type, banca, numer
 Cohesion: 0.25
 Nodes (8): disciplinas, n_questoes, pontos_por_questao, topicos, required, required, codigo, nome
 
-### Community 365 - "audio.js"
-Cohesion: 0.61
-Nodes (7): getAudioContext(), playBossHitSound(), playFocusEndSound(), playLevelUpSound(), playNote(), playRestDueSound(), playRestSoonSound()
+### Community 365 - "16. CUSTOS DE EMPRÉSTIMOS"
+Cohesion: 0.33
+Nodes (6): 16.1. DEFINIÇÕES, 16.2.1. Tratamento Padrão dos custos dos empréstimos, 16.2.2. Tratamento Alternativo dos custos dos empréstimos, 16.2. RECONHECIMENTO, 16.3. EVIDENCIAÇÃO, 16. CUSTOS DE EMPRÉSTIMOS
 
-### Community 366 - "items"
-Cohesion: 0.29
-Nodes (8): items, additionalProperties, type, questoes, items, maxItems, minItems, type
+### Community 366 - "6. ATIVO BIOLÓGICO E PRODUTO AGRÍCOLA"
+Cohesion: 0.33
+Nodes (6): 6.1. DEFINIÇÕES, 6.2. RECONHECIMENTO, 6.3. MENSURAÇÃO, 6.4. GANHOS E PERDAS, 6.5. DIVULGAÇÃO, 6. ATIVO BIOLÓGICO E PRODUTO AGRÍCOLA
 
 ### Community 367 - "properties"
 Cohesion: 0.25
@@ -1375,13 +1432,13 @@ Nodes (8): $ref, properties, assunto, questoes, schema_versao, minItems, type, $
 Cohesion: 0.29
 Nodes (6): Contrato de dados, Decisões tomadas, Fases, Riscos e pontos em aberto, Sabatina 2026-11-21 — Módulo de estudo para concursos dirigido por índices, Suposições a validar
 
-### Community 373 - "10. ACORDOS EM CONJUNTO"
-Cohesion: 0.29
-Nodes (7): 10.1. OBJETIVO E CONTEXTUALIZAÇÃO, 10.2. DEFINIÇÕES, 10.3. CONCEITO, 10.4. TIPOS DE ACORDO EM CONJUNTO, 10.5. DEMONSTRAÇÕES CONTÁBEIS DAS PARTES DE ACORDO EM CONJUNTO, 10.6. DEMONSTRAÇÕES CONTÁBEIS SEPARADAS, 10. ACORDOS EM CONJUNTO
+### Community 373 - "validar_grifos.py"
+Cohesion: 0.60
+Nodes (4): main(), normalizar(), questoes_dos_cadernos(), Valida os grifos questão → trecho feitos à mão (por um agente) para o Resumo de…
 
-### Community 374 - "24.7. RECLASSIFICAÇÃO DE ATIVOS FINANCEIROS"
-Cohesion: 0.29
-Nodes (7): 24.7.1. De Valor Justo por Meio do Resultado (VJR) Para Valor Justo Reconhecido, 24.7.2. De Valor Justo Reconhecido Diretamente no Patrimônio Líquido (VJPL) Para Valor, 24.7.3. De Valor Justo por Meio do Resultado (VJR) para Custo Amortizado, 24.7.4. De Custo Amortizado para Valor Justo por Meio do Resultado (VJR), 24.7.5. De Custo Amortizado para Valor Justo Reconhecido Diretamente no Patrimônio, 24.7.6. De Valor Justo Reconhecido Diretamente no Patrimônio Líquido (VJPL) Para Custo, 24.7. RECLASSIFICAÇÃO DE ATIVOS FINANCEIROS
+### Community 374 - "items"
+Cohesion: 0.20
+Nodes (10): additionalProperties, properties, type, items, maxItems, type, cheat_sheet, erros_fatais (+2 more)
 
 ### Community 375 - "topico"
 Cohesion: 0.29
@@ -1411,21 +1468,17 @@ Nodes (7): numero, parte, total_partes, additionalProperties, required, type, lo
 Cohesion: 0.29
 Nodes (7): numero, parte, total_partes, additionalProperties, required, type, lote
 
-### Community 382 - "3.2. CLASSIFICAÇÕES DA RECEITA ORÇAMENTÁRIA"
-Cohesion: 0.33
-Nodes (6): 3.2.1. Classificação da Receita Orçamentária por Natureza, 3.2.2. Categoria Econômica, 3.2.3. Origens e Espécies de Receita Orçamentária, 3.2.4. Recursos Arrecadados em Exercícios Anteriores (RAEA) referente aos RPPS, 3.2.5. Classificação da Receita para Apuração do Resultado Primário, 3.2. CLASSIFICAÇÕES DA RECEITA ORÇAMENTÁRIA
-
-### Community 383 - "4.6. DÚVIDAS COMUNS REFERENTES À CLASSIFICAÇÃO ORÇAMENTÁRIA"
-Cohesion: 0.33
-Nodes (6): 4.6.2.1. Transferência, 4.6.2.2. Delegação, 4.6.2. Classificação Orçamentária das Transferências e Delegações de Execução Orçamentária, 4.6.3. Classificação Orçamentária das Movimentações para Instituições Multigovernamentais, Consórcios Públicos e sua Contratação Direta, 4.6.4. Classificação Orçamentária das despesas para fins de aplicação em Saúde – Lei, 4.6. DÚVIDAS COMUNS REFERENTES À CLASSIFICAÇÃO ORÇAMENTÁRIA
-
-### Community 384 - "4.7. RESTOS A PAGAR"
-Cohesion: 0.33
-Nodes (6): 4.7.1. Inscrição dos Restos a Pagar, 4.7.2. Restos a Pagar Não Processados (RPNP), 4.7.3. Restos a Pagar Processados (RPP), 4.7.5. Cancelamento de Restos a Pagar, 4.7.6. Encerramento, Transferência e Abertura dos Saldos de Restos a Pagar, 4.7. RESTOS A PAGAR
+### Community 383 - "properties"
+Cohesion: 0.22
+Nodes (9): codigo, titulo, additionalProperties, required, type, properties, norma, schema_versao (+1 more)
 
 ### Community 385 - "validar.py"
 Cohesion: 0.40
 Nodes (5): main(), modo_json(), Valida arquivos JSON do contrato de concursos contra os schemas desta pasta.…, Usado pelo sistema: valida UM arquivo contra o tipo dado e imprime {"ok": bool,…, schema_para()
+
+### Community 386 - "items"
+Cohesion: 0.29
+Nodes (8): items, additionalProperties, type, questoes, items, maxItems, minItems, type
 
 ### Community 387 - "lista_ids"
 Cohesion: 0.40
@@ -1451,17 +1504,9 @@ Nodes (5): description, maxItems, minItems, type, alternativas
 Cohesion: 0.40
 Nodes (5): items, type, uniqueItems, $ref, dispositivos
 
-### Community 395 - "4.3. SISTEMA DE PROTEÇÃO SOCIAL DOS MILITARES DOS ESTADOS, DOS TERRITÓRIOS E DO DISTRITO FEDERAL (SPSM)"
-Cohesion: 0.50
-Nodes (4): 4.3.1. Introdução, 4.3.2. Aspectos Legais, 4.3.3. Aspectos Contábeis, 4.3. SISTEMA DE PROTEÇÃO SOCIAL DOS MILITARES DOS ESTADOS, DOS TERRITÓRIOS E DO DISTRITO FEDERAL (SPSM)
-
 ### Community 396 - "numero"
 Cohesion: 0.50
 Nodes (4): PROGEP/UFMS nº 152/2026, examples, type, numero
-
-### Community 397 - "orgao"
-Cohesion: 0.50
-Nodes (4): UFMS, examples, type, orgao
 
 ### Community 398 - "comum.schema.json"
 Cohesion: 0.50
@@ -1495,37 +1540,45 @@ Nodes (4): CE, ME, tipo, enum
 Cohesion: 0.50
 Nodes (4): $ref, items, type, prerequisitos
 
-### Community 406 - "enum"
-Cohesion: 0.50
-Nodes (4): CE, ME, tipo, enum
-
 ### Community 407 - "Prompt: questões inéditas de uma norma (tópicos sem questões no TEC)"
 Cohesion: 0.50
 Nodes (3): Formato de saída (obrigatório), Prompt: questões inéditas de uma norma (tópicos sem questões no TEC), Regras
 
-### Community 430 - "verso"
+### Community 465 - "arquivo"
 Cohesion: 0.67
-Nodes (3): verso, maxLength, type
+Nodes (3): description, type, arquivo
+
+### Community 475 - "slug"
+Cohesion: 0.40
+Nodes (5): slug, description, maxLength, pattern, type
+
+### Community 476 - "orgao"
+Cohesion: 0.50
+Nodes (4): UFMS, examples, type, orgao
+
+### Community 477 - "frente"
+Cohesion: 0.67
+Nodes (3): maxLength, type, frente
 
 ## Knowledge Gaps
-- **2071 isolated node(s):** `$schema`, `name`, `type`, `description`, `laravel` (+2066 more)
+- **2074 isolated node(s):** `$schema`, `name`, `type`, `description`, `laravel` (+2069 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **62 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **65 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `User` connect `User` to `CartaoCompra`, `AllowedGoogleEmail`, `EstudosGurujaTest`, `Perfil`, `SalaryPayslip`, `TelegramWebhookController`, `MaterialAnotacao`, `AuthController.php`, `Illuminate\Support\Facades\DB`, `Illuminate\Database\Seeder`, `Cartao`, `Illuminate\Console\Command`, `StudySyncTest`, `Controller`, `Illuminate\Database\Eloquent\Model`, `Assunto`, `Questao`, `Illuminate\Database\Eloquent\Relations\HasMany`, `EditalTopico`, `GurujaMcpService`, `NetworkService`, `CartaoPrevisao`, `TransacaoUpdateDateTest`, `Exercise`, `ConcursosMaterialTest`, `.app`, `EstudosApiTest`, `static`, `TelegramWebhookRoutingTest`, `SalaryProjectionTest`, `Transacao`, `EstudosGurujaPostMetaTest`, `Categoria`, `SalaryProjectionTest.php`, `ResumoEstudosCommandTest`, `StudyRoomsTest`, `TvWidgetEndpointTest`, `Material`?**
-  _High betweenness centrality (0.027) - this node is a cross-community bridge._
-- **Why does `TestCase` connect `User` to `CartaoCompra`, `WhatsappMessageParserTest`, `AllowedGoogleEmail`, `EstudosGurujaTest`, `Perfil`, `MaterialAnotacao`, `AuthController.php`, `Illuminate\Support\Facades\DB`, `Cartao`, `StudySyncTest`, `Assunto`, `Questao`, `EditalTopico`, `NetworkService`, `CartaoPrevisao`, `TransacaoUpdateDateTest`, `Exercise`, `ConcursosMaterialTest`, `.count`, `.app`, `EstudosApiTest`, `PacoteGeradorTest`, `TelegramWebhookRoutingTest`, `SalaryProjectionTest`, `BackupConcursosCommand`, `Importacao`, `Transacao`, `EstudosGurujaPostMetaTest`, `SalaryProjectionTest.php`, `ResumoEstudosCommandTest`, `StudyRoomsTest`, `TecImportadorTest`, `TvWidgetEndpointTest`?**
-  _High betweenness centrality (0.016) - this node is a cross-community bridge._
-- **Why does `MCASP — Manual de Contabilidade Aplicada ao Setor Público, 11ª edição` connect `2. ASPECTOS GERAIS DO PCASP` to `Parte V — Demonstrações Contábeis Aplicadas ao Setor Público`, `Parte III — Procedimentos Contábeis Específicos`, `Parte II — Procedimentos Contábeis Patrimoniais`, `Parte Geral — Contabilidade Aplicada ao Setor Público`, `Parte I — Procedimentos Contábeis Orçamentários`?**
-  _High betweenness centrality (0.011) - this node is a cross-community bridge._
+- **Why does `User` connect `User` to `Cartao`, `Illuminate\Http\Request`, `Mockery`, `EstudosGurujaTest`, `ModulosAccessTest`, `SalaryPayslip`, `Conta`, `Material`, `TelegramWebhookController`, `AuthController`, `TestCase`, `Illuminate\Database\Seeder`, `BackupEstudosCommandTest`, `CreditCardReconciliationTest`, `Illuminate\Console\Command`, `CartaoCompra`, `Tentativa`, `StudySyncTest`, `Illuminate\Database\Eloquent\Model`, `Assunto`, `Illuminate\Database\Eloquent\Relations\HasMany`, `GrifosQuestoes`, `EditalTopico`, `NetworkService`, `Exercise`, `CartaoParcela`, `ConcursosMaterialTest`, `TransacaoPrevisao`, `.app`, `.http`, `EstudosApiTest`, `static`, `SalaryProjectionTest`, `MotorMetaTest`, `FitnessAiModuleTest`, `Transacao`, `JornadaMetaTest`, `ConcursosVadeMecumTest`, `SalaryProjectionTest.php`, `TelegramWebhookRoutingTest`, `.db`, `GurujaConnectCommand`, `TvWidgetEndpointTest`, `Carbon\Carbon`?**
+  _High betweenness centrality (0.028) - this node is a cross-community bridge._
+- **Why does `TestCase` connect `TestCase` to `Cartao`, `Mockery`, `EstudosGurujaTest`, `ModulosAccessTest`, `TecImportadorTest`, `Conta`, `Material`, `BackupEstudosCommandTest`, `CreditCardReconciliationTest`, `Illuminate\Console\Command`, `CartaoCompra`, `Tentativa`, `StudySyncTest`, `Assunto`, `GrifosQuestoes`, `EditalTopico`, `NetworkService`, `Exercise`, `BackupDriveCommandTest`, `ConcursosMaterialTest`, `CartaoParcela`, `TransacaoPrevisao`, `TecCadernoParser`, `.app`, `EstudosApiTest`, `SalaryProjectionTest`, `BackupConcursosCommand`, `User`, `MotorMetaTest`, `Questao`, `FitnessAiModuleTest`, `Transacao`, `JornadaMetaTest`, `ConcursosVadeMecumTest`, `SalaryProjectionTest.php`, `TelegramWebhookRoutingTest`, `.db`, `GeminiImportadorTest`, `TvWidgetEndpointTest`?**
+  _High betweenness centrality (0.013) - this node is a cross-community bridge._
+- **Why does `Parte II — Procedimentos Contábeis Patrimoniais` connect `Parte II — Procedimentos Contábeis Patrimoniais` to `5.2. MENSURAÇÃO`, `7. PROPRIEDADE PARA INVESTIMENTO`, `19.2. REGISTROS PATRIMONIAIS DECORRENTES DAS DESPESAS ORÇAMENTÁRIAS DE`, `11. ATIVO IMOBILIZADO`, `12. ATIVO INTANGÍVEL`, `17. PROVISÕES, PASSIVOS CONTINGENTES E ATIVOS CONTINGENTES`, `20. EFEITOS DAS MUDANÇAS NAS TAXAS DE CÂMBIO`, `14. RECEITA DE TRANSAÇÃO SEM CONTRAPRESTAÇÃO`, `9.2. FUSÃO`, `23. BENEFÍCIOS SOCIAIS`, `2. ELEMENTOS DAS DEMONSTRAÇÕES CONTÁBEIS`, `8. INVESTIMENTO EM COLIGADA E EM EMPREENDIMENTO CONTROLADO EM`, `2. ASPECTOS GERAIS DO PCASP`, `24. INSTRUMENTOS FINANCEIROS`, `16. CUSTOS DE EMPRÉSTIMOS`, `22. POLÍTICAS CONTÁBEIS, MUDANÇA DE ESTIMATIVA E RETIFICAÇÃO DE ERRO`, `6. ATIVO BIOLÓGICO E PRODUTO AGRÍCOLA`, `15. RECEITA DE TRANSAÇÃO COM CONTRAPRESTAÇÃO`, `3.2. AVALIAÇÃO E MENSURAÇÃO`, `4. CAIXA E EQUIVALENTE DE CAIXA`, `13. REDUÇÃO AO VALOR RECUPERÁVEL`, `21.2. EVENTO SUBSEQUENTE`?**
+  _High betweenness centrality (0.010) - this node is a cross-community bridge._
 - **What connects `$schema`, `name`, `type` to the rest of the system?**
-  _2071 weakly-connected nodes found - possible documentation gaps or missing edges._
-- **Should `CartaoCompra` be split into smaller, more focused modules?**
-  _Cohesion score 0.09686609686609686 - nodes in this community are weakly interconnected._
+  _2074 weakly-connected nodes found - possible documentation gaps or missing edges._
+- **Should `Cartao` be split into smaller, more focused modules?**
+  _Cohesion score 0.0783744557329463 - nodes in this community are weakly interconnected._
 - **Should `Illuminate\Http\Request` be split into smaller, more focused modules?**
-  _Cohesion score 0.07743496672716274 - nodes in this community are weakly interconnected._
-- **Should `AllowedGoogleEmail` be split into smaller, more focused modules?**
-  _Cohesion score 0.11956521739130435 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.07341269841269842 - nodes in this community are weakly interconnected._
+- **Should `composer.json` be split into smaller, more focused modules?**
+  _Cohesion score 0.14285714285714285 - nodes in this community are weakly interconnected._

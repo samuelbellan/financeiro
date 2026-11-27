@@ -216,4 +216,19 @@ class ConcursosVadeMecumTest extends TestCase
         $this->actingAs($this->user)->postJson($url, ['capitulo_id' => $alheio->id])->assertNotFound();
         $this->assertSame(0, MaterialPonto::count());
     }
+
+    public function test_indice_de_leis_agrupa_e_mostra_grifos_e_notas_do_aluno(): void
+    {
+        LeiGrifo::create(['user_id' => $this->user->id, 'lei' => 'li', 'ancora' => 'art-1', 'trecho' => 'Texto']);
+        LeiGrifo::create(['user_id' => $this->user->id, 'lei' => 'li', 'ancora' => 'art-2', 'trecho' => 'Outro']);
+        LeiMarca::create(['user_id' => $this->user->id, 'lei' => 'li', 'ancora' => 'art-1', 'marcado' => true, 'nota' => 'Atenção']);
+        // Anotações de outro aluno não aparecem.
+        LeiGrifo::create(['user_id' => $this->user->id + 1, 'lei' => 'li', 'ancora' => 'art-1', 'trecho' => 'Alheio']);
+
+        $this->actingAs($this->user)->get(route('concursos.leis.index'))
+            ->assertOk()
+            ->assertSee('Outras Normas')
+            ->assertSee('Lei Inventada')
+            ->assertSee('2 grifos · 1 nota');
+    }
 }
