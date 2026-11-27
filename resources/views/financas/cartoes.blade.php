@@ -5,7 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Meus Cartões | Finanças de Casa</title>
     <link rel="stylesheet" href="{{ asset('css/home.css') }}">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700;800&family=JetBrains+Mono:wght@500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="{{ asset('js/sidebar.js') }}"></script>
     <style>
@@ -162,6 +164,7 @@
 
         @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
+    <link rel="stylesheet" href="{{ asset('css/financas-theme.css') }}">
 </head>
 <body>
     <div class="layout">
@@ -1277,10 +1280,11 @@
                         datasets: [{
                             data: Object.values(chartDataAVista),
                             backgroundColor: [
-                                '#6366f1', '#10b981', '#f59e0b', '#ef4444', '#3b82f6', 
-                                '#8b5cf6', '#ec4899', '#06b6d4', '#f97316', '#14b8a6'
+                                '#0f5132', '#0f766e', '#c28e3a', '#b91c1c', '#334155',
+                                '#15803d', '#c2410c', '#0369a1', '#a16207', '#4d7c0f'
                             ],
-                            borderWidth: 1
+                            borderWidth: 2,
+                            borderColor: '#ffffff'
                         }]
                     },
                     options: {
@@ -1315,10 +1319,11 @@
                         datasets: [{
                             data: Object.values(chartDataAPrazo),
                             backgroundColor: [
-                                '#8b5cf6', '#ec4899', '#06b6d4', '#f97316', '#14b8a6',
-                                '#6366f1', '#10b981', '#f59e0b', '#ef4444', '#3b82f6'
+                                '#c28e3a', '#0f5132', '#0369a1', '#c2410c', '#0f766e',
+                                '#334155', '#15803d', '#b91c1c', '#a16207', '#4d7c0f'
                             ],
-                            borderWidth: 1
+                            borderWidth: 2,
+                            borderColor: '#ffffff'
                         }]
                     },
                     options: {
@@ -1417,12 +1422,12 @@
                             {
                                 label: 'Gasto Real no Dia',
                                 data: gastosDiarios,
-                                borderColor: '#6366f1',
-                                backgroundColor: 'rgba(99, 102, 241, 0.1)',
+                                borderColor: '#0f5132',
+                                backgroundColor: 'rgba(15, 81, 50, 0.1)',
                                 fill: true,
                                 tension: 0.3,
                                 borderWidth: 2,
-                                pointBackgroundColor: '#6366f1',
+                                pointBackgroundColor: '#0f5132',
                                 pointRadius: 3
                             },
                             {

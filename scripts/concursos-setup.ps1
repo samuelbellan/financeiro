@@ -1,7 +1,7 @@
 ﻿# Prepara o PC servidor para o módulo de concursos (rodar UMA vez, na pasta do projeto):
 #   1. Cria o usuário e o banco "concursos" no Postgres local (pede a senha do superusuário "postgres")
 #   2. Grava as variáveis CONCURSOS_* no .env (a senha do usuário "concursos" é gerada aqui)
-#   3. Agenda o backup diário (03:00) no Agendador de Tarefas do Windows
+#   3. Agenda o backup (de hora em hora, conferência e teste semanal) via scripts\backup-drive-setup.ps1
 #
 # Uso:  powershell -ExecutionPolicy Bypass -File scripts\concursos-setup.ps1
 #       (opcional) -BackupDir "G:\Meu Drive\Backups\concursos"  -PgBin "C:\Program Files\PostgreSQL\18\bin"
@@ -108,16 +108,9 @@ if (-not (Test-Path $venvPy)) {
 if ($LASTEXITCODE -ne 0) { throw "Falha ao instalar o pdfplumber no .venv-concursos." }
 Write-Host "Leitor de PDF (pdfplumber) pronto." -ForegroundColor Green
 
-# --- 3. Backup diário -----------------------------------------------------------
-$log = Join-Path $Projeto "storage\logs\concursos-backup.log"
-$acao = New-ScheduledTaskAction -Execute "cmd.exe" `
-    -Argument "/c php artisan concursos:backup >> `"$log`" 2>&1" `
-    -WorkingDirectory $Projeto
-$gatilho = New-ScheduledTaskTrigger -Daily -At $Horario
-# StartWhenAvailable: se o PC estava desligado às 03:00, roda assim que ligar.
-$config = New-ScheduledTaskSettingsSet -StartWhenAvailable -DontStopIfGoingOnBatteries -AllowStartIfOnBatteries
-Register-ScheduledTask -TaskName "Financeiro - Backup Concursos" -Action $acao -Trigger $gatilho -Settings $config -Force | Out-Null
-Write-Host "Backup agendado para $Horario (tarefa 'Financeiro - Backup Concursos')." -ForegroundColor Green
+# --- 3. Backup -----------------------------------------------------------------
+# O pg_dump roda de hora em hora dentro do backup:drive (scripts\backup-drive-setup.ps1).
+& (Join-Path $PSScriptRoot "backup-drive-setup.ps1")
 
 Write-Host ""
 Write-Host "Testando conexão e backup agora..." -ForegroundColor Cyan

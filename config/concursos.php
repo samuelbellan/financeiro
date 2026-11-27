@@ -46,28 +46,54 @@ return [
         // abre qualquer norma federal pelo número e navega pelo acervo inteiro.
         'local' => env('CONCURSOS_LEIS_LOCAL'),
         'catalogo' => [
-            'cf' => ['sigla' => 'CF', 'nome' => 'Constituição Federal de 1988', 'path' => 'constituicao.md'],
+            'cf' => ['sigla' => 'CF', 'nome' => 'Constituição Federal de 1988', 'grupo' => 'Normas Constitucionais', 'path' => 'constituicao.md'],
             // O ADCT está no mesmo arquivo da CF; os artigos dele ficam com âncora "adct-art-N".
-            'adct' => ['sigla' => 'ADCT', 'nome' => 'Ato das Disposições Constitucionais Transitórias', 'path' => 'constituicao.md', 'de' => 'cf', 'prefixo' => 'adct-'],
-            'ctn' => ['sigla' => 'CTN', 'nome' => 'Código Tributário Nacional (Lei 5.172/1966)', 'path' => 'federal/leis-ordinarias/1966/lei-5172-1966-10-25.md'],
-            'ec132' => ['sigla' => 'EC 132/2023', 'nome' => 'Emenda Constitucional 132/2023 (Reforma Tributária)', 'path' => 'federal/emendas-constitucionais/2023/emc-132-2023-12-20.md'],
-            'lc87' => ['sigla' => 'LC 87/1996', 'nome' => 'Lei Kandir (ICMS)', 'path' => 'federal/leis-complementares/1996/lcp-87-1996-09-13.md'],
-            'lc116' => ['sigla' => 'LC 116/2003', 'nome' => 'Lei Complementar 116/2003 (ISS)', 'path' => 'federal/leis-complementares/2003/lcp-116-2003-07-31.md'],
-            'lc123' => ['sigla' => 'LC 123/2006', 'nome' => 'Estatuto da Microempresa (Simples Nacional)', 'path' => 'federal/leis-complementares/2006/lcp-123-2006-12-14.md'],
+            'adct' => ['sigla' => 'ADCT', 'nome' => 'Ato das Disposições Constitucionais Transitórias', 'grupo' => 'Normas Constitucionais', 'path' => 'constituicao.md', 'de' => 'cf', 'prefixo' => 'adct-'],
+            'ec132' => ['sigla' => 'EC 132/2023', 'nome' => 'Emenda Constitucional 132/2023 (Reforma Tributária)', 'grupo' => 'Normas Constitucionais', 'path' => 'federal/emendas-constitucionais/2023/emc-132-2023-12-20.md'],
+            'ctn' => ['sigla' => 'CTN', 'nome' => 'Código Tributário Nacional (Lei 5.172/1966)', 'grupo' => 'Normas Gerais e Complementares Tributárias', 'path' => 'federal/leis-ordinarias/1966/lei-5172-1966-10-25.md'],
+            'lc87' => ['sigla' => 'LC 87/1996', 'nome' => 'Lei Kandir (ICMS)', 'grupo' => 'Normas Gerais e Complementares Tributárias', 'path' => 'federal/leis-complementares/1996/lcp-87-1996-09-13.md'],
+            'lc116' => ['sigla' => 'LC 116/2003', 'nome' => 'Lei Complementar 116/2003 (ISS)', 'grupo' => 'Normas Gerais e Complementares Tributárias', 'path' => 'federal/leis-complementares/2003/lcp-116-2003-07-31.md'],
+            'lc123' => ['sigla' => 'LC 123/2006', 'nome' => 'Estatuto da Microempresa (Simples Nacional)', 'grupo' => 'Normas Gerais e Complementares Tributárias', 'path' => 'federal/leis-complementares/2006/lcp-123-2006-12-14.md'],
             // LC 214/2025 (IBS/CBS) fica de fora: no acervo só existe o texto das partes vetadas promulgadas.
-            'lef' => ['sigla' => 'LEF', 'nome' => 'Lei de Execução Fiscal (Lei 6.830/1980)', 'path' => 'federal/leis-ordinarias/1980/lei-6830-1980-09-22.md'],
-            'lei11101' => ['sigla' => 'Lei 11.101/2005', 'nome' => 'Lei de Falências e Recuperação Judicial', 'path' => 'federal/leis-ordinarias/2005/lei-11101-2005-02-09.md'],
-            'lei9492' => ['sigla' => 'Lei 9.492/1997', 'nome' => 'Lei de Protesto de Títulos', 'path' => 'federal/leis-ordinarias/1997/lei-9492-1997-09-10.md'],
-            'ctb' => ['sigla' => 'CTB', 'nome' => 'Código de Trânsito Brasileiro (Lei 9.503/1997)', 'path' => 'federal/leis-ordinarias/1997/lei-9503-1997-09-23.md'],
+            'lef' => ['sigla' => 'LEF', 'nome' => 'Lei de Execução Fiscal (Lei 6.830/1980)', 'grupo' => 'Legislação Processual e Empresarial', 'path' => 'federal/leis-ordinarias/1980/lei-6830-1980-09-22.md'],
+            'lei11101' => ['sigla' => 'Lei 11.101/2005', 'nome' => 'Lei de Falências e Recuperação Judicial', 'grupo' => 'Legislação Processual e Empresarial', 'path' => 'federal/leis-ordinarias/2005/lei-11101-2005-02-09.md'],
+            'lei9492' => ['sigla' => 'Lei 9.492/1997', 'nome' => 'Lei de Protesto de Títulos', 'grupo' => 'Legislação Processual e Empresarial', 'path' => 'federal/leis-ordinarias/1997/lei-9492-1997-09-10.md'],
+            'ctb' => ['sigla' => 'CTB', 'nome' => 'Código de Trânsito Brasileiro (Lei 9.503/1997)', 'grupo' => 'Legislação de Trânsito', 'path' => 'federal/leis-ordinarias/1997/lei-9503-1997-09-23.md'],
         ],
     ],
 
     'backup' => [
-        // Pasta sincronizada com o Google Drive onde o pg_dump diário é salvo.
+        // Pasta sincronizada com o Google Drive onde o pg_dump (de hora em hora, via backup:drive) é salvo.
         'dir' => env('CONCURSOS_BACKUP_DIR'),
+        // Retenção: os N mais recentes, depois 1 por dia por D dias e 1 por semana por S semanas.
+        'recentes' => (int) env('CONCURSOS_BACKUP_RECENTES', 24),
         'diarios' => (int) env('CONCURSOS_BACKUP_DIARIOS', 14),
         'semanais' => (int) env('CONCURSOS_BACKUP_SEMANAIS', 8),
+        // Banco onde o backup:testar restaura o dump toda semana (criado por scripts/backup-teste-setup.ps1).
+        'teste_db' => env('CONCURSOS_BACKUP_TESTE_DB', 'concursos_restauracao'),
         // Pasta do pg_dump.exe (vazio = usa o PATH).
         'pg_bin' => env('CONCURSOS_PG_BIN', 'C:\\Program Files\\PostgreSQL\\18\\bin'),
+    ],
+
+    // Cadernos novos da pasta do TEC (scripts/concursos/vigiar_tec.js → receptor → concursos:tec-novos).
+    // Cada subpasta de storage/concursos/tec é de um material; o prefixo vai na chave da seção
+    // (o Tributário tem os cadernos "Expert" em c01… e os demais em tc01…). A mesma tabela
+    // de siglas → subpasta está no vigiar_tec.js.
+    'tec' => [
+        'pasta' => env('CONCURSOS_TEC_PASTA', 5145567),
+        'subpastas' => [
+            'aud' => ['material' => 'aud', 'prefixo' => ''],
+            'ctbga' => ['material' => 'ctbga', 'prefixo' => ''],
+            'dadm' => ['material' => 'dadm', 'prefixo' => ''],
+            'dciv' => ['material' => 'dciv', 'prefixo' => ''],
+            'dcon' => ['material' => 'dcon', 'prefixo' => ''],
+            'demp' => ['material' => 'demp', 'prefixo' => ''],
+            'dpen' => ['material' => 'dpen', 'prefixo' => ''],
+            'dtrib-expert' => ['material' => 'dtrib', 'prefixo' => ''],
+            'dtrib' => ['material' => 'dtrib', 'prefixo' => 't'],
+            'mfin' => ['material' => 'mfin', 'prefixo' => ''],
+            'port' => ['material' => 'port', 'prefixo' => ''],
+            'rlog' => ['material' => 'rlog', 'prefixo' => ''],
+        ],
     ],
 ];

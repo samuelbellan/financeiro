@@ -15,6 +15,8 @@ use App\Services\Concursos\Leis\Citacoes;
  */
 class Documento
 {
+    public const PALAVRAS_POR_MINUTO = 200;
+
     public const CAIXAS = [
         'pegadinha' => 'Pegadinha',
         'regra' => 'Regra certa',
@@ -31,7 +33,7 @@ class Documento
     private const BLOCOS = ['paragraph', 'heading', 'bulletList', 'orderedList', 'listItem', 'blockquote', 'horizontalRule',
         'image', 'table', 'tableRow', 'tableHeader', 'tableCell', 'caixa', 'pontoErro', 'questao', 'rascunho'];
 
-    private const EM_LINHA = ['text', 'hardBreak', 'lei'];
+    private const EM_LINHA = ['text', 'hardBreak', 'lei', 'notaPonto'];
 
     private const MARCAS = ['bold', 'italic', 'underline', 'strike', 'code', 'link', 'grifo'];
 
@@ -87,6 +89,7 @@ class Documento
             'questao' => ($id = (int) ($a['questaoId'] ?? 0)) > 0 ? ['questaoId' => $id] : null,
             'rascunho' => $this->limparRascunho($a),
             'lei' => ($ref = trim((string) ($a['ref'] ?? ''))) !== '' && mb_strlen($ref) <= 80 ? ['ref' => $ref] : null,
+            'notaPonto' => $this->limparNotaPonto($a),
             default => [],
         };
         if ($attrs === null) {
@@ -106,7 +109,7 @@ class Documento
             if ($marcas) {
                 $saida['marks'] = $marcas;
             }
-        } elseif (!in_array($tipo, ['hardBreak', 'lei', 'image', 'horizontalRule', 'questao', 'rascunho'], true)) {
+        } elseif (!in_array($tipo, ['hardBreak', 'lei', 'notaPonto', 'image', 'horizontalRule', 'questao', 'rascunho'], true)) {
             $filhos = $this->limparFilhos($no['content'] ?? []);
             if ($filhos) {
                 $saida['content'] = $filhos;
@@ -181,6 +184,22 @@ class Documento
         return ['altura' => max(160, min(6000, (int) ($a['altura'] ?? 360))), 'tracos' => $tracos];
     }
 
+    /**
+     * Nota num ponto do texto: id, texto e tinta (mesmo formato do rascunho). Nota vazia sai do
+     * documento (o navegador já a tira ao fechar o modal; isto cobre o caso de a página fechar antes).
+     */
+    public function limparNotaPonto(array $a): ?array
+    {
+        $id = preg_match('/^[a-z0-9-]{1,40}$/', (string) ($a['id'] ?? '')) ? $a['id'] : 'n' . bin2hex(random_bytes(5));
+        $texto = mb_substr(rtrim(str_replace("\r", '', (string) ($a['texto'] ?? ''))), 0, 5000);
+        $tinta = $this->limparRascunho(['tracos' => $a['tracos'] ?? [], 'altura' => $a['altura'] ?? 420]);
+        if (trim($texto) === '' && !$tinta['tracos']) {
+            return null;
+        }
+
+        return ['id' => $id, 'texto' => $texto, 'tracos' => $tinta['tracos'], 'altura' => $tinta['altura']];
+    }
+
     /** SVG do rascunho para leitura sem JS e impressão (traço de espessura fixa, sem pressão). */
     private function htmlRascunho(array $a): string
     {
@@ -217,6 +236,7 @@ class Documento
                 match ($no['type'] ?? null) {
                     'text' => $partes[] = $no['text'] ?? '',
                     'lei' => $partes[] = ' ' . ($no['attrs']['ref'] ?? '') . ' ',
+                    'notaPonto' => $partes[] = trim($no['attrs']['texto'] ?? '') !== '' ? ' (nota: ' . trim($no['attrs']['texto']) . ') ' : '',
                     'pontoErro' => $partes[] = "\n" . ($no['attrs']['titulo'] ?? '') . "\n",
                     'hardBreak' => $partes[] = "\n",
                     default => null,
@@ -232,6 +252,60 @@ class Documento
         $andar($doc['content'] ?? []);
 
         return trim(preg_replace("/[ \t]+/u", ' ', preg_replace("/\n{2,}/u", "\n", implode('', $partes))));
+    }
+
+    /** Total de palavras do documento (ignorando pontos de erro e questões quando $soTeoria é true). */
+    public function palavras(mixed $doc, bool $soTeoria = false): int
+    {
+        if (!is_array($doc)) {
+            return 0;
+        }
+        $total = 0;
+        $contar = static function (?string $s) use (&$total): void {
+            if ($s !== null && $s !== '') {
+                $total += (int) preg_match_all('/[\p{L}\p{N}]+/u', $s);
+            }
+        };
+        $andar = function (array $nos) use (&$andar, $contar, $soTeoria): void {
+            foreach ($nos as $no) {
+                $tipo = $no['type'] ?? null;
+                if ($soTeoria && in_array($tipo, ['pontoErro', 'questao'], true)) {
+                    continue;
+                }
+                match ($tipo) {
+                    'text' => $contar($no['text'] ?? null),
+                    'lei' => $contar($no['attrs']['ref'] ?? null),
+                    'pontoErro' => $contar($no['attrs']['titulo'] ?? null),
+                    default => null,
+                };
+                if (!empty($no['content'])) {
+                    $andar($no['content']);
+                }
+            }
+        };
+        $andar($doc['content'] ?? []);
+
+        return $total;
+    }
+
+    /** Tempo médio de leitura em minutos (200 palavras/min), ou 0 se o capítulo estiver vazio. */
+    public function tempoLeitura(mixed $doc, bool $soTeoria = false): int
+    {
+        $palavras = $this->palavras($doc, $soTeoria);
+
+        return $palavras > 0 ? max(1, (int) round($palavras / self::PALAVRAS_POR_MINUTO)) : 0;
+    }
+
+    /** Formata minutos como "8 min", "1h" ou "1h 25min". */
+    public static function formatarDuracao(int $minutos): string
+    {
+        if ($minutos < 60) {
+            return "{$minutos} min";
+        }
+        $horas = intdiv($minutos, 60);
+        $resto = $minutos % 60;
+
+        return $resto > 0 ? "{$horas}h {$resto}min" : "{$horas}h";
     }
 
     /** @return list<int> valores de um atributo inteiro em todos os nós de um tipo (ex.: pontoErro.pontoId). */
@@ -367,6 +441,8 @@ class Documento
                 return '<section class="questao-livro"><div class="caixa-rotulo">Questão' . ($q->id_externo ? ' TEC ' . e($q->id_externo) : '') . '</div><p>' . nl2br(e($q->enunciado)) . '</p>' . $alts . '<p class="gab">Gabarito: ' . e($q->gabarito) . '</p></section>';
             case 'rascunho':
                 return $this->htmlRascunho($a);
+            case 'notaPonto':
+                return '<sup class="nota-ponto-imp" title="' . e($a['texto'] ?? '') . '">✎</sup>';
             case 'lei':
                 $link = $cit->link($a['ref'] ?? '');
 

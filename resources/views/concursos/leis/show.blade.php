@@ -122,7 +122,8 @@
                 <section class="art @if ($notas) citado @endif @if ($marca?->marcado) marcado @endif" id="{{ $b['ancora'] }}"
                          data-rotulo="{{ $b['rotulo'] }}" data-prova="{{ $inc ? 1 : 0 }}"
                          data-marcado="{{ $marca?->marcado ? 1 : 0 }}" data-nota="{{ $marca?->nota }}" data-em="{{ $marca?->updated_at?->format('d/m/Y') }}"
-                         @isset($grifos[$b['ancora']]) data-grifos="{{ json_encode($grifos[$b['ancora']], JSON_UNESCAPED_UNICODE) }}" @endisset>
+                         @isset($grifos[$b['ancora']]) data-grifos="{{ json_encode($grifos[$b['ancora']], JSON_UNESCAPED_UNICODE) }}" @endisset
+                         @isset($notasPonto[$b['ancora']]) data-notas-ponto="{{ json_encode($notasPonto[$b['ancora']], JSON_UNESCAPED_UNICODE) }}" @endisset>
                     <div class="barra">
                         @if ($inc)
                             <button type="button" class="badge banco js-detalhe" title="Questões do banco que cobram este artigo">{{ $inc['total'] }} {{ $inc['total'] === 1 ? 'questão' : 'questões' }}</button>
@@ -205,6 +206,11 @@
 @endsection
 
 @section('js')
+@php
+    $leiNotasDados = ['csrf' => csrf_token(), 'criar' => route('concursos.leis.notas.store', [$chave, '__A__']), 'nota' => route('concursos.leis.notas.update', '__N__')];
+@endphp
+<script type="application/json" id="lei-notas-dados">{!! json_encode($leiNotasDados, JSON_HEX_TAG | JSON_UNESCAPED_SLASHES) !!}</script>
+@vite('resources/js/concursos/lei-notas.js')
 <script>
 (() => {
     const prefixo = @json($lei['prefixo'] ?? '');
@@ -226,7 +232,7 @@
         document.querySelectorAll('section.art').forEach((s) => {
             const ok = f === 'prova' ? s.dataset.prova === '1'
                 : f === 'marcado' ? s.dataset.marcado === '1'
-                : f === 'nota' ? !!s.dataset.nota
+                : f === 'nota' ? !!s.dataset.nota || !!s.querySelector('.nota-ponto')
                 : f === 'grifo' ? s.querySelector('mark.grifo, .orfao') !== null
                 : f === 'citado' ? s.classList.contains('citado') : true;
             s.classList.toggle('mostra', ok);

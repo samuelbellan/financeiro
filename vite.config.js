@@ -12,6 +12,7 @@ export default defineConfig({
                 'resources/css/estudos.css',
                 'resources/js/estudos/main.js',
                 'resources/js/concursos/livro.js',
+                'resources/js/concursos/lei-notas.js',
             ],
             refresh: true,
         }),

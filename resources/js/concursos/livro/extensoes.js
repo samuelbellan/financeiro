@@ -220,7 +220,11 @@ async function montarQuestao(dom, id) {
             });
             ret.hidden = false;
             ret.replaceChildren(el('p', { class: r.acertou ? 'ok' : 'no' }, r.acertou ? `Acertou! Gabarito: ${r.gabarito}.` : `Errou: você marcou ${a.letra}; o gabarito é ${r.gabarito}.`));
-            if (r.comentario) ret.append(el('details', {}, el('summary', {}, 'Comentário do caderno'), el('pre', {}, r.comentario)));
+            if (r.comentario_html) {
+                const corpo = el('div', { class: 'q-com' });
+                corpo.innerHTML = r.comentario_html; // limpo no servidor (HtmlComentario)
+                ret.append(el('details', {}, el('summary', {}, 'Comentário'), corpo));
+            } else if (r.comentario) ret.append(el('details', {}, el('summary', {}, 'Comentário do caderno'), el('pre', {}, r.comentario)));
             const refazer = el('button', { type: 'button', class: 'btn mini' }, 'Responder de novo');
             refazer.addEventListener('click', () => montarQuestao(dom, id));
             ret.append(el('div', { class: 'q-acoes' }, refazer, r.tec ? el('a', { href: r.tec, target: '_blank', rel: 'noopener', class: 'btn mini' }, 'Ver no TEC') : ''));

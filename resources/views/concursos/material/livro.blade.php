@@ -175,6 +175,7 @@
     .q-ret { margin-top: 10px; }
     .q-ret .ok { color: var(--ok); font-weight: 700; } .q-ret .no { color: var(--no); font-weight: 700; }
     .q-ret pre { white-space: pre-wrap; font: inherit; font-size: 14px; }
+    .q-ret .q-com { font-size: 14px; } .q-ret .q-com img { max-width: 100%; height: auto; border-radius: 6px; }
     .q-acoes { display: flex; gap: 6px; margin-top: 8px; }
     a.lei { font-weight: 600; text-decoration: underline dotted; text-underline-offset: 3px; cursor: pointer; }
     a.lei.ProseMirror-selectednode { outline: 2px solid var(--accent); border-radius: 3px; }
@@ -244,19 +245,21 @@
     .slash button[aria-selected=true] { background: var(--accent-soft); }
     [hidden] { display: none !important; }
 
-    /* notas na margem */
-    .margem h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); margin: 6px 0 8px; }
-    .margem .dica-notas { font-size: 13px; color: var(--muted); }
-    .margem:not(.vazia) .dica-notas { display: none; }
+    /* margem: só o sumário "Nesta página" (as notas abrem num modal ao clicar no grifo) */
     .margem { position: static; }
-    .notas-lista { position: relative; }
-    .nota { position: absolute; left: 0; right: 0; background: var(--card); border: 1px solid var(--line); border-left: 4px solid #ffe066; border-radius: 10px; padding: 8px 10px; font-size: 14px; cursor: pointer; transition: top .15s; }
-    .nota.verde { border-left-color: #7bd99a; } .nota.azul { border-left-color: #8bbcff; } .nota.rosa { border-left-color: #ff9cc2; }
-    .nota blockquote { margin: 0 0 4px; font-size: 12px; color: var(--muted); }
+
+    /* modal da nota (mesma moldura do modal de questões) */
+    dialog.modal-nota.so-nota { height: fit-content; max-height: min(80vh, 640px); width: min(620px, calc(100vw - 24px)); }
+    dialog.modal-nota.so-nota .mq-corpo { display: none; }
+    dialog.modal-nota:not(.so-nota) .mn-nota { display: none; }
+    dialog.modal-nota header { border-left: 5px solid #ffe066; }
+    dialog.modal-nota.cor-verde header { border-left-color: #7bd99a; } dialog.modal-nota.cor-azul header { border-left-color: #8bbcff; } dialog.modal-nota.cor-rosa header { border-left-color: #ff9cc2; }
+    dialog.modal-nota header small { color: var(--muted); }
+    dialog.modal-nota h2 { font-weight: 500; font-style: italic; }
+    .mn-nota { padding: 16px 18px 18px; overflow: auto; font-size: 15px; line-height: 1.55; }
     .nota-texto { margin: 0; white-space: pre-wrap; }
-    .nota-acoes { display: flex; gap: 8px; margin-top: 4px; }
-    .nota .link { border: 0; background: none; color: var(--accent); font: inherit; font-size: 12px; font-weight: 600; padding: 0; cursor: pointer; }
-    .nota textarea { width: 100%; font: inherit; font-size: 14px; border: 1px solid var(--line); border-radius: 8px; padding: 6px 8px; background: var(--bg); color: var(--ink); resize: vertical; }
+    .nota-acoes { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+    .mn-nota textarea { width: 100%; font: inherit; font-size: 15px; border: 1px solid var(--line); border-radius: 10px; padding: 8px 10px; background: var(--card); color: var(--ink); resize: vertical; }
 
     /* questões do capítulo, navegação */
     .questoes-cap { margin-top: 16px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
@@ -322,6 +325,11 @@
     .pagina { border: 0; background: var(--card); box-shadow: 0 1px 2px rgba(16,24,40,.04), 0 6px 24px rgba(16,24,40,.05); position: relative; --pad-x: 56px; padding: 64px var(--pad-x) 56px; }
     :root[data-theme=dark] .pagina { box-shadow: none; }
     .pagina h1 { font-family: var(--serif); font-size: 32px; font-weight: 700; letter-spacing: -.015em; max-width: 34ch; }
+    .pagina h1:has(+ .cap-tempo:not([hidden])) { margin-bottom: 6px; }
+    .cap-tempo { display: inline-flex; align-items: center; gap: 6px; margin: 0 0 22px; font-family: Inter, system-ui, sans-serif; font-size: 13px; font-weight: 500; color: var(--muted); font-variant-numeric: tabular-nums; }
+    .cap-tempo svg, .capa-tempo svg { width: 14px; height: 14px; flex: none; opacity: .8; }
+    .capa-tempo { display: inline-flex; align-items: center; gap: 6px; margin: 6px 0 0; font-size: 13px; color: var(--muted); font-variant-numeric: tabular-nums; }
+    .ind-tempo { font-variant-numeric: tabular-nums; white-space: nowrap; }
     .pagina-texto, [data-estatico] { font-family: var(--serif); font-size: 18px; line-height: 1.7; max-width: 100%; font-optical-sizing: auto; }
     .pagina-texto h2, .pagina-texto h3, [data-estatico] h3, [data-estatico] h4 { font-family: var(--serif); letter-spacing: -.01em; }
     .pagina-texto h2 { font-size: 25px; margin-top: 1.8em; }
@@ -416,10 +424,8 @@
     .cap-linha.atual > a { color: color-mix(in srgb, var(--disc) 55%, var(--ink)); }
     .cap-linha:hover:not(.atual) { background: color-mix(in srgb, var(--disc) 7%, transparent); }
 
-    /* margem: notas, ou "Nesta página" quando não há nota */
+    /* margem: "Nesta página" */
     .margem.vazia { position: sticky; top: 16px; max-height: calc(100vh - 32px); overflow: auto; scrollbar-width: thin; }
-    .margem.vazia > h2, .margem.vazia .dica-notas { display: none; }
-    .margem:not(.vazia) .nesta-pagina { display: none; }
     .nesta-pagina h2 { font-size: 12px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); margin: 6px 0 8px; }
     .nesta-pagina ol { list-style: none; margin: 0; padding: 0 0 0 1px; border-left: 1px solid var(--line); }
     .nesta-pagina a { display: flex; gap: 6px; align-items: baseline; padding: 4px 8px 4px 12px; margin-left: -1px; border-left: 2px solid transparent; color: var(--muted); text-decoration: none; font-size: 13px; line-height: 1.35; }
@@ -465,8 +471,6 @@
         .pagina h1 { font-size: 23px; }
         .pagina-texto, [data-estatico] { font-size: 16px; }
         .margem { position: static; }
-        .notas-lista { position: static !important; min-height: 0 !important; display: grid; gap: 8px; }
-        .nota { position: static; }
         .margem.vazia { display: none; }
         .navega { grid-template-columns: 1fr; }
         .navega .prox { grid-column: auto; }
@@ -524,6 +528,10 @@
             <div class="barra" data-barra hidden role="toolbar" aria-label="Formatação"></div>
             <article class="pagina">
                 <h1 data-titulo-capitulo>{{ $capitulo->titulo }}</h1>
+                <p class="cap-tempo" data-tempo-leitura @if (!$tempoLeitura) hidden @endif title="Tempo médio estimado (200 palavras/min)">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                    <span data-tempo-texto>{{ $tempoLeitura ? \App\Services\Concursos\Livro\Documento::formatarDuracao($tempoLeitura) . ' de leitura' : '' }}</span>
+                </p>
                 <div data-estatico>{!! $html !!}</div>
                 <div data-editor hidden></div>
             </article>
@@ -552,11 +560,7 @@
             </nav>
         </main>
 
-        <aside class="margem vazia" aria-label="Notas na margem">
-            <h2>Notas</h2>
-            <p class="dica-notas">Selecione um trecho do texto e toque em <b>✎ Nota</b> para anotar aqui, ou numa cor para só grifar.</p>
-            <div class="notas-lista" data-margem></div>
-        </aside>
+        <aside class="margem vazia" aria-label="Nesta página"></aside>
     @else
         @php
             $pontosTotal = $resumo['errando'] + $resumo['revisando'] + $resumo['dominado'];
@@ -574,6 +578,12 @@
                     <div>
                         <h1>{{ $material->titulo }}</h1>
                         @if ($material->descricao)<p class="muted" style="margin:0">{{ $material->descricao }}</p>@endif
+                        @if ($resumo['tempo_leitura'])
+                            <p class="capa-tempo" title="Tempo médio estimado de leitura do livro (200 palavras/min)">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                                <span>Tempo médio de leitura: {{ \App\Services\Concursos\Livro\Documento::formatarDuracao($resumo['tempo_leitura']) }}</span>
+                            </p>
+                        @endif
                     </div>
                     <div class="capa-acoes">
                         @if ($prioritario)
@@ -636,6 +646,7 @@
                                     <span class="cap-num">{{ $c['num'] }}</span>
                                     <span class="ind-nome">{{ $c['titulo'] }}</span>
                                     <span class="ind-meta">
+                                        @if ($c['tempo_leitura'])<span class="ind-tempo" title="Tempo médio de leitura">{{ \App\Services\Concursos\Livro\Documento::formatarDuracao($c['tempo_leitura']) }}</span>@endif
                                         @if ($c['questoes'])<span title="questões erradas deste assunto">{{ $c['questoes'] }} q.</span>@endif
                                         @if ($c['errando'])
                                             <span class="etq err" title="pontos que ainda erro">{{ $c['errando'] }}</span>

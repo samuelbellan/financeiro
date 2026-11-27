@@ -331,6 +331,113 @@ MD;
             ->assertSee('Qual o prazo inventado?')->assertDontSee('Item inventado.');
     }
 
+    public function test_trechos_errados_vem_do_gemini_uma_vez_e_so_depois_de_responder(): void
+    {
+        config(['services.gemini.key' => 'chave-teste']);
+        $this->importarQuestoes();
+        $q1 = \App\Models\Concursos\MaterialQuestao::where('chave', 'q111111')->first();
+        $resposta = ['itens' => [
+            ['letra' => 'A', 'trechos' => ['DEZ  dias', 'inexistente'], 'motivo' => 'São cinco dias.'],
+            ['letra' => 'B', 'trechos' => ['cinco'], 'motivo' => 'É o gabarito, não entra.'],
+        ]];
+        $gemini = fn ($json) => ['candidates' => [['content' => ['parts' => [['text' => json_encode($json)]]]]]];
+        Http::fake(['generativelanguage.googleapis.com/*' => Http::sequence()->push($gemini($resposta))
+            ->push($gemini(['itens' => [['letra' => 'E', 'trechos' => ['inventado'], 'motivo' => 'x']]]))]);
+
+        $this->actingAs($this->user)->getJson(route('concursos.material.questoes.trechos', $q1))->assertForbidden();
+        $this->actingAs($this->user)->postJson(route('concursos.material.questoes.responder', $q1), ['resposta' => 'A'])->assertOk();
+        $esperado = ['trechos' => ['A' => ['trechos' => ['DEZ  dias'], 'motivo' => 'São cinco dias.']]];
+        $this->actingAs($this->user)->getJson(route('concursos.material.questoes.trechos', $q1))->assertOk()->assertExactJson($esperado);
+        $this->actingAs($this->user)->getJson(route('concursos.material.questoes.trechos', $q1))->assertOk()->assertExactJson($esperado);
+        Http::assertSentCount(1); // a segunda vem do banco
+
+        // Certo/Errado com gabarito E: o grifo vai no enunciado.
+        $q2 = \App\Models\Concursos\MaterialQuestao::where('chave', 'q222222')->first();
+        $this->actingAs($this->user)->postJson(route('concursos.material.questoes.responder', $q2), ['resposta' => 'C'])->assertOk();
+        $this->actingAs($this->user)->getJson(route('concursos.material.questoes.trechos', $q2))->assertOk()
+            ->assertJsonPath('trechos.enunciado.trechos', ['inventado']);
+
+        $outro = User::factory()->create();
+        $this->actingAs($outro)->getJson(route('concursos.material.questoes.trechos', $q1))->assertNotFound();
+    }
+
+    public function test_comentario_sem_professor_vem_do_gemini_e_pode_ser_editado_com_imagem(): void
+    {
+        config(['services.gemini.key' => 'chave-teste']);
+        $this->importarQuestoes();
+        $q1 = \App\Models\Concursos\MaterialQuestao::where('chave', 'q111111')->first();
+        $q1->forceFill(['comentario' => "No TEC você marcou A; gabarito B.\n\nAssunto: Prazos"])->save();
+        Http::fake(['generativelanguage.googleapis.com/*' => Http::response(['candidates' => [['content' => ['parts' => [
+            ['text' => "O prazo é de **cinco dias** (art. 5º).\n\n<script>alert(1)</script>\n- **A)** dez dias está errado."],
+        ]]]]])]);
+
+        $this->actingAs($this->user)->getJson(route('concursos.material.questoes.comentario', $q1))->assertForbidden();
+        $this->actingAs($this->user)->postJson(route('concursos.material.questoes.responder', $q1), ['resposta' => 'A'])
+            ->assertOk()->assertJson(['gerar_comentario' => true, 'comentario_html' => null]);
+        $html = $this->actingAs($this->user)->getJson(route('concursos.material.questoes.comentario', $q1))
+            ->assertOk()->assertJsonPath('fonte', 'gemini')->json('html');
+        $this->assertStringContainsString('<strong>cinco dias</strong>', $html);
+        $this->assertStringContainsString('No TEC você marcou A; gabarito B.', $html);
+        $this->assertStringNotContainsString('<script', $html);
+        $this->actingAs($this->user)->getJson(route('concursos.material.questoes.comentario', $q1))->assertOk();
+        Http::assertSentCount(1); // a segunda vem do banco
+        $this->actingAs($this->user)->postJson(route('concursos.material.questoes.responder', $q1), ['resposta' => 'B'])
+            ->assertJson(['gerar_comentario' => false, 'comentario_fonte' => 'gemini']);
+
+        // Edição: limpa scripts, atributos e imagens de fora; mantém as anexadas ao material.
+        $this->actingAs($this->user)->putJson(route('concursos.material.questoes.comentario.salvar', $q1), [
+            'html' => '<p onclick="x()">Meu <b>texto</b></p><img src="http://localhost/concursos/material/anexos/7" onerror="x"><img src="https://mal.com/a.png"><script>alert(1)</script><a href="javascript:x">link</a>',
+        ])->assertOk()->assertJsonPath('fonte', 'aluno')
+            ->assertJsonPath('html', '<p>Meu <b>texto</b></p><img src="/concursos/material/anexos/7" alt=""><a>link</a>');
+
+        // Vazio volta ao comentário do caderno.
+        $this->actingAs($this->user)->putJson(route('concursos.material.questoes.comentario.salvar', $q1), ['html' => '<p> </p>'])
+            ->assertOk()->assertJsonPath('html', null)->assertJsonPath('fonte', null);
+
+        // Questão com comentário de professor não chama o Gemini.
+        $this->assertFalse(\App\Services\Concursos\ComentarioGemini::semComentarioReal("No TEC você marcou A.\n\nComentário do prof. Fulano:\nO prazo é..."));
+
+        $outro = User::factory()->create();
+        $this->actingAs($outro)->putJson(route('concursos.material.questoes.comentario.salvar', $q1), ['html' => 'x'])->assertNotFound();
+    }
+
+    public function test_pacotes_e_importacao_de_trechos_errados_pelo_chat(): void
+    {
+        $this->importarQuestoes();
+        $this->user->forceFill(['is_owner' => true])->save();
+        // Pasta temporária: não pode apagar os pacotes de verdade em storage/concursos/trechos.
+        $base = storage_path('framework/testing/trechos-' . uniqid());
+        $real = $this->app->storagePath();
+        $this->app->useStoragePath($base);
+        $this->beforeApplicationDestroyed(function () use ($base, $real) {
+            $this->app->useStoragePath($real);
+            File::deleteDirectory($base);
+        });
+        $dir = storage_path('concursos/trechos');
+        $q1 = \App\Models\Concursos\MaterialQuestao::where('chave', 'q111111')->first();
+        $q2 = \App\Models\Concursos\MaterialQuestao::where('chave', 'q222222')->first();
+
+        $this->artisan('concursos:trechos-pacotes', ['--lote' => 1])->assertSuccessful();
+        $pacotes = File::glob($dir . '/trechos-lote-*.json');
+        $this->assertCount(2, $pacotes);
+        $p1 = json_decode(File::get($pacotes[0]), true)['questoes'][0];
+        $this->assertSame(['id' => $q1->id, 'tipo' => 'ME', 'gabarito' => 'B', 'enunciado' => $q1->enunciado,
+            'alternativas' => [['letra' => 'A', 'texto' => 'dez dias'], ['letra' => 'B', 'texto' => 'cinco dias']], 'erradas' => ['A']], $p1);
+        $this->assertSame('Errado', json_decode(File::get($pacotes[1]), true)['questoes'][0]['gabarito']);
+
+        File::put($dir . '/respostas/r1.json', "```json\n" . json_encode(['lote' => 1, 'questoes' => [
+            ['id' => $q1->id, 'itens' => [['letra' => 'A', 'trechos' => ['dez', 'vinte'], 'motivo' => 'São cinco.']]],
+            ['id' => $q2->id, 'itens' => [['letra' => 'E', 'trechos' => ['Item'], 'motivo' => 'x']]],
+            ['id' => 999999, 'itens' => []],
+        ]]) . "\n```");
+        $this->artisan('concursos:trechos-importar')->assertSuccessful()
+            ->expectsOutputToContain('2 questões marcadas; 2 de 3 trechos conferem');
+        $this->assertSame(['A' => ['trechos' => ['dez'], 'motivo' => 'São cinco.']], $q1->fresh()->trechos_errados);
+        $this->assertSame(['Item'], $q2->fresh()->trechos_errados['enunciado']['trechos']);
+
+        $this->artisan('concursos:trechos-pacotes')->assertSuccessful()->expectsOutputToContain('Nenhuma questão sem marcação.');
+    }
+
     public function test_refazer_e_so_do_proprio_aluno(): void
     {
         $this->importarQuestoes();

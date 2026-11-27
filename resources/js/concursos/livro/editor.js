@@ -10,6 +10,8 @@ import { Caixa, PontoErro, Questao, Lei, Grifo, CORES } from './extensoes.js';
 import { Leitura } from './leitura.js';
 import { Rascunho } from './rascunho.js';
 import { montarCaneta } from './caneta.js';
+import { NotaPonto } from './nota-ponto-no.js';
+import { instalarMenuNota } from '../nota-ponto.js';
 import { estado, api, el, avisar, debounce, novoId } from './util.js';
 
 const NOMES_COR = { amarelo: 'Amarelo', verde: 'Verde', azul: 'Azul', rosa: 'Rosa' };
@@ -28,7 +30,7 @@ export function criarEditor({ alvo, doc, editavel, aoMudarModo }) {
             Placeholder.configure({ placeholder: ({ node }) => (node.type.name === 'paragraph' ? 'Escreva aqui… (digite / para inserir caixa, questão, lei, imagem)' : '') }),
             Typography.configure({ oneHalf: false, oneQuarter: false, threeQuarters: false, plusMinus: false, notEqual: false, laquo: false, raquo: false }),
             TableKit.configure({ table: { resizable: false } }),
-            Caixa, PontoErro, Questao, Lei, Grifo, Leitura, Rascunho,
+            Caixa, PontoErro, Questao, Lei, Grifo, Leitura, Rascunho, NotaPonto,
         ],
         editorProps: {
             attributes: { class: 'pagina-texto', 'aria-label': 'Texto do capítulo' },
@@ -148,6 +150,7 @@ export function criarEditor({ alvo, doc, editavel, aoMudarModo }) {
         { id: 'tabela', nome: 'Tabela', dica: 'Quadro comparativo', run: c => c.insertTable({ rows: 3, cols: 3, withHeaderRow: true }) },
         { id: 'imagem', nome: 'Imagem', dica: 'Print, esquema, mapa mental', acao: escolherImagem },
         { id: 'rascunho', nome: 'Rascunho à mão', dica: 'Área para escrever ou desenhar com a caneta', run: c => c.inserirRascunho() },
+        { id: 'nota', nome: 'Nota aqui', dica: 'Ícone que abre uma nota (texto e caneta)', acao: () => editor.commands.inserirNotaPonto(editor.state.selection.from) },
         { id: 'citacao', nome: 'Citação', dica: 'Texto recuado', run: c => c.toggleBlockquote() },
         { id: 'linha', nome: 'Linha divisória', dica: '', run: c => c.setHorizontalRule() },
     ];
@@ -186,7 +189,7 @@ export function criarEditor({ alvo, doc, editavel, aoMudarModo }) {
             ),
             grupo(
                 ...CORES.map(c => botao(el('span', { class: `cor ${c}` }), `Grifar em ${NOMES_COR[c].toLowerCase()}`, () => grifar(c))),
-                botao('✎', 'Nota na margem', () => notaNaSelecao()),
+                botao('✎', 'Nota no trecho', () => notaNaSelecao()),
             ),
             grupo(menuCaixa,
                 botao('Ponto', 'Ponto de erro', inserirPonto),
@@ -269,7 +272,7 @@ export function criarEditor({ alvo, doc, editavel, aoMudarModo }) {
         b.addEventListener('click', () => grifar(c));
         bolha.append(b);
     }
-    const bNota = el('button', { type: 'button', title: 'Grifar e anotar na margem' }, '✎ Nota');
+    const bNota = el('button', { type: 'button', title: 'Grifar e anotar' }, '✎ Nota');
     bNota.addEventListener('mousedown', e => e.preventDefault());
     bNota.addEventListener('click', () => notaNaSelecao());
     const bTirar = el('button', { type: 'button', title: 'Tirar o grifo' }, '⌫');
@@ -296,6 +299,41 @@ export function criarEditor({ alvo, doc, editavel, aoMudarModo }) {
 
     // ---- caneta: grifar passando a caneta sobre o texto ---------------------------------------
     montarCaneta(editor, alvo, document.querySelector('[data-caneta]'));
+
+    // ---- botão direito / dois toques da caneta: nota ou edição naquele ponto -------------------
+    /** Posição do documento sob o ponteiro, no fim da palavra; null fora de um parágrafo. */
+    function posNoPonto(x, y) {
+        const r = editor.view.posAtCoords({ left: x, top: y });
+        if (!r) return null;
+        const $p = editor.state.doc.resolve(r.pos);
+        if (!$p.parent.inlineContent) return null;
+        const resto = $p.parent.textBetween($p.parentOffset, $p.parent.content.size, null, '￼');
+        let i = 0;
+        while (i < resto.length && /[\p{L}\p{N}]/u.test(resto[i])) i++;
+        return r.pos + i;
+    }
+    const botaoModo = document.querySelector('[data-modo]');
+    instalarMenuNota(alvo, ({ x, y, alvo: t }) => {
+        if (t.closest('.rascunho, .nota-ponto, .questao-livro')) return [];
+        const pos = posNoPonto(x, y);
+        if (pos == null) return [];
+        const itens = [{ icone: '📝', rotulo: 'Adicionar nota aqui', acao: () => editor.commands.inserirNotaPonto(pos) }];
+        if (botaoModo || editor.isEditable) {
+            itens.push({
+                icone: '✏️', rotulo: editor.isEditable ? 'Pôr o cursor aqui' : 'Editar o texto aqui',
+                acao: () => {
+                    if (!editor.isEditable) botaoModo.click();
+                    setTimeout(() => editor.chain().focus().setTextSelection(pos).scrollIntoView().run(), 0);
+                },
+            });
+        }
+        const sel = selecao();
+        if (sel) {
+            itens.push({ icone: '🖍', rotulo: 'Grifar a seleção', acao: () => grifar('amarelo') });
+            itens.push({ icone: '✎', rotulo: 'Nota (seleção)', acao: () => notaNaSelecao() });
+        }
+        return itens;
+    });
 
     // ---- menu "/" -----------------------------------------------------------------------------
     const slash = criarMenuBarra(editor, comandos, executar);
@@ -401,46 +439,88 @@ function criarMenuBarra(editor, comandos, executar) {
 }
 
 /**
- * Notas na margem: um cartão por grifo com nota, na altura do trecho (desktop) ou em lista
- * abaixo do texto (celular). A nota é salva na hora; o grifo vai junto com o texto.
+ * Notas dos grifos num modal: clicar num trecho grifado com nota abre a nota e, quando o trecho
+ * está ligado a questões (grifo da Fase 2 ou "✔ Q123" citado na nota), dá para passar dali para
+ * essas questões sem sair do modal. A nota é salva na hora; o grifo vai junto com o texto.
  */
 function criarNotas(editor, alvo, salvarTexto) {
-    const margem = document.querySelector('[data-margem]');
     const porMarca = new Map(estado.anotacoes.map(a => [a.marca, a]));
 
-    function grifos() {
-        const vistos = new Set();
-        const lista = [];
-        alvo.querySelectorAll('mark.grifo[data-nota]').forEach(m => {
-            if (vistos.has(m.dataset.nota)) return;
-            vistos.add(m.dataset.nota);
-            lista.push(m);
-        });
-        return lista;
+    const dlg = el('dialog', { class: 'modal-questoes modal-nota so-nota', 'aria-labelledby': 'mn-titulo' });
+    const sub = el('small');
+    const titulo = el('h2', { id: 'mn-titulo' });
+    const voltar = el('button', { type: 'button', class: 'btn mini', title: 'Voltar para a nota' }, '← Nota');
+    const expandir = el('a', { class: 'btn mini', title: 'Abrir as questões em página própria' }, '⤢ Expandir');
+    const fechar = el('button', { type: 'button', class: 'btn mini', 'aria-label': 'Fechar' }, '✕');
+    const corpoNota = el('div', { class: 'mn-nota' });
+    const quadro = el('iframe', { title: 'Questões do trecho' });
+    const cartaoEsq = () => el('div', { class: 'c' }, el('div', { class: 'esqueleto l t' }), el('div', { class: 'esqueleto l' }), el('div', { class: 'esqueleto l', style: 'width:85%' }),
+        el('div', { class: 'esqueleto o' }), el('div', { class: 'esqueleto o' }), el('div', { class: 'esqueleto o' }));
+    const esqueleto = el('div', { class: 'mq-esqueleto', 'aria-hidden': 'true' }, cartaoEsq());
+    const corpoQ = el('div', { class: 'mq-corpo' }, quadro, esqueleto);
+    dlg.append(el('header', {}, voltar, el('div', {}, sub, titulo), expandir, fechar), corpoNota, corpoQ);
+    document.body.append(dlg);
+
+    let atual = null; // anotação aberta
+    quadro.addEventListener('load', () => { if (quadro.src !== 'about:blank') dlg.classList.remove('carregando'); });
+    fechar.addEventListener('click', () => dlg.close());
+    dlg.addEventListener('click', e => { if (e.target === dlg) dlg.close(); });
+    dlg.addEventListener('close', () => {
+        document.body.style.overflow = '';
+        // Nota nova fechada sem texto: o grifo sai junto.
+        if (atual && !atual.nota) removerGrifo(atual.marca);
+        atual = null;
+        setTimeout(() => { if (!dlg.open) quadro.src = 'about:blank'; }, 300);
+    });
+    voltar.addEventListener('click', () => verNota());
+
+    /** Questões ligadas ao trecho ({url, n}) ou null. */
+    function questoesDe(a) {
+        const gq = estado.grifosQ?.[a.marca];
+        if (gq?.url) return { url: new URL(gq.url, location.href), n: gq.n };
+        const tec = [...new Set([...(a.nota ?? '').matchAll(/(?:^|\n)[✔✘•] Q(\d+)/gu)].map(m => m[1]))];
+        if (!tec.length || !estado.urls.refazer) return null;
+        const url = new URL(estado.urls.refazer, location.href);
+        url.search = new URLSearchParams({ tec: tec.join(','), situacao: 'todas', iniciar: '1', qtd: '200' });
+        return { url, n: tec.length };
     }
 
-    function cartao(a, editando = false) {
-        const c = el('article', { class: `nota ${a.cor}`, 'data-marca': a.marca, tabindex: '0' });
-        const trecho = el('blockquote', {}, a.trecho ? `“${a.trecho.slice(0, 140)}${a.trecho.length > 140 ? '…' : ''}”` : '');
+    function verNota(editando = false) {
+        dlg.classList.add('so-nota');
+        voltar.hidden = expandir.hidden = true;
+        sub.textContent = 'Nota';
+        titulo.textContent = atual.trecho ? `“${atual.trecho}”` : 'Trecho grifado';
+        titulo.title = atual.trecho ?? '';
+        desenharNota(atual, editando);
+    }
+
+    function verQuestoes(q) {
+        dlg.classList.remove('so-nota');
+        voltar.hidden = expandir.hidden = false;
+        sub.textContent = `${q.n} ${q.n === 1 ? 'questão' : 'questões'} deste trecho`;
+        expandir.href = q.url.href;
+        const embutido = new URL(q.url); embutido.searchParams.set('embed', '1');
+        if (quadro.src !== embutido.href) { dlg.classList.add('carregando'); quadro.src = embutido.href; }
+    }
+
+    function desenharNota(a, editando) {
         const texto = el('p', { class: 'nota-texto' }, a.nota);
-        const editar = el('button', { type: 'button', class: 'link' }, 'Editar');
-        const apagar = el('button', { type: 'button', class: 'link' }, 'Apagar');
-        const area = el('textarea', { rows: '3', 'aria-label': 'Nota', placeholder: 'Sua anotação…', maxlength: '5000' });
+        const editar = el('button', { type: 'button', class: 'btn mini' }, 'Editar');
+        const apagar = el('button', { type: 'button', class: 'btn mini' }, 'Apagar');
+        const q = a.nota ? questoesDe(a) : null;
+        const irQ = q ? el('button', { type: 'button', class: 'btn mini main' }, `Ver ${q.n === 1 ? 'a questão' : `as ${q.n} questões`} →`) : null;
+        const acoes = el('div', { class: 'nota-acoes' }, ...(irQ ? [irQ] : []), editar, apagar);
+        const area = el('textarea', { rows: '6', 'aria-label': 'Nota', placeholder: 'Sua anotação…', maxlength: '5000' });
         const ok = el('button', { type: 'button', class: 'btn mini main' }, 'Salvar');
         const cancelar = el('button', { type: 'button', class: 'btn mini' }, 'Cancelar');
         const form = el('div', { class: 'nota-form' }, area, el('div', { class: 'nota-acoes' }, ok, cancelar));
-        // Grifo ligado a questões (Fase 2): atalho para refazê-las.
-        const gq = estado.grifosQ?.[a.marca];
-        const refazer = gq ? el('a', { class: 'link', href: gq.url }, `Refazer ${gq.n === 1 ? 'esta questão' : `estas ${gq.n} questões`}`) : null;
-        c.append(trecho, texto, el('div', { class: 'nota-acoes' }, ...(refazer ? [refazer] : []), editar, apagar), form);
+        corpoNota.replaceChildren(texto, acoes, form);
 
-        const modo = ed => { form.hidden = !ed; texto.hidden = ed; editar.parentElement.hidden = ed; if (ed) { area.value = a.nota; setTimeout(() => area.focus(), 0); } };
+        const modo = ed => { form.hidden = !ed; texto.hidden = acoes.hidden = ed; if (ed) { area.value = a.nota; setTimeout(() => area.focus(), 0); } };
         modo(editando);
+        irQ?.addEventListener('click', () => verQuestoes(q));
         editar.addEventListener('click', () => modo(true));
-        cancelar.addEventListener('click', () => {
-            if (!a.nota) { removerGrifo(a.marca); c.remove(); return; }
-            modo(false);
-        });
+        cancelar.addEventListener('click', () => { if (!a.nota) dlg.close(); else modo(false); });
         ok.addEventListener('click', async () => {
             const nota = area.value.trim();
             if (!nota) { apagar.click(); return; }
@@ -450,25 +530,16 @@ function criarNotas(editor, alvo, salvarTexto) {
             if (!r) return;
             Object.assign(a, r);
             porMarca.set(a.marca, a);
-            abertos.delete(a.marca);
-            texto.textContent = a.nota;
-            modo(false);
+            desenharNota(a, false);
         });
         area.addEventListener('keydown', e => { if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) ok.click(); });
         apagar.addEventListener('click', async () => {
             if (a.nota && !confirm('Apagar esta nota? (o grifo também sai)')) return;
             if (a.nota) await api(estado.urls.anotacao, { method: 'POST', body: { marca: a.marca, nota: '' } });
             porMarca.delete(a.marca);
-            removerGrifo(a.marca);
-            c.remove();
+            a.nota = '';
+            dlg.close();
         });
-        c.addEventListener('click', e => {
-            if (e.target.closest('button, textarea')) return;
-            const m = alvo.querySelector(`mark[data-nota="${a.marca}"]`);
-            m?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            piscar(m);
-        });
-        return c;
     }
 
     function removerGrifo(marca) {
@@ -481,60 +552,22 @@ function criarNotas(editor, alvo, salvarTexto) {
         if (tr.docChanged) editor.view.dispatch(tr);
     }
 
-    function piscar(elem) {
-        if (!elem) return;
-        elem.classList.remove('piscar');
-        void elem.offsetWidth;
-        elem.classList.add('piscar');
+    function abrir(a, editando = false) {
+        atual = a;
+        dlg.className = `modal-questoes modal-nota so-nota cor-${a.cor ?? 'amarelo'}`;
+        verNota(editando);
+        document.body.style.overflow = 'hidden';
+        if (!dlg.open) dlg.showModal();
+        if (!editando) fechar.focus();
     }
 
-    let abertos = new Map(); // marca → cartão em edição (sobrevive ao redesenho)
-
-    function desenhar() {
-        if (!margem) return;
-        const lista = grifos();
-        const cartoes = lista.map(m => {
-            const marca = m.dataset.nota;
-            const aberto = abertos.get(marca);
-            if (aberto) return [m, aberto];
-            const a = porMarca.get(marca);
-            return a ? [m, cartao(a)] : null;
-        }).filter(Boolean);
-        margem.replaceChildren(...cartoes.map(([, c]) => c));
-        margem.closest('.margem')?.classList.toggle('vazia', !cartoes.length);
-
-        // Desktop: alinha cada nota ao trecho, sem sobrepor.
-        if (getComputedStyle(margem).position !== 'relative') return;
-        const base = margem.getBoundingClientRect().top;
-        let fundo = 0;
-        for (const [m, c] of cartoes) {
-            const topo = Math.max(fundo, m.getBoundingClientRect().top - base);
-            c.style.top = `${topo}px`;
-            fundo = topo + c.offsetHeight + 8;
-        }
-        margem.style.minHeight = `${fundo}px`;
-    }
-
-    const redesenhar = debounce(desenhar, 150);
-    editor.on('update', redesenhar);
-    window.addEventListener('resize', redesenhar);
-    new ResizeObserver(redesenhar).observe(alvo);
-    setTimeout(desenhar, 50);
-
-    // Clique num grifo com nota destaca a nota.
+    // Clique num grifo com nota (fora do modo de edição) abre o modal.
     alvo.addEventListener('click', e => {
         const m = e.target.closest('mark[data-nota]');
-        if (!m) return;
-        const c = margem?.querySelector(`[data-marca="${m.dataset.nota}"]`);
-        if (c) { c.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); piscar(c); }
+        if (!m || editor.isEditable || window.getSelection()?.toString()) return;
+        const a = porMarca.get(m.dataset.nota);
+        if (a) abrir(a);
     });
 
-    return {
-        abrir(a, editando) {
-            const c = cartao(a, editando);
-            abertos.set(a.marca, c);
-            c.addEventListener('focusout', () => setTimeout(() => { if (!c.contains(document.activeElement)) abertos.delete(a.marca); }, 0));
-            desenhar();
-        },
-    };
+    return { abrir };
 }

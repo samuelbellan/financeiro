@@ -9,6 +9,9 @@ use App\Models\Concursos\MaterialPonto;
 use App\Models\Concursos\MaterialQuestao;
 use App\Models\Concursos\MaterialTentativa;
 use App\Services\Concursos\Leis\Citacoes;
+use App\Services\Concursos\ComentarioGemini;
+use App\Services\Concursos\HtmlComentario;
+use App\Services\Concursos\TrechosErrados;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
@@ -126,6 +129,9 @@ class RefazerController extends Controller
             'acertou' => $acertou,
             'gabarito' => $questao->gabarito,
             'comentario' => $questao->comentario,
+            'comentario_html' => $questao->comentario_html,
+            'comentario_fonte' => $questao->comentario_fonte,
+            'gerar_comentario' => $questao->comentario_html === null && ComentarioGemini::semComentarioReal($questao->comentario),
             'tec' => $questao->id_externo ? 'https://www.tecconcursos.com.br/questoes/' . $questao->id_externo : null,
             'caixa' => $this->textoCaixa($caixaAntes, $questao->fresh()),
             'pontos' => $pontos->map(fn ($p) => [
@@ -139,6 +145,51 @@ class RefazerController extends Controller
             ])->values(),
             'livro' => $questao->capitulo_id ? route('concursos.material.capitulo', [$questao->material_id, $questao->capitulo_id]) : null,
         ]);
+    }
+
+    /**
+     * Trechos que tornam cada alternativa errada, para grifar depois de um erro. Pedido à parte
+     * (o Gemini pode levar alguns segundos) e só depois de o aluno ter respondido a questão.
+     */
+    public function trechos(Request $request, MaterialQuestao $questao, TrechosErrados $trechos): JsonResponse
+    {
+        abort_unless($questao->material->user_id === $request->user()->id, 404);
+        abort_unless($questao->tentativas()->where('user_id', $request->user()->id)->exists(), 403);
+
+        $t = $trechos->para($questao);
+
+        return $t === null
+            ? response()->json(['erro' => 'Não consegui analisar as alternativas agora.'], 503)
+            : response()->json(['trechos' => (object) $t]);
+    }
+
+    /**
+     * Comentário da questão: o editado/gerado ou, quando o caderno não trouxe comentário de
+     * professor, um novo escrito pelo Gemini (uma vez; fica salvo). Só depois de responder.
+     */
+    public function comentario(Request $request, MaterialQuestao $questao, ComentarioGemini $gemini): JsonResponse
+    {
+        abort_unless($questao->material->user_id === $request->user()->id, 404);
+        abort_unless($questao->tentativas()->where('user_id', $request->user()->id)->exists(), 403);
+
+        if ($questao->comentario_html === null && ComentarioGemini::semComentarioReal($questao->comentario)) {
+            if ($gemini->gerar($questao) === null) {
+                return response()->json(['erro' => 'Não consegui gerar o comentário agora.'], 503);
+            }
+        }
+
+        return response()->json(['html' => $questao->comentario_html, 'fonte' => $questao->comentario_fonte]);
+    }
+
+    /** Salva o comentário editado (HTML limpo; imagens só dos anexos do material). Vazio volta ao do caderno. */
+    public function salvarComentario(Request $request, MaterialQuestao $questao): JsonResponse
+    {
+        abort_unless($questao->material->user_id === $request->user()->id, 404);
+        $dados = $request->validate(['html' => ['nullable', 'string', 'max:200000']]);
+        $html = HtmlComentario::limpar($dados['html'] ?? '');
+        $questao->forceFill(['comentario_html' => $html === '' ? null : $html, 'comentario_fonte' => $html === '' ? null : 'aluno'])->save();
+
+        return response()->json(['html' => $questao->comentario_html, 'fonte' => $questao->comentario_fonte, 'original' => $questao->comentario]);
     }
 
     /** Pontos do resumo ligados à questão: o dela e os que citam o nº do TEC (baterias diferentes). */
@@ -225,6 +276,9 @@ class RefazerController extends Controller
         return [
             'id' => $q->id,
             'url' => route('concursos.material.questoes.responder', $q),
+            'trechos' => route('concursos.material.questoes.trechos', $q),
+            'comentario' => route('concursos.material.questoes.comentario', $q),
+            'anexos' => route('concursos.material.anexos.store', $q->material_id),
             'caderno' => $q->secao?->titulo,
             'assunto' => $q->ponto?->titulo ?? $q->capitulo?->titulo,
             'origem' => $q->origem,

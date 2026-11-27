@@ -33,6 +33,9 @@
         <env name="DADOS_DIR" value=""/>
         <env name="BACKUP_DRIVE_DIR" value=""/>
         <env name="BACKUP_LOCAL_DIR" value=""/>
+        <env name="CONCURSOS_BACKUP_DIR" value=""/>
+        <env name="TELEGRAM_BOT_TOKEN" value=""/>
+        <env name="TELEGRAM_ALLOWED_CHAT_ID" value=""/>
         <env name="MAIL_MAILER" value="array"/>
         <env name="QUEUE_CONNECTION" value="sync"/>
         <env name="SESSION_DRIVER" value="array"/>

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Concursos;
 use App\Http\Controllers\Controller;
 use App\Models\Concursos\LeiGrifo;
 use App\Models\Concursos\LeiMarca;
+use App\Models\Concursos\LeiNota;
 use App\Models\Concursos\Material;
 use App\Models\Concursos\MaterialCapitulo;
 use App\Models\Concursos\MaterialPonto;
@@ -27,15 +28,34 @@ use RuntimeException;
  */
 class LeisController extends Controller
 {
-    public function index(AcervoLeis $acervo): View
+    public function index(Request $request, AcervoLeis $acervo): View
     {
-        $leis = collect($acervo->catalogo())->map(fn ($l, $sigla) => $l + [
-            'chave' => $sigla,
-            'baixada' => $acervo->baixada($sigla),
-            'fonte' => $acervo->urlFonte($sigla),
-        ]);
+        $userId = $request->user()?->id;
+        $grifos = $userId
+            ? LeiGrifo::where('user_id', $userId)->selectRaw('lei, COUNT(*) as total')->groupBy('lei')->pluck('total', 'lei')
+            : collect();
+        $marcasPorLei = $userId
+            ? LeiMarca::where('user_id', $userId)->get(['lei', 'marcado', 'nota'])->groupBy('lei')
+            : collect();
 
-        return view('concursos.leis.index', compact('leis'));
+        $leis = collect($acervo->catalogo())->map(function ($l, $sigla) use ($acervo, $grifos, $marcasPorLei) {
+            $marcas = $marcasPorLei->get($sigla, collect());
+
+            return $l + [
+                'chave' => $sigla,
+                'grupo' => $l['grupo'] ?? 'Outras Normas',
+                'prefixo' => $l['prefixo'] ?? '',
+                'baixada' => $acervo->baixada($sigla),
+                'fonte' => $acervo->urlFonte($sigla),
+                'grifos' => (int) ($grifos[$sigla] ?? 0),
+                'notas' => $marcas->filter(fn ($m) => filled($m->nota))->count(),
+                'marcados' => $marcas->where('marcado', true)->count(),
+            ];
+        });
+
+        $grupos = $leis->groupBy('grupo');
+
+        return view('concursos.leis.index', compact('leis', 'grupos'));
     }
 
     public function show(Request $request, string $lei, AcervoLeis $acervo, Citacoes $citacoes, IncidenciaLeis $incidencia, Reancorador $reancorador): View
@@ -60,6 +80,7 @@ class LeisController extends Controller
             'marcas' => LeiMarca::where('user_id', $request->user()->id)->where('lei', $lei)->get()->keyBy('ancora'),
             'capitulos' => $this->capitulosDoAluno($request->user()->id),
             'grifos' => $this->grifos($request->user()->id, $lei, $blocos, $acervo, $reancorador),
+            'notasPonto' => $this->notasPonto($request->user()->id, $lei, $blocos, $acervo, $reancorador),
         ]);
     }
 
@@ -75,6 +96,24 @@ class LeisController extends Controller
             if ($b['tipo'] === 'artigo' && $porAncora->has($b['ancora'])) {
                 $texto = Reancorador::textoDoHtml($acervo->mdParaHtml($b['md']));
                 $saida[$b['ancora']] = $reancorador->posicionar($texto, $porAncora[$b['ancora']]);
+            }
+        }
+
+        return $saida;
+    }
+
+    /** Notas num ponto do texto, reposicionadas: âncora → [{id, texto, tracos, altura, posicao}] (posicao null = fim do artigo). */
+    private function notasPonto(int $userId, string $lei, array $blocos, AcervoLeis $acervo, Reancorador $reancorador): array
+    {
+        $porAncora = LeiNota::where('user_id', $userId)->where('lei', $lei)->orderBy('id')->get()->groupBy('ancora');
+        if ($porAncora->isEmpty()) {
+            return [];
+        }
+        $saida = [];
+        foreach ($blocos as $b) {
+            if ($b['tipo'] === 'artigo' && $porAncora->has($b['ancora'])) {
+                $texto = Reancorador::textoDoHtml($acervo->mdParaHtml($b['md']));
+                $saida[$b['ancora']] = $porAncora[$b['ancora']]->map(fn ($n) => VadeMecumController::notaJson($n, $reancorador->localizarPonto($texto, $n->antes, $n->depois)))->all();
             }
         }
 

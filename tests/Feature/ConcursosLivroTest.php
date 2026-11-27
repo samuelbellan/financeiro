@@ -234,6 +234,31 @@ class ConcursosLivroTest extends TestCase
             ->assertOk()->assertSee('viewBox="0 0 1000 6000"', false)->assertSee('M10 20 L30 40.6', false)->assertDontSee('"><script>', false);
     }
 
+    public function test_nota_num_ponto_do_texto_e_limpa_e_some_quando_vazia(): void
+    {
+        $material = $this->material();
+        $this->abrir($material);
+        $cap = MaterialCapitulo::where('titulo', 'Estoques')->firstOrFail();
+
+        $doc = ['type' => 'doc', 'content' => [['type' => 'paragraph', 'content' => [
+            ['type' => 'text', 'text' => 'Função de governo'],
+            ['type' => 'notaPonto', 'attrs' => ['id' => 'nabc12', 'texto' => "Cai muito!\r\nVer <b>STF</b>", 'tracos' => [['c' => 'azul', 'p' => [1, 2, 0.5]]], 'altura' => 9]],
+            ['type' => 'notaPonto', 'attrs' => ['id' => '"><x', 'texto' => 'só tinta não', 'tracos' => []]],
+            ['type' => 'notaPonto', 'attrs' => ['id' => 'nvazia', 'texto' => '  ', 'tracos' => []]],
+            ['type' => 'text', 'text' => ': decisões políticas.'],
+        ]]]];
+        $this->actingAs($this->user)->putJson(route('concursos.material.capitulos.conteudo', $cap), ['conteudo' => $doc])->assertOk();
+
+        $p = $cap->fresh()->conteudo['content'][0]['content'];
+        $this->assertCount(4, $p); // a vazia saiu
+        $this->assertEquals(['id' => 'nabc12', 'texto' => "Cai muito!\nVer <b>STF</b>", 'tracos' => [['c' => 'azul', 'p' => [1.0, 2.0, 0.5]]], 'altura' => 160], $p[1]['attrs']);
+        $this->assertMatchesRegularExpression('/^n[0-9a-f]{10}$/', $p[2]['attrs']['id']); // id inválido trocado
+        $this->assertStringContainsString('(nota: Cai muito!', $cap->fresh()->texto);
+
+        $this->actingAs($this->user)->get(route('concursos.material.imprimir', $material))
+            ->assertOk()->assertSee('class="nota-ponto-imp"', false)->assertDontSee('<b>STF</b>', false);
+    }
+
     public function test_capitulos_criar_renomear_ordenar_e_apagar(): void
     {
         $material = Material::create(['user_id' => $this->user->id, 'slug' => 'livre', 'titulo' => 'Livro Livre']);
@@ -317,5 +342,38 @@ class ConcursosLivroTest extends TestCase
             ->assertOk()->assertSee(route('concursos.material.capitulo', [$material, $cap]) . '#ponto-' . $p1->id, false);
 
         $this->actingAs(User::factory()->create())->get(route('concursos.material.imprimir', $material))->assertNotFound();
+    }
+
+    public function test_tempo_medio_de_leitura_no_capitulo_e_na_capa(): void
+    {
+        $doc = app(\App\Services\Concursos\Livro\Documento::class);
+        $this->assertSame(0, $doc->tempoLeitura($doc::vazio()));
+        $this->assertSame('1 min', $doc::formatarDuracao(1));
+        $this->assertSame('1h', $doc::formatarDuracao(60));
+        $this->assertSame('1h 25min', $doc::formatarDuracao(85));
+
+        $material = Material::create(['user_id' => $this->user->id, 'slug' => 'tempo', 'titulo' => 'Direito Constitucional']);
+        $texto600 = trim(str_repeat('palavra ', 600)); // 600 palavras → 3 min (200 ppm)
+        $cap = MaterialCapitulo::create([
+            'material_id' => $material->id,
+            'titulo' => 'Poder Executivo',
+            'conteudo' => ['type' => 'doc', 'content' => [
+                ['type' => 'paragraph', 'content' => [['type' => 'text', 'text' => $texto600]]],
+                ['type' => 'pontoErro', 'attrs' => ['pontoId' => 1, 'titulo' => 'Ignorado'], 'content' => [
+                    ['type' => 'paragraph', 'content' => [['type' => 'text', 'text' => trim(str_repeat('extra ', 400))]]],
+                ]],
+            ]],
+            'texto' => $texto600,
+        ]);
+
+        // Capítulo de teoria ignora pontoErro no cálculo (600 palavras = 3 min).
+        $this->actingAs($this->user)->get(route('concursos.material.capitulo', [$material, $cap]))
+            ->assertOk()
+            ->assertSee('3 min de leitura');
+
+        // Capa mostra o tempo do capítulo no sumário e o total do livro.
+        $this->abrir($material)
+            ->assertSee('Tempo médio de leitura: 3 min')
+            ->assertSee('>3 min</span>', false);
     }
 }

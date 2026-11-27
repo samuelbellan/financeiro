@@ -48,7 +48,21 @@
     .bloco.armadilha > span { color: var(--no); } .bloco.regra > span { color: var(--ok); }
     details.com { margin-top: 10px; font-size: 14px; }
     details.com summary { cursor: pointer; font-weight: 600; color: var(--accent); }
-    details.com pre { white-space: pre-wrap; font: inherit; font-size: 14px; color: var(--ink); background: var(--bg); border-radius: 8px; padding: 10px 12px; max-height: 420px; overflow: auto; }
+    details.com pre { white-space: pre-wrap; font: inherit; font-size: 14px; color: var(--ink); margin: 0; }
+    details.com summary .fonte { font-weight: 500; font-size: 12px; color: var(--muted); margin-left: 6px; }
+    .com-wrap { margin-top: 8px; }
+    .com-corpo { font-size: 14px; color: var(--ink); background: var(--bg); border-radius: 8px; padding: 10px 12px; max-height: 520px; overflow: auto; line-height: 1.5; }
+    .com-corpo > :first-child { margin-top: 0; } .com-corpo > :last-child { margin-bottom: 0; }
+    .com-corpo p { margin: 0 0 8px; } .com-corpo h4, .com-corpo h3 { margin: 12px 0 6px; font-size: 14px; }
+    .com-corpo ul, .com-corpo ol { margin: 0 0 8px; padding-left: 20px; }
+    .com-corpo img { max-width: 100%; height: auto; border-radius: 6px; display: block; margin: 6px 0; }
+    .com-corpo blockquote { margin: 0 0 8px; padding-left: 10px; border-left: 3px solid var(--line); color: var(--muted); }
+    .com-corpo.carregando { color: var(--muted); }
+    .com-corpo[contenteditable=true] { outline: 2px solid var(--accent); max-height: none; min-height: 120px; }
+    .com-barra { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; margin-top: 8px; }
+    .com-barra .ferr { display: flex; gap: 4px; flex-wrap: wrap; }
+    .com-barra[hidden], .com-barra [hidden] { display: none; }
+    .com-barra .dica { font-size: 12px; color: var(--muted); margin-left: auto; }
     .acoes { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 14px; }
     a.lei { font-weight: 600; text-decoration: underline dotted; text-underline-offset: 3px; }
     .fim h2 { font-size: 20px; margin: 0 0 8px; }
@@ -78,6 +92,11 @@
     .certeza button.on { border-color: var(--accent); background: var(--accent); color: #fff; }
     .caixa-info { font-size: 14px; color: var(--muted); margin: -4px 0 10px; }
     .etq { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); border: 1px solid var(--line); border-radius: 6px; padding: 0 6px; margin-left: 6px; }
+    mark.errado { background: var(--no-soft); color: var(--no); font-weight: 600; border-radius: 4px; padding: 0 2px; box-shadow: inset 0 -2px 0 var(--no); animation: surgir .3s var(--mola); cursor: help; }
+    .opt:disabled:has(mark.errado) { opacity: .9; }
+    .porque { font-size: 14px; margin: -2px 0 10px; display: grid; gap: 4px; }
+    .porque b { color: var(--no); }
+    .porque.carregando { color: var(--muted); }
     .ponto-card + .ponto-card { border-top: 1px dashed var(--line); margin-top: 10px; padding-top: 10px; }
 @endsection
 
@@ -208,9 +227,32 @@
         <div class="opts" data-opts></div>
         <div data-retorno hidden>
             <div class="res" data-res></div>
+            <div class="porque" data-porque hidden></div>
             <div class="caixa-info" data-caixa></div>
             <div data-ponto></div>
-            <details class="com" data-com-box><summary>Comentário do caderno</summary><pre data-com></pre></details>
+            <details class="com" data-com-box><summary>Comentário <span class="fonte" data-com-fonte></span></summary>
+                <div class="com-wrap">
+                    <div class="com-corpo" data-com></div>
+                    <div class="com-barra" data-com-ver>
+                        <button type="button" class="btn mini" data-com-editar>✎ Editar</button>
+                        <button type="button" class="btn mini" data-com-gerar hidden>✨ Gerar com o Gemini</button>
+                    </div>
+                    <div class="com-barra" data-com-edit hidden>
+                        <div class="ferr">
+                            <button type="button" class="btn mini" data-cmd="bold" title="Negrito (Ctrl+B)"><b>B</b></button>
+                            <button type="button" class="btn mini" data-cmd="italic" title="Itálico (Ctrl+I)"><i>I</i></button>
+                            <button type="button" class="btn mini" data-cmd="underline" title="Sublinhado (Ctrl+U)"><u>U</u></button>
+                            <button type="button" class="btn mini" data-cmd="insertUnorderedList" title="Lista">• Lista</button>
+                            <button type="button" class="btn mini" data-cmd="hiliteColor" title="Marca-texto">🖍</button>
+                            <button type="button" class="btn mini" data-com-img title="Inserir imagem (também dá para colar ou arrastar)">🖼 Imagem</button>
+                            <input type="file" accept="image/png,image/jpeg,image/gif,image/webp" data-com-arquivo hidden multiple>
+                        </div>
+                        <button type="button" class="btn mini main" data-com-salvar>Salvar</button>
+                        <button type="button" class="btn mini" data-com-cancelar>Cancelar</button>
+                        <span class="dica">Cole (Ctrl+V) ou arraste imagens aqui</span>
+                    </div>
+                </div>
+            </details>
             <div class="acoes">
                 <button class="btn main" type="button" data-prox>Próxima →</button>
                 <a class="btn" data-tec target="_blank" rel="noopener">Ver no TEC</a>
@@ -297,7 +339,7 @@
             const b = document.createElement('button');
             b.type = 'button'; b.className = 'opt'; b.dataset.letra = a.letra;
             const l = document.createElement('span'); l.className = 'l'; l.textContent = q.tipo === 'CE' ? '' : a.letra + ')';
-            const t = document.createElement('span'); t.textContent = a.texto;
+            const t = document.createElement('span'); t.className = 'tx'; t.textContent = a.texto;
             b.append(l, t);
             b.addEventListener('click', () => responder(a.letra));
             return b;
@@ -326,6 +368,8 @@
         void res.offsetWidth; // reinicia a animação de entrada
         res.className = 'res ' + (r.acertou ? 'ok' : 'no');
         res.textContent = r.acertou ? `Acertou! Gabarito: ${nome(r.gabarito)}` : `Errou. Você marcou ${nome(letra)}; o gabarito é ${nome(r.gabarito)}.`;
+        $('[data-porque]').hidden = true;
+        grifarErros(q, letra, r.acertou);
         $('[data-caixa]').textContent = r.caixa ?? '';
         $('[data-caixa]').hidden = !r.caixa;
         const ponto = $('[data-ponto]');
@@ -342,15 +386,178 @@
         if (r.livro) {
             ponto.insertAdjacentHTML('beforeend', `<div class="bloco"><span>No resumo</span><div><a href="${r.livro}">Ver o capítulo deste assunto</a></div></div>`);
         }
-        $('[data-com-box]').hidden = !r.comentario;
-        $('[data-com-box]').open = !r.ponto;
-        $('[data-com]').textContent = r.comentario ?? '';
+        mostrarComentario(q, r);
         const tec = $('[data-tec]');
         tec.hidden = !r.tec; if (r.tec) tec.href = r.tec;
         $('[data-placar]').textContent = `${acertos} de ${i + 1} certas`;
         $('[data-retorno]').hidden = false;
         $('[data-prox]').textContent = i + 1 < fila.length ? 'Próxima →' : 'Ver resultado';
         $('[data-prox]').focus({ preventScroll: true });
+    }
+
+    // Depois de responder: grifa em vermelho o que torna cada alternativa errada (gerado uma vez pelo
+    // Gemini e guardado na questão). Em Certo/Errado, o grifo vai no próprio item. No erro, também
+    // explica por que a marcada está errada; no acerto, só grifa as outras, sem aviso de espera.
+    async function grifarErros(q, letra, acertou) {
+        const box = $('[data-porque]');
+        if (!acertou) { box.className = 'porque carregando'; box.textContent = 'Procurando o erro das alternativas…'; box.hidden = false; }
+        let t = null;
+        try {
+            const resp = await fetch(q.trechos, { headers: { 'Accept': 'application/json' } });
+            t = resp.ok ? (await resp.json()).trechos : null;
+        } catch (err) { /* sem rede: fica sem grifo */ }
+        if (fila[i] !== q) return; // já passou para a próxima
+        if (!t) { box.hidden = true; return; }
+        if (q.tipo === 'CE') {
+            if (t.enunciado) grifar($('[data-enun]'), t.enunciado);
+        } else {
+            document.querySelectorAll('.opt').forEach(b => { if (t[b.dataset.letra]) grifar(b.querySelector('.tx'), t[b.dataset.letra]); });
+        }
+        const marcada = acertou ? null : (q.tipo === 'CE' ? t.enunciado : t[letra]);
+        box.className = 'porque';
+        box.replaceChildren();
+        if (marcada?.motivo) {
+            const p = document.createElement('div');
+            const b = document.createElement('b'); b.textContent = q.tipo === 'CE' ? 'Por que está errado: ' : `Por que ${letra} está errada: `;
+            p.append(b, marcada.motivo);
+            box.append(p);
+        }
+        box.hidden = !box.childElementCount;
+    }
+
+    // Comentário da questão: o editado/gerado (HTML limpo no servidor) ou o texto do caderno. Sem
+    // comentário de professor, o Gemini escreve um (uma vez; fica salvo). Editável, com imagens.
+    const com = {
+        box: $('[data-com-box]'), corpo: $('[data-com]'), fonte: $('[data-com-fonte]'),
+        ver: $('[data-com-ver]'), edit: $('[data-com-edit]'), gerar: $('[data-com-gerar]'),
+        arquivo: $('[data-com-arquivo]'), q: null, original: '', html: null, enviando: 0,
+    };
+    const FONTES = { gemini: '· gerado pelo Gemini', aluno: '· editado por você' };
+    const rotuloFonte = f => FONTES[f] ?? (com.original ? '· do caderno' : '');
+    function pintarComentario() {
+        com.corpo.contentEditable = 'false';
+        com.corpo.classList.remove('carregando');
+        com.edit.hidden = true; com.ver.hidden = false;
+        if (com.html) com.corpo.innerHTML = com.html; // limpo no servidor (HtmlComentario)
+        else if (com.original) { const pre = document.createElement('pre'); pre.textContent = com.original; com.corpo.replaceChildren(pre); }
+        else com.corpo.replaceChildren(Object.assign(document.createElement('span'), { className: 'muted', textContent: 'Sem comentário. Clique em Editar para escrever o seu.' }));
+    }
+    function mostrarComentario(q, r) {
+        com.q = q; com.original = r.comentario ?? ''; com.html = r.comentario_html ?? null;
+        com.fonte.textContent = rotuloFonte(r.comentario_fonte);
+        com.box.hidden = false;
+        com.box.open = !r.ponto || !!r.gerar_comentario;
+        com.gerar.hidden = true;
+        pintarComentario();
+        if (r.gerar_comentario) gerarComentario(q);
+    }
+    async function gerarComentario(q) {
+        com.ver.hidden = true;
+        com.corpo.classList.add('carregando');
+        com.corpo.textContent = 'O caderno não trouxe comentário de professor: pedindo um ao Gemini…';
+        let d = null;
+        try { const resp = await fetch(q.comentario, { headers: { 'Accept': 'application/json' } }); d = resp.ok ? await resp.json() : null; } catch (err) { /* sem rede */ }
+        if (com.q !== q || com.corpo.contentEditable === 'true') return; // já passou para a próxima ou começou a editar
+        if (d?.html) { com.html = d.html; com.fonte.textContent = rotuloFonte(d.fonte); pintarComentario(); return; }
+        pintarComentario();
+        com.gerar.hidden = false;
+        com.corpo.insertAdjacentHTML('beforeend', '<p class="muted small">Não consegui gerar o comentário agora.</p>');
+    }
+    com.gerar.addEventListener('click', () => gerarComentario(com.q));
+    $('[data-com-editar]').addEventListener('click', () => {
+        if (!com.html) {
+            // Começa do texto do caderno, em parágrafos.
+            com.corpo.replaceChildren(...com.original.split(/\n\s*\n/).filter(b => b.trim()).map(b => {
+                const p = document.createElement('p');
+                b.trim().split('\n').forEach((l, k) => { if (k) p.append(document.createElement('br')); p.append(l); });
+                return p;
+            }));
+        }
+        com.corpo.contentEditable = 'true';
+        com.ver.hidden = true; com.edit.hidden = false;
+        com.corpo.focus();
+    });
+    $('[data-com-cancelar]').addEventListener('click', pintarComentario);
+    $('[data-com-salvar]').addEventListener('click', async () => {
+        if (com.enviando) { alert('Espere a imagem terminar de enviar.'); return; }
+        const corpo = new FormData();
+        corpo.append('_method', 'PUT'); corpo.append('_token', token); corpo.append('html', com.corpo.innerHTML);
+        const resp = await fetch(com.q.comentario, { method: 'POST', body: corpo, headers: { 'Accept': 'application/json' } });
+        if (!resp.ok) { alert('Não consegui salvar o comentário.'); return; }
+        const d = await resp.json();
+        com.html = d.html; com.fonte.textContent = rotuloFonte(d.fonte);
+        pintarComentario();
+    });
+    com.edit.querySelectorAll('[data-cmd]').forEach(b => b.addEventListener('mousedown', e => {
+        e.preventDefault(); // não tira o foco do texto
+        document.execCommand(b.dataset.cmd, false, b.dataset.cmd === 'hiliteColor' ? '#fff3a3' : null);
+    }));
+    $('[data-com-img]').addEventListener('click', () => com.arquivo.click());
+    com.arquivo.addEventListener('change', () => { [...com.arquivo.files].forEach(inserirImagem); com.arquivo.value = ''; });
+    com.corpo.addEventListener('paste', e => {
+        if (com.corpo.contentEditable !== 'true') return;
+        const imgs = [...(e.clipboardData?.files ?? [])].filter(f => f.type.startsWith('image/'));
+        if (imgs.length) { e.preventDefault(); imgs.forEach(inserirImagem); return; }
+        // Texto colado entra sem a formatação de fora (o servidor limparia de todo jeito).
+        const txt = e.clipboardData?.getData('text/plain');
+        if (txt) { e.preventDefault(); document.execCommand('insertText', false, txt); }
+    });
+    com.corpo.addEventListener('dragover', e => { if (com.corpo.contentEditable === 'true') e.preventDefault(); });
+    com.corpo.addEventListener('drop', e => {
+        if (com.corpo.contentEditable !== 'true') return;
+        const imgs = [...(e.dataTransfer?.files ?? [])].filter(f => f.type.startsWith('image/'));
+        if (!imgs.length) return;
+        e.preventDefault();
+        const pos = document.caretRangeFromPoint?.(e.clientX, e.clientY);
+        if (pos) { const sel = getSelection(); sel.removeAllRanges(); sel.addRange(pos); }
+        imgs.forEach(inserirImagem);
+    });
+    async function inserirImagem(arq) {
+        if (arq.size > 8 * 1024 * 1024) { alert('Imagem grande demais (máx. 8 MB).'); return; }
+        const img = document.createElement('img');
+        img.alt = arq.name; img.src = URL.createObjectURL(arq); img.style.opacity = '.5';
+        const sel = getSelection();
+        if (sel.rangeCount && com.corpo.contains(sel.anchorNode)) {
+            const rg = sel.getRangeAt(0);
+            rg.deleteContents(); rg.insertNode(img); rg.setStartAfter(img); rg.collapse(true);
+            sel.removeAllRanges(); sel.addRange(rg);
+        } else com.corpo.append(img);
+        com.enviando++;
+        try {
+            const corpo = new FormData(); corpo.append('arquivo', arq); corpo.append('_token', token);
+            const resp = await fetch(com.q.anexos, { method: 'POST', body: corpo, headers: { 'Accept': 'application/json' } });
+            if (!resp.ok) throw new Error(resp.status);
+            const { src } = await resp.json();
+            URL.revokeObjectURL(img.src);
+            img.src = src; img.style.opacity = '';
+        } catch (err) {
+            img.remove(); alert('Não consegui enviar a imagem.');
+        } finally { com.enviando--; }
+    }
+
+    /** Envolve em <mark class="errado"> cada trecho (sem diferenciar maiúsculas nem espaços). */
+    function grifar(el, { trechos = [], motivo = '' }) {
+        const texto = el.textContent;
+        const faixas = [];
+        trechos.forEach(tr => {
+            const re = new RegExp(tr.trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replace(/\s+/g, '\\s+'), 'giu');
+            for (const m of texto.matchAll(re)) if (m[0]) faixas.push([m.index, m.index + m[0].length]);
+        });
+        if (!faixas.length) return;
+        faixas.sort((a, b) => a[0] - b[0]);
+        const juntas = [faixas[0]];
+        faixas.slice(1).forEach(f => { const u = juntas[juntas.length - 1]; if (f[0] <= u[1]) u[1] = Math.max(u[1], f[1]); else juntas.push(f); });
+        const nos = [];
+        let pos = 0;
+        juntas.forEach(([a, b]) => {
+            if (a > pos) nos.push(document.createTextNode(texto.slice(pos, a)));
+            const m = document.createElement('mark'); m.className = 'errado'; m.textContent = texto.slice(a, b);
+            if (motivo) m.title = motivo;
+            nos.push(m);
+            pos = b;
+        });
+        if (pos < texto.length) nos.push(document.createTextNode(texto.slice(pos)));
+        el.replaceChildren(...nos);
     }
 
     function escapar(s) { const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
@@ -372,7 +579,7 @@
 
     $('[data-prox]').addEventListener('click', proxima);
     document.addEventListener('keydown', e => {
-        if (dlg.open || e.target.closest('input, select, textarea')) return;
+        if (dlg.open || e.target.closest('input, select, textarea, [contenteditable=true]')) return;
         if (e.key === 'Enter' && respondida) { e.preventDefault(); return proxima(); }
         const k = e.key.toUpperCase();
         if (!respondida && ['1', '2', '3'].includes(k)) return marcarCerteza(['sei', 'acho', 'chute'][+k - 1]);

@@ -63,6 +63,7 @@ class LivroController extends Controller
         $base = $this->base($material);
         $plano = $base['plano'];
         $i = $plano->search(fn ($c) => $c['id'] === $capitulo->id);
+        $soTeoria = !request()->boolean('todos') && $this->documento->temTeoria($doc);
 
         return view('concursos.material.livro', $base + [
             'capitulo' => $capitulo,
@@ -70,13 +71,15 @@ class LivroController extends Controller
             'pdf' => $capitulo->pdf_anexo_id ? route('concursos.material.anexos.show', $capitulo->pdf_anexo_id) : null,
             'anterior' => $i > 0 ? $plano[$i - 1] : null,
             'proximo' => $i !== false && $i < $plano->count() - 1 ? $plano[$i + 1] : null,
+            'tempoLeitura' => $this->documento->tempoLeitura($doc, $soTeoria),
             // Capítulo de teoria: lê-se só a teoria (os pontos ficam na área de Questões e no editor).
             // Capítulo só do diário de erros (assunto do TEC): mostra os pontos, que é tudo o que ele tem.
             'html' => $this->documento->html($doc, $citacoes, ['pontos' => $pontos, 'questoes' => $questoes,
-                'soTeoria' => !request()->boolean('todos') && $this->documento->temTeoria($doc)]),
+                'soTeoria' => $soTeoria]),
             'dadosEditor' => [
                 'doc' => $doc,
                 'capituloId' => $capitulo->id,
+                'soTeoria' => $soTeoria,
                 'pontos' => $pontos->map(fn ($p) => $this->dadosPonto($p))->all(),
                 'questoes' => $questoes->map(fn ($q) => $this->dadosQuestao($q))->all(),
                 'doCapitulo' => $questoes->where('capitulo_id', $capitulo->id)->keys()->values()->all(),
@@ -400,7 +403,11 @@ class LivroController extends Controller
         $porCap = $ids->map(fn ($qids) => $qids->map(fn ($id) => $porId->get($id))->filter()->countBy(fn ($q) => $q->estado()));
         $estados = $questoes->countBy(fn ($q) => $q->estado());
 
-        $plano = $this->plano($capitulos)->map(function ($c) use ($porCap) {
+        $tempos = $capitulos->mapWithKeys(fn ($c) => [
+            $c->id => $this->documento->tempoLeitura($c->conteudo, !$todos && $this->documento->temTeoria($c->conteudo)),
+        ]);
+
+        $plano = $this->plano($capitulos)->map(function ($c) use ($porCap, $tempos) {
             $e = $porCap->get($c['id'], collect());
 
             return $c + [
@@ -409,6 +416,7 @@ class LivroController extends Controller
                 'dominado' => (int) $e->get('dominado', 0),
                 'pontos' => (int) $e->sum(),
                 'questoes' => (int) $e->sum(),
+                'tempo_leitura' => (int) $tempos->get($c['id'], 0),
             ];
         });
 
@@ -424,6 +432,7 @@ class LivroController extends Controller
                 'dominado' => (int) $estados->get('dominado', 0),
                 'questoes' => $questoes->count(),
                 'hoje' => $questoes->filter(fn ($q) => $q->naFilaHoje())->count(),
+                'tempo_leitura' => (int) $plano->sum('tempo_leitura'),
             ],
         ];
     }

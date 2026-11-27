@@ -164,6 +164,19 @@
                 <div>
                     <h1>Bem-vindo, {{ Auth::user()->name }}!</h1>
                     <p>Selecione um sistema no menu lateral para começar</p>
+                    @if (Auth::user()->is_admin)
+                        @php $backups = \App\Console\Commands\BackupConferirCommand::situacao(); @endphp
+                        @if ($backups)
+                            <p class="selos-backup" style="display:flex; flex-wrap:wrap; gap:.4rem; margin-top:.5rem;">
+                                @foreach ($backups as $b)
+                                    @php $cor = $b['horas'] === null || $b['horas'] > 26 ? ['#fee2e2', '#b91c1c'] : ($b['horas'] > 2 ? ['#fef3c7', '#92400e'] : ['#dcfce7', '#166534']); @endphp
+                                    <span title="Cópia mais nova em {{ $b['pasta'] }}" style="font-size:.75rem; font-weight:600; padding:.2rem .55rem; border-radius:99px; background:{{ $cor[0] }}; color:{{ $cor[1] }};">
+                                        Backup {{ mb_strtolower($b['nome']) }}: {{ $b['horas'] === null ? 'nenhum' : 'há ' . \App\Console\Commands\BackupConferirCommand::horas($b['horas']) }}
+                                    </span>
+                                @endforeach
+                            </p>
+                        @endif
+                    @endif
                 </div>
                 <div>
                     <button type="button" onclick="openCelularModal()" class="btn-conectar-celular" style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.55rem 0.95rem; background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: #fff; border: none; border-radius: 8px; font-weight: 600; font-size: 0.85rem; cursor: pointer; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25); transition: all 0.2s ease;">
