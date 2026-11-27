@@ -2,33 +2,48 @@
 
 @section('title', 'Resumos')
 
+@section('head')
+    <link href="https://fonts.googleapis.com/css2?family=Literata:opsz,wght@7..72,600;7..72,700&display=swap" rel="stylesheet">
+@endsection
+
 @section('css')
     @include('concursos.material._estilo')
-    .intro { margin: 0 0 20px; }
+    .wrap { max-width: 1100px; }
+    .intro { margin: 0 0 28px; }
 
-    /* fila de revisão */
-    .fila { padding: 8px; }
-    .fila .secao-titulo { padding: 10px 10px 0; }
-    .fila-item { display: flex; align-items: center; gap: 12px; padding: 10px; border-radius: 10px; text-decoration: none; color: var(--ink); }
-    .fila-item:hover, .fila-item:focus-visible { background: var(--accent-soft); outline: none; }
-    .fila-item .etq { min-width: 34px; justify-content: center; }
-    .fila-texto { flex: 1; min-width: 0; }
-    .fila-texto b { display: block; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .fila-texto span { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--muted); }
-    .ponto-cor { width: 8px; height: 8px; border-radius: 50%; flex: none; }
-    .fila-ir { font-size: 13px; font-weight: 600; color: var(--accent); white-space: nowrap; }
-    .fila-vazia { display: flex; align-items: center; gap: 10px; padding: 6px 10px 10px; color: var(--muted); font-size: 14px; }
-
-    /* estante */
-    .estante { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
-    .livro-card { display: flex; flex-direction: column; gap: 10px; margin: 0; text-decoration: none; color: inherit; border-left: 4px solid var(--cor); padding: 18px 20px; }
-    .livro-card h3 { font-size: 16px; margin: 0; color: var(--ink); line-height: 1.35; }
-    .livro-card .desc { font-size: 13px; color: var(--muted); margin: -6px 0 0; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-    .livro-card .etqs { display: flex; gap: 6px; flex-wrap: wrap; }
-    .livro-card .rodape { display: flex; justify-content: space-between; font-size: 13px; color: var(--muted); margin-top: auto; }
+    /* estante: cada matéria é a capa de um livro */
+    .estante { display: grid; grid-template-columns: repeat(auto-fill, minmax(168px, 1fr)); gap: 36px 28px; padding: 4px 4px 8px; }
+    .livro-item { display: flex; flex-direction: column; gap: 10px; text-decoration: none; color: var(--ink); perspective: 900px; }
+    .capa-livro { --cor: #7f77dd; position: relative; aspect-ratio: 3 / 4.2; border-radius: 3px 10px 10px 3px;
+        background:
+            radial-gradient(120% 70% at 85% 0%, rgba(255,255,255,.22), transparent 60%),
+            linear-gradient(160deg, color-mix(in srgb, var(--cor) 85%, #fff) 0%, var(--cor) 45%, color-mix(in srgb, var(--cor) 68%, #000) 100%);
+        box-shadow: inset 0 0 0 1px rgba(0,0,0,.08), 6px 10px 22px rgba(16,24,40,.22), 3px 0 0 -1px #f3efe6, 5px 1px 0 -1px #e2ddd2, 7px 2px 0 -1px #d3cdc0;
+        transform-origin: left center; transition: transform .25s ease, box-shadow .25s ease; color: #fff; container-type: inline-size; display: flex; flex-direction: column; padding: 18px 14px 14px 26px; }
+    /* lombada */
+    .capa-livro::before { content: ''; position: absolute; inset: 0 auto 0 0; width: 14px; border-radius: 3px 0 0 3px;
+        background: linear-gradient(90deg, rgba(0,0,0,.32), rgba(0,0,0,.12) 55%, rgba(255,255,255,.18) 70%, rgba(0,0,0,.18)); }
+    /* moldura gravada */
+    .capa-livro::after { content: ''; position: absolute; inset: 10px 10px 10px 22px; border: 1px solid rgba(255,255,255,.35); border-radius: 4px; pointer-events: none; }
+    .capa-rotulo { font: 700 10.5px/1 Inter, system-ui, sans-serif; letter-spacing: .14em; text-transform: uppercase; opacity: .85; }
+    .capa-titulo { margin: auto 0; font-family: 'Literata', Georgia, serif; font-weight: 700; font-size: clamp(15px, 12cqi, 24px); line-height: 1.15; letter-spacing: -.01em; text-shadow: 0 1px 2px rgba(0,0,0,.25); overflow-wrap: break-word; }
+    .capa-titulo.longo { font-size: clamp(13px, 9.6cqi, 20px); }
+    .capa-filete { width: 36px; height: 3px; border-radius: 2px; background: rgba(255,255,255,.7); margin-bottom: 10px; }
+    .capa-rodape { display: flex; justify-content: space-between; align-items: end; font: 600 11px/1.2 Inter, system-ui, sans-serif; opacity: .9; }
+    .capa-sigla { font-family: 'Literata', Georgia, serif; font-size: 22px; font-weight: 700; opacity: .4; line-height: 1; }
+    .livro-item:hover .capa-livro, .livro-item:focus-visible .capa-livro { transform: rotateY(-14deg) translateY(-3px);
+        box-shadow: inset 0 0 0 1px rgba(0,0,0,.08), 14px 16px 30px rgba(16,24,40,.28), 3px 0 0 -1px #f3efe6, 5px 1px 0 -1px #e2ddd2, 7px 2px 0 -1px #d3cdc0; }
+    .livro-item:focus-visible { outline: none; } .livro-item:focus-visible .capa-livro { outline: 3px solid var(--accent); outline-offset: 3px; }
+    .livro-item { animation: surgir .45s var(--mola) both; animation-delay: calc(var(--i, 0) * 45ms); }
+    .livro-legenda { font-size: 14px; font-weight: 600; line-height: 1.3; }
+    .livro-legenda span { display: block; font-size: 12.5px; font-weight: 500; color: var(--muted); }
     .livro-vazio { grid-column: 1 / -1; }
-    .livro-card .acoes-card { display: flex; gap: 8px; }
-    .livro-card .acoes-card .btn { flex: 1; text-align: center; }
+    /* "novo livro" como capa em branco */
+    .capa-nova { aspect-ratio: 3 / 4.2; border: 2px dashed var(--line); border-radius: 3px 10px 10px 3px; display: grid; place-items: center; text-align: center; color: var(--muted); font-weight: 600; font-size: 14px; background: none; cursor: pointer; font-family: inherit; width: 100%; transition: border-color .15s, color .15s; }
+    .capa-nova b { display: block; font-size: 34px; font-weight: 400; line-height: 1; margin-bottom: 6px; }
+    .capa-nova:hover { border-color: var(--accent); color: var(--accent); }
+    @media (prefers-reduced-motion: reduce) { .capa-livro { transition: none; } .livro-item:hover .capa-livro { transform: none; } }
+    @media (max-width: 520px) { .estante { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 26px 18px; } }
 
     /* novo livro */
     dialog.novo-livro { border: 1px solid var(--line); border-radius: 14px; background: var(--card); color: var(--ink); padding: 20px; width: min(440px, calc(100% - 32px)); }
@@ -38,72 +53,35 @@
     dialog.novo-livro input:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
     dialog.novo-livro .acoes { display: flex; justify-content: flex-end; gap: 8px; }
 
-    @media (max-width: 680px) { .estante { grid-template-columns: minmax(0, 1fr); } .fila-ir { display: none; } }
 @endsection
 
 @section('content')
-<div class="cabeca">
-    <h1>Matérias</h1>
-    <button type="button" class="btn main" data-novo-livro>+ Novo livro</button>
-</div>
-<p class="muted small intro">Uma matéria por card: o <b>Resumo</b> (teoria, para ler e grifar) e as <b>Questões</b> (todas as dos cadernos, com a fila de revisão do dia).</p>
+<div class="cabeca"><h1>Resumos</h1></div>
+<p class="muted small intro">Um livro por matéria, com a teoria para ler, grifar e anotar. As questões e a fila do dia ficam em <a href="{{ route('concursos.revisoes') }}">Revisões</a>.</p>
 
-@if ($materiais->isNotEmpty())
-    <section class="card fila" aria-labelledby="fila-titulo">
-        <div class="secao-titulo">
-            <h2 id="fila-titulo">Para revisar hoje</h2>
-            @if ($fila->isNotEmpty())
-                <span class="muted small">{{ $fila->sum(fn ($m) => $contagens[$m->id]['hoje']) }} questões na fila</span>
-            @endif
-        </div>
-        @forelse ($fila as $m)
-            <a class="fila-item" href="{{ route('concursos.material.refazer', [$m, 'situacao' => 'fila', 'iniciar' => 1]) }}">
-                <span class="etq err" title="questões vencidas na fila de revisão">{{ $contagens[$m->id]['hoje'] }}</span>
-                <span class="fila-texto">
-                    <b>{{ $m->titulo }}</b>
-                    <span><i class="ponto-cor" style="background: {{ $m->cor() }}"></i>{{ $contagens[$m->id]['errando'] ?? 0 }} ainda erro · {{ $contagens[$m->id]['revisando'] ?? 0 }} revisando</span>
-                </span>
-                <span class="fila-ir">Revisar →</span>
-            </a>
-        @empty
-            <div class="fila-vazia">Nada vencido hoje. Quando errar uma questão, ela volta aqui amanhã.</div>
-        @endforelse
-    </section>
-@endif
-
-<div class="secao-titulo"><h2>Matérias</h2>@if ($materiais->isNotEmpty())<span class="muted small">{{ $materiais->count() }}</span>@endif</div>
 <div class="estante">
-    @forelse ($materiais as $m)
+    @foreach ($materiais as $m)
         @php
-            $c = $contagens[$m->id] ?? [];
-            $err = $c['errando'] ?? 0; $rev = $c['revisando'] ?? 0; $dom = $c['dominado'] ?? 0;
-            $total = $err + $rev + $dom;
+            $n = $capitulos[$m->id] ?? 0;
+            $palavras = preg_split('/\s+/u', trim(preg_replace('/\b(de|da|do|das|dos|e|para)\b/iu', ' ', $m->titulo)));
+            $sigla = mb_strtoupper(collect($palavras)->filter()->take(2)->map(fn ($p) => mb_substr($p, 0, 1))->implode(''));
         @endphp
-        <div class="card livro-card" style="--cor: {{ $m->cor() }}">
-            <h3><a href="{{ route('concursos.material.show', $m) }}" style="color:inherit;text-decoration:none">{{ $m->titulo }}</a></h3>
-            @if ($m->descricao)<p class="desc">{{ $m->descricao }}</p>@endif
-            <div class="seg" role="img" aria-label="{{ $err }} ainda erro, {{ $rev }} revisando, {{ $dom }} dominados">
-                @if ($total)
-                    <i class="err" style="width: {{ $err / $total * 100 }}%"></i><i class="rev" style="width: {{ $rev / $total * 100 }}%"></i><i class="dom" style="width: {{ $dom / $total * 100 }}%"></i>
-                @endif
-            </div>
-            <div class="etqs">
-                <span class="etq err">{{ $err }} ainda erro</span>
-                <span class="etq rev">{{ $rev }} revisando</span>
-                <span class="etq dom">{{ $dom }} dominadas</span>
-            </div>
-            <div class="rodape">
-                <span>{{ $total }} questões · {{ $total ? round($dom / $total * 100) : 0 }}% dominadas</span>
-                @if ($c['hoje'] ?? 0)<span>{{ $c['hoje'] }} para hoje</span>@endif
-            </div>
-            <div class="acoes-card">
-                <a class="btn" href="{{ route('concursos.material.show', $m) }}">Resumo</a>
-                <a class="btn" href="{{ route('concursos.material.refazer', $m) }}">Questões</a>
-            </div>
-        </div>
-    @empty
-        <div class="card muted livro-vazio">Nenhum livro ainda. Crie um em <b>+ Novo livro</b> ou importe os cadernos com <code>php artisan concursos:importar-material</code>.</div>
-    @endforelse
+        <a class="livro-item" style="--i: {{ $loop->index }}" href="{{ route('concursos.material.show', $m) }}" aria-label="Abrir o resumo de {{ $m->titulo }}">
+            <span class="capa-livro" style="--cor: {{ $m->cor() }}" aria-hidden="true">
+                <span class="capa-rotulo">Resumo</span>
+                <span class="capa-titulo{{ collect($palavras)->max(fn ($p) => mb_strlen($p)) >= 12 ? ' longo' : '' }}">{{ $m->titulo }}</span>
+                <span class="capa-filete"></span>
+                <span class="capa-rodape"><span>{{ $n }} {{ $n === 1 ? 'capítulo' : 'capítulos' }}</span><span class="capa-sigla">{{ $sigla }}</span></span>
+            </span>
+            <span class="livro-legenda">{{ $m->titulo }}</span>
+        </a>
+    @endforeach
+    <div class="livro-item" style="--i: {{ $materiais->count() }}">
+        <button type="button" class="capa-nova" data-novo-livro><span><b>+</b>Novo livro</span></button>
+    </div>
+    @if ($materiais->isEmpty())
+        <p class="muted small livro-vazio">Nenhum livro ainda. Crie um em <b>Novo livro</b> ou importe os cadernos com <code>php artisan concursos:importar-material</code>.</p>
+    @endif
 </div>
 
 <dialog class="novo-livro" aria-labelledby="novo-livro-titulo">

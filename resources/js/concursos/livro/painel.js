@@ -1,5 +1,5 @@
-// Peças de leitura em volta do texto: prévia de artigo ao passar o mouse, gaveta com as questões
-// erradas de uma seção, sumário "Nesta página" (quando não há notas), barra de progresso e modo foco.
+// Peças de leitura em volta do texto: prévia de artigo ao passar o mouse, modal com as questões
+// de uma seção, sumário "Nesta página" (quando não há notas), barra de progresso e modo foco.
 import { estado, api, el, abrirCitacao, guardar, ler } from './util.js';
 import { chaveLeitura } from './leitura.js';
 
@@ -80,14 +80,45 @@ function montarPrevia(alvo) {
     });
 }
 
-// ---- gaveta "✗ N erros" ------------------------------------------------------------------------
+// ---- selo "N questões": modal para resolver as questões da seção ---------------------------------
+// O modal carrega a tela de Questões em modo embutido; "Expandir" abre a mesma lista em página própria.
+function urlQuestoes(s) {
+    // O selo conta os números do TEC citados nas notas da seção: abre exatamente essas.
+    if (s.total?.size) {
+        const u = new URL(estado.urls.refazer, location.href);
+        u.search = new URLSearchParams({ tec: [...s.total].join(','), situacao: 'todas', iniciar: '1', qtd: '200' });
+        return u;
+    }
+    const ids = new Set();
+    s.todasMarcas.forEach(m => (estado.grifosQ?.[m]?.ids ?? []).forEach(id => ids.add(id)));
+    if (ids.size) {
+        const u = new URL(estado.urls.refazer, location.href);
+        u.search = new URLSearchParams({ ids: [...ids].join(','), situacao: 'todas', iniciar: '1', qtd: '200' });
+        return u;
+    }
+    // Sem grifo ligado: cai nas questões do capítulo inteiro.
+    const cap = document.querySelector('.questoes-cap a.btn');
+    return cap ? new URL(cap.href, location.href) : null;
+}
+
 function montarGavetaErros(alvo, secoes) {
-    const gaveta = el('aside', { class: 'gaveta-erros', 'aria-label': 'Questões erradas da seção', hidden: '' });
-    const fundo = el('div', { class: 'gaveta-fundo', hidden: '' });
-    document.body.append(fundo, gaveta);
-    const fechar = () => { gaveta.hidden = true; fundo.hidden = true; };
-    fundo.addEventListener('click', fechar);
-    document.addEventListener('keydown', e => { if (e.key === 'Escape' && !gaveta.hidden) fechar(); });
+    const dlg = el('dialog', { class: 'modal-questoes', 'aria-labelledby': 'mq-titulo' });
+    const titulo = el('h2', { id: 'mq-titulo' });
+    const sub = el('small');
+    const expandir = el('a', { class: 'btn mini', title: 'Abrir as questões em página própria' }, '⤢ Expandir');
+    const fechar = el('button', { type: 'button', class: 'btn mini', 'aria-label': 'Fechar' }, '✕');
+    const quadro = el('iframe', { title: 'Questões da seção' });
+    // Skeleton no formato de uma questão enquanto a tela carrega dentro do modal.
+    const cartao = () => el('div', { class: 'c' }, el('div', { class: 'esqueleto l t' }), el('div', { class: 'esqueleto l' }), el('div', { class: 'esqueleto l', style: 'width:85%' }),
+        el('div', { class: 'esqueleto o' }), el('div', { class: 'esqueleto o' }), el('div', { class: 'esqueleto o' }));
+    const esqueleto = el('div', { class: 'mq-esqueleto', 'aria-hidden': 'true' }, cartao());
+    dlg.append(el('header', {}, el('div', {}, sub, titulo), expandir, fechar), el('div', { class: 'mq-corpo' }, quadro, esqueleto));
+    quadro.addEventListener('load', () => { if (quadro.src !== 'about:blank') dlg.classList.remove('carregando'); });
+    document.body.append(dlg);
+    fechar.addEventListener('click', () => dlg.close());
+    dlg.addEventListener('click', e => { if (e.target === dlg) dlg.close(); });
+    // Espera a animação de saída antes de descarregar a tela de dentro.
+    dlg.addEventListener('close', () => { document.body.style.overflow = ''; setTimeout(() => { if (!dlg.open) quadro.src = 'about:blank'; }, 300); });
 
     alvo.addEventListener('mousedown', e => { if (e.target.closest('.badge-erros')) e.preventDefault(); });
     alvo.addEventListener('click', e => {
@@ -95,32 +126,17 @@ function montarGavetaErros(alvo, secoes) {
         if (!b) return;
         e.preventDefault();
         const s = secoes().find(x => x.id === b.dataset.secao);
-        if (!s) return;
-        const porMarca = new Map((estado.anotacoes ?? []).map(a => [a.marca, a]));
-        const fechar1 = el('button', { type: 'button', class: 'btn mini', 'aria-label': 'Fechar' }, '✕');
-        fechar1.addEventListener('click', fechar);
-        const itens = [...s.todasMarcas].map(m => porMarca.get(m)).filter(Boolean).map(a => {
-            const ir = el('button', { type: 'button', class: 'link' }, 'Ver no texto');
-            ir.addEventListener('click', () => {
-                fechar();
-                const m = alvo.querySelector(`mark[data-nota="${a.marca}"]`);
-                m?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                m?.classList.remove('piscar'); void m?.offsetWidth; m?.classList.add('piscar');
-            });
-            return el('article', { class: `ge-item ${a.cor}` },
-                el('blockquote', {}, `“${(a.trecho ?? '').slice(0, 180)}${(a.trecho ?? '').length > 180 ? '…' : ''}”`),
-                el('p', { class: 'nota-texto' }, a.nota ?? ''),
-                ir);
-        });
-        const refazer = document.querySelector('.questoes-cap a.btn');
-        gaveta.replaceChildren(
-            el('header', {}, el('div', {}, el('small', {}, `${s.num} · ${s.total.size} ${s.total.size === 1 ? 'questão' : 'questões'}`), el('h2', {}, s.titulo)), fechar1),
-            el('div', { class: 'ge-lista' }, ...itens),
-            ...(refazer ? [el('a', { class: 'btn main', href: refazer.href }, 'Refazer as questões do capítulo')] : []),
-        );
-        gaveta.hidden = false;
-        fundo.hidden = false;
-        fechar1.focus();
+        const url = s && urlQuestoes(s);
+        if (!url) return;
+        sub.textContent = `${s.num} · ${s.total.size} ${s.total.size === 1 ? 'questão' : 'questões'}`;
+        titulo.textContent = s.titulo;
+        expandir.href = url.href;
+        const embutido = new URL(url); embutido.searchParams.set('embed', '1');
+        dlg.classList.add('carregando');
+        quadro.src = embutido.href;
+        document.body.style.overflow = 'hidden';
+        dlg.showModal();
+        fechar.focus();
     });
 }
 

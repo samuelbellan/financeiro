@@ -21,7 +21,18 @@ use Illuminate\View\View;
  */
 class MaterialController extends Controller
 {
+    /** Aba Resumos: só a estante de livros (um por matéria). */
     public function index(Request $request): View
+    {
+        $materiais = Material::where('user_id', $request->user()->id)->orderBy('titulo')->get();
+        $capitulos = MaterialCapitulo::whereIn('material_id', $materiais->pluck('id'))
+            ->whereNull('parent_id')->selectRaw('material_id, count(*) as n')->groupBy('material_id')->pluck('n', 'material_id');
+
+        return view('concursos.material.index', compact('materiais', 'capitulos'));
+    }
+
+    /** Aba Revisões: fila do dia e situação das questões de cada matéria. */
+    public function revisoes(Request $request): View
     {
         $materiais = Material::where('user_id', $request->user()->id)->orderBy('titulo')->get();
 
@@ -30,14 +41,12 @@ class MaterialController extends Controller
             ->get(['id', 'material_id', 'resultado_tec', 'caixa', 'revisar_em'])
             ->groupBy('material_id')
             ->map(fn ($qs) => $qs->countBy(fn ($q) => $q->estado())->all() + ['hoje' => $qs->filter(fn ($q) => $q->naFilaHoje())->count(), 'total' => $qs->count()]);
-        $capitulos = MaterialCapitulo::whereIn('material_id', $materiais->pluck('id'))
-            ->whereNull('parent_id')->selectRaw('material_id, count(*) as n')->groupBy('material_id')->pluck('n', 'material_id');
 
         // "Para revisar hoje": matérias com questões vencidas na fila.
         $fila = $materiais->filter(fn ($m) => ($contagens[$m->id]['hoje'] ?? 0) > 0)
             ->sortByDesc(fn ($m) => $contagens[$m->id]['hoje'])->values();
 
-        return view('concursos.material.index', compact('materiais', 'contagens', 'capitulos', 'fila'));
+        return view('concursos.material.revisoes', compact('materiais', 'contagens', 'fila'));
     }
 
     public function store(Request $request): RedirectResponse

@@ -91,6 +91,7 @@ class LivroController extends Controller
                     'anexo' => route('concursos.material.anexos.store', $material),
                     'citacao' => route('concursos.material.citacao'),
                     'questoes' => route('concursos.material.questoes', $material),
+                    'refazer' => $refazer,
                 ],
             ],
         ]);

@@ -27,6 +27,7 @@ class UsoEvento extends ConcursosModel
         'concursos.questoes.responder' => 'Respondeu questão',
         'concursos.questoes.motivo' => 'Informou motivo do erro',
         'concursos.material.index' => 'Resumos',
+        'concursos.revisoes' => 'Revisões',
         'concursos.material.store' => 'Criou resumo',
         'concursos.material.show' => 'Livro de resumo',
         'concursos.material.capitulo' => 'Capítulo do resumo',
