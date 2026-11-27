@@ -69,6 +69,38 @@ class Reancorador
         return $saida;
     }
 
+    /**
+     * Posição de um ponto (nota) pelo contexto: o fim do "antes" colado ao começo do "depois", com
+     * espaços flexíveis; sem isso, só o "antes" (o ponto fica no fim dele) ou só o "depois".
+     * null quando nenhum dos dois aparece mais.
+     */
+    public function localizarPonto(string $texto, string $antes, string $depois): ?int
+    {
+        $pa = preg_split('/\s+/u', trim($antes), -1, PREG_SPLIT_NO_EMPTY);
+        $pd = preg_split('/\s+/u', trim($depois), -1, PREG_SPLIT_NO_EMPTY);
+        $q = fn (array $ps) => implode('\s+', array_map(fn ($p) => preg_quote($p, '/'), $ps));
+        $tentativas = [];
+        if ($pa && $pd) {
+            $meio = preg_match('/\s$/u', $antes) || preg_match('/^\s/u', $depois) ? '\s+' : '';
+            $tentativas[] = ['/(' . $q($pa) . ')' . $meio . $q($pd) . '/u', 'fim'];
+        }
+        if ($pa) {
+            $tentativas[] = ['/(' . $q($pa) . ')/u', 'fim'];
+        }
+        if ($pd) {
+            $tentativas[] = ['/(' . $q($pd) . ')/u', 'inicio'];
+        }
+        foreach ($tentativas as [$padrao, $lado]) {
+            if (preg_match($padrao, $texto, $m, PREG_OFFSET_CAPTURE)) {
+                $byte = $lado === 'fim' ? $m[1][1] + strlen($m[1][0]) : $m[1][1];
+
+                return mb_strlen(substr($texto, 0, $byte));
+            }
+        }
+
+        return $pa || $pd ? null : 0;
+    }
+
     /** Contexto em volta de um intervalo, para guardar junto do grifo. @return array{antes: string, depois: string} */
     public function contexto(string $texto, int $inicio, int $fim): array
     {

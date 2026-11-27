@@ -2,7 +2,7 @@
 // tinta) no modal de nota-ponto.js. A nota fica no próprio documento (salva junto com o texto).
 // Formato validado de novo no servidor (Documento::limparNo, tipo notaPonto): manter igual.
 import { Node } from '@tiptap/core';
-import { abrirNota, dicaDaNota, notaVazia } from '../nota-ponto.js';
+import { abrirNota, dicaDaNota } from '../nota-ponto.js';
 import { novoId } from './util.js';
 
 const jsonAttr = (nome, padrao) => ({
@@ -41,10 +41,10 @@ export const NotaPonto = Node.create({
     addCommands() {
         return {
             /** Põe uma nota nova em pos e já abre o modal; fechada vazia, ela sai do texto. */
-            inserirNotaPonto: pos => ({ editor }) => {
+            inserirNotaPonto: pos => ({ editor, tr, dispatch }) => {
+                if (!dispatch) return true;
                 const id = novoId();
-                const tr = editor.state.tr.insert(pos, this.type.create({ id }));
-                editor.view.dispatch(tr);
+                tr.insert(pos, this.type.create({ id }));
                 setTimeout(() => abrirDoTexto(editor, id, true), 0);
                 return true;
             },
@@ -119,5 +119,3 @@ function abrirDoTexto(editor, id, nova = false) {
         },
     });
 }
-
-export { notaVazia };

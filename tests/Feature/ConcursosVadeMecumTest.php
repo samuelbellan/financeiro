@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\Concursos\LeiGrifo;
 use App\Models\Concursos\LeiMarca;
+use App\Models\Concursos\LeiNota;
 use App\Models\Concursos\Material;
 use App\Models\Concursos\MaterialCapitulo;
 use App\Models\Concursos\MaterialPonto;
@@ -189,6 +190,40 @@ class ConcursosVadeMecumTest extends TestCase
         $this->assertSame('texto que foi revogado', $grifos[0]['trecho']);
         $this->assertSame(8, $grifos[1]['inicio']);
         $this->assertSame(2, LeiGrifo::count());
+    }
+
+    public function test_nota_num_ponto_guarda_contexto_e_volta_no_lugar(): void
+    {
+        // Texto puro do art. 1: "Art. 1º Texto inventado." → posição 13 = logo depois de "Texto".
+        $url = route('concursos.leis.notas.store', ['li', 'art-1']);
+        $r = $this->actingAs($this->user)->postJson($url, ['posicao' => 13, 'texto' => 'Minha nota', 'tracos' => [['c' => 'verde', 'p' => [1, 2, 0.5]]]])
+            ->assertOk()->assertJson(['texto' => 'Minha nota', 'posicao' => 13]);
+        $n = LeiNota::findOrFail($r->json('id'));
+        $this->assertSame('Art. 1º Texto', $n->antes);
+        $this->assertSame(' inventado.', rtrim($n->depois));
+
+        // Vazia, fora do artigo, artigo inexistente.
+        $this->actingAs($this->user)->postJson($url, ['posicao' => 3, 'texto' => ' '])->assertStatus(422);
+        $this->actingAs($this->user)->postJson($url, ['posicao' => 999, 'texto' => 'x'])->assertStatus(422);
+        $this->actingAs($this->user)->postJson(route('concursos.leis.notas.store', ['li', 'art-77']), ['posicao' => 1, 'texto' => 'x'])->assertNotFound();
+
+        // O texto mudou na frente: a nota acha o lugar pelo contexto; sem contexto, vai para o fim (null).
+        LeiNota::create(['user_id' => $this->user->id, 'lei' => 'li', 'ancora' => 'art-2', 'antes' => 'Art. 2º Outro', 'depois' => ' texto.', 'texto' => 'a']);
+        LeiNota::create(['user_id' => $this->user->id, 'lei' => 'li', 'ancora' => 'art-2', 'antes' => 'revogado', 'depois' => 'sumiu', 'texto' => 'b']);
+        $html = $this->actingAs($this->user)->get(route('concursos.leis.show', 'li'))->assertOk()->getContent();
+        preg_match('/id="art-2"[^>]*data-notas-ponto="([^"]+)"/', $html, $m);
+        $notas = json_decode(html_entity_decode($m[1]), true);
+        $this->assertSame(13, $notas[0]['posicao']);
+        $this->assertNull($notas[1]['posicao']);
+        $this->assertStringContainsString('lei-notas', $html);
+
+        // Editar e apagar: só o dono.
+        $outro = User::factory()->create();
+        $this->actingAs($outro)->putJson(route('concursos.leis.notas.update', $n), ['texto' => 'x'])->assertNotFound();
+        $this->actingAs($outro)->deleteJson(route('concursos.leis.notas.destroy', $n))->assertNotFound();
+        $this->actingAs($this->user)->putJson(route('concursos.leis.notas.update', $n), ['texto' => 'Outra', 'tracos' => []])->assertOk()->assertJson(['texto' => 'Outra', 'tracos' => []]);
+        $this->actingAs($this->user)->deleteJson(route('concursos.leis.notas.destroy', $n))->assertOk();
+        $this->assertSame(2, LeiNota::count());
     }
 
     public function test_trocar_cor_e_apagar_grifo_so_do_dono(): void

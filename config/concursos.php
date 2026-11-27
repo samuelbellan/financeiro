@@ -63,10 +63,14 @@ return [
     ],
 
     'backup' => [
-        // Pasta sincronizada com o Google Drive onde o pg_dump diário é salvo.
+        // Pasta sincronizada com o Google Drive onde o pg_dump (de hora em hora, via backup:drive) é salvo.
         'dir' => env('CONCURSOS_BACKUP_DIR'),
+        // Retenção: os N mais recentes, depois 1 por dia por D dias e 1 por semana por S semanas.
+        'recentes' => (int) env('CONCURSOS_BACKUP_RECENTES', 24),
         'diarios' => (int) env('CONCURSOS_BACKUP_DIARIOS', 14),
         'semanais' => (int) env('CONCURSOS_BACKUP_SEMANAIS', 8),
+        // Banco onde o backup:testar restaura o dump toda semana (criado por scripts/backup-teste-setup.ps1).
+        'teste_db' => env('CONCURSOS_BACKUP_TESTE_DB', 'concursos_restauracao'),
         // Pasta do pg_dump.exe (vazio = usa o PATH).
         'pg_bin' => env('CONCURSOS_PG_BIN', 'C:\\Program Files\\PostgreSQL\\18\\bin'),
     ],

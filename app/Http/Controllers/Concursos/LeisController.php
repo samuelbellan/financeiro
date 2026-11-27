@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Concursos;
 use App\Http\Controllers\Controller;
 use App\Models\Concursos\LeiGrifo;
 use App\Models\Concursos\LeiMarca;
+use App\Models\Concursos\LeiNota;
 use App\Models\Concursos\Material;
 use App\Models\Concursos\MaterialCapitulo;
 use App\Models\Concursos\MaterialPonto;
@@ -79,6 +80,7 @@ class LeisController extends Controller
             'marcas' => LeiMarca::where('user_id', $request->user()->id)->where('lei', $lei)->get()->keyBy('ancora'),
             'capitulos' => $this->capitulosDoAluno($request->user()->id),
             'grifos' => $this->grifos($request->user()->id, $lei, $blocos, $acervo, $reancorador),
+            'notasPonto' => $this->notasPonto($request->user()->id, $lei, $blocos, $acervo, $reancorador),
         ]);
     }
 
@@ -94,6 +96,24 @@ class LeisController extends Controller
             if ($b['tipo'] === 'artigo' && $porAncora->has($b['ancora'])) {
                 $texto = Reancorador::textoDoHtml($acervo->mdParaHtml($b['md']));
                 $saida[$b['ancora']] = $reancorador->posicionar($texto, $porAncora[$b['ancora']]);
+            }
+        }
+
+        return $saida;
+    }
+
+    /** Notas num ponto do texto, reposicionadas: âncora → [{id, texto, tracos, altura, posicao}] (posicao null = fim do artigo). */
+    private function notasPonto(int $userId, string $lei, array $blocos, AcervoLeis $acervo, Reancorador $reancorador): array
+    {
+        $porAncora = LeiNota::where('user_id', $userId)->where('lei', $lei)->orderBy('id')->get()->groupBy('ancora');
+        if ($porAncora->isEmpty()) {
+            return [];
+        }
+        $saida = [];
+        foreach ($blocos as $b) {
+            if ($b['tipo'] === 'artigo' && $porAncora->has($b['ancora'])) {
+                $texto = Reancorador::textoDoHtml($acervo->mdParaHtml($b['md']));
+                $saida[$b['ancora']] = $porAncora[$b['ancora']]->map(fn ($n) => VadeMecumController::notaJson($n, $reancorador->localizarPonto($texto, $n->antes, $n->depois)))->all();
             }
         }
 

@@ -215,6 +215,8 @@ Route::middleware(['auth', 'modulos'])->group(function () {
         Route::get('/material/{material}/refazer', [\App\Http\Controllers\Concursos\RefazerController::class, 'index'])->whereNumber('material')->name('material.refazer');
         Route::post('/material/questoes/{questao}/responder', [\App\Http\Controllers\Concursos\RefazerController::class, 'responder'])->whereNumber('questao')->name('material.questoes.responder');
         Route::get('/material/questoes/{questao}/trechos', [\App\Http\Controllers\Concursos\RefazerController::class, 'trechos'])->whereNumber('questao')->name('material.questoes.trechos');
+        Route::get('/material/questoes/{questao}/comentario', [\App\Http\Controllers\Concursos\RefazerController::class, 'comentario'])->whereNumber('questao')->name('material.questoes.comentario');
+        Route::put('/material/questoes/{questao}/comentario', [\App\Http\Controllers\Concursos\RefazerController::class, 'salvarComentario'])->whereNumber('questao')->name('material.questoes.comentario.salvar');
         Route::post('/material/pontos/{ponto}/errei', [\App\Http\Controllers\Concursos\MaterialController::class, 'errei'])->whereNumber('ponto')->name('material.pontos.errei');
         Route::post('/material/pontos/{ponto}/status', [\App\Http\Controllers\Concursos\MaterialController::class, 'status'])->whereNumber('ponto')->name('material.pontos.status');
         Route::get('/legislacao', [\App\Http\Controllers\Concursos\LeisController::class, 'index'])->name('leis.index');
@@ -229,6 +231,9 @@ Route::middleware(['auth', 'modulos'])->group(function () {
         Route::post('/legislacao/{lei}/grifos/{ancora}', [\App\Http\Controllers\Concursos\VadeMecumController::class, 'grifar'])->where(['lei' => '[a-z][a-z0-9]*', 'ancora' => '(adct-)?art-\d+(-[a-z])?'])->name('leis.grifar');
         Route::patch('/legislacao/grifos/{grifo}', [\App\Http\Controllers\Concursos\VadeMecumController::class, 'recolorir'])->whereNumber('grifo')->name('leis.grifos.update');
         Route::delete('/legislacao/grifos/{grifo}', [\App\Http\Controllers\Concursos\VadeMecumController::class, 'desgrifar'])->whereNumber('grifo')->name('leis.grifos.destroy');
+        Route::post('/legislacao/{lei}/notas/{ancora}', [\App\Http\Controllers\Concursos\VadeMecumController::class, 'anotarPonto'])->where(['lei' => '[a-z][a-z0-9]*', 'ancora' => '(adct-)?art-\d+(-[a-z])?'])->name('leis.notas.store');
+        Route::put('/legislacao/notas/{nota}', [\App\Http\Controllers\Concursos\VadeMecumController::class, 'atualizarNotaPonto'])->whereNumber('nota')->name('leis.notas.update');
+        Route::delete('/legislacao/notas/{nota}', [\App\Http\Controllers\Concursos\VadeMecumController::class, 'apagarNotaPonto'])->whereNumber('nota')->name('leis.notas.destroy');
     });
 
     // Sistema - Estudo para Concursos (Questões, Simulados, Flashcards, Lei Seca e Edital)

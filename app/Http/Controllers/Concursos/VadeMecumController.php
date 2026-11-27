@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Concursos;
 use App\Http\Controllers\Controller;
 use App\Models\Concursos\LeiGrifo;
 use App\Models\Concursos\LeiMarca;
+use App\Models\Concursos\LeiNota;
 use App\Models\Concursos\MaterialCapitulo;
 use App\Models\Concursos\MaterialPonto;
 use App\Services\Concursos\Leis\AcervoLeis;
@@ -149,6 +150,63 @@ class VadeMecumController extends Controller
         $grifo->delete();
 
         return response()->json(['apagado' => true]);
+    }
+
+    /**
+     * Nota num ponto do artigo (ícone no texto que abre texto + tinta). O navegador manda a posição em
+     * caracteres do texto puro; o servidor guarda o contexto em volta para reposicionar depois.
+     */
+    public function anotarPonto(Request $request, string $lei, string $ancora, AcervoLeis $acervo, Reancorador $reancorador, Documento $documento): JsonResponse
+    {
+        $artigo = $this->artigoExiste($acervo, $lei, $ancora);
+        $dados = $request->validate(['posicao' => ['required', 'integer', 'min:0']] + $this->regrasNota());
+        $texto = Reancorador::textoDoHtml($acervo->mdParaHtml($artigo['md']));
+        abort_if($dados['posicao'] > mb_strlen($texto), 422, 'Ponto fora do artigo.');
+        $conteudo = $this->conteudoNota($dados, $documento);
+
+        $n = LeiNota::create(['user_id' => $request->user()->id, 'lei' => $lei, 'ancora' => $ancora] + $conteudo
+            + $reancorador->contexto($texto, $dados['posicao'], $dados['posicao']));
+
+        return response()->json($this->notaJson($n, $dados['posicao']));
+    }
+
+    public function atualizarNotaPonto(Request $request, LeiNota $nota, Documento $documento): JsonResponse
+    {
+        abort_unless($nota->user_id === $request->user()->id, 404);
+        $nota->update($this->conteudoNota($request->validate($this->regrasNota()), $documento));
+
+        return response()->json($this->notaJson($nota, null));
+    }
+
+    public function apagarNotaPonto(Request $request, LeiNota $nota): JsonResponse
+    {
+        abort_unless($nota->user_id === $request->user()->id, 404);
+        $nota->delete();
+
+        return response()->json(['apagado' => true]);
+    }
+
+    private function regrasNota(): array
+    {
+        return [
+            'texto' => ['nullable', 'string', 'max:5000'],
+            'tracos' => ['nullable', 'array', 'max:3000'],
+            'altura' => ['nullable', 'integer', 'min:0', 'max:6000'],
+        ];
+    }
+
+    /** Mesma limpeza da nota do livro (Documento::limparNotaPonto); vazia é recusada. */
+    private function conteudoNota(array $dados, Documento $documento): array
+    {
+        $limpo = $documento->limparNotaPonto(['id' => 'x', 'texto' => $dados['texto'] ?? '', 'tracos' => $dados['tracos'] ?? [], 'altura' => $dados['altura'] ?? 420]);
+        abort_if($limpo === null, 422, 'A nota está vazia.');
+
+        return ['texto' => $limpo['texto'], 'tracos' => $limpo['tracos'], 'altura' => $limpo['altura']];
+    }
+
+    public static function notaJson(LeiNota $n, ?int $posicao): array
+    {
+        return ['id' => $n->id, 'texto' => (string) $n->texto, 'tracos' => $n->tracos ?? [], 'altura' => $n->altura, 'posicao' => $posicao];
     }
 
     /** @return array{lei: string, ancora: string, rotulo: string, md: string} */

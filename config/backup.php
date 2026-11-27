@@ -16,4 +16,7 @@ return [
     'recentes' => (int) env('BACKUP_DRIVE_RECENTES', 24),
     'diarios' => (int) env('BACKUP_DRIVE_DIARIOS', 14),
     'semanais' => (int) env('BACKUP_DRIVE_SEMANAIS', 8),
+
+    // backup:conferir (a cada 3 h): cópia mais nova com mais que isto conta como atraso.
+    'atraso_horas' => (float) env('BACKUP_ATRASO_HORAS', 3),
 ];
