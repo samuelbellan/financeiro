@@ -195,6 +195,7 @@ Route::middleware(['auth', 'modulos'])->group(function () {
         // Material de resumo (cadernos de erros) e lei seca do acervo ctresb/leis
         Route::get('/material', [\App\Http\Controllers\Concursos\MaterialController::class, 'index'])->name('material.index');
         Route::post('/material', [\App\Http\Controllers\Concursos\MaterialController::class, 'store'])->name('material.store');
+        Route::get('/revisoes', [\App\Http\Controllers\Concursos\MaterialController::class, 'revisoes'])->name('revisoes');
         // Material de resumo como livro: capítulos, editor visual, notas na margem e imagens.
         Route::get('/material/{material}', [\App\Http\Controllers\Concursos\LivroController::class, 'show'])->whereNumber('material')->name('material.show');
         Route::get('/material/{material}/capitulos/{capitulo}', [\App\Http\Controllers\Concursos\LivroController::class, 'capitulo'])->whereNumber(['material', 'capitulo'])->name('material.capitulo');

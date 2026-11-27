@@ -45,6 +45,7 @@ class RefazerController extends Controller
             'ordem' => ['nullable', Rule::in(['caderno', 'aleatoria'])],
             'qtd' => ['nullable', 'integer', 'min:1', 'max:200'],
             'ids' => ['nullable', 'string', 'max:4000'], // questões de um grifo do resumo
+            'tec' => ['nullable', 'string', 'max:8000'], // números do TEC (selo "N questões" de uma seção do resumo)
         ]) + ['situacao' => 'fila', 'ordem' => 'caderno', 'qtd' => 20];
 
         $todas = MaterialQuestao::with(['secao', 'ponto', 'capitulo', 'ultimaTentativa'])
@@ -55,6 +56,7 @@ class RefazerController extends Controller
 
         $filtradas = $todas
             ->when($f['ids'] ?? null, fn ($c, $ids) => $c->whereIn('id', array_map('intval', explode(',', $ids))))
+            ->when($f['tec'] ?? null, fn ($c, $tec) => $c->whereIn('id_externo', explode(',', $tec)))
             ->when($f['secao'] ?? null, fn ($c, $s) => $c->where('secao_id', $s))
             ->when($f['ponto'] ?? null, fn ($c, $p) => $c->where('ponto_id', $p))
             ->when($f['capitulo'] ?? null, fn ($c, $cap) => $c->whereIn('capitulo_id', $this->comSubcapitulos($material, (int) $cap)))

@@ -2,6 +2,11 @@
 
 @section('title', 'Questões · ' . $material->titulo)
 
+{{-- ?embed=1: dentro do modal do resumo, sem menu nem cabeçalho (o modal já mostra a seção). --}}
+@if (request()->boolean('embed'))
+    @section('semmenu', '1')
+@endif
+
 @section('css')
     .cab { display: flex; gap: 12px; align-items: baseline; flex-wrap: wrap; margin-bottom: 12px; }
     .cab h1 { font-size: 22px; margin: 0; flex: 1; }
@@ -24,9 +29,17 @@
     .opt:hover:not(:disabled) { border-color: var(--accent); }
     .opt .l { font-weight: 700; min-width: 20px; }
     .opt:disabled { cursor: default; }
-    .opt.certa { border-color: var(--ok); background: var(--ok-soft); }
-    .opt.marcada-errada { border-color: var(--no); background: var(--no-soft); }
-    .res { border-radius: 10px; padding: 10px 14px; margin: 14px 0 10px; font-weight: 700; }
+    .opt { transition: border-color .15s, background-color .2s, transform .12s var(--mola), opacity .2s; }
+    .opt:active:not(:disabled) { transform: scale(.985); }
+    .opt.certa { border-color: var(--ok); background: var(--ok-soft); animation: pulso-ok .5s var(--mola); }
+    .opt.marcada-errada { border-color: var(--no); background: var(--no-soft); animation: tremer .38s; }
+    .opt:disabled:not(.certa):not(.marcada-errada) { opacity: .6; }
+    @keyframes pulso-ok { 40% { transform: scale(1.015); box-shadow: 0 0 0 4px color-mix(in srgb, var(--ok) 25%, transparent); } }
+    @keyframes tremer { 20%, 60% { transform: translateX(-4px); } 40%, 80% { transform: translateX(4px); } }
+    .res { border-radius: 10px; padding: 10px 14px; margin: 14px 0 10px; font-weight: 700; animation: surgir .3s var(--mola); }
+    .res.ok::before { content: '✓'; display: inline-grid; place-items: center; width: 20px; height: 20px; margin-right: 8px; border-radius: 50%; background: var(--ok); color: #fff; font-size: 12px; animation: carimbo .45s var(--mola); }
+    @keyframes carimbo { from { transform: scale(0) rotate(-30deg); } }
+    .entrando { animation: surgir .3s var(--mola); }
     .res.ok { background: var(--ok-soft); color: var(--ok); }
     .res.no { background: var(--no-soft); color: var(--no); }
     .bloco { display: grid; grid-template-columns: 104px 1fr; gap: 4px 12px; margin: 6px 0; font-size: 15px; }
@@ -69,9 +82,16 @@
 @endsection
 
 @section('content')
+@if (request()->boolean('embed'))
+    <style>.wrap { padding-top: 12px; } .cab, nav.abas { display: none; }</style>
+    <script>
+        // Links que saem das questões (ex.: "ver no livro") abrem na página de fora, não dentro do modal.
+        document.addEventListener('click', e => { const a = e.target.closest('a[href]'); if (a && !a.pathname.endsWith('/refazer')) a.target = '_top'; });
+    </script>
+@endif
 <div class="cab">
     <h1>{{ $material->titulo }}</h1>
-    <a href="{{ route('concursos.material.index') }}">← Matérias</a>
+    <a href="{{ route('concursos.revisoes') }}">← Revisões</a>
 </div>
 <nav class="abas">
     <a href="{{ route('concursos.material.show', $material) }}">Resumo</a>
@@ -271,6 +291,7 @@
             meta.append(s);
         });
         $('[data-enun]').textContent = q.enunciado;
+        const quiz = $('#quiz'); quiz?.classList.remove('entrando'); void quiz?.offsetWidth; quiz?.classList.add('entrando');
         const opts = $('[data-opts]');
         opts.replaceChildren(...q.alternativas.map(a => {
             const b = document.createElement('button');
@@ -301,6 +322,8 @@
         });
         const res = $('[data-res]');
         const nome = x => q.tipo === 'CE' ? (x === 'C' ? 'Certo' : 'Errado') : x;
+        res.className = 'res';
+        void res.offsetWidth; // reinicia a animação de entrada
         res.className = 'res ' + (r.acertou ? 'ok' : 'no');
         res.textContent = r.acertou ? `Acertou! Gabarito: ${nome(r.gabarito)}` : `Errou. Você marcou ${nome(letra)}; o gabarito é ${nome(r.gabarito)}.`;
         $('[data-caixa]').textContent = r.caixa ?? '';
